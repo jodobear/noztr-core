@@ -21,6 +21,8 @@ Use one prompt per phase. Do not combine phases in one run.
 - Complete the current phase exit criteria before moving on.
 - Keep outputs phase-local. Avoid writing future-phase documents early.
 - Keep all outputs under `docs/`.
+- Pre-v1 broad studies are reference-only inputs.
+- v1 artifacts are canonical working outputs for downstream phases.
 - Every phase output must include these sections:
   - `Decisions`
   - `Tradeoffs`

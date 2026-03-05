@@ -109,3 +109,75 @@ Immutable record of accepted planning decisions.
   `A-B-009` resolved, `A-B-010` resolved, `A-B-011` resolved.
 - Decision-Needed Count (High Impact): 0
 - Owner: active phase owner
+
+### PC1-E-001: Phase C1 closure record
+
+- Phase: C1
+- Closure Date: 2026-03-05
+- Gate Result: pass
+- Ambiguity Snapshot: `A-C1-001` resolved, `A-C1-002` resolved, `A-C1-003` accepted-risk.
+- Decision-Needed Count (High Impact): 0
+- Owner: active phase owner
+
+### PC2-E-001: Phase C2 closure record
+
+- Phase: C2
+- Closure Date: 2026-03-05
+- Gate Result: pass
+- Ambiguity Snapshot: `A-C2-001` resolved, `A-C2-002` resolved, `A-C2-003` accepted-risk.
+- Decision-Needed Count (High Impact): 0
+- Owner: active phase owner
+
+### PC3-E-001: Phase C3 closure record
+
+- Phase: C3
+- Closure Date: 2026-03-05
+- Gate Result: pass
+- Ambiguity Snapshot: `A-C3-001` resolved, `A-C3-002` resolved, `A-C3-003` accepted-risk.
+- Decision-Needed Count (High Impact): 0
+- Owner: active phase owner
+
+### PC0-E-001: Phase C0 closure record
+
+- Phase: C0
+- Closure Date: 2026-03-05
+- Gate Result: pass
+- Ambiguity Snapshot: `A-C0-001` accepted-risk, `A-C0-002` accepted-risk, `A-C0-003` resolved.
+- Decision-Needed Count (High Impact): 0
+- Owner: active phase owner
+
+### PC4-E-001: Phase C4 closure record
+
+- Phase: C4
+- Closure Date: 2026-03-05
+- Gate Result: pass
+- Ambiguity Snapshot: `A-C4-001` accepted-risk, `A-C4-002` accepted-risk, `A-C4-003` resolved.
+- Decision-Needed Count (High Impact): 0
+- Owner: active phase owner
+
+### PD-E-001: Phase D closure record
+
+- Phase: D
+- Closure Date: 2026-03-05
+- Gate Result: pass
+- Ambiguity Snapshot: `A-D-001` accepted-risk, `A-D-002` accepted-risk, `A-D-003` resolved.
+- Decision-Needed Count (High Impact): 0
+- Owner: active phase owner
+
+### PE-E-001: Phase E closure record
+
+- Phase: E
+- Closure Date: 2026-03-05
+- Gate Result: pass
+- Ambiguity Snapshot: `A-E-001` accepted-risk, `A-E-002` accepted-risk, `A-E-003` accepted-risk.
+- Decision-Needed Count (High Impact): 0
+- Owner: active phase owner
+
+### PF-E-001: Phase F closure record
+
+- Phase: F
+- Closure Date: 2026-03-05
+- Gate Result: pass
+- Ambiguity Snapshot: `A-F-001` accepted-risk, `A-F-002` accepted-risk, `A-F-003` resolved.
+- Decision-Needed Count (High Impact): 0
+- Owner: active phase owner

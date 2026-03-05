@@ -4,11 +4,11 @@ This handoff captures the current documentation status and immediate direction f
 
 ## Current Phase Status
 
-- Phase B: closed.
-- Closure basis: `docs/research/v1-protocol-reference.md` completed with per-NIP canonical
-  acceptance/failure criteria, interaction matrix, strictness tradeoffs, and ambiguity checkpoint
-  (high-impact decision-needed count 0).
-- Next phase target: Phase C1 (`docs/research/v1-applesauce-deep-study.md`).
+- Phase F: closed.
+- Closure basis: implementation kickoff artifact finalized (`docs/plans/implementation-kickoff.md`) and
+  closure evidence recorded in `docs/plans/decision-log.md` (`PF-E-001`) with high-impact
+  decision-needed count 0.
+- Next phase target: Implementation Phase I0 start (coding begins in `src/`).
 
 ## Completed Tasks
 
@@ -29,6 +29,9 @@ This handoff captures the current documentation status and immediate direction f
 - Split implementation study into C1/C2/C3 deep studies plus C4 synthesis.
 - Added frozen defaults baseline in `docs/plans/nostr-principles.md`.
 - Added immutable decision records in `docs/plans/decision-log.md`.
+- Codified artifact categorization policy:
+  pre-v1 broad studies are reference-only, v1 artifacts are canonical,
+  and `docs/plans/build-plan.md` is a working baseline until Phase E finalization.
 - Finalized Phase 0 principles artifact in `docs/plans/nostr-principles.md`:
   - one-line enforceable rules and rationale for `P01`..`P06`
   - anti-goals and forbidden shortcuts
@@ -50,25 +53,54 @@ This handoff captures the current documentation status and immediate direction f
   - created `docs/research/v1-protocol-reference.md` for selected H1 NIPs only
   - recorded strictness-vs-compatibility tradeoff decisions for material policy choices
   - recorded Phase B closure evidence in `docs/plans/decision-log.md`
+- Completed Phase C1 applesauce deep study artifact:
+  - created `docs/research/v1-applesauce-deep-study.md` scoped to v1-selected H1 NIPs and
+    build-plan modules
+  - recorded Phase C1 closure evidence in `docs/plans/decision-log.md`
+- Completed Phase C2 rust-nostr deep study artifact:
+  - created `docs/research/v1-rust-nostr-deep-study.md` scoped to v1-selected H1 NIPs and
+  build-plan modules
+  - recorded Phase C2 closure evidence in `docs/plans/decision-log.md`
+- Completed Phase C3 libnostr-z deep study artifact:
+  - created `docs/research/v1-libnostr-z-deep-study.md` scoped to v1-selected H1 NIPs and
+    build-plan modules
+  - recorded Phase C3 closure evidence in `docs/plans/decision-log.md`
+- Completed Phase C0 Zig language study artifacts:
+  - refreshed `docs/guides/zig-patterns.md` for v1-scoped module-safe patterns
+  - created `docs/guides/zig-anti-patterns.md` with footgun-safe replacements
+  - created `docs/research/v1-zig-implementation-notes.md` with C1/C2/C3 translation notes,
+    coding-agent review checklist, tradeoffs, and ambiguity checkpoint
+  - recorded Phase C0 closure evidence in `docs/plans/decision-log.md`
 - Completed additional NIP scope planning addendum:
   - created `docs/plans/v1-additional-nips-roadmap.md` with user-requested Group A/B/C
     classifications and H2/H3 wave sequencing
   - captured NIP-41 provisional comparison between PR `#829` (`41.md`, kinds 1776/1777) and PR
     `#1056` draft direction
+- Completed Phase C4 implementation synthesis artifact:
+  - created `docs/research/v1-implementation-decisions.md` with final module decision matrix,
+    conflict resolutions, risk/mitigation register, and ambiguity checkpoint
+  - recorded Phase C4 closure evidence in `docs/plans/decision-log.md`
+- Completed Phase D contracts and vectors artifact:
+  - created `docs/plans/v1-api-contracts.md` with implementation-ready module contracts,
+    deterministic behavior rules, assertion pairs, and vector requirements
+  - recorded Phase D closure evidence in `docs/plans/decision-log.md`
+- Completed Phase E build-plan finalization artifact:
+  - finalized `docs/plans/build-plan.md` as implementation-executable phase schedule aligned to
+    v1 contracts and implementation decisions
+  - recorded Phase E closure evidence in `docs/plans/decision-log.md`
+- Completed Phase F implementation handoff artifact:
+  - created `docs/plans/implementation-kickoff.md` with implementation-ready I0/I1 coding steps,
+    exact file targets, verification cadence, tradeoffs, open questions, and stop conditions
+  - recorded Phase F closure evidence in `docs/plans/decision-log.md`
 
 ## Pending Actions
 
-- Create `docs/research/v1-applesauce-deep-study.md` (Phase C1).
-- Create `docs/research/v1-rust-nostr-deep-study.md` (Phase C2).
-- Create `docs/research/v1-libnostr-z-deep-study.md` (Phase C3).
-- Create `docs/research/v1-zig-implementation-notes.md` (Phase C0).
-- Refresh `docs/guides/zig-patterns.md` for v1 scope (Phase C0).
-- Create `docs/guides/zig-anti-patterns.md` (Phase C0).
-- Create `docs/research/v1-implementation-decisions.md` (Phase C4).
-- Create `docs/plans/v1-api-contracts.md` (Phase D).
-- Create `docs/plans/implementation-kickoff.md` (Phase F handoff).
-- Fold accepted items from `docs/plans/v1-additional-nips-roadmap.md` into Phase C4 synthesis
-  decisions and Phase D contract planning inputs.
+- Execute Implementation Phase I0 coding in `src/` and `build.zig` per
+  `docs/plans/implementation-kickoff.md`.
+- Execute Implementation Phase I1 coding (`src/nip01_event.zig`, `src/nip01_filter.zig`) and enforce
+  vector/error forcing gates.
+- Maintain verification cadence: run `zig build test --summary all` after each material change and
+  `zig build` at slice closure.
 
 ## Key Decisions Made
 
@@ -95,6 +127,8 @@ This handoff captures the current documentation status and immediate direction f
   - `docs/plans/nostr-principles.md`
   - `docs/plans/decision-log.md`
   - `docs/plans/v1-scope.md`
+  - `docs/plans/v1-api-contracts.md`
+  - `docs/research/v1-implementation-decisions.md`
   - `docs/plans/prompts/README.md`
   - `docs/plans/prompts/phase-0-philosophy-and-principles.md`
   - `docs/plans/prompts/phase-a-scope-freeze.md`
@@ -124,6 +158,8 @@ This handoff captures the current documentation status and immediate direction f
 ## Next Steps To Continue
 
 - Run `./agent-brief` and verify prompt artifact status.
-- Execute Phase C1 prompt and publish `docs/research/v1-applesauce-deep-study.md`.
-- Advance phases in order through `docs/plans/prompts/` only after phase exit criteria are met.
+- Start Implementation Phase I0 using `docs/plans/implementation-kickoff.md` and complete its gate.
+- Start Implementation Phase I1 after I0 pass, including required `5 valid + 5 invalid` vector floors
+  for `nip01_event` and `nip01_filter`.
+- Continue implementation phases in build-plan order and close each slice only after gate commands pass.
 - Keep `applesauce` as comparative context only when evaluating API ergonomics and developer UX.

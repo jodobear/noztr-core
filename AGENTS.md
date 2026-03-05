@@ -16,6 +16,14 @@ Pure Zig Nostr protocol library. Zero external dependencies — Zig stdlib only.
   - `docs/plans/prompts/README.md`
 - Work in phase order. Do not skip phase gates.
 
+## Artifact Authority
+
+- Pre-v1 broad studies are reference-only inputs and do not set policy defaults.
+- v1 artifacts are canonical working outputs for downstream phases.
+- `docs/plans/build-plan.md` is a working baseline until Phase E finalization.
+- Precedence on conflict: `docs/plans/nostr-principles.md` and
+  `docs/plans/decision-log.md` > v1 artifacts > pre-v1 broad studies.
+
 ## Build & Test
 
 ```bash
