@@ -6,16 +6,11 @@ pub const limits = @import("limits.zig");
 /// Strict-by-default typed errors used by v1 module contracts.
 pub const errors = @import("errors.zig");
 
-/// I0 placeholder export for Phase D `nip01_event` contract namespace.
-pub const nip01_event = struct {
-    pub const EventParseError = errors.EventParseError;
-    pub const EventVerifyError = errors.EventVerifyError;
-};
+/// Phase I1 concrete export for the NIP-01 event module.
+pub const nip01_event = @import("nip01_event.zig");
 
-/// I0 placeholder export for Phase D `nip01_filter` contract namespace.
-pub const nip01_filter = struct {
-    pub const FilterParseError = errors.FilterParseError;
-};
+/// Phase I1 concrete export for the NIP-01 filter module.
+pub const nip01_filter = @import("nip01_filter.zig");
 
 fn use_typed_error_for_smoke(fail: bool) errors.EventVerifyError!void {
     std.debug.assert(fail);
