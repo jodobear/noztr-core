@@ -1,0 +1,12 @@
+.{
+    .name = .noztr,
+    .version = "0.15.2",
+    .dependencies = .{
+        .secp256k1 = .{
+            .url = "git+https://github.com/zig-bitcoin/libsecp256k1-zig.git?ref=main#b96922b375a601f3303bf43be1dceb3d101df6c6",
+            .hash = "secp256k1-0.0.0-AAAAAPPgAAADPOkS7brnO1B26LjbhZsxwz6Kx8a6jCwB",
+        },
+    },
+    .paths = .{""},
+    .fingerprint = 0x2f5b98005e4cd8cb,
+}

@@ -540,14 +540,21 @@ test "event parse json accepts minimal required fields" {
 test "event verify signature routes through boundary module" {
     var event = Event{
         .id = [_]u8{0} ** 32,
-        .pubkey = [_]u8{7} ** 32,
+        .pubkey = [_]u8{0} ** 32,
         .sig = [_]u8{0} ** 64,
         .kind = 1,
         .created_at = 42,
         .content = "hello",
     };
-    event.id = event_compute_id(&event);
-    event.sig[0] = event.id[0];
+    _ = try std.fmt.hexToBytes(
+        &event.pubkey,
+        "F9308A019258C31049344F85F89D5229B531C845836F99B08601F113BCE036F9",
+    );
+    _ = try std.fmt.hexToBytes(
+        &event.sig,
+        "E907831F80848D1069A5371B402410364BDF1C5F8307B0084C55F1CE2DCA8215" ++
+            "25F66A4A85EA8B71E482A74F382D2CE5EBEEE8FDB2172F477DF4900D310536C0",
+    );
 
     secp256k1_backend.reset_counters();
     try event_verify_signature(&event);
@@ -566,6 +573,10 @@ test "event typed errors are forceable through public paths" {
         .created_at = 1,
         .content = "x",
     };
+    _ = try std.fmt.hexToBytes(
+        &event.pubkey,
+        "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC30",
+    );
     event.sig[0] = 1;
 
     var arena = std.heap.ArenaAllocator.init(std.testing.allocator);
