@@ -1,4 +1,5 @@
 const std = @import("std");
+const limits = @import("limits.zig");
 const nip01_event = @import("nip01_event.zig");
 
 /// Typed failures for strict NIP-13 PoW parsing and validation.
@@ -8,6 +9,9 @@ pub const PowError = error{
     InvalidNonceCounter,
     InvalidNonceCommitment,
 };
+
+/// Typed failures for PoW checks that must first verify event id integrity.
+pub const PowVerifiedIdError = PowError || error{InvalidId};
 
 /// Counts leading zero bits in a 32-byte event id.
 pub fn pow_leading_zero_bits(id: *const [32]u8) u16 {
@@ -38,11 +42,11 @@ pub fn pow_leading_zero_bits(id: *const [32]u8) u16 {
 /// Extracts optional committed nonce difficulty from a strict nonce tag.
 pub fn pow_extract_nonce_target(event: *const nip01_event.Event) PowError!?u16 {
     std.debug.assert(@intFromPtr(event) != 0);
-    std.debug.assert(event.tags.len <= std.math.maxInt(u16));
+    std.debug.assert(event.id.len == 32);
 
     var found_nonce = false;
     var nonce_target: ?u16 = null;
-    var tag_index: u16 = 0;
+    var tag_index: usize = 0;
     while (tag_index < event.tags.len) : (tag_index += 1) {
         const tag = event.tags[tag_index];
         if (tag.items.len == 0) {
@@ -75,7 +79,7 @@ pub fn pow_extract_nonce_target(event: *const nip01_event.Event) PowError!?u16 {
 /// Validates nonce-tag shape and compares event id difficulty against the required threshold.
 pub fn pow_meets_difficulty(event: *const nip01_event.Event, required_bits: u16) PowError!bool {
     std.debug.assert(@intFromPtr(event) != 0);
-    std.debug.assert(required_bits <= std.math.maxInt(u16));
+    std.debug.assert(event.id.len == 32);
 
     if (required_bits > 256) {
         return error.DifficultyOutOfRange;
@@ -90,10 +94,32 @@ pub fn pow_meets_difficulty(event: *const nip01_event.Event, required_bits: u16)
     return leading_zero_bits >= required_bits;
 }
 
+/// Verifies event id integrity first, then checks PoW difficulty with strict nonce validation.
+pub fn pow_meets_difficulty_verified_id(
+    event: *const nip01_event.Event,
+    required_bits: u16,
+) PowVerifiedIdError!bool {
+    std.debug.assert(@intFromPtr(event) != 0);
+    std.debug.assert(event.id.len == 32);
+
+    if (!event_shape_is_valid_for_id_verify(event)) {
+        return error.InvalidId;
+    }
+
+    nip01_event.event_verify_id(event) catch {
+        return error.InvalidId;
+    };
+
+    return pow_meets_difficulty(event, required_bits);
+}
+
 fn parse_nonce_counter(counter_text: []const u8) PowError!void {
-    std.debug.assert(counter_text.len <= std.math.maxInt(u16));
+    std.debug.assert(counter_text.len <= std.math.maxInt(usize));
     std.debug.assert(@sizeOf(u64) == 8);
 
+    if (counter_text.len > std.math.maxInt(u16)) {
+        return error.InvalidNonceCounter;
+    }
     if (counter_text.len == 0) {
         return error.InvalidNonceCounter;
     }
@@ -103,9 +129,12 @@ fn parse_nonce_counter(counter_text: []const u8) PowError!void {
 }
 
 fn parse_nonce_target(target_text: []const u8) PowError!u16 {
-    std.debug.assert(target_text.len <= std.math.maxInt(u16));
+    std.debug.assert(target_text.len <= std.math.maxInt(usize));
     std.debug.assert(@sizeOf(u16) == 2);
 
+    if (target_text.len > std.math.maxInt(u16)) {
+        return error.InvalidNonceCommitment;
+    }
     if (target_text.len == 0) {
         return error.InvalidNonceCommitment;
     }
@@ -120,9 +149,9 @@ fn parse_nonce_target(target_text: []const u8) PowError!u16 {
 
 fn event_has_nonce_tag(event: *const nip01_event.Event) bool {
     std.debug.assert(@intFromPtr(event) != 0);
-    std.debug.assert(event.tags.len <= std.math.maxInt(u16));
+    std.debug.assert(event.id.len == 32);
 
-    var tag_index: u16 = 0;
+    var tag_index: usize = 0;
     while (tag_index < event.tags.len) : (tag_index += 1) {
         const tag = event.tags[tag_index];
         if (tag.items.len == 0) {
@@ -133,6 +162,36 @@ fn event_has_nonce_tag(event: *const nip01_event.Event) bool {
         }
     }
     return false;
+}
+
+fn event_shape_is_valid_for_id_verify(event: *const nip01_event.Event) bool {
+    std.debug.assert(@intFromPtr(event) != 0);
+    std.debug.assert(limits.tags_max > 0);
+
+    if (event.content.len > limits.content_bytes_max) {
+        return false;
+    }
+    if (event.tags.len > limits.tags_max) {
+        return false;
+    }
+
+    var tag_index: usize = 0;
+    while (tag_index < event.tags.len) : (tag_index += 1) {
+        const tag = event.tags[tag_index];
+        if (tag.items.len > limits.tag_items_max) {
+            return false;
+        }
+
+        var item_index: usize = 0;
+        while (item_index < tag.items.len) : (item_index += 1) {
+            const tag_item = tag.items[item_index];
+            if (tag_item.len > limits.tag_item_bytes_max) {
+                return false;
+            }
+        }
+    }
+
+    return true;
 }
 
 fn test_event(id: [32]u8, tags: []const nip01_event.EventTag) nip01_event.Event {
@@ -275,4 +334,92 @@ test "pow duplicate nonce tags are rejected as malformed shape" {
 
     try std.testing.expectError(error.InvalidNonceTag, pow_extract_nonce_target(&event));
     try std.testing.expectError(error.InvalidNonceTag, pow_meets_difficulty(&event, 1));
+}
+
+test "pow verified-id wrapper accepts valid id path" {
+    const nonce_items = [_][]const u8{ "nonce", "200" };
+    const tags = [_]nip01_event.EventTag{.{ .items = nonce_items[0..] }};
+
+    var event = test_event([_]u8{0} ** 32, tags[0..]);
+    event.id = nip01_event.event_compute_id(&event);
+
+    try std.testing.expect(try pow_meets_difficulty_verified_id(&event, 0));
+}
+
+test "pow verified-id wrapper rejects invalid event id before pow check" {
+    const nonce_items = [_][]const u8{ "nonce", "201" };
+    const tags = [_]nip01_event.EventTag{.{ .items = nonce_items[0..] }};
+
+    var event = test_event([_]u8{0} ** 32, tags[0..]);
+    event.id = nip01_event.event_compute_id(&event);
+    event.id[0] ^= 0x01;
+
+    try std.testing.expectError(error.InvalidId, pow_meets_difficulty_verified_id(&event, 0));
+}
+
+test "pow verified-id wrapper preserves existing pow errors" {
+    const nonce_bad_counter = [_][]const u8{ "nonce", "not-a-number" };
+    const tags = [_]nip01_event.EventTag{.{ .items = nonce_bad_counter[0..] }};
+
+    var event = test_event([_]u8{0} ** 32, tags[0..]);
+    event.id = nip01_event.event_compute_id(&event);
+
+    try std.testing.expectError(
+        error.InvalidNonceCounter,
+        pow_meets_difficulty_verified_id(&event, 1),
+    );
+}
+
+test "pow oversized nonce counter and target lengths return typed errors" {
+    const one_digit = [_]u8{'1'};
+    const oversized_text_ptr: [*]const u8 = @ptrCast(one_digit[0..].ptr);
+    const oversized_text = oversized_text_ptr[0 .. @as(usize, std.math.maxInt(u16)) + 1];
+
+    const nonce_counter_oversized = [_][]const u8{ "nonce", oversized_text };
+    const nonce_target_oversized = [_][]const u8{ "nonce", "1", oversized_text };
+
+    const tags_counter = [_]nip01_event.EventTag{.{ .items = nonce_counter_oversized[0..] }};
+    const tags_target = [_]nip01_event.EventTag{.{ .items = nonce_target_oversized[0..] }};
+
+    const event_counter = test_event([_]u8{0} ** 32, tags_counter[0..]);
+    const event_target = test_event([_]u8{0} ** 32, tags_target[0..]);
+
+    try std.testing.expectError(error.InvalidNonceCounter, pow_extract_nonce_target(&event_counter));
+    try std.testing.expectError(error.InvalidNonceCommitment, pow_extract_nonce_target(&event_target));
+}
+
+test "pow verified-id wrapper preflight rejects malformed in-memory event shape" {
+    const nonce_items = [_][]const u8{ "nonce", "9" };
+    const tags = [_]nip01_event.EventTag{.{ .items = nonce_items[0..] }};
+
+    var oversized_content_bytes = [_]u8{'x'} ** (limits.content_bytes_max + 1);
+    var event_bad_content = test_event([_]u8{0} ** 32, tags[0..]);
+    event_bad_content.content = oversized_content_bytes[0..];
+
+    try std.testing.expectError(
+        error.InvalidId,
+        pow_meets_difficulty_verified_id(&event_bad_content, 0),
+    );
+
+    const oversized_tags_ptr: [*]const nip01_event.EventTag = @ptrCast(tags[0..].ptr);
+    const oversized_tags = oversized_tags_ptr[0 .. @as(usize, limits.tags_max) + 1];
+    const event_bad_tags = test_event([_]u8{0} ** 32, oversized_tags);
+
+    try std.testing.expectError(
+        error.InvalidId,
+        pow_meets_difficulty_verified_id(&event_bad_tags, 0),
+    );
+
+    const one_byte = [_]u8{'x'};
+    const oversized_tag_item_ptr: [*]const u8 = @ptrCast(one_byte[0..].ptr);
+    const oversized_tag_item =
+        oversized_tag_item_ptr[0 .. @as(usize, limits.tag_item_bytes_max) + 1];
+    const nonce_oversized_item = [_][]const u8{ "nonce", oversized_tag_item };
+    const oversized_item_tags = [_]nip01_event.EventTag{.{ .items = nonce_oversized_item[0..] }};
+    const event_bad_tag_item = test_event([_]u8{0} ** 32, oversized_item_tags[0..]);
+
+    try std.testing.expectError(
+        error.InvalidId,
+        pow_meets_difficulty_verified_id(&event_bad_tag_item, 0),
+    );
 }

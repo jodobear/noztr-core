@@ -28,58 +28,45 @@ pub const Filter = struct {
     tag_conditions: []const FilterTagCondition = &.{},
 };
 
-pub fn filter_parse_json(input: []const u8, scratch: std.mem.Allocator) FilterParseError!Filter {
-    std.debug.assert(input.len <= limits.event_json_max + 1);
+/// Parse a filter from a JSON value tree and copy owned fields into `scratch`.
+pub fn filter_parse_value(
+    value: std.json.Value,
+    scratch: std.mem.Allocator,
+) FilterParseError!Filter {
+    std.debug.assert(@sizeOf(std.json.Value) > 0);
     std.debug.assert(@intFromPtr(scratch.ptr) != 0);
 
-    if (input.len > limits.event_json_max) {
-        return error.InputTooLong;
-    }
-
-    if (input.len == 0) {
-        return error.InvalidFilter;
-    }
-
-    const root = std.json.parseFromSliceLeaky(
-        std.json.Value,
-        scratch,
-        input,
-        .{},
-    ) catch |parse_error| {
-        return map_filter_json_parse_error(parse_error);
-    };
-
-    if (root != .object) {
+    if (value != .object) {
         return error.InvalidFilter;
     }
 
     var filter = Filter{};
     var tag_conditions_temp: [256]FilterTagCondition = undefined;
     var tag_conditions_count: u16 = 0;
-    var iterator = root.object.iterator();
+    var iterator = value.object.iterator();
     while (iterator.next()) |entry| {
         const key = entry.key_ptr.*;
-        const value = entry.value_ptr.*;
+        const item_value = entry.value_ptr.*;
 
         if (std.mem.eql(u8, key, "ids")) {
-            try parse_filter_ids(&filter, value);
+            try parse_filter_ids(&filter, item_value);
         } else if (std.mem.eql(u8, key, "authors")) {
-            try parse_filter_authors(&filter, value);
+            try parse_filter_authors(&filter, item_value);
         } else if (std.mem.eql(u8, key, "kinds")) {
-            try parse_filter_kinds(&filter, value);
+            try parse_filter_kinds(&filter, item_value);
         } else if (std.mem.eql(u8, key, "since")) {
-            filter.since = try parse_filter_u64(value);
+            filter.since = try parse_filter_u64(item_value);
         } else if (std.mem.eql(u8, key, "until")) {
-            filter.until = try parse_filter_u64(value);
+            filter.until = try parse_filter_u64(item_value);
         } else if (std.mem.eql(u8, key, "limit")) {
-            filter.limit = try parse_filter_u16(value);
+            filter.limit = try parse_filter_u16(item_value);
         } else {
             const tag_key = try parse_filter_tag_key(key);
             if (tag_conditions_count == 256) {
                 return error.InvalidTagKey;
             }
 
-            const values = try parse_filter_tag_values(value, scratch);
+            const values = try parse_filter_tag_values(item_value, scratch);
             tag_conditions_temp[tag_conditions_count] = .{ .key = tag_key, .values = values };
             tag_conditions_count += 1;
         }
@@ -97,6 +84,33 @@ pub fn filter_parse_json(input: []const u8, scratch: std.mem.Allocator) FilterPa
     }
 
     return filter;
+}
+
+pub fn filter_parse_json(input: []const u8, scratch: std.mem.Allocator) FilterParseError!Filter {
+    std.debug.assert(input.len <= limits.event_json_max + 1);
+    std.debug.assert(@intFromPtr(scratch.ptr) != 0);
+
+    if (input.len > limits.event_json_max) {
+        return error.InputTooLong;
+    }
+
+    if (input.len == 0) {
+        return error.InvalidFilter;
+    }
+
+    var parse_arena = std.heap.ArenaAllocator.init(std.heap.page_allocator);
+    defer parse_arena.deinit();
+
+    const root = std.json.parseFromSliceLeaky(
+        std.json.Value,
+        parse_arena.allocator(),
+        input,
+        .{},
+    ) catch |parse_error| {
+        return map_filter_json_parse_error(parse_error);
+    };
+
+    return filter_parse_value(root, scratch);
 }
 
 pub fn filter_matches_event(filter: *const Filter, event: *const nip01_event.Event) bool {
@@ -259,7 +273,13 @@ fn parse_filter_tag_key(key: []const u8) FilterParseError!u8 {
         return error.InvalidTagKey;
     }
 
-    return key[1];
+    const tag_key = key[1];
+    const is_lower_ascii = tag_key >= 'a' and tag_key <= 'z';
+    if (!is_lower_ascii) {
+        return error.InvalidTagKey;
+    }
+
+    return tag_key;
 }
 
 fn parse_filter_tag_values(
@@ -277,6 +297,10 @@ fn parse_filter_tag_values(
         return error.TooManyTagValues;
     }
 
+    if (value.array.items.len == 0) {
+        return error.InvalidFilter;
+    }
+
     const values = scratch.alloc(
         []const u8,
         value.array.items.len,
@@ -292,10 +316,21 @@ fn parse_filter_tag_values(
             return error.InvalidFilter;
         }
 
-        values[index] = item.string;
+        values[index] = try copy_filter_string(item.string, scratch);
     }
 
     return values;
+}
+
+fn copy_filter_string(source: []const u8, scratch: std.mem.Allocator) FilterParseError![]const u8 {
+    std.debug.assert(@intFromPtr(scratch.ptr) != 0);
+    std.debug.assert(source.len <= limits.event_json_max);
+
+    const copy = scratch.alloc(u8, source.len) catch return error.InvalidFilter;
+    if (source.len > 0) {
+        @memcpy(copy, source);
+    }
+    return copy;
 }
 
 fn finalize_tag_conditions(
@@ -637,6 +672,37 @@ test "parsed filter fields drive deterministic matching" {
     try std.testing.expect(matched_b);
 }
 
+test "filter parse value copies tag values into scratch" {
+    var scratch_arena = std.heap.ArenaAllocator.init(std.testing.allocator);
+    defer scratch_arena.deinit();
+    var filter: Filter = undefined;
+
+    {
+        var parse_arena = std.heap.ArenaAllocator.init(std.testing.allocator);
+        defer parse_arena.deinit();
+
+        const input = "{\"#e\":[\"target\",\"backup\"]}";
+        const root = try std.json.parseFromSliceLeaky(
+            std.json.Value,
+            parse_arena.allocator(),
+            input,
+            .{},
+        );
+        const source_values = root.object.get("#e").?.array.items;
+
+        filter = try filter_parse_value(root, scratch_arena.allocator());
+        try std.testing.expect(filter.tag_conditions.len == 1);
+        try std.testing.expect(filter.tag_conditions[0].values.len == 2);
+        try std.testing.expect(
+            @intFromPtr(filter.tag_conditions[0].values[0].ptr) !=
+                @intFromPtr(source_values[0].string.ptr),
+        );
+    }
+
+    try std.testing.expectEqualStrings("target", filter.tag_conditions[0].values[0]);
+    try std.testing.expectEqualStrings("backup", filter.tag_conditions[0].values[1]);
+}
+
 test "parsed filters keep OR-across-filters deterministic" {
     var arena = std.heap.ArenaAllocator.init(std.testing.allocator);
     defer arena.deinit();
@@ -669,6 +735,14 @@ test "filter parse rejects malformed tag key shapes" {
     ));
     try std.testing.expectError(error.InvalidTagKey, filter_parse_json(
         "{\"#ab\":[\"abc\"]}",
+        arena.allocator(),
+    ));
+    try std.testing.expectError(error.InvalidTagKey, filter_parse_json(
+        "{\"#1\":[\"abc\"]}",
+        arena.allocator(),
+    ));
+    try std.testing.expectError(error.InvalidTagKey, filter_parse_json(
+        "{\"#_\":[\"abc\"]}",
         arena.allocator(),
     ));
 }
@@ -721,6 +795,16 @@ test "filter parse returns TooManyTagValues for #x overflow" {
     try std.testing.expectError(
         error.TooManyTagValues,
         filter_parse_json(input, arena.allocator()),
+    );
+}
+
+test "filter parse rejects empty #x value arrays" {
+    var arena = std.heap.ArenaAllocator.init(std.testing.allocator);
+    defer arena.deinit();
+
+    try std.testing.expectError(
+        error.InvalidFilter,
+        filter_parse_json("{\"#e\":[]}", arena.allocator()),
     );
 }
 

@@ -4,10 +4,10 @@ const nip01_event = @import("nip01_event.zig");
 pub const ProtectedError = error{ ProtectedAuthRequired, ProtectedPubkeyMismatch };
 
 pub fn event_has_protected_tag(event: *const nip01_event.Event) bool {
-    std.debug.assert(event.tags.len <= std.math.maxInt(u16));
+    std.debug.assert(event.tags.len <= std.math.maxInt(usize));
     std.debug.assert(@intFromPtr(event) != 0);
 
-    var index: u16 = 0;
+    var index: usize = 0;
     while (index < event.tags.len) : (index += 1) {
         const tag = event.tags[index];
         if (tag.items.len != 1) {

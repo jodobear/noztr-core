@@ -78,9 +78,7 @@ fn configure_secp_c_bindings(builder: *std.Build, module: *std.Build.Module) voi
         .root = secp_root,
         .files = secp_source_files,
         .flags = &.{
-            "-DENABLE_MODULE_RECOVERY=1",
             "-DENABLE_MODULE_SCHNORRSIG=1",
-            "-DENABLE_MODULE_ECDH=1",
             "-DENABLE_MODULE_EXTRAKEYS=1",
         },
     });
@@ -130,6 +128,62 @@ const secp256k1_shim_source =
     \\
     \\    const context = signing_context_storage orelse return error.BackendUnavailable;
     \\    return context;
+    \\}
+    \\
+    \\fn wipe_keypair(keypair: *secp.secp256k1_keypair) void {
+    \\    std.debug.assert(!@inComptime());
+    \\    std.debug.assert(@sizeOf(secp.secp256k1_keypair) > 0);
+    \\
+    \\    std.crypto.secureZero(u8, std.mem.asBytes(keypair));
+    \\}
+    \\
+    \\fn wipe_aux_random(aux_random: *[32]u8) void {
+    \\    std.debug.assert(!@inComptime());
+    \\    std.debug.assert(aux_random.len == 32);
+    \\
+    \\    std.crypto.secureZero(u8, aux_random[0..]);
+    \\}
+    \\
+    \\fn sign_schnorr_with_aux(
+    \\    secret_key: *const [32]u8,
+    \\    message_digest: *const [32]u8,
+    \\    out_signature: *[64]u8,
+    \\    aux_random: ?*const [32]u8,
+    \\) Error!void {
+    \\    std.debug.assert(secret_key[0] <= 255);
+    \\    std.debug.assert(message_digest[0] <= 255);
+    \\
+    \\    const context = try get_signing_context();
+    \\    std.debug.assert(out_signature.len == 64);
+    \\
+    \\    var keypair: secp.secp256k1_keypair = undefined;
+    \\    defer wipe_keypair(&keypair);
+    \\
+    \\    const create_result = secp.secp256k1_keypair_create(
+    \\        context,
+    \\        &keypair,
+    \\        secret_key,
+    \\    );
+    \\    if (create_result != 1) {
+    \\        return error.InvalidSecretKey;
+    \\    }
+    \\
+    \\    var aux_random_ptr: [*c]const u8 = null;
+    \\    if (aux_random) |aux_random_value| {
+    \\        std.debug.assert(aux_random_value.len == 32);
+    \\        aux_random_ptr = @ptrCast(aux_random_value);
+    \\    }
+    \\
+    \\    const sign_result = secp.secp256k1_schnorrsig_sign32(
+    \\        context,
+    \\        out_signature,
+    \\        message_digest,
+    \\        &keypair,
+    \\        aux_random_ptr,
+    \\    );
+    \\    if (sign_result != 1) {
+    \\        return error.BackendUnavailable;
+    \\    }
     \\}
     \\
     \\pub const XOnlyPublicKey = struct {
@@ -183,29 +237,21 @@ const secp256k1_shim_source =
     \\    std.debug.assert(secret_key[0] <= 255);
     \\    std.debug.assert(message_digest[0] <= 255);
     \\
-    \\    const context = try get_signing_context();
-    \\    std.debug.assert(out_signature.len == 64);
+    \\    var aux_random: [32]u8 = undefined;
+    \\    std.crypto.random.bytes(&aux_random);
+    \\    defer wipe_aux_random(&aux_random);
     \\
-    \\    var keypair: secp.secp256k1_keypair = undefined;
-    \\    const create_result = secp.secp256k1_keypair_create(
-    \\        context,
-    \\        &keypair,
-    \\        secret_key,
-    \\    );
-    \\    if (create_result != 1) {
-    \\        return error.InvalidSecretKey;
-    \\    }
+    \\    return sign_schnorr_with_aux(secret_key, message_digest, out_signature, &aux_random);
+    \\}
     \\
-    \\    const sign_result = secp.secp256k1_schnorrsig_sign32(
-    \\        context,
-    \\        out_signature,
-    \\        message_digest,
-    \\        &keypair,
-    \\        null,
-    \\    );
-    \\    if (sign_result != 1) {
-    \\        return error.BackendUnavailable;
-    \\    }
-    \\    return;
+    \\pub fn sign_schnorr_deterministic(
+    \\    secret_key: *const [32]u8,
+    \\    message_digest: *const [32]u8,
+    \\    out_signature: *[64]u8,
+    \\) Error!void {
+    \\    std.debug.assert(secret_key[0] <= 255);
+    \\    std.debug.assert(message_digest[0] <= 255);
+    \\
+    \\    return sign_schnorr_with_aux(secret_key, message_digest, out_signature, null);
     \\}
 ;

@@ -21,6 +21,8 @@ pub const DeleteExtractError = error{
     InvalidAddressCoordinate,
 };
 
+pub const DeleteExtractCheckedError = DeleteExtractError || error{InvalidDeleteEventKind};
+
 const DeleteTargetParseError = error{
     InvalidETag,
     InvalidATag,
@@ -47,7 +49,7 @@ pub fn delete_extract_targets(
     std.debug.assert(out.len <= std.math.maxInt(u16));
 
     var count: u16 = 0;
-    var index: u16 = 0;
+    var index: usize = 0;
     while (index < delete_event.tags.len) : (index += 1) {
         const tag = delete_event.tags[index];
         const maybe_target = try parse_delete_tag_to_target(tag);
@@ -68,6 +70,18 @@ pub fn delete_extract_targets(
     return count;
 }
 
+/// Validates kind-5 and then extracts `e` and `a` deletion targets.
+pub fn delete_extract_targets_checked(
+    delete_event: *const nip01_event.Event,
+    out: []DeleteTarget,
+) DeleteExtractCheckedError!u16 {
+    std.debug.assert(@intFromPtr(delete_event) != 0);
+    std.debug.assert(out.len <= std.math.maxInt(u16));
+
+    try validate_delete_kind(delete_event);
+    return delete_extract_targets(delete_event, out);
+}
+
 /// Returns whether a validated kind-5 delete can apply to `target_event`.
 pub fn deletion_can_apply(
     delete_event: *const nip01_event.Event,
@@ -81,8 +95,8 @@ pub fn deletion_can_apply(
         return error.CrossAuthorDelete;
     }
 
-    var count: u16 = 0;
-    var index: u16 = 0;
+    var has_targets = false;
+    var index: usize = 0;
     while (index < delete_event.tags.len) : (index += 1) {
         const tag = delete_event.tags[index];
         const maybe_target = try parse_delete_tag_to_target(tag);
@@ -90,7 +104,7 @@ pub fn deletion_can_apply(
             continue;
         }
 
-        count += 1;
+        has_targets = true;
         if (target_event.kind == delete_event_kind) {
             continue;
         }
@@ -99,13 +113,13 @@ pub fn deletion_can_apply(
         }
     }
 
-    if (count == 0) {
+    if (!has_targets) {
         return error.EmptyDeleteTargets;
     }
     return false;
 }
 
-fn validate_delete_kind(delete_event: *const nip01_event.Event) DeleteError!void {
+fn validate_delete_kind(delete_event: *const nip01_event.Event) error{InvalidDeleteEventKind}!void {
     std.debug.assert(delete_event.kind <= std.math.maxInt(u32));
     std.debug.assert(delete_event.created_at <= std.math.maxInt(u64));
 
@@ -219,7 +233,7 @@ fn validate_lower_hex(text: []const u8) error{InvalidHex}!void {
     std.debug.assert(limits.id_hex_length == 64);
     std.debug.assert(text.len <= limits.tag_item_bytes_max);
 
-    var index: u16 = 0;
+    var index: usize = 0;
     while (index < text.len) : (index += 1) {
         const byte = text[index];
         const is_digit = byte >= '0' and byte <= '9';
@@ -273,10 +287,10 @@ fn coordinate_matches_event(
 }
 
 fn find_d_tag_value(event: *const nip01_event.Event) ?[]const u8 {
-    std.debug.assert(event.tags.len <= std.math.maxInt(u16));
+    std.debug.assert(event.tags.len <= limits.tags_max);
     std.debug.assert(@intFromPtr(event) != 0);
 
-    var index: u16 = 0;
+    var index: usize = 0;
     while (index < event.tags.len) : (index += 1) {
         const tag = event.tags[index];
         if (tag.items.len < 2) {
@@ -352,6 +366,55 @@ test "delete_extract_targets valid vectors and deterministic order" {
     try std.testing.expectEqual(
         hex32("ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"),
         out[2].e,
+    );
+}
+
+test "delete_extract_targets_checked kind-5 parity with extractor" {
+    const pubkey = [_]u8{0xbb} ** 32;
+    const e_one_hex = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+    const e_two_hex = "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb";
+    const a_value = "30023:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb:" ++
+        "channel";
+
+    const e_one = [_][]const u8{ "e", e_one_hex };
+    const p_ignored = [_][]const u8{ "p", "ignore" };
+    const a_tag = [_][]const u8{ "a", a_value };
+    const e_two = [_][]const u8{ "e", e_two_hex };
+    const tags = [_]nip01_event.EventTag{
+        .{ .items = e_one[0..] },
+        .{ .items = p_ignored[0..] },
+        .{ .items = a_tag[0..] },
+        .{ .items = e_two[0..] },
+    };
+
+    const delete_event = test_event(delete_event_kind, pubkey, 100, [_]u8{0} ** 32, tags[0..]);
+    var out_existing: [3]DeleteTarget = undefined;
+    var out_checked: [3]DeleteTarget = undefined;
+
+    const count_existing = try delete_extract_targets(&delete_event, out_existing[0..]);
+    const count_checked = try delete_extract_targets_checked(&delete_event, out_checked[0..]);
+
+    try std.testing.expectEqual(count_existing, count_checked);
+    try std.testing.expectEqual(@as(u16, 3), count_checked);
+    var index: usize = 0;
+    while (index < count_checked) : (index += 1) {
+        try std.testing.expectEqual(out_existing[index], out_checked[index]);
+    }
+}
+
+test "delete_extract_targets_checked non-kind-5 rejects" {
+    const pubkey = [_]u8{0xcc} ** 32;
+    const e_items = [_][]const u8{
+        "e",
+        "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+    };
+    const tags = [_]nip01_event.EventTag{.{ .items = e_items[0..] }};
+    const not_delete = test_event(1, pubkey, 100, [_]u8{0} ** 32, tags[0..]);
+
+    var out: [1]DeleteTarget = undefined;
+    try std.testing.expectError(
+        error.InvalidDeleteEventKind,
+        delete_extract_targets_checked(&not_delete, out[0..]),
     );
 }
 

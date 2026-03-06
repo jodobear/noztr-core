@@ -1,6 +1,6 @@
 # v1 API Contracts (Phase D)
 
-Date: 2026-03-05
+Date: 2026-03-06
 
 Scope: implementation-ready contracts for all Phase A H1 v1 modules.
 
@@ -14,6 +14,9 @@ Scope: implementation-ready contracts for all Phase A H1 v1 modules.
   happy/error vectors.
 - `PD-004`: optional modules keep the Phase B minimum vector gate (`3 valid + 3 invalid`) and do
   not alter core parser defaults.
+- `PD-005`: security-hardening defaults are canonical in strict APIs: backend outage is typed,
+  relay-auth freshness rejects stale and future timestamps beyond window, and new checked wrappers
+  are preferred.
 
 ## Global Contract Rules
 
@@ -33,7 +36,7 @@ pub const EventParseError = error{
     InputTooShort, InputTooLong, InvalidJson, InvalidField, InvalidHex,
     InvalidUtf8, DuplicateField, TooManyTags, TooManyTagItems, TagItemTooLong,
 };
-pub const EventVerifyError = error{ InvalidId, InvalidSignature, InvalidPubkey };
+pub const EventVerifyError = error{ InvalidId, InvalidSignature, InvalidPubkey, BackendUnavailable };
 
 pub fn event_parse_json(input: []const u8, scratch: std.mem.Allocator)
     EventParseError!Event;
@@ -50,13 +53,15 @@ pub fn event_replace_decision(current: *const Event, candidate: *const Event)
 - Bounds: input <= `Limits.event_json_max`; `tags_count <= Limits.tags_max`; `content_len <=
   Limits.content_bytes_max`; hex lengths fixed (`id/pubkey=64`, `sig=128`).
 - Failure modes: malformed JSON/field typing, duplicate critical keys, invalid lowercase hex,
-  out-of-bounds tags/content, invalid id recomputation, invalid signature/pubkey.
+  out-of-bounds tags/content, invalid id recomputation, invalid signature/pubkey, typed
+  signature-backend outage.
 - Deterministic behavior: canonical serialization bytes, computed id, and replace ordering are
   deterministic (`created_at`, then lexical `id`).
 - Assertion pairs: assert required field presence and assert no extra critical duplicates; assert
   bounds in positive space and return typed over-bound errors in negative space.
 - Vectors: happy (`canonical round-trip`, `verify split/full`, `tie-break replaceable/addressable`);
-  error (`duplicate key`, `invalid hex length/case`, `invalid id`, `invalid sig`, `too many tags`).
+  error (`duplicate key`, `invalid hex length/case`, `invalid id`, `invalid sig`, `backend outage`,
+  `too many tags`).
 
 ### `nip01_filter`
 
@@ -76,13 +81,13 @@ pub fn filters_match_event(filters: []const Filter, event: *const Event) bool;
 - Bounds: all lists fixed-capacity; `subscription` filter arrays bounded by module constants;
   optional `limit` bounded to `u16`; `since <= until` when both present.
 - Failure modes: malformed filter object/field type, invalid `#x` key shape, invalid hex,
-  over-capacity arrays, invalid time window.
+  empty `#x` value arrays, over-capacity arrays, invalid time window.
 - Deterministic behavior: AND within one filter, OR across filter list; same filter/event input
   returns identical boolean.
 - Assertion pairs: assert key shape starts with `#` then one codepoint; assert rejection path for
   bad keys and over-capacity lists.
 - Vectors: happy (`single-field`, `combined-and`, `or-across-filters`); error (`bad # key`,
-  `invalid hex`, `since>until`, each capacity overflow).
+  `invalid hex`, `empty #x array`, `since>until`, each capacity overflow).
 
 ### `nip01_message`
 
@@ -101,33 +106,38 @@ pub fn client_message_serialize_json(output: []u8, message: *const ClientMessage
     MessageEncodeError![]const u8;
 pub fn relay_message_serialize_json(output: []u8, message: *const RelayMessage)
     MessageEncodeError![]const u8;
-pub fn transcript_apply(state: *TranscriptState, message: *const RelayMessage)
+pub fn transcript_mark_client_req(state: *TranscriptState, subscription_id: []const u8)
+    error{InvalidTranscriptTransition}!void;
+pub fn transcript_apply_relay(state: *TranscriptState, message: *const RelayMessage)
     error{InvalidTranscriptTransition}!void;
 ```
 
 - Bounds: message JSON input <= `Limits.relay_message_bytes_max`; `subscription_id` length `1..64`;
   bounded filters per `REQ`; bounded transcript steps per subscription.
 - Failure modes: unknown command in strict mode, malformed array arity/types, malformed `OK`/
-  `CLOSED` prefix shape, invalid transcript transition.
+  `CLOSED` prefix shape, uppercase/non-hex `OK` event id, invalid transcript transition.
 - Deterministic behavior: same message bytes parse to same union variant; transcript transition
-  decisions are deterministic per prior state.
+  decisions are deterministic per prior state and explicit client `REQ` marker.
 - Assertion pairs: assert command token valid and assert explicit reject for unknown token; assert
   expected arity and reject all other arities.
-- Vectors: happy (`REQ -> EVENT* -> EOSE -> CLOSE`, valid `OK/CLOSED/NOTICE/AUTH/COUNT` grammar);
-  error (`unknown command`, `bad arity`, `bad prefix`, invalid transcript order).
+- Vectors: happy (`mark REQ -> EVENT* -> EOSE -> CLOSE`, valid
+  `OK/CLOSED/NOTICE/AUTH/COUNT` grammar);
+  error (`unknown command`, `bad arity`, `bad prefix`, `OK` uppercase id reject,
+  invalid transcript order).
 
 ### `nip42_auth`
 
 ```zig
 pub const AuthError = error{
-    ChallengeTooLong, RelayUrlMismatch, ChallengeMismatch,
+    ChallengeEmpty, ChallengeTooLong, RelayUrlMismatch, ChallengeMismatch,
     InvalidAuthEventKind, MissingRelayTag, MissingChallengeTag,
-    StaleTimestamp, InvalidSignature, PubkeySetFull,
+    DuplicateRequiredTag,
+    FutureTimestamp, StaleTimestamp, InvalidSignature, BackendUnavailable, PubkeySetFull,
 };
 
 pub fn auth_state_init(state: *AuthState) void;
 pub fn auth_state_set_challenge(state: *AuthState, challenge: []const u8)
-    error{ChallengeTooLong}!void;
+    error{ChallengeEmpty, ChallengeTooLong}!void;
 pub fn auth_validate_event(auth_event: *const Event, expected_relay: []const u8,
     expected_challenge: []const u8, now_unix_seconds: u64, window_seconds: u32)
     AuthError!void;
@@ -138,15 +148,20 @@ pub fn auth_state_is_pubkey_authenticated(state: *const AuthState, pubkey: *cons
 ```
 
 - Bounds: challenge length `1..64`; authenticated key store fixed-capacity; timestamp skew bounded by
-  `window_seconds` (`u32`).
-- Failure modes: wrong kind, missing/mismatched `relay` or `challenge`, stale timestamp, invalid
-  signature, full auth-set capacity.
+  `window_seconds` (`u32`) for stale and future rejection.
+- Failure modes: empty challenge set attempt, too-long challenge set attempt, wrong kind,
+   missing/mismatched `relay` or `challenge`, invalid signature, duplicate required tags, future
+   timestamp rejection, stale timestamp rejection, typed backend outage, full auth-set capacity.
 - Deterministic behavior: auth validation outcome depends only on event/tags/time inputs and current
-  challenge state.
-- Assertion pairs: assert challenge exists before accept and reject mismatch explicitly; assert time
-  inside window and return `StaleTimestamp` otherwise.
+  challenge state; challenge rotation clears authenticated pubkeys before next accept; strict relay
+  origin matching accepts bracketed IPv6 authorities while preserving scheme/host/port equality.
+- Assertion pairs: assert challenge exists before accept and reject mismatch explicitly; assert
+  `created_at` is within freshness window and reject stale/future violations.
 - Vectors: happy (`valid auth`, `challenge rotation then valid auth`); error (`wrong kind`,
-  `relay mismatch`, `challenge mismatch`, `stale timestamp`, `pubkey set full`).
+   `relay mismatch`, `challenge mismatch`, `empty challenge`, `challenge too long`,
+   `duplicate required tags`, `future timestamp`, `stale timestamp`, `backend outage`,
+   `pubkey set full`,
+   `bracketed ipv6 origin match/mismatch`).
 
 ### `nip70_protected`
 
@@ -178,12 +193,16 @@ pub const DeleteError = error{
 
 pub fn delete_extract_targets(delete_event: *const Event, out: []DeleteTarget)
     error{BufferTooSmall, EmptyDeleteTargets, InvalidETag, InvalidATag, InvalidAddressCoordinate}!u16;
+pub fn delete_extract_targets_checked(delete_event: *const Event, out: []DeleteTarget)
+    DeleteError!u16;
 pub fn deletion_can_apply(delete_event: *const Event, target_event: *const Event)
     DeleteError!bool;
 ```
 
 - Bounds: at least one `e` or `a` target required; extracted target count bounded by output slice.
 - Failure modes: non-kind-5 input, empty targets, malformed `e`/`a` tags, cross-author apply attempt.
+- Safe wrapper: `delete_extract_targets_checked` enforces kind and target validation in one typed API
+  surface for relay call sites.
 - Deterministic behavior: same delete/target pair yields identical apply decision.
 - Assertion pairs: assert delete kind is `5` and reject others; assert author equality for apply and
   reject cross-author paths.
@@ -214,7 +233,7 @@ pub fn event_is_expired_at(event: *const Event, now_unix_seconds: u64)
 ```zig
 pub const PowError = error{
     DifficultyOutOfRange, InvalidNonceTag, InvalidNonceCounter,
-    InvalidNonceCommitment,
+    InvalidNonceCommitment, InvalidEventId,
 };
 
 pub fn pow_leading_zero_bits(id: *const [32]u8) u16;
@@ -222,12 +241,16 @@ pub fn pow_extract_nonce_target(event: *const Event)
     PowError!?u16;
 pub fn pow_meets_difficulty(event: *const Event, required_bits: u16)
     PowError!bool;
+pub fn pow_meets_difficulty_verified_id(event: *const Event, required_bits: u16)
+    PowError!bool;
 ```
 
 - Bounds: `required_bits` in `0..256`; nonce tag shape `['nonce', counter]` or
   `['nonce', counter, target]`.
 - Failure modes: malformed nonce shape, invalid integer counter/target, out-of-range difficulty.
 - Deterministic behavior: leading-zero count is deterministic bit scan of event id bytes.
+- Safe wrapper: `pow_meets_difficulty_verified_id` first checks event id canonical validity before PoW
+  comparison and returns `InvalidEventId` on mismatch.
 - Assertion pairs: assert `required_bits <= 256` and reject higher values; assert valid nonce tag
   arities and reject others.
 - Vectors: happy (`known id leading-zero vectors`, `meets required`, `missing commitment accepted`);
@@ -476,7 +499,8 @@ pub fn negentropy_items_validate_order(items: []const NegentropyItem)
 ```zig
 pub const Nip11Error = error{
     InvalidJson, InvalidKnownFieldType, InvalidStructuredField,
-    InputTooLong,
+    InvalidPubkeyHex, TooManySupportedNips, TooManyRetentionPolicies,
+    ValueOutOfRange, InputTooLong,
 };
 
 pub fn nip11_parse_document(input: []const u8, scratch: std.mem.Allocator)
@@ -486,15 +510,17 @@ pub fn nip11_validate_known_fields(doc: *const RelayInformationDocument)
 ```
 
 - Bounds: input length bounded by NIP-11 parser cap; known structured fields parsed with explicit
-  object/list caps.
-- Failure modes: malformed JSON, known-field type mismatch, malformed known structured sub-object.
+  object/list caps; per-field list/object caps have typed overflow errors.
+- Failure modes: malformed JSON, known-field type mismatch, malformed known structured sub-object,
+  invalid relay pubkey hex, and cap overflows with typed variants.
 - Deterministic behavior: unknown fields are ignored; known fields (when present) are strictly type
   checked with deterministic typed failure.
 - Assertion pairs: assert known field type correctness and reject mismatches; assert unknown fields
-  do not fail parse and are ignored.
+  do not fail parse and are ignored; assert relay pubkey is strict lowercase 32-byte hex.
 - Vectors: happy (`partial document with known valid fields`, unknown field ignored, supported_nips
   valid list);
-  error (`known field wrong type`, malformed limitations object, input over cap).
+  error (`known field wrong type`, `malformed limitations object`, invalid pubkey hex,
+  supported_nips cap overflow, input over cap).
 
 ## Test Vector Gate
 
@@ -524,10 +550,11 @@ pub fn nip11_validate_known_fields(doc: *const RelayInformationDocument)
 - Owner: active phase owner.
 
 `A-D-003`
-- Topic: NIP-42 relay URL comparison normalization depth.
+- Topic: NIP-42 strict relay origin matching with bracketed IPv6 authorities.
 - Impact: medium.
 - Status: resolved.
-- Default: scheme/host/port normalized comparison in strict auth validator, path excluded.
+- Default: strict auth compares origin on scheme/host/port equality, accepts bracketed IPv6
+  authority parsing, and excludes path/query/fragment from origin comparison.
 - Owner: active phase owner.
 
 Ambiguity checkpoint result: high-impact `decision-needed` count = 0.

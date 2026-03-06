@@ -59,14 +59,17 @@ pub fn client_message_parse_json(
     std.debug.assert(input.len <= limits.relay_message_bytes_max + 1);
     std.debug.assert(@intFromPtr(scratch.ptr) != 0);
 
-    const root = try parse_message_array(input, scratch);
+    var parse_arena = std.heap.ArenaAllocator.init(std.heap.page_allocator);
+    defer parse_arena.deinit();
+
+    const root = try parse_message_array(input, parse_arena.allocator());
     const command = try parse_command(root.array.items[0]);
 
     if (std.mem.eql(u8, command, "REQ")) {
         return parse_client_req(root.array.items, scratch);
     }
     if (std.mem.eql(u8, command, "CLOSE")) {
-        return parse_client_close(root.array.items);
+        return parse_client_close(root.array.items, scratch);
     }
     if (std.mem.eql(u8, command, "AUTH")) {
         return parse_client_auth(root.array.items, scratch);
@@ -85,29 +88,32 @@ pub fn relay_message_parse_json(
     std.debug.assert(input.len <= limits.relay_message_bytes_max + 1);
     std.debug.assert(@intFromPtr(scratch.ptr) != 0);
 
-    const root = try parse_message_array(input, scratch);
+    var parse_arena = std.heap.ArenaAllocator.init(std.heap.page_allocator);
+    defer parse_arena.deinit();
+
+    const root = try parse_message_array(input, parse_arena.allocator());
     const command = try parse_command(root.array.items[0]);
 
     if (std.mem.eql(u8, command, "EVENT")) {
         return parse_relay_event(root.array.items, scratch);
     }
     if (std.mem.eql(u8, command, "EOSE")) {
-        return parse_relay_eose(root.array.items);
+        return parse_relay_eose(root.array.items, scratch);
     }
     if (std.mem.eql(u8, command, "OK")) {
-        return parse_relay_ok(root.array.items);
+        return parse_relay_ok(root.array.items, scratch);
     }
     if (std.mem.eql(u8, command, "CLOSED")) {
-        return parse_relay_closed(root.array.items);
+        return parse_relay_closed(root.array.items, scratch);
     }
     if (std.mem.eql(u8, command, "NOTICE")) {
-        return parse_relay_notice(root.array.items);
+        return parse_relay_notice(root.array.items, scratch);
     }
     if (std.mem.eql(u8, command, "AUTH")) {
-        return parse_relay_auth(root.array.items);
+        return parse_relay_auth(root.array.items, scratch);
     }
     if (std.mem.eql(u8, command, "COUNT")) {
-        return parse_relay_count(root.array.items);
+        return parse_relay_count(root.array.items, scratch);
     }
 
     return error.InvalidCommand;
@@ -238,6 +244,23 @@ pub fn transcript_apply(
     }
 
     try transcript_apply_relay(state, message.*);
+}
+
+/// Marks that a client `REQ` was sent for `subscription_id`.
+/// Must be called before relay transcript transitions are applied.
+pub fn transcript_mark_client_req(
+    state: *TranscriptState,
+    subscription_id: []const u8,
+) error{InvalidTranscriptTransition}!void {
+    std.debug.assert(state.subscription_id_len <= limits.subscription_id_bytes_max);
+    std.debug.assert(@intFromPtr(state) != 0);
+
+    if (state.stage != .idle) {
+        return error.InvalidTranscriptTransition;
+    }
+
+    try transcript_set_subscription_id(state, subscription_id);
+    state.stage = .req_sent;
 }
 
 fn transcript_tracked_subscription_id(message: RelayMessage) ?[]const u8 {
@@ -624,10 +647,10 @@ fn serialize_event_tag_items(
 
 fn parse_message_array(
     input: []const u8,
-    scratch: std.mem.Allocator,
+    parse_allocator: std.mem.Allocator,
 ) MessageParseError!std.json.Value {
     std.debug.assert(input.len <= limits.relay_message_bytes_max + 1);
-    std.debug.assert(@intFromPtr(scratch.ptr) != 0);
+    std.debug.assert(@intFromPtr(parse_allocator.ptr) != 0);
 
     if (input.len > limits.relay_message_bytes_max) {
         return error.InputTooLong;
@@ -636,7 +659,7 @@ fn parse_message_array(
         return error.InvalidMessage;
     }
 
-    const root = std.json.parseFromSliceLeaky(std.json.Value, scratch, input, .{}) catch {
+    const root = std.json.parseFromSliceLeaky(std.json.Value, parse_allocator, input, .{}) catch {
         return error.InvalidMessage;
     };
     if (root != .array) {
@@ -672,19 +695,23 @@ fn parse_client_req(
     if (values.len != 3) {
         return error.InvalidArity;
     }
-    const subscription_id = try parse_subscription_id(values[1]);
+    const subscription_id = try parse_subscription_id(values[1], scratch);
     const filter = try parse_filter(values[2], scratch);
     return .{ .req = .{ .subscription_id = subscription_id, .filter = filter } };
 }
 
-fn parse_client_close(values: []const std.json.Value) MessageParseError!ClientMessage {
+fn parse_client_close(
+    values: []const std.json.Value,
+    scratch: std.mem.Allocator,
+) MessageParseError!ClientMessage {
     std.debug.assert(values.len <= std.math.maxInt(u16));
     std.debug.assert(limits.subscription_id_bytes_max == 64);
+    std.debug.assert(@intFromPtr(scratch.ptr) != 0);
 
     if (values.len != 2) {
         return error.InvalidArity;
     }
-    const subscription_id = try parse_subscription_id(values[1]);
+    const subscription_id = try parse_subscription_id(values[1], scratch);
     return .{ .close = .{ .subscription_id = subscription_id } };
 }
 
@@ -712,7 +739,7 @@ fn parse_client_count(
     if (values.len != 3) {
         return error.InvalidArity;
     }
-    const subscription_id = try parse_subscription_id(values[1]);
+    const subscription_id = try parse_subscription_id(values[1], scratch);
     const filter = try parse_filter(values[2], scratch);
     return .{ .count = .{ .subscription_id = subscription_id, .filter = filter } };
 }
@@ -727,86 +754,114 @@ fn parse_relay_event(
     if (values.len != 3) {
         return error.InvalidArity;
     }
-    const subscription_id = try parse_subscription_id(values[1]);
+    const subscription_id = try parse_subscription_id(values[1], scratch);
     const event = try parse_event(values[2], scratch);
     return .{ .event = .{ .subscription_id = subscription_id, .event = event } };
 }
 
-fn parse_relay_eose(values: []const std.json.Value) MessageParseError!RelayMessage {
+fn parse_relay_eose(
+    values: []const std.json.Value,
+    scratch: std.mem.Allocator,
+) MessageParseError!RelayMessage {
     std.debug.assert(values.len <= std.math.maxInt(u16));
     std.debug.assert(limits.subscription_id_bytes_max == 64);
+    std.debug.assert(@intFromPtr(scratch.ptr) != 0);
 
     if (values.len != 2) {
         return error.InvalidArity;
     }
-    const subscription_id = try parse_subscription_id(values[1]);
+    const subscription_id = try parse_subscription_id(values[1], scratch);
     return .{ .eose = .{ .subscription_id = subscription_id } };
 }
 
-fn parse_relay_ok(values: []const std.json.Value) MessageParseError!RelayMessage {
+fn parse_relay_ok(
+    values: []const std.json.Value,
+    scratch: std.mem.Allocator,
+) MessageParseError!RelayMessage {
     std.debug.assert(values.len <= std.math.maxInt(u16));
     std.debug.assert(limits.id_hex_length == 64);
+    std.debug.assert(@intFromPtr(scratch.ptr) != 0);
 
     if (values.len != 4) {
         return error.InvalidArity;
     }
     const event_id = try parse_hex_32(values[1]);
     const accepted = try parse_bool(values[2]);
-    const status = try parse_prefixed_status(values[3]);
+    const status = try parse_prefixed_status(values[3], scratch);
     return .{ .ok = .{ .event_id = event_id, .accepted = accepted, .status = status } };
 }
 
-fn parse_relay_closed(values: []const std.json.Value) MessageParseError!RelayMessage {
+fn parse_relay_closed(
+    values: []const std.json.Value,
+    scratch: std.mem.Allocator,
+) MessageParseError!RelayMessage {
     std.debug.assert(values.len <= std.math.maxInt(u16));
     std.debug.assert(limits.subscription_id_bytes_max == 64);
+    std.debug.assert(@intFromPtr(scratch.ptr) != 0);
 
     if (values.len != 3) {
         return error.InvalidArity;
     }
-    const subscription_id = try parse_subscription_id(values[1]);
-    const status = try parse_prefixed_status(values[2]);
+    const subscription_id = try parse_subscription_id(values[1], scratch);
+    const status = try parse_prefixed_status(values[2], scratch);
     return .{ .closed = .{ .subscription_id = subscription_id, .status = status } };
 }
 
-fn parse_relay_notice(values: []const std.json.Value) MessageParseError!RelayMessage {
+fn parse_relay_notice(
+    values: []const std.json.Value,
+    scratch: std.mem.Allocator,
+) MessageParseError!RelayMessage {
     std.debug.assert(values.len <= std.math.maxInt(u16));
     std.debug.assert(limits.subscription_id_bytes_max > 0);
+    std.debug.assert(@intFromPtr(scratch.ptr) != 0);
 
     if (values.len != 2) {
         return error.InvalidArity;
     }
-    const message = try parse_string(values[1]);
+    const message = try parse_string_owned(values[1], scratch);
     return .{ .notice = .{ .message = message } };
 }
 
-fn parse_relay_auth(values: []const std.json.Value) MessageParseError!RelayMessage {
+fn parse_relay_auth(
+    values: []const std.json.Value,
+    scratch: std.mem.Allocator,
+) MessageParseError!RelayMessage {
     std.debug.assert(values.len <= std.math.maxInt(u16));
     std.debug.assert(limits.subscription_id_bytes_max > 0);
+    std.debug.assert(@intFromPtr(scratch.ptr) != 0);
 
     if (values.len != 2) {
         return error.InvalidArity;
     }
-    const challenge = try parse_string(values[1]);
+    const challenge = try parse_string_owned(values[1], scratch);
     return .{ .auth = .{ .challenge = challenge } };
 }
 
-fn parse_relay_count(values: []const std.json.Value) MessageParseError!RelayMessage {
+fn parse_relay_count(
+    values: []const std.json.Value,
+    scratch: std.mem.Allocator,
+) MessageParseError!RelayMessage {
     std.debug.assert(values.len <= std.math.maxInt(u16));
     std.debug.assert(limits.subscription_id_bytes_max == 64);
+    std.debug.assert(@intFromPtr(scratch.ptr) != 0);
 
     if (values.len != 3) {
         return error.InvalidArity;
     }
-    const subscription_id = try parse_subscription_id(values[1]);
+    const subscription_id = try parse_subscription_id(values[1], scratch);
     const count = try parse_count_object(values[2]);
     return .{ .count = .{ .subscription_id = subscription_id, .count = count } };
 }
 
-fn parse_subscription_id(value: std.json.Value) MessageParseError![]const u8 {
+fn parse_subscription_id(
+    value: std.json.Value,
+    scratch: std.mem.Allocator,
+) MessageParseError![]const u8 {
     std.debug.assert(limits.subscription_id_bytes_max == 64);
     std.debug.assert(@sizeOf(std.json.Value) > 0);
+    std.debug.assert(@intFromPtr(scratch.ptr) != 0);
 
-    const text = try parse_string(value);
+    const text = try parse_string_owned(value, scratch);
     if (text.len == 0) {
         return error.InvalidFieldType;
     }
@@ -824,6 +879,17 @@ fn parse_string(value: std.json.Value) MessageParseError![]const u8 {
         return error.InvalidFieldType;
     }
     return value.string;
+}
+
+fn parse_string_owned(
+    value: std.json.Value,
+    scratch: std.mem.Allocator,
+) MessageParseError![]const u8 {
+    std.debug.assert(@sizeOf(std.json.Value) > 0);
+    std.debug.assert(@intFromPtr(scratch.ptr) != 0);
+
+    const source = try parse_string(value);
+    return scratch.dupe(u8, source) catch return error.InvalidMessage;
 }
 
 fn parse_bool(value: std.json.Value) MessageParseError!bool {
@@ -845,16 +911,47 @@ fn parse_hex_32(value: std.json.Value) MessageParseError![32]u8 {
         return error.InvalidFieldType;
     }
 
+    var source_index: u32 = 0;
+    while (source_index < source.len) : (source_index += 1) {
+        const source_byte = source[source_index];
+        if (!is_lower_hex_byte(source_byte)) {
+            return error.InvalidFieldType;
+        }
+    }
+
     var output: [32]u8 = undefined;
     _ = std.fmt.hexToBytes(&output, source) catch return error.InvalidFieldType;
     return output;
 }
 
-fn parse_prefixed_status(value: std.json.Value) MessageParseError![]const u8 {
+fn is_lower_hex_byte(value: u8) bool {
+    std.debug.assert(value <= 0x7f);
+    std.debug.assert(limits.id_hex_length == 64);
+
+    if (value >= '0') {
+        if (value <= '9') {
+            return true;
+        }
+    }
+
+    if (value >= 'a') {
+        if (value <= 'f') {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+fn parse_prefixed_status(
+    value: std.json.Value,
+    scratch: std.mem.Allocator,
+) MessageParseError![]const u8 {
     std.debug.assert(@sizeOf(std.json.Value) > 0);
     std.debug.assert(limits.subscription_id_bytes_max > 0);
+    std.debug.assert(@intFromPtr(scratch.ptr) != 0);
 
-    const status = try parse_string(value);
+    const status = try parse_string_owned(value, scratch);
     const separator = std.mem.indexOf(u8, status, ": ") orelse return error.InvalidPrefix;
     if (separator == 0) {
         return error.InvalidPrefix;
@@ -875,8 +972,7 @@ fn parse_filter(
     if (value != .object) {
         return error.InvalidFieldType;
     }
-    const json_text = try json_value_to_text(value, scratch);
-    return nip01_filter.filter_parse_json(json_text, scratch) catch return error.InvalidFieldType;
+    return nip01_filter.filter_parse_value(value, scratch) catch return error.InvalidFieldType;
 }
 
 fn parse_event(
@@ -889,24 +985,7 @@ fn parse_event(
     if (value != .object) {
         return error.InvalidFieldType;
     }
-    const json_text = try json_value_to_text(value, scratch);
-    return nip01_event.event_parse_json(json_text, scratch) catch return error.InvalidFieldType;
-}
-
-fn json_value_to_text(
-    value: std.json.Value,
-    scratch: std.mem.Allocator,
-) MessageParseError![]const u8 {
-    std.debug.assert(@intFromPtr(scratch.ptr) != 0);
-    std.debug.assert(limits.relay_message_bytes_max > 0);
-
-    const output = std.json.Stringify.valueAlloc(scratch, value, .{}) catch {
-        return error.InvalidMessage;
-    };
-    if (output.len > limits.relay_message_bytes_max) {
-        return error.InputTooLong;
-    }
-    return output;
+    return nip01_event.event_parse_value(value, scratch) catch return error.InvalidFieldType;
 }
 
 fn parse_count_object(value: std.json.Value) MessageParseError!u64 {
@@ -927,7 +1006,9 @@ fn parse_count_object(value: std.json.Value) MessageParseError!u64 {
     return std.math.cast(u64, count_value.integer) orelse error.InvalidFieldType;
 }
 
-fn transcript_apply_relay(
+/// Applies relay-only transcript transitions after client REQ mark:
+/// `EVENT* -> EOSE -> CLOSED`.
+pub fn transcript_apply_relay(
     state: *TranscriptState,
     message: RelayMessage,
 ) error{InvalidTranscriptTransition}!void {
@@ -936,23 +1017,17 @@ fn transcript_apply_relay(
 
     switch (message) {
         .event => |event_message| {
-            if (state.stage == .idle) {
-                try transcript_set_subscription_id(state, event_message.subscription_id);
-                state.stage = .req_sent;
-                return;
+            if (state.stage != .req_sent) {
+                return error.InvalidTranscriptTransition;
             }
-            if (state.stage != .req_sent) return error.InvalidTranscriptTransition;
             if (!transcript_subscription_matches(state, event_message.subscription_id)) {
                 return error.InvalidTranscriptTransition;
             }
         },
         .eose => |eose_message| {
-            if (state.stage == .idle) {
-                try transcript_set_subscription_id(state, eose_message.subscription_id);
-                state.stage = .eose_received;
-                return;
+            if (state.stage != .req_sent) {
+                return error.InvalidTranscriptTransition;
             }
-            if (state.stage != .req_sent) return error.InvalidTranscriptTransition;
             if (!transcript_subscription_matches(state, eose_message.subscription_id)) {
                 return error.InvalidTranscriptTransition;
             }
@@ -1094,6 +1169,57 @@ test "parser forces every MessageParseError variant" {
     );
 }
 
+test "relay parser rejects uppercase event id in OK message" {
+    var arena = std.heap.ArenaAllocator.init(std.testing.allocator);
+    defer arena.deinit();
+
+    try std.testing.expectError(
+        error.InvalidFieldType,
+        relay_message_parse_json(
+            "[\"OK\",\"0123456789ABCDEF0123456789abcdef0123456789abcdef0123456789abcdef\"," ++
+                "true,\"pow: difficulty too low\"]",
+            arena.allocator(),
+        ),
+    );
+}
+
+test "client parser keeps owned strings after input mutation" {
+    var scratch_arena = std.heap.ArenaAllocator.init(std.testing.allocator);
+    defer scratch_arena.deinit();
+
+    const input_owned = try std.testing.allocator.dupe(u8, "[\"CLOSE\",\"sub-1\"]");
+    defer std.testing.allocator.free(input_owned);
+
+    const parsed = try client_message_parse_json(input_owned, scratch_arena.allocator());
+    try std.testing.expect(parsed == .close);
+    @memset(input_owned, 'x');
+
+    try std.testing.expectEqualStrings("sub-1", parsed.close.subscription_id);
+}
+
+test "relay parser keeps owned strings after input mutation" {
+    var scratch_arena = std.heap.ArenaAllocator.init(std.testing.allocator);
+    defer scratch_arena.deinit();
+
+    const closed_input = try std.testing.allocator.dupe(
+        u8,
+        "[\"CLOSED\",\"sub-1\",\"error: denied\"]",
+    );
+    defer std.testing.allocator.free(closed_input);
+    const closed = try relay_message_parse_json(closed_input, scratch_arena.allocator());
+    try std.testing.expect(closed == .closed);
+    @memset(closed_input, 'x');
+    try std.testing.expectEqualStrings("sub-1", closed.closed.subscription_id);
+    try std.testing.expectEqualStrings("error: denied", closed.closed.status);
+
+    const notice_input = try std.testing.allocator.dupe(u8, "[\"NOTICE\",\"heads up\"]");
+    defer std.testing.allocator.free(notice_input);
+    const notice = try relay_message_parse_json(notice_input, scratch_arena.allocator());
+    try std.testing.expect(notice == .notice);
+    @memset(notice_input, 'x');
+    try std.testing.expectEqualStrings("heads up", notice.notice.message);
+}
+
 test "client serialization is deterministic" {
     var buffer: [1024]u8 = undefined;
     var filter = nip01_filter.Filter{};
@@ -1151,7 +1277,53 @@ test "serializer forces MessageEncodeError variants" {
     );
 }
 
-test "transcript_apply accepts post-REQ EVENT* -> EOSE -> CLOSED" {
+test "transcript_apply_relay rejects relay before mark" {
+    var state = TranscriptState{};
+    const event = RelayMessage{ .event = .{ .subscription_id = "sub-1", .event = sample_event() } };
+
+    try std.testing.expectError(
+        error.InvalidTranscriptTransition,
+        transcript_apply_relay(&state, event),
+    );
+}
+
+test "transcript_apply accepts mark and valid sequence" {
+    var state = TranscriptState{};
+    const first_event = RelayMessage{ .event = .{
+        .subscription_id = "sub-1",
+        .event = sample_event(),
+    } };
+    const second_event = RelayMessage{ .event = .{
+        .subscription_id = "sub-1",
+        .event = sample_event(),
+    } };
+    const eose = RelayMessage{ .eose = .{ .subscription_id = "sub-1" } };
+    const closed = RelayMessage{ .closed = .{
+        .subscription_id = "sub-1",
+        .status = "closed: done",
+    } };
+
+    try transcript_mark_client_req(&state, "sub-1");
+    try std.testing.expect(state.stage == .req_sent);
+    try transcript_apply(&state, &first_event);
+    try transcript_apply(&state, &second_event);
+    try transcript_apply(&state, &eose);
+    try transcript_apply(&state, &closed);
+    try std.testing.expect(state.stage == .closed);
+}
+
+test "transcript_apply rejects mismatched subscription" {
+    var state = TranscriptState{};
+    const event = RelayMessage{ .event = .{ .subscription_id = "sub-2", .event = sample_event() } };
+
+    try transcript_mark_client_req(&state, "sub-1");
+    try std.testing.expectError(
+        error.InvalidTranscriptTransition,
+        transcript_apply(&state, &event),
+    );
+}
+
+test "transcript_apply rejects invalid ordering" {
     var state = TranscriptState{};
     const event = RelayMessage{ .event = .{ .subscription_id = "sub-1", .event = sample_event() } };
     const eose = RelayMessage{ .eose = .{ .subscription_id = "sub-1" } };
@@ -1160,66 +1332,16 @@ test "transcript_apply accepts post-REQ EVENT* -> EOSE -> CLOSED" {
         .status = "closed: done",
     } };
 
+    try transcript_mark_client_req(&state, "sub-1");
     try transcript_apply(&state, &event);
-    try transcript_apply(&state, &event);
-    try transcript_apply(&state, &eose);
-    try transcript_apply(&state, &closed);
-    try std.testing.expect(state.stage == .closed);
-}
-
-test "transcript_apply accepts post-REQ EOSE -> CLOSED" {
-    var state = TranscriptState{};
-    const eose = RelayMessage{ .eose = .{ .subscription_id = "sub-1" } };
-    const closed = RelayMessage{ .closed = .{
-        .subscription_id = "sub-1",
-        .status = "closed: done",
-    } };
-
-    try transcript_apply(&state, &eose);
-    try std.testing.expect(state.stage == .eose_received);
-    try transcript_apply(&state, &closed);
-    try std.testing.expect(state.stage == .closed);
-}
-
-test "transcript_apply rejects idle -> CLOSED" {
-    var state = TranscriptState{};
-    const closed = RelayMessage{ .closed = .{
-        .subscription_id = "sub-1",
-        .status = "closed: done",
-    } };
-
     try std.testing.expectError(
         error.InvalidTranscriptTransition,
         transcript_apply(&state, &closed),
     );
-}
-
-test "transcript_apply rejects idle -> EVENT -> CLOSED without EOSE" {
-    var state = TranscriptState{};
-    const event = RelayMessage{ .event = .{ .subscription_id = "sub-1", .event = sample_event() } };
-    const closed = RelayMessage{ .closed = .{
-        .subscription_id = "sub-1",
-        .status = "closed: done",
-    } };
-
-    try transcript_apply(&state, &event);
-    try std.testing.expect(state.stage == .req_sent);
+    try transcript_apply(&state, &eose);
     try std.testing.expectError(
         error.InvalidTranscriptTransition,
-        transcript_apply(&state, &closed),
-    );
-}
-
-test "transcript_apply rejects subscription mismatch" {
-    var state = TranscriptState{};
-    const event = RelayMessage{ .event = .{ .subscription_id = "sub-1", .event = sample_event() } };
-    const eose = RelayMessage{ .eose = .{ .subscription_id = "sub-2" } };
-
-    try transcript_apply(&state, &event);
-    try std.testing.expect(state.stage == .req_sent);
-    try std.testing.expectError(
-        error.InvalidTranscriptTransition,
-        transcript_apply(&state, &eose),
+        transcript_apply(&state, &event),
     );
 }
 
@@ -1228,6 +1350,7 @@ test "transcript_apply rejects non-transcript relay variants" {
     const notice = RelayMessage{ .notice = .{ .message = "heads up" } };
     const auth = RelayMessage{ .auth = .{ .challenge = "challenge" } };
 
+    try transcript_mark_client_req(&state, "sub-1");
     try std.testing.expectError(
         error.InvalidTranscriptTransition,
         transcript_apply(&state, &notice),
@@ -1235,20 +1358,6 @@ test "transcript_apply rejects non-transcript relay variants" {
     try std.testing.expectError(
         error.InvalidTranscriptTransition,
         transcript_apply(&state, &auth),
-    );
-}
-
-test "transcript_apply rejects oversized relay subscription_id" {
-    var state = TranscriptState{};
-    var oversized_subscription_id: [limits.subscription_id_bytes_max + 1]u8 =
-        [_]u8{'a'} ** (limits.subscription_id_bytes_max + 1);
-    const eose = RelayMessage{ .eose = .{
-        .subscription_id = oversized_subscription_id[0..],
-    } };
-
-    try std.testing.expectError(
-        error.InvalidTranscriptTransition,
-        transcript_apply(&state, &eose),
     );
 }
 

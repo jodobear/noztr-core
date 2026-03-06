@@ -5,10 +5,10 @@ pub const ExpirationError = error{ InvalidExpirationTag, InvalidTimestamp };
 
 pub fn event_expiration_unix_seconds(event: *const nip01_event.Event) ExpirationError!?u64 {
     std.debug.assert(@intFromPtr(event) != 0);
-    std.debug.assert(event.tags.len <= std.math.maxInt(u16));
+    std.debug.assert(event.tags.len <= std.math.maxInt(usize));
 
     var parsed_expiration: ?u64 = null;
-    var index: u16 = 0;
+    var index: usize = 0;
     while (index < event.tags.len) : (index += 1) {
         const value = try parse_expiration_tag_value(event.tags[index]);
         if (value == null) {
@@ -43,8 +43,12 @@ pub fn event_is_expired_at(
 }
 
 fn parse_expiration_tag_value(tag: nip01_event.EventTag) ExpirationError!?u64 {
-    std.debug.assert(tag.items.len <= std.math.maxInt(u16));
+    std.debug.assert(tag.items.len <= std.math.maxInt(usize));
     std.debug.assert(@sizeOf(u64) == 8);
+
+    if (tag.items.len > std.math.maxInt(u16)) {
+        return error.InvalidExpirationTag;
+    }
 
     if (tag.items.len == 0) {
         return null;
@@ -194,4 +198,15 @@ test "expiration forcing test for InvalidTimestamp" {
         error.InvalidTimestamp,
         event_is_expired_at(&event_for_tags(bad_tags[0..]), 4),
     );
+}
+
+test "expiration oversized item count returns InvalidExpirationTag" {
+    const placeholder_items = [_][]const u8{"expiration"};
+    const oversized_items_ptr: [*]const []const u8 = @ptrCast(placeholder_items[0..].ptr);
+    const oversized_items = oversized_items_ptr[0 .. @as(usize, std.math.maxInt(u16)) + 1];
+
+    const tags = [_]nip01_event.EventTag{.{ .items = oversized_items }};
+    const event = event_for_tags(tags[0..]);
+
+    try std.testing.expectError(error.InvalidExpirationTag, event_expiration_unix_seconds(&event));
 }

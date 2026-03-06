@@ -2,14 +2,18 @@ const std = @import("std");
 const nip01_event = @import("nip01_event.zig");
 
 pub const AuthError = error{
+    ChallengeEmpty,
     ChallengeTooLong,
     RelayUrlMismatch,
     ChallengeMismatch,
     InvalidAuthEventKind,
     MissingRelayTag,
     MissingChallengeTag,
+    DuplicateRequiredTag,
+    FutureTimestamp,
     StaleTimestamp,
     InvalidSignature,
+    BackendUnavailable,
     PubkeySetFull,
 };
 
@@ -35,12 +39,12 @@ pub fn auth_state_init(state: *AuthState) void {
 pub fn auth_state_set_challenge(
     state: *AuthState,
     challenge: []const u8,
-) error{ChallengeTooLong}!void {
+) error{ ChallengeEmpty, ChallengeTooLong }!void {
     std.debug.assert(@intFromPtr(state) != 0);
     std.debug.assert(challenge_max_bytes == 64);
 
     if (challenge.len == 0) {
-        return error.ChallengeTooLong;
+        return error.ChallengeEmpty;
     }
     if (challenge.len > challenge_max_bytes) {
         return error.ChallengeTooLong;
@@ -49,6 +53,8 @@ pub fn auth_state_set_challenge(
     state.challenge_len = @intCast(challenge.len);
     @memset(state.challenge[0..], 0);
     @memcpy(state.challenge[0..challenge.len], challenge);
+    @memset(state.authenticated_pubkeys[0..], [_]u8{0} ** 32);
+    state.authenticated_count = 0;
 }
 
 pub fn auth_validate_event(
@@ -64,10 +70,10 @@ pub fn auth_validate_event(
     if (auth_event.kind != auth_event_kind) {
         return error.InvalidAuthEventKind;
     }
-    const relay_value = find_required_tag_value(auth_event, "relay") orelse {
+    const relay_value = try find_required_tag_value_unique(auth_event, "relay") orelse {
         return error.MissingRelayTag;
     };
-    const challenge_value = find_required_tag_value(auth_event, "challenge") orelse {
+    const challenge_value = try find_required_tag_value_unique(auth_event, "challenge") orelse {
         return error.MissingChallengeTag;
     };
     if (!relay_urls_match(relay_value, expected_relay)) {
@@ -77,8 +83,8 @@ pub fn auth_validate_event(
         return error.ChallengeMismatch;
     }
     try validate_timestamp_window(auth_event.created_at, now_unix_seconds, window_seconds);
-    nip01_event.event_verify(auth_event) catch {
-        return error.InvalidSignature;
+    nip01_event.event_verify(auth_event) catch |verify_error| {
+        return map_event_verify_error(verify_error);
     };
 }
 
@@ -118,7 +124,7 @@ pub fn auth_state_is_pubkey_authenticated(state: *const AuthState, pubkey: *cons
     std.debug.assert(state.authenticated_count <= authenticated_pubkeys_max);
     std.debug.assert(pubkey[0] <= 255);
 
-    var index: u16 = 0;
+    var index: usize = 0;
     while (index < state.authenticated_count) : (index += 1) {
         if (std.mem.eql(u8, &state.authenticated_pubkeys[index], pubkey)) {
             return true;
@@ -127,11 +133,15 @@ pub fn auth_state_is_pubkey_authenticated(state: *const AuthState, pubkey: *cons
     return false;
 }
 
-fn find_required_tag_value(event: *const nip01_event.Event, key: []const u8) ?[]const u8 {
+fn find_required_tag_value_unique(
+    event: *const nip01_event.Event,
+    key: []const u8,
+) error{DuplicateRequiredTag}!?[]const u8 {
     std.debug.assert(key.len > 0);
     std.debug.assert(event.tags.len <= std.math.maxInt(u16));
 
-    var tag_index: u16 = 0;
+    var matched_value: ?[]const u8 = null;
+    var tag_index: usize = 0;
     while (tag_index < event.tags.len) : (tag_index += 1) {
         const tag = event.tags[tag_index];
         if (tag.items.len < 2) {
@@ -140,9 +150,13 @@ fn find_required_tag_value(event: *const nip01_event.Event, key: []const u8) ?[]
         if (!std.mem.eql(u8, tag.items[0], key)) {
             continue;
         }
-        return tag.items[1];
+        if (matched_value == null) {
+            matched_value = tag.items[1];
+            continue;
+        }
+        return error.DuplicateRequiredTag;
     }
-    return null;
+    return matched_value;
 }
 
 fn validate_timestamp_window(
@@ -153,13 +167,33 @@ fn validate_timestamp_window(
     std.debug.assert(created_at <= std.math.maxInt(u64));
     std.debug.assert(window_seconds <= std.math.maxInt(u32));
 
-    const diff = if (now_unix_seconds >= created_at)
-        now_unix_seconds - created_at
-    else
-        created_at - now_unix_seconds;
+    if (created_at > now_unix_seconds) {
+        return error.FutureTimestamp;
+    }
+
+    const diff = now_unix_seconds - created_at;
     if (diff > window_seconds) {
         return error.StaleTimestamp;
     }
+}
+
+fn map_event_verify_error(verify_error: nip01_event.EventVerifyError) AuthError {
+    std.debug.assert(@intFromError(verify_error) >= 0);
+    std.debug.assert(!@inComptime());
+
+    return switch (verify_error) {
+        error.InvalidId => error.InvalidSignature,
+        error.InvalidSignature => error.InvalidSignature,
+        error.InvalidPubkey => error.InvalidSignature,
+        error.BackendUnavailable => error.BackendUnavailable,
+    };
+}
+
+fn force_auth_verify_mapping(verify_error: nip01_event.EventVerifyError) AuthError!void {
+    std.debug.assert(@intFromError(verify_error) >= 0);
+    std.debug.assert(!@inComptime());
+
+    return map_event_verify_error(verify_error);
 }
 
 const RelayOrigin = struct {
@@ -169,8 +203,15 @@ const RelayOrigin = struct {
 };
 
 fn relay_urls_match(left: []const u8, right: []const u8) bool {
-    std.debug.assert(left.len > 0);
-    std.debug.assert(right.len > 0);
+    std.debug.assert(left.len <= std.math.maxInt(u32));
+    std.debug.assert(right.len <= std.math.maxInt(u32));
+
+    if (left.len == 0) {
+        return false;
+    }
+    if (right.len == 0) {
+        return false;
+    }
 
     const left_origin = parse_relay_origin(left) orelse return false;
     const right_origin = parse_relay_origin(right) orelse return false;
@@ -187,8 +228,12 @@ fn relay_urls_match(left: []const u8, right: []const u8) bool {
 }
 
 fn parse_relay_origin(url: []const u8) ?RelayOrigin {
-    std.debug.assert(url.len > 0);
+    std.debug.assert(url.len <= std.math.maxInt(u32));
     std.debug.assert(challenge_max_bytes == 64);
+
+    if (url.len == 0) {
+        return null;
+    }
 
     const scheme_end = std.mem.indexOf(u8, url, "://") orelse return null;
     if (scheme_end == 0) {
@@ -202,6 +247,9 @@ fn parse_relay_origin(url: []const u8) ?RelayOrigin {
 
     const authority_end = find_authority_end(url, authority_start);
     const authority = url[authority_start..authority_end];
+    if (authority.len == 0) {
+        return null;
+    }
     const host_port = parse_host_port(authority, scheme) orelse return null;
     return .{ .scheme = scheme, .host = host_port.host, .port = host_port.port };
 }
@@ -235,6 +283,10 @@ fn parse_host_port(authority: []const u8, scheme: []const u8) ?HostPort {
     std.debug.assert(authority.len > 0);
     std.debug.assert(scheme.len > 0);
 
+    if (authority[0] == '[') {
+        return parse_bracketed_host_port(authority, scheme);
+    }
+
     const last_colon = std.mem.lastIndexOfScalar(u8, authority, ':');
     if (last_colon == null) {
         const port_default = default_port_for_scheme(scheme) orelse return null;
@@ -251,6 +303,32 @@ fn parse_host_port(authority: []const u8, scheme: []const u8) ?HostPort {
 
     const host = authority[0..colon_index];
     const port_text = authority[colon_index + 1 ..];
+    const port = std.fmt.parseUnsigned(u16, port_text, 10) catch return null;
+    return .{ .host = host, .port = port };
+}
+
+fn parse_bracketed_host_port(authority: []const u8, scheme: []const u8) ?HostPort {
+    std.debug.assert(authority.len > 0);
+    std.debug.assert(authority[0] == '[');
+
+    const closing_bracket = std.mem.indexOfScalar(u8, authority, ']') orelse return null;
+    if (closing_bracket == 1) {
+        return null;
+    }
+
+    const host = authority[0 .. closing_bracket + 1];
+    if (closing_bracket + 1 == authority.len) {
+        const port_default = default_port_for_scheme(scheme) orelse return null;
+        return .{ .host = host, .port = port_default };
+    }
+    if (authority[closing_bracket + 1] != ':') {
+        return null;
+    }
+    if (closing_bracket + 2 >= authority.len) {
+        return null;
+    }
+
+    const port_text = authority[closing_bracket + 2 ..];
     const port = std.fmt.parseUnsigned(u16, port_text, 10) catch return null;
     return .{ .host = host, .port = port };
 }
@@ -332,15 +410,63 @@ test "auth accepts relay normalization and duplicate pubkey" {
     try std.testing.expectEqual(@as(u16, 1), state.authenticated_count);
 }
 
-test "auth challenge rotation then valid auth" {
+test "auth accepts bracketed ipv6 relay authorities" {
+    var state = AuthState{};
+    auth_state_init(&state);
+    try auth_state_set_challenge(&state, "challenge-ipv6");
+
+    var fixture_explicit: AuthTagFixture = undefined;
+    auth_tag_fixture_init(&fixture_explicit, "wss://[2001:db8::1]:443/path", "challenge-ipv6");
+    var event_explicit = build_signed_auth_event(fixture_explicit.tags[0..], 4_000);
+    try auth_validate_event(&event_explicit, "wss://[2001:db8::1]", "challenge-ipv6", 4_001, 60);
+    try auth_state_accept_event(&state, &event_explicit, "wss://[2001:db8::1]", 4_001, 60);
+
+    var fixture_default: AuthTagFixture = undefined;
+    auth_tag_fixture_init(&fixture_default, "ws://[::1]", "challenge-ipv6");
+    var event_default = build_signed_auth_event(fixture_default.tags[0..], 4_100);
+    try auth_validate_event(&event_default, "ws://[::1]:80", "challenge-ipv6", 4_101, 60);
+    try std.testing.expectError(
+        error.RelayUrlMismatch,
+        auth_validate_event(&event_default, "ws://[::1]:81", "challenge-ipv6", 4_101, 60),
+    );
+}
+
+test "relay origin rejects empty authority segment" {
+    try std.testing.expect(parse_relay_origin("wss:///path") == null);
+}
+
+test "auth empty relay tag value returns relay mismatch" {
+    const relay_items = [_][]const u8{ "relay", "" };
+    const challenge_items = [_][]const u8{ "challenge", "challenge-1" };
+    const tags = [_]nip01_event.EventTag{
+        .{ .items = relay_items[0..] },
+        .{ .items = challenge_items[0..] },
+    };
+    const event = build_signed_auth_event(tags[0..], 2_200);
+
+    try std.testing.expectError(
+        error.RelayUrlMismatch,
+        auth_validate_event(&event, "wss://relay.example.com", "challenge-1", 2_201, 60),
+    );
+}
+
+test "auth challenge rotation clears authenticated identities" {
     var state = AuthState{};
     auth_state_init(&state);
     try auth_state_set_challenge(&state, "challenge-old");
-    try auth_state_set_challenge(&state, "challenge-new");
 
     var old_fixture: AuthTagFixture = undefined;
     auth_tag_fixture_init(&old_fixture, "wss://relay.example.com", "challenge-old");
     var old_event = build_signed_auth_event(old_fixture.tags[0..], 3_000);
+    try auth_state_accept_event(&state, &old_event, "wss://relay.example.com", 3_001, 60);
+    try std.testing.expect(auth_state_is_pubkey_authenticated(&state, &old_event.pubkey));
+    try std.testing.expectEqual(@as(u16, 1), state.authenticated_count);
+
+    try auth_state_set_challenge(&state, "challenge-new");
+    try std.testing.expect(!auth_state_is_pubkey_authenticated(&state, &old_event.pubkey));
+    try std.testing.expectEqual(@as(u16, 0), state.authenticated_count);
+    try std.testing.expect(std.mem.allEqual(u8, state.authenticated_pubkeys[0][0..], 0));
+
     try std.testing.expectError(
         error.ChallengeMismatch,
         auth_state_accept_event(&state, &old_event, "wss://relay.example.com", 3_000, 60),
@@ -353,7 +479,7 @@ test "auth challenge rotation then valid auth" {
     try std.testing.expect(auth_state_is_pubkey_authenticated(&state, &new_event.pubkey));
 }
 
-test "auth forcing errors for kind, missing tags, relay mismatch, timestamp" {
+test "auth forcing errors for kind, missing tags, relay mismatch, duplicate tags" {
     var fixture: AuthTagFixture = undefined;
     auth_tag_fixture_init(&fixture, "wss://relay.example.com", "challenge-1");
     var event = build_signed_auth_event(fixture.tags[0..], 1_000);
@@ -390,13 +516,66 @@ test "auth forcing errors for kind, missing tags, relay mismatch, timestamp" {
         auth_validate_event(&event, "wss://other.example.com", "challenge-1", 1_000, 60),
     );
 
+    const duplicate_relay_first = [_][]const u8{ "relay", "wss://relay.example.com" };
+    const duplicate_relay_second = [_][]const u8{ "relay", "wss://relay.example.com" };
+    const duplicate_relay_challenge = [_][]const u8{ "challenge", "challenge-1" };
+    const duplicate_relay_tags = [_]nip01_event.EventTag{
+        .{ .items = duplicate_relay_first[0..] },
+        .{ .items = duplicate_relay_second[0..] },
+        .{ .items = duplicate_relay_challenge[0..] },
+    };
+    event = build_signed_auth_event(duplicate_relay_tags[0..], 1_000);
+    try std.testing.expectError(
+        error.DuplicateRequiredTag,
+        auth_validate_event(&event, "wss://relay.example.com", "challenge-1", 1_000, 60),
+    );
+
+    const duplicate_challenge_relay = [_][]const u8{ "relay", "wss://relay.example.com" };
+    const duplicate_challenge_first = [_][]const u8{ "challenge", "challenge-1" };
+    const duplicate_challenge_second = [_][]const u8{ "challenge", "challenge-1" };
+    const duplicate_challenge_tags = [_]nip01_event.EventTag{
+        .{ .items = duplicate_challenge_relay[0..] },
+        .{ .items = duplicate_challenge_first[0..] },
+        .{ .items = duplicate_challenge_second[0..] },
+    };
+    event = build_signed_auth_event(duplicate_challenge_tags[0..], 1_000);
+    try std.testing.expectError(
+        error.DuplicateRequiredTag,
+        auth_validate_event(&event, "wss://relay.example.com", "challenge-1", 1_000, 60),
+    );
+}
+
+test "auth forcing timestamp and verification mapping errors" {
+    var fixture: AuthTagFixture = undefined;
+    auth_tag_fixture_init(&fixture, "wss://relay.example.com", "challenge-1");
+    var event = build_signed_auth_event(fixture.tags[0..], 1_000);
+
+    try std.testing.expectError(
+        error.FutureTimestamp,
+        auth_validate_event(&event, "wss://relay.example.com", "challenge-1", 999, 60),
+    );
+
     try std.testing.expectError(
         error.StaleTimestamp,
         auth_validate_event(&event, "wss://relay.example.com", "challenge-1", 1_200, 60),
     );
+
+    event.sig[0] ^= 1;
+    try std.testing.expectError(
+        error.InvalidSignature,
+        auth_validate_event(&event, "wss://relay.example.com", "challenge-1", 1_000, 60),
+    );
+
+    try std.testing.expectError(
+        error.BackendUnavailable,
+        force_auth_verify_mapping(error.BackendUnavailable),
+    );
+    try std.testing.expect(
+        map_event_verify_error(error.BackendUnavailable) != error.InvalidSignature,
+    );
 }
 
-test "auth forcing errors for challenge, signature, challenge bounds, pubkey set" {
+test "auth forcing errors for challenge, challenge bounds, pubkey set" {
     var fixture: AuthTagFixture = undefined;
     auth_tag_fixture_init(&fixture, "wss://relay.example.com", "challenge-1");
     var event = build_signed_auth_event(fixture.tags[0..], 1_000);
@@ -406,15 +585,9 @@ test "auth forcing errors for challenge, signature, challenge bounds, pubkey set
         auth_validate_event(&event, "wss://relay.example.com", "challenge-2", 1_000, 60),
     );
 
-    event.sig[0] ^= 1;
-    try std.testing.expectError(
-        error.InvalidSignature,
-        auth_validate_event(&event, "wss://relay.example.com", "challenge-1", 1_000, 60),
-    );
-
     var state = AuthState{};
     auth_state_init(&state);
-    try std.testing.expectError(error.ChallengeTooLong, auth_state_set_challenge(&state, ""));
+    try std.testing.expectError(error.ChallengeEmpty, auth_state_set_challenge(&state, ""));
     const oversized = [_]u8{'a'} ** (challenge_max_bytes + 1);
     try std.testing.expectError(
         error.ChallengeTooLong,

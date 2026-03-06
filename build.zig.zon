@@ -3,7 +3,7 @@
     .version = "0.15.2",
     .dependencies = .{
         .secp256k1 = .{
-            .url = "git+https://github.com/bitcoin-core/secp256k1.git?ref=v0.6.0",
+            .url = "git+https://github.com/bitcoin-core/secp256k1.git?ref=0cdc758a56360bf58a851fe91085a327ec97685a",
             .hash = "N-V-__8AAPTEWwDHn7CZ8KKEZ50Y7z3tmVTGa0DigtHsIc2J",
         },
     },

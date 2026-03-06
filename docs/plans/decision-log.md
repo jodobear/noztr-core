@@ -78,6 +78,102 @@ Immutable record of accepted planning decisions.
 - Reversal Trigger: demonstrated process bottleneck without quality benefits.
 - Supersedes: none
 
+## D-005: Typed backend-outage errors at verify/auth trust boundaries
+
+- Date: 2026-03-06
+- Status: accepted
+- Decision: event verify and NIP-42 auth paths must expose backend outage as typed errors distinct
+  from cryptographic invalidity.
+- Why: relay policy and observability need outage-versus-invalid separation for deterministic handling.
+- Tradeoff: larger error surfaces versus precise failure semantics.
+- Related Tradeoff: T-0-003.
+- Reversal Trigger: backend integration no longer has outage semantics that can be observed at boundary.
+- Supersedes: none
+
+## D-006: NIP-42 strict hardening semantics
+
+- Date: 2026-03-06
+- Status: accepted
+- Decision: challenge rotation clears authenticated pubkeys; duplicate required `relay`/`challenge`
+  tags are rejected as `DuplicateRequiredTag`; freshness rejects `FutureTimestamp` and
+  `StaleTimestamp` beyond window.
+- Why: closes replay/ambiguity gaps while preserving deterministic strict defaults.
+- Tradeoff: stricter validation versus permissive ecosystem tolerance.
+- Related Tradeoff: T-0-001, T-0-003.
+- Reversal Trigger: standards-backed parity evidence requires broader permissive behavior.
+- Supersedes: none
+
+## D-007: Freeze checked wrappers for strict call sites
+
+- Date: 2026-03-06
+- Status: accepted
+- Decision: treat `pow_meets_difficulty_verified_id`, `delete_extract_targets_checked`, and transcript
+  split markers (`transcript_mark_client_req`, `transcript_apply_relay`) as canonical safe wrappers.
+- Why: reduces misuse risk by collapsing multi-step validation into single typed entry points.
+- Tradeoff: additional API surface versus safer default integration behavior.
+- Related Tradeoff: T-0-001.
+- Reversal Trigger: wrapper layering causes measurable maintenance burden without reducing defects.
+- Supersedes: none
+
+## D-008: secp boundary hardening and source pinning
+
+- Date: 2026-03-06
+- Status: accepted
+- Decision: reduce exposed secp boundary module surface and require commit-SHA pinning for the selected
+  backend.
+- Why: minimizes accidental direct backend usage and supply-chain drift.
+- Tradeoff: less flexibility in backend updates versus stronger reproducibility and safety.
+- Related Tradeoff: T-0-003.
+- Reversal Trigger: verified security maintenance need requires backend pin update or boundary expansion.
+- Supersedes: none
+
+## D-009: Post-security usability evaluation sequencing
+
+- Date: 2026-03-06
+- Status: accepted
+- Decision: schedule LLM-first usability evaluation after security hardening completion and before the
+  first release-candidate API freeze.
+- Why: evaluate developer UX on hardened APIs rather than pre-hardening surfaces.
+- Tradeoff: delayed UX feedback versus lower churn and clearer usability signal.
+- Related Tradeoff: T-0-004.
+- Reversal Trigger: security-critical issue requires postponing usability work.
+- Supersedes: none
+
+## D-010: NIP-42 auth boundary hardening follow-up
+
+- Date: 2026-03-06
+- Status: accepted
+- Decision: extend strict NIP-42 auth hardening with distinct challenge-set boundary failures
+  (`ChallengeEmpty` vs `ChallengeTooLong`) and relay-origin matching that accepts bracketed IPv6
+  authorities while preserving strict scheme/host/port equality semantics.
+- Why: removes ambiguity at the auth challenge boundary and closes IPv6 authority parsing gaps without
+  widening origin-match permissiveness.
+- Tradeoff: larger typed error surface and stricter authority parsing behavior versus permissive
+  fallback matching.
+- Related Tradeoff: T-0-001, T-0-003.
+- Reversal Trigger: standards-backed interop evidence requires a different strict origin policy.
+- Supersedes: none
+
+## D-011: Low-hardening strictness and edge-audit closure
+
+- Date: 2026-03-06
+- Status: accepted
+- Decision: close low-hardening parser gaps by requiring relay `OK` event ids to be strict lowercase
+  hex and rejecting empty `#x` arrays in strict filter parsing; close edge-case audit with no
+  unresolved Medium+ findings.
+- Why: preserves deterministic strict boundaries and removes acceptance ambiguity in low-severity edge
+  paths.
+- Tradeoff: stricter rejection behavior versus permissive parsing of malformed relay/filter payloads.
+- Related Tradeoff: T-0-001, T-0-003.
+- Reversal Trigger: standards-backed parity evidence requires accepting uppercase `OK` ids or empty
+  `#x` arrays in strict mode.
+- Supersedes: none
+
+- Follow-up observations (low):
+  - compatibility API placement (`UT-E-002`) remains accepted-risk.
+  - LLM-first usability evaluation remains pending post-security checkpoint and before RC API freeze
+    (`D-009`, `OQ-E-006`).
+
 ## Phase Closure Evidence
 
 ### P0-E-001: Phase 0 closure record

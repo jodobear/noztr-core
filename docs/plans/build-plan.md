@@ -1,6 +1,6 @@
 # noztr Build Plan (Phase E Final)
 
-Date: 2026-03-05
+Date: 2026-03-06
 
 This artifact is finalized for implementation execution and is aligned to:
 
@@ -19,6 +19,8 @@ This artifact is finalized for implementation execution and is aligned to:
   v1 scope expansion.
 - `PE-005`: carry only low/medium impact accepted-risk items into Phase F; no high-impact ambiguity may
   remain `decision-needed` at Phase E close.
+- `PE-006`: security hardening defaults are frozen for implementation: reduced secp module surface,
+  commit-SHA pinning, typed backend outage boundaries, and strict transcript/auth wrappers.
 
 ## Implementation Schedule
 
@@ -47,11 +49,13 @@ Note: these are implementation phases, not planning prompt phases.
 - Deliverables:
   - deterministic event parse/serialize/verify split (`verify_id`, `verify_signature`, `verify`).
   - deterministic replace decision (`created_at`, lexical `id`).
+  - typed verify outage distinction (`BackendUnavailable`) separated from cryptographic invalidity.
   - strict filter grammar and pure match semantics (`AND` within filter, `OR` across filters).
 - Test/vector plan:
   - `nip01_event`: minimum `5 valid + 5 invalid`; include duplicate-key reject, invalid hex,
     invalid id/sig, max bounds, tie-break vectors.
-  - `nip01_filter`: minimum `5 valid + 5 invalid`; include malformed `#x`, overflow paths,
+  - `nip01_filter`: minimum `5 valid + 5 invalid`; include malformed `#x`, empty `#x` array reject,
+    overflow paths,
     `since > until` reject, OR-of-filters behavior.
   - every public error variant has a forcing test.
 - Exit gate:
@@ -61,6 +65,7 @@ Note: these are implementation phases, not planning prompt phases.
     - backend pinned by commit or tag.
     - boundary-only call graph (no direct backend calls elsewhere).
     - deterministic typed-error mapping for sign/verify/pubkey parse outcomes.
+    - explicit backend outage mapped to typed boundary error (no generic verify failure).
     - BIP340 vector suite pass plus required negative corpus.
     - differential verification checks pass against pinned reference behavior.
     - no unbounded runtime allocation in signature paths.
@@ -71,14 +76,29 @@ Note: these are implementation phases, not planning prompt phases.
   `src/nip11.zig`.
 - Deliverables:
   - typed client/relay union grammar with exact arity checks.
-  - transcript state enforcement (`REQ -> EVENT* -> EOSE -> CLOSE`).
+  - strict relay `OK` grammar requires lowercase-hex event id.
+  - transcript state enforcement with explicit client marker
+    (`transcript_mark_client_req`, `transcript_apply_relay`) and strict flow
+    (`REQ -> EVENT* -> EOSE -> CLOSE`).
   - auth challenge validation and bounded authenticated-pubkey state.
+  - challenge-set boundary typing distinguishes empty from too-long challenge input.
+  - challenge rotation semantics: set-challenge clears authenticated pubkey set.
+  - auth required-tag strictness: duplicate `relay`/`challenge` tags are rejected.
+  - strict relay origin matching supports bracketed IPv6 authorities without relaxing
+    scheme/host/port equality checks.
+  - freshness policy: reject future auth timestamps and stale auth timestamps beyond window.
+  - auth backend outage distinction typed separately from invalid signature.
   - protected-event gate with default deny unless auth context matches.
-  - `nip11` partial-document parse with strict known-field typing.
+  - `nip11` partial-document parse with strict known-field typing, strict pubkey hex validation,
+    and typed bounded caps.
 - Test/vector plan:
   - `nip01_message`, `nip42_auth`, `nip70_protected`, `nip11`: each minimum `5 valid + 5 invalid`.
   - transcript forcing tests for invalid order and prefix mapping.
-  - `nip11` vectors include unknown-field ignore and known-field type mismatch reject.
+  - NIP-42 vectors include challenge rotation auth-set clear, duplicate required-tag reject, future
+    timestamp reject, stale timestamp reject, typed empty-vs-too-long challenge-set failures,
+    bracketed-IPv6 origin match/mismatch, and backend outage mapping.
+  - `nip11` vectors include unknown-field ignore, known-field type mismatch reject, invalid pubkey
+    reject, and cap overflow typed errors.
 - Exit gate:
   - all parity-core messaging and trust-boundary modules pass deterministic transcript and policy tests.
   - `nip11` included in pass criteria (cannot defer beyond this phase).
@@ -88,12 +108,16 @@ Note: these are implementation phases, not planning prompt phases.
 - Modules/files: `src/nip09_delete.zig`, `src/nip40_expire.zig`, `src/nip13_pow.zig`.
 - Deliverables:
   - author-bound deletion rules for `e`/`a` targets.
+  - checked delete extraction wrapper for relay-safe callers (`delete_extract_targets_checked`).
   - strict expiration parse and deterministic boundary helper.
   - deterministic PoW leading-zero and nonce-tag validation.
+  - checked PoW verification wrapper (`pow_meets_difficulty_verified_id`) to couple id validity with
+    difficulty checks.
 - Test/vector plan:
   - each module minimum `5 valid + 5 invalid`.
   - boundary vectors: expiration equality second, delete cross-author reject,
     malformed nonce and difficulty range errors.
+  - wrapper vectors: checked delete kind guard and checked PoW invalid-id reject.
 - Exit gate:
   - pure helper behavior deterministic and side-effect free.
   - lifecycle error-path coverage includes all typed public errors.
@@ -175,6 +199,9 @@ Note: these are implementation phases, not planning prompt phases.
 - `R-E-004` backend-boundary correctness risk on selected secp256k1/BIP340 path: boundary misuse or
   API leakage can break deterministic and typed-error contracts; mitigated by a single boundary
   module, pinned backend revision, and differential verification corpus.
+- `R-E-005` secp hardening drift risk: broadened wrapper/call surface can reintroduce unsafe direct
+  backend usage; mitigated by reduced boundary module exports and commit-SHA pinning in canonical
+  records.
 - `R-E-002` optional-lane drift risk remains medium; mitigated by explicit non-interference tests and
   extension gate checks.
 - `R-E-003` bounded capacities may need empirical adjustment; mitigated by typed overflow errors and
@@ -185,6 +212,15 @@ Note: these are implementation phases, not planning prompt phases.
   zero-unbounded-runtime-work and typed-error boundary requirements.
 - `A-E-004` notes that H2 NIP-06 requires an explicit build-vs-buy checkpoint for BIP39/BIP32
   correctness and security burden before implementation starts.
+
+## Edge-Case Audit Closure
+
+- Status: edge-case audit is closed with no unresolved Medium+ findings.
+- Follow-up observations (low):
+  - `UT-E-002` compatibility API physical placement (`co-located` vs `compat/`) remains accepted-risk
+    and does not change strict defaults.
+  - LLM-first usability evaluation remains pending post-security checkpoint and before release-candidate
+    API freeze.
 
 ## Unresolved Tradeoff Register
 
@@ -240,6 +276,8 @@ Note: these are implementation phases, not planning prompt phases.
   before first release candidate.
 - `OQ-E-005`: for H2 NIP-06, what build-vs-buy threshold is required before selecting in-house
   BIP39/BIP32 implementation versus vetted helper/wrapper.
+- `OQ-E-006`: keep LLM-first usability evaluation pending post-security checkpoint, before
+  release-candidate API freeze.
 
 ## Ambiguity Checkpoint
 

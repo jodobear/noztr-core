@@ -25,8 +25,20 @@ pub const Event = struct {
     tags: []const EventTag = &.{},
 };
 
+/// Parse an event from a JSON value tree and copy owned fields into `scratch`.
+pub fn event_parse_value(value: std.json.Value, scratch: std.mem.Allocator) EventParseError!Event {
+    std.debug.assert(@sizeOf(std.json.Value) > 0);
+    std.debug.assert(@intFromPtr(scratch.ptr) != 0);
+
+    if (value != .object) {
+        return error.InvalidJson;
+    }
+
+    return parse_event_object(value.object, scratch);
+}
+
 pub fn event_parse_json(input: []const u8, scratch: std.mem.Allocator) EventParseError!Event {
-    std.debug.assert(input.len <= limits.event_json_max + 1);
+    std.debug.assert(limits.event_json_max > 0);
     std.debug.assert(@intFromPtr(scratch.ptr) != 0);
 
     if (input.len == 0) {
@@ -41,20 +53,19 @@ pub fn event_parse_json(input: []const u8, scratch: std.mem.Allocator) EventPars
         return error.InvalidUtf8;
     }
 
+    var parse_arena = std.heap.ArenaAllocator.init(std.heap.page_allocator);
+    defer parse_arena.deinit();
+
     const root = std.json.parseFromSliceLeaky(
         std.json.Value,
-        scratch,
+        parse_arena.allocator(),
         input,
         .{},
     ) catch |parse_error| {
         return map_event_json_parse_error(parse_error);
     };
 
-    if (root != .object) {
-        return error.InvalidJson;
-    }
-
-    return parse_event_object(root.object, scratch);
+    return event_parse_value(root, scratch);
 }
 
 fn parse_event_object(
@@ -108,7 +119,7 @@ fn parse_event_object(
             has_created_at = true;
         } else if (std.mem.eql(u8, key, "content")) {
             if (has_content) return error.DuplicateField;
-            parsed.content = try parse_content_field(value);
+            parsed.content = try parse_content_field_owned(value, scratch);
             has_content = true;
         } else if (std.mem.eql(u8, key, "tags")) {
             if (has_tags) return error.DuplicateField;
@@ -237,7 +248,7 @@ fn map_backend_verify_error(verify_error: secp256k1_backend.BackendVerifyError) 
     return switch (verify_error) {
         error.InvalidPublicKey => error.InvalidPubkey,
         error.InvalidSignature => error.InvalidSignature,
-        error.BackendUnavailable => error.InvalidSignature,
+        error.BackendUnavailable => error.BackendUnavailable,
     };
 }
 
@@ -284,6 +295,21 @@ fn parse_content_field(value: std.json.Value) EventParseError![]const u8 {
     return content;
 }
 
+fn parse_content_field_owned(
+    value: std.json.Value,
+    scratch: std.mem.Allocator,
+) EventParseError![]const u8 {
+    std.debug.assert(limits.content_bytes_max > 0);
+    std.debug.assert(@intFromPtr(scratch.ptr) != 0);
+
+    const content = try parse_content_field(value);
+    const owned = scratch.alloc(u8, content.len) catch return error.InvalidJson;
+    if (content.len > 0) {
+        @memcpy(owned, content);
+    }
+    return owned;
+}
+
 fn parse_tags_field(
     value: std.json.Value,
     scratch: std.mem.Allocator,
@@ -317,7 +343,7 @@ fn parse_tags_field(
         var item_index: u32 = 0;
         while (item_index < tag_value.array.items.len) : (item_index += 1) {
             const item = tag_value.array.items[item_index];
-            items[item_index] = try parse_tag_item(item);
+            items[item_index] = try parse_tag_item_owned(item, scratch);
         }
 
         tags[tag_index] = .{ .items = items };
@@ -344,6 +370,21 @@ fn parse_tag_item(value: std.json.Value) EventParseError![]const u8 {
     }
 
     return item;
+}
+
+fn parse_tag_item_owned(
+    value: std.json.Value,
+    scratch: std.mem.Allocator,
+) EventParseError![]const u8 {
+    std.debug.assert(limits.tag_item_bytes_max <= limits.content_bytes_max);
+    std.debug.assert(@intFromPtr(scratch.ptr) != 0);
+
+    const item = try parse_tag_item(value);
+    const owned = scratch.alloc(u8, item.len) catch return error.InvalidJson;
+    if (item.len > 0) {
+        @memcpy(owned, item);
+    }
+    return owned;
 }
 
 fn parse_json_u32(value: std.json.Value) EventParseError!u32 {
@@ -686,6 +727,46 @@ test "event parse json accepts minimal required fields" {
     try std.testing.expect(event.tags.len == 0);
 }
 
+test "event parse value copies content and tag items into scratch" {
+    var scratch_arena = std.heap.ArenaAllocator.init(std.testing.allocator);
+    defer scratch_arena.deinit();
+    var event: Event = undefined;
+
+    {
+        var parse_arena = std.heap.ArenaAllocator.init(std.testing.allocator);
+        defer parse_arena.deinit();
+
+        const input =
+            "{" ++
+            "\"id\":\"0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef\"," ++
+            "\"pubkey\":\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\"," ++
+            "\"sig\":\"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb" ++
+            "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\"," ++
+            "\"kind\":1,\"created_at\":1700000000," ++
+            "\"tags\":[[\"e\",\"target\",\"relay\"]],\"content\":\"ok\"}";
+
+        const root = try std.json.parseFromSliceLeaky(
+            std.json.Value,
+            parse_arena.allocator(),
+            input,
+            .{},
+        );
+        const source_content = root.object.get("content").?.string;
+        const source_tags = root.object.get("tags").?.array.items[0].array.items;
+
+        event = try event_parse_value(root, scratch_arena.allocator());
+        try std.testing.expect(@intFromPtr(event.content.ptr) != @intFromPtr(source_content.ptr));
+        try std.testing.expect(
+            @intFromPtr(event.tags[0].items[1].ptr) != @intFromPtr(source_tags[1].string.ptr),
+        );
+    }
+
+    try std.testing.expectEqualStrings("ok", event.content);
+    try std.testing.expect(event.tags.len == 1);
+    try std.testing.expect(event.tags[0].items.len == 3);
+    try std.testing.expectEqualStrings("target", event.tags[0].items[1]);
+}
+
 test "event parse json rejects missing tags" {
     var arena = std.heap.ArenaAllocator.init(std.testing.allocator);
     defer arena.deinit();
@@ -824,6 +905,13 @@ test "event parse json forces input bounds errors" {
     try std.testing.expectError(
         error.InputTooLong,
         event_parse_json(too_long[0..], arena.allocator()),
+    );
+
+    var far_too_long: [limits.event_json_max + 2]u8 = undefined;
+    @memset(far_too_long[0..], 'a');
+    try std.testing.expectError(
+        error.InputTooLong,
+        event_parse_json(far_too_long[0..], arena.allocator()),
     );
 }
 
@@ -970,6 +1058,13 @@ test "event verify rejects invalid signature explicitly" {
 
     event.sig[0] ^= 1;
     try std.testing.expectError(error.InvalidSignature, event_verify_signature(&event));
+}
+
+test "event verify preserves backend unavailable mapping" {
+    const mapped_error = map_backend_verify_error(error.BackendUnavailable);
+
+    try std.testing.expect(mapped_error == error.BackendUnavailable);
+    try std.testing.expect(mapped_error != error.InvalidSignature);
 }
 
 test "event verify rejects invalid pubkey explicitly" {

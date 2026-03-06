@@ -18,6 +18,16 @@ pub const Limits = struct {
     pub const relay_message_bytes_max: u32 = 524_288;
     pub const subscription_id_bytes_max: u8 = 64;
 
+    pub const nip11_supported_nips_max: u16 = 256;
+    pub const nip11_limitation_max_message_length_max: u32 = Limits.relay_message_bytes_max;
+    pub const nip11_limitation_max_subscriptions_max: u32 = 65_536;
+    pub const nip11_limitation_max_filters_max: u32 = 4_096;
+    pub const nip11_limitation_max_limit_max: u32 = 65_536;
+    pub const nip11_limitation_max_subid_length_max: u32 = Limits.subscription_id_bytes_max;
+    pub const nip11_limitation_max_event_tags_max: u32 = Limits.tags_max;
+    pub const nip11_limitation_max_content_length_max: u32 = Limits.content_bytes_max;
+    pub const nip11_limitation_min_pow_difficulty_max: u32 = 256;
+
     pub const id_hex_length: u8 = 64;
     pub const pubkey_hex_length: u8 = 64;
     pub const sig_hex_length: u8 = 128;
@@ -37,6 +47,20 @@ pub const filter_tag_values_max: u16 = Limits.filter_tag_values_max;
 pub const relay_message_bytes_max: u32 = Limits.relay_message_bytes_max;
 pub const subscription_id_bytes_max: u8 = Limits.subscription_id_bytes_max;
 
+pub const nip11_supported_nips_max: u16 = Limits.nip11_supported_nips_max;
+pub const nip11_limitation_max_message_length_max: u32 =
+    Limits.nip11_limitation_max_message_length_max;
+pub const nip11_limitation_max_subscriptions_max: u32 =
+    Limits.nip11_limitation_max_subscriptions_max;
+pub const nip11_limitation_max_filters_max: u32 = Limits.nip11_limitation_max_filters_max;
+pub const nip11_limitation_max_limit_max: u32 = Limits.nip11_limitation_max_limit_max;
+pub const nip11_limitation_max_subid_length_max: u32 = Limits.nip11_limitation_max_subid_length_max;
+pub const nip11_limitation_max_event_tags_max: u32 = Limits.nip11_limitation_max_event_tags_max;
+pub const nip11_limitation_max_content_length_max: u32 =
+    Limits.nip11_limitation_max_content_length_max;
+pub const nip11_limitation_min_pow_difficulty_max: u32 =
+    Limits.nip11_limitation_min_pow_difficulty_max;
+
 pub const id_hex_length: u8 = Limits.id_hex_length;
 pub const pubkey_hex_length: u8 = Limits.pubkey_hex_length;
 pub const sig_hex_length: u8 = Limits.sig_hex_length;
@@ -48,6 +72,16 @@ comptime {
     std.debug.assert(Limits.id_hex_length == Limits.pubkey_hex_length);
     std.debug.assert(Limits.sig_hex_length == Limits.id_hex_length * 2);
     std.debug.assert(Limits.subscription_id_bytes_max > 0);
+    std.debug.assert(Limits.nip11_supported_nips_max > 0);
+    std.debug.assert(
+        Limits.nip11_limitation_max_message_length_max <= Limits.relay_message_bytes_max,
+    );
+    std.debug.assert(
+        Limits.nip11_limitation_max_subid_length_max == Limits.subscription_id_bytes_max,
+    );
+    std.debug.assert(Limits.nip11_limitation_max_event_tags_max == Limits.tags_max);
+    std.debug.assert(Limits.nip11_limitation_max_content_length_max == Limits.content_bytes_max);
+    std.debug.assert(Limits.nip11_limitation_min_pow_difficulty_max <= 256);
 }
 
 test "limits relation checks stay true" {
@@ -56,6 +90,18 @@ test "limits relation checks stay true" {
     try std.testing.expect(Limits.tag_item_bytes_max <= Limits.content_bytes_max);
     try std.testing.expect(Limits.id_hex_length == Limits.pubkey_hex_length);
     try std.testing.expect(Limits.sig_hex_length == Limits.id_hex_length * 2);
+    try std.testing.expect(Limits.nip11_supported_nips_max > 0);
+    try std.testing.expect(
+        Limits.nip11_limitation_max_message_length_max <= Limits.relay_message_bytes_max,
+    );
+    try std.testing.expect(
+        Limits.nip11_limitation_max_subid_length_max == Limits.subscription_id_bytes_max,
+    );
+    try std.testing.expect(Limits.nip11_limitation_max_event_tags_max == Limits.tags_max);
+    try std.testing.expect(
+        Limits.nip11_limitation_max_content_length_max == Limits.content_bytes_max,
+    );
+    try std.testing.expect(Limits.nip11_limitation_min_pow_difficulty_max <= 256);
 }
 
 test "limits negative-space boundaries are explicit" {

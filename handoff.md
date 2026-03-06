@@ -8,7 +8,7 @@ This handoff captures the current documentation status and immediate direction f
 - Closure basis: implementation kickoff artifact finalized (`docs/plans/implementation-kickoff.md`) and
   closure evidence recorded in `docs/plans/decision-log.md` (`PF-E-001`) with high-impact
   decision-needed count 0.
-- Next phase target: Implementation Phase I1 start (after I0 gate pass).
+- Next phase target: Implementation Phase I2 continuation on hardened API surface.
 
 ## Completed Tasks
 
@@ -95,17 +95,32 @@ This handoff captures the current documentation status and immediate direction f
 - Completed Implementation Phase I0 gate pass:
   - `zig build test --summary all` pass
   - `zig build` pass
+- Completed security hardening sprint (post-I1 boundary and semantics pass):
+  - updated strict verify/auth error contracts to type backend outage separately.
+  - finalized NIP-42 hardening semantics: challenge rotation clears auth set, duplicate required tags
+    reject as `DuplicateRequiredTag`, and freshness rejects future/stale timestamps beyond window.
+  - hardened challenge setter boundary to return distinct `ChallengeEmpty` and `ChallengeTooLong`
+    failures.
+  - updated strict NIP-42 relay origin matching to accept bracketed IPv6 authorities while preserving
+    strict scheme/host/port equality semantics.
+  - froze safe wrapper APIs: `pow_meets_difficulty_verified_id`,
+    `delete_extract_targets_checked`, `transcript_mark_client_req`,
+    `transcript_apply_relay`.
+  - hardened `nip11` contract with strict pubkey validation and typed bounded-cap errors.
+  - recorded secp boundary hardening defaults: reduced module surface and commit-SHA pinning.
+- Completed low-hardening and edge-audit closure updates:
+  - strict relay `OK` message parsing now requires lowercase hex event ids.
+  - strict filter parsing now rejects empty `#x` value arrays.
+  - edge-case audit now has no unresolved Medium+ findings.
+  - remaining low follow-ups are tracked: compatibility API placement (`UT-E-002`) and LLM-first
+    usability sequencing (`OQ-E-006`).
 
 ## Pending Actions
 
-- Execute Implementation Phase I1 coding (`src/nip01_event.zig`, `src/nip01_filter.zig`) and enforce
-  vector/error forcing gates.
-- Implement I1 signature boundary on the resolved path: one in-repo thin Zig wrapper over pinned
-  `bitcoin-core/secp256k1` BIP340/Schnorr backend, with no direct backend calls outside the boundary
-  module.
-- Enforce and verify I1 signature closure acceptance criteria: pinned backend revision, deterministic
-  typed-error mapping, BIP340 vector suite + negative corpus, differential checks against pinned
-  references, and no unbounded runtime allocation in signature paths.
+- Continue implementation in build-plan order from I2 onward on the hardened API contract baseline.
+- Keep the secp boundary narrowed to approved exports only; preserve commit-SHA pinning policy when
+  updating backend references.
+- Keep LLM-first usability evaluation pending post-security checkpoint and before first RC API freeze.
 - Add H2 NIP-06 build-vs-buy checkpoint artifact entry before any NIP-06 implementation start.
 - Maintain verification cadence: run `zig build test --summary all` after each material change and
   `zig build` at slice closure.
@@ -169,7 +184,8 @@ This handoff captures the current documentation status and immediate direction f
 ## Next Steps To Continue
 
 - Run `./agent-brief` and verify prompt artifact status.
-- Continue Implementation Phase I1 using `docs/plans/implementation-kickoff.md`, including required
-  `5 valid + 5 invalid` vector floors for `nip01_event` and `nip01_filter`.
+- Continue Implementation Phase I2 using `docs/plans/implementation-kickoff.md`, including required
+  `5 valid + 5 invalid` vector floors for `nip01_message`, `nip42_auth`, `nip70_protected`, and
+  `nip11`.
 - Continue implementation phases in build-plan order and close each slice only after gate commands pass.
 - Keep `applesauce` as comparative context only when evaluating API ergonomics and developer UX.

@@ -14,21 +14,24 @@ pub const BackendSignError = error{
     BackendUnavailable,
 };
 
-var verify_signature_call_count: u32 = 0;
+var verify_signature_call_count = std.atomic.Value(u32).init(0);
 
 pub fn reset_counters() void {
-    std.debug.assert(verify_signature_call_count >= 0);
+    const current_count = verify_signature_call_count.load(.seq_cst);
+    std.debug.assert(current_count >= 0);
     std.debug.assert(!@inComptime());
 
-    verify_signature_call_count = 0;
-    std.debug.assert(verify_signature_call_count == 0);
+    verify_signature_call_count.store(0, .seq_cst);
+    const reset_count = verify_signature_call_count.load(.seq_cst);
+    std.debug.assert(reset_count == 0);
 }
 
 pub fn get_verify_signature_call_count() u32 {
-    std.debug.assert(verify_signature_call_count >= 0);
+    const current_count = verify_signature_call_count.load(.seq_cst);
+    std.debug.assert(current_count >= 0);
     std.debug.assert(!@inComptime());
 
-    return verify_signature_call_count;
+    return current_count;
 }
 
 pub fn verify_schnorr_signature(
@@ -39,7 +42,7 @@ pub fn verify_schnorr_signature(
     std.debug.assert(public_key[0] <= 255);
     std.debug.assert(signature[0] <= 255);
 
-    verify_signature_call_count += 1;
+    _ = verify_signature_call_count.fetchAdd(1, .seq_cst);
 
     const parsed_public_key = secp256k1.XOnlyPublicKey.from_slice(public_key) catch |verify_error| {
         return map_public_key_error(verify_error);
@@ -58,6 +61,23 @@ pub fn sign_schnorr_signature(
     std.debug.assert(message_digest[0] <= 255);
 
     secp256k1.sign_schnorr(secret_key, message_digest, out_signature) catch |sign_error| {
+        return map_sign_error(sign_error);
+    };
+}
+
+pub fn sign_schnorr_signature_deterministic(
+    secret_key: *const [32]u8,
+    message_digest: *const [32]u8,
+    out_signature: *[64]u8,
+) BackendSignError!void {
+    std.debug.assert(secret_key[0] <= 255);
+    std.debug.assert(message_digest[0] <= 255);
+
+    secp256k1.sign_schnorr_deterministic(
+        secret_key,
+        message_digest,
+        out_signature,
+    ) catch |sign_error| {
         return map_sign_error(sign_error);
     };
 }
@@ -345,7 +365,7 @@ test "mutation from valid bip340 vector is rejected and matches direct classifie
     try std.testing.expect(boundary_class != .invalid_public_key);
 }
 
-test "sign path yields deterministic signature verified by boundary" {
+test "deterministic sign path yields stable signature verified by boundary" {
     const secret_key = try decode_hex_fixed(
         32,
         "0000000000000000000000000000000000000000000000000000000000000003",
@@ -362,12 +382,34 @@ test "sign path yields deterministic signature verified by boundary" {
     var signature_a: [64]u8 = undefined;
     var signature_b: [64]u8 = undefined;
 
-    try sign_schnorr_signature(&secret_key, &message_digest, &signature_a);
-    try sign_schnorr_signature(&secret_key, &message_digest, &signature_b);
+    try sign_schnorr_signature_deterministic(&secret_key, &message_digest, &signature_a);
+    try sign_schnorr_signature_deterministic(&secret_key, &message_digest, &signature_b);
 
     try std.testing.expectEqualSlices(u8, &signature_a, &signature_b);
     try std.testing.expect(signature_a[0] <= 255);
     try verify_schnorr_signature(&public_key, &message_digest, &signature_a);
+}
+
+test "hardened sign path yields verifiable schnorr signature" {
+    const secret_key = try decode_hex_fixed(
+        32,
+        "0000000000000000000000000000000000000000000000000000000000000003",
+    );
+    const public_key = try decode_hex_fixed(
+        32,
+        "F9308A019258C31049344F85F89D5229B531C845836F99B08601F113BCE036F9",
+    );
+    const message_digest = try decode_hex_fixed(
+        32,
+        "0000000000000000000000000000000000000000000000000000000000000000",
+    );
+
+    var signature: [64]u8 = undefined;
+
+    try sign_schnorr_signature(&secret_key, &message_digest, &signature);
+    try std.testing.expect(signature[0] <= 255);
+    try std.testing.expect(signature.len == 64);
+    try verify_schnorr_signature(&public_key, &message_digest, &signature);
 }
 
 test "sign path maps invalid secret key to typed boundary error" {
