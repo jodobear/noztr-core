@@ -27,7 +27,7 @@ Date: 2026-03-05
 | NIP | Horizon | Classification | Rationale |
 | --- | --- | --- | --- |
 | 03 | H3 | defer | Open timestamp proof utility is recognized, but deterministic verification scope is not yet bounded for near-term extension delivery. |
-| 06 | H2 | expansion-candidate | Mnemonic/BIP39/BIP32 key-derivation behavior is wallet and key-lifecycle scope; it remains an H2 expansion-candidate for bounded key-management primitives rather than core event transport semantics. |
+| 06 | H2 | expansion-candidate | Mnemonic/BIP39/BIP32 key-derivation behavior is wallet and key-lifecycle scope; it remains an H2 expansion-candidate for bounded key-management primitives rather than core event transport semantics, with a mandatory H2 build-vs-buy checkpoint before implementation. |
 | 07 | H3 | rejected | NIP-07 defines `window.nostr` browser runtime capability integration, which is intentionally out-of-scope for this low-level core protocol library. |
 | 08 | H3 | rejected | NIP-08 is a mention-handling convention for client content/reference behavior and is therefore outside this repository's protocol-kernel scope. |
 | 10 | H2 | expansion-candidate | Thread/reply relationship conventions improve interoperability and fit bounded parser/validator primitives. |
@@ -63,6 +63,11 @@ Date: 2026-03-05
 
 ## Implementation Roadmap
 
+- Pre-wave checkpoint (required before H2 Wave 1 starts):
+  - NIP-06 dependency strategy decision (`in-house` vs `vetted helper/wrapper`) must be documented.
+  - acceptance criteria for BIP39/BIP32 correctness, security burden, corpus depth, and boundary
+    contracts must be approved.
+  - unresolved status is `decision-needed` and blocks NIP-06 implementation start.
 - Wave 1 (H2, priority expansion-candidates): `06`, `46`, `51`, `10`, `25`.
 - Wave 2 (H2, remaining expansion-candidates): `18`, `22`, `23`, `27`, `36`, `48`, `56`, `58`,
   `98`, `99`.
@@ -125,6 +130,23 @@ Date: 2026-03-05
 - Principles Impacted: P01, P03, P05, P06.
 - Scope Impacted: NIP-41 provisional planning, Phase C4 synthesis notes, Phase D contract gating.
 
+## Tradeoff T-X-004: NIP-06 build-vs-buy before implementation
+
+- Context: NIP-06 introduces BIP39/BIP32 correctness and security burden that can be built in-house or
+  delegated to a vetted helper/wrapper boundary.
+- Options:
+  - O1: implement BIP39/BIP32 in-house for full control and uniform internal contracts.
+  - O2: use vetted helper/wrapper path for primitives while keeping noztr protocol boundaries strict.
+- Decision: decision-needed before NIP-06 implementation starts.
+- Benefits: explicit upfront framing prevents implicit dependency-policy drift and hidden security debt.
+- Costs: additional planning checkpoint before coding NIP-06.
+- Risks: delayed H2 start if acceptance criteria stay ambiguous.
+- Mitigations: define acceptance criteria and corpus requirements in pre-wave checkpoint artifacts.
+- Reversal Trigger: evidence that one path cannot satisfy deterministic, typed-error, bounded
+  contracts.
+- Principles Impacted: P01, P03, P05, P06.
+- Scope Impacted: H2 NIP-06 sequencing and dependency strategy checkpoint.
+
 ## Open Questions
 
 - `OQ-X-001`: for NIP-41, should proof verification reuse NIP-03-style OTS verification directly or
@@ -133,6 +155,8 @@ Date: 2026-03-05
   into the next H2 extension wave.
 - `OQ-X-003`: what formal reversal criteria should be required before revisiting currently rejected
   NIPs (`07`, `08`, `47`, `55`).
+- `OQ-X-004`: for NIP-06, should implementation be in-house BIP39/BIP32 logic or a vetted
+  helper/wrapper strategy with strict boundary contracts.
 
 ## Principles Compliance
 

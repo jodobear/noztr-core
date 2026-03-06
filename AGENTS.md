@@ -62,6 +62,8 @@ Read `docs/guides/TIGER_STYLE.md` — every word. Non-negotiable. The critical r
 - Pair assertions: positive AND negative space
 - **Static allocation only** — no dynamic allocation after init
 - **Zero dependencies** — Zig stdlib only
+- Follow KISS — prefer the simplest solution that satisfies requirements
+- Reuse approved implementations before writing from scratch — approved means Zig stdlib or existing in-repo modules/utilities only
 - `defer` for cleanup, `errdefer` for error paths
 - All errors handled — never discarded
 - No recursion — all paths bounded

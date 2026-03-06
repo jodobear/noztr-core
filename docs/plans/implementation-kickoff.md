@@ -15,6 +15,9 @@ gates, exact file targets, and deterministic verification cadence.
   extension behavior.
 - `PF-004`: treat ambiguity discovery as a hard stop when it affects trust boundaries, crypto
   correctness, or frozen defaults (`D-001`..`D-004`).
+- `PF-005`: require a mandatory crypto-boundary checkpoint before closing I1 signature work: evaluate
+  `stdlib-only` versus `vetted external secp256k1/BIP340 backend via thin Zig wrapper`, and keep all
+  backend calls behind one boundary module.
 
 ## First Implementation Slice (I0/I1)
 
@@ -50,14 +53,20 @@ Ordered coding steps:
 1. Create `src/nip01_event.zig` with typed parse/verify APIs and deterministic replacement helper:
    `event_parse_json`, `event_serialize_canonical`, `event_compute_id`, `event_verify_id`,
    `event_verify_signature`, `event_verify`, `event_replace_decision`.
-2. Implement strict event-field checks and typed failures per contract (`duplicate key`, `invalid hex`,
+2. Run crypto-boundary checkpoint before signature closure:
+   - evaluate `stdlib-only` versus vetted external secp256k1/BIP340 backend through one boundary
+     module.
+   - enforce "no direct backend calls outside boundary module" as an implementation constraint.
+   - if unresolved at I1 signature closure, log high-impact `decision-needed` and stop phase
+     advancement.
+3. Implement strict event-field checks and typed failures per contract (`duplicate key`, `invalid hex`,
    bounds violations, id/sig/pubkey failures).
-3. Create `src/nip01_filter.zig` with strict parser and pure match functions:
+4. Create `src/nip01_filter.zig` with strict parser and pure match functions:
    `filter_parse_json`, `filter_matches_event`, `filters_match_event`.
-4. Implement deterministic AND-within-filter / OR-across-filters behavior and strict `#x` key
+5. Implement deterministic AND-within-filter / OR-across-filters behavior and strict `#x` key
    validation.
-5. Update `src/root.zig` exports from I0 stubs to concrete `nip01_event` and `nip01_filter` symbols.
-6. Add co-located forcing tests for every public error variant in both files.
+6. Update `src/root.zig` exports from I0 stubs to concrete `nip01_event` and `nip01_filter` symbols.
+7. Add co-located forcing tests for every public error variant in both files.
 
 Exact files for I1:
 
@@ -69,6 +78,8 @@ I1 gate checks:
 
 - `zig build test --summary all`
 - `zig build`
+- Crypto-boundary checkpoint is resolved and documented; if unresolved, status is high-impact
+  `decision-needed` and I1 cannot close.
 
 ## Required Verification And Vector Checks
 
@@ -92,6 +103,18 @@ I1 gate checks:
   - filter OR-across-filters deterministic behavior.
 - Forcing rule: every public error variant in `EventParseError`, `EventVerifyError`,
   `FilterParseError` has at least one direct forcing test.
+
+## High-Risk Guardrails For Later Phases
+
+- `nip44` (`I5`): preserve strict staged decrypt invariants in exact order
+  (`length -> version -> MAC -> decrypt -> padding`) with typed stage errors and invalid corpus
+  coverage for every stage.
+- `nip59_wrap` (`I5`): preserve strict staged verification order (`wrap -> seal -> rumor`) and require
+  typed failure by stage for malformed/signature/sender mismatch cases.
+- `nip42_auth` (`I2`): enforce strict challenge/relay/timestamp checks with no permissive fallback and
+  explicit stale/mismatch typed failures.
+- Security-sensitive behavior must carry both negative corpus tests and differential checks against
+  pinned references before phase closure.
 
 ## Tradeoffs
 
@@ -182,8 +205,9 @@ Ambiguity checkpoint result: high-impact `decision-needed` count = 0.
   default (`D-001`..`D-004`) change.
 - Stop immediately if a trust-boundary correctness rule from `v1-api-contracts.md` cannot be enforced
   with typed errors and deterministic output.
-- Stop immediately if event signature/id verification cannot be implemented using stdlib-only approach
-  under current project constraints.
+- Stop immediately if event signature/id verification cannot be satisfied by either approved path
+  (`stdlib-only` or one-module vetted backend wrapper) under strict deterministic, typed-error, and
+  bounded-work contracts.
 - Stop immediately if any public API would require catch-all error variants or unbounded runtime
   allocation to proceed.
 

@@ -99,6 +99,11 @@ This handoff captures the current documentation status and immediate direction f
   `docs/plans/implementation-kickoff.md`.
 - Execute Implementation Phase I1 coding (`src/nip01_event.zig`, `src/nip01_filter.zig`) and enforce
   vector/error forcing gates.
+- Run the mandatory crypto-boundary checkpoint before I1 signature closure (`stdlib-only` vs vetted
+  external secp256k1/BIP340 backend via thin Zig wrapper).
+- Record crypto-boundary decision outcome in planning artifacts once resolved
+  (`docs/plans/implementation-kickoff.md`, `docs/plans/build-plan.md`, and related roadmap notes).
+- Add H2 NIP-06 build-vs-buy checkpoint artifact entry before any NIP-06 implementation start.
 - Maintain verification cadence: run `zig build test --summary all` after each material change and
   `zig build` at slice closure.
 
@@ -113,6 +118,9 @@ This handoff captures the current documentation status and immediate direction f
 - Ambiguity checkpoint is required before phase closure.
 - Zig language phase runs after external studies and before synthesis/contracts.
 - Frozen defaults are canonical policy and require decision-log updates to change.
+- `noztr` remains differentiated beyond primitive source choice: strict deterministic contracts,
+  bounded memory/work, typed errors, and check-order invalid-corpus rigor remain core value even if a
+  vetted crypto backend is used behind one boundary.
 
 ## Files Modified
 
