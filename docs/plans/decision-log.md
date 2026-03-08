@@ -339,6 +339,22 @@ Immutable record of accepted planning decisions.
   contract wording baseline.
 - Supersedes: none
 
+## D-021: Start Phase F execution tracking on post-I7 baseline
+
+- Date: 2026-03-08
+- Status: accepted
+- Decision: start active Phase F execution tracking on the post-I7 baseline and anchor kickoff
+  execution guidance in `docs/plans/phase-f-kickoff.md`, including UT-E-003/UT-E-004 burn-down,
+  optional corpus review triggers (`UT-E-001`/`A-D-001`), and dual-run gate reminders.
+- Why: keeps execution state explicit after I7 closure while preserving deterministic gate posture.
+- Tradeoff: additional tracking artifact maintenance versus lower phase-state drift.
+- Related Tradeoff: T-0-004, T-E-001.
+- Reversal Trigger: execution tracking responsibilities move into another canonical artifact without
+  losing traceability.
+- Supersedes: none
+
+- Policy note: no frozen-default or strictness-policy changes are introduced by this kickoff update.
+
 ## Phase Closure Evidence
 
 ### P0-E-001: Phase 0 closure record

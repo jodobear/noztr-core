@@ -80,8 +80,10 @@ Implementation status snapshot (post-I7 closure):
 - PoW trust-boundary path is explicit: `pow_meets_difficulty` remains compatibility-only; canonical
   strict callers use `pow_meets_difficulty_verified_id`; invalid/non-canonical ids now return
   `false` in the compatibility path and unchecked helper behavior is internal-only.
-- Current implementation state is post-I7 closure; immediate execution target is Phase F kickoff
-  actions on this baseline.
+- Phase F execution is active on the post-I7 baseline; kickoff tracking is in
+  `docs/plans/phase-f-kickoff.md`.
+- Current implementation state remains post-I7 closure baseline; no default-policy changes are
+  introduced by kickoff tracking.
 - Layer 2 compatibility/ergonomic adapter work remains deferred until Layer 1 execution and
   `OQ-E-006` closure.
 

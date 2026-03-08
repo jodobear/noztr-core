@@ -6,7 +6,9 @@ This handoff captures the current documentation status and immediate direction f
 
 - Planning prompt phase closure records are complete (`PF-E-001` in
   `docs/plans/decision-log.md`, high-impact decision-needed count 0).
-- Active execution state is post-I7 baseline; immediate target is Phase F kickoff actions.
+- Active execution state is Phase F on the post-I7 baseline.
+- Phase F kickoff tracking is active in `docs/plans/phase-f-kickoff.md`.
+- No frozen-default or strictness-policy changes are introduced by kickoff activation.
 - Implementation status snapshot: I0-I7 are complete and validated on current protocol fixes.
 - I4 optional modules are implemented with required non-interference coverage.
 - I5 gates passed: staged `nip44` decrypt checks, staged `nip59` unwrap, and vector floors plus
@@ -205,6 +207,7 @@ This handoff captures the current documentation status and immediate direction f
 ## Pending Actions
 
 - Start Phase F kickoff actions from the I7 closure baseline and keep build-plan ordering intact.
+- Execute Phase F kickoff worklist from `docs/plans/phase-f-kickoff.md` and keep defaults unchanged.
 - Keep the secp boundary narrowed to approved exports only; preserve commit-SHA pinning policy when
   updating backend references.
 - Keep PoW trust-boundary docs explicit: `pow_meets_difficulty` stays compatibility-only and strict
@@ -268,6 +271,7 @@ This handoff captures the current documentation status and immediate direction f
   - `docs/plans/prompts/phase-f-implementation-handoff.md`
   - `docs/plans/security-hardening-register.md`
   - `docs/plans/llm-usability-pass.md`
+  - `docs/plans/phase-f-kickoff.md`
   - `handoff.md`
 - Updated:
   - `AGENTS.md`
