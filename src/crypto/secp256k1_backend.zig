@@ -366,6 +366,160 @@ fn run_bip340_vector(vector: Bip340Vector) !void {
     try std.testing.expectEqual(vector.expected_class, boundary_class);
 }
 
+const MutationClass = enum {
+    message_bitflip,
+    signature_bitflip,
+    public_key_bitflip,
+};
+
+fn apply_mutation(
+    mutation_class: MutationClass,
+    vector_index: u32,
+    public_key: *[32]u8,
+    message_digest: *[32]u8,
+    signature: *[64]u8,
+) void {
+    std.debug.assert(public_key.len == 32);
+    std.debug.assert(signature.len == 64);
+
+    switch (mutation_class) {
+        .message_bitflip => {
+            const message_index: usize = @intCast(vector_index % 32);
+            std.debug.assert(message_index < message_digest.len);
+            std.debug.assert(message_digest.len != 0);
+            message_digest[message_index] ^= 0x01;
+        },
+        .signature_bitflip => {
+            const signature_index: usize = @intCast(vector_index % 64);
+            std.debug.assert(signature_index < signature.len);
+            std.debug.assert(signature.len != 0);
+            signature[signature_index] ^= 0x80;
+        },
+        .public_key_bitflip => {
+            const key_index: usize = @intCast(vector_index % 32);
+            std.debug.assert(key_index < public_key.len);
+            std.debug.assert(public_key.len != 0);
+            public_key[key_index] ^= 0x40;
+        },
+    }
+}
+
+fn expect_mutation_mapping(mutation_class: MutationClass, boundary_class: VerifyClass) !void {
+    std.debug.assert(boundary_class != .valid);
+    std.debug.assert(boundary_class != .backend_unavailable);
+
+    switch (mutation_class) {
+        .message_bitflip => {
+            try std.testing.expectEqual(VerifyClass.invalid_signature, boundary_class);
+            try std.testing.expect(boundary_class != .invalid_public_key);
+        },
+        .signature_bitflip => {
+            try std.testing.expectEqual(VerifyClass.invalid_signature, boundary_class);
+            try std.testing.expect(boundary_class != .invalid_public_key);
+        },
+        .public_key_bitflip => {
+            if (boundary_class == .invalid_public_key) {
+                try std.testing.expect(boundary_class != .invalid_signature);
+            } else {
+                try std.testing.expectEqual(VerifyClass.invalid_signature, boundary_class);
+            }
+        },
+    }
+}
+
+fn classify_boundary_hex_inputs(
+    public_key_hex: []const u8,
+    message_hex: []const u8,
+    signature_hex: []const u8,
+) VerifyClass {
+    std.debug.assert(public_key_hex.len > 0);
+    std.debug.assert(signature_hex.len > 0);
+
+    if (public_key_hex.len != 64) {
+        return .invalid_public_key;
+    }
+    if (message_hex.len != 64) {
+        return .invalid_signature;
+    }
+    if (signature_hex.len != 128) {
+        return .invalid_signature;
+    }
+
+    const public_key = decode_hex_fixed(32, public_key_hex) catch {
+        return .invalid_public_key;
+    };
+    const message_digest = decode_hex_fixed(32, message_hex) catch {
+        return .invalid_signature;
+    };
+    const signature = decode_hex_fixed(64, signature_hex) catch {
+        return .invalid_signature;
+    };
+
+    std.debug.assert(public_key.len == 32);
+    std.debug.assert(signature.len == 64);
+    return classify_boundary(&public_key, &message_digest, &signature);
+}
+
+fn classify_direct_hex_inputs(
+    public_key_hex: []const u8,
+    message_hex: []const u8,
+    signature_hex: []const u8,
+) VerifyClass {
+    std.debug.assert(public_key_hex.len > 0);
+    std.debug.assert(signature_hex.len > 0);
+
+    if (public_key_hex.len != 64) {
+        return .invalid_public_key;
+    }
+    if (message_hex.len != 64) {
+        return .invalid_signature;
+    }
+    if (signature_hex.len != 128) {
+        return .invalid_signature;
+    }
+
+    const public_key = decode_hex_fixed(32, public_key_hex) catch {
+        return .invalid_public_key;
+    };
+    const message_digest = decode_hex_fixed(32, message_hex) catch {
+        return .invalid_signature;
+    };
+    const signature = decode_hex_fixed(64, signature_hex) catch {
+        return .invalid_signature;
+    };
+
+    std.debug.assert(public_key.len == 32);
+    std.debug.assert(signature.len == 64);
+    return classify_direct(&public_key, &message_digest, &signature);
+}
+
+fn run_mutation_case(
+    vector: Bip340Vector,
+    vector_index: u32,
+    mutation_class: MutationClass,
+) !void {
+    std.debug.assert(vector.expected_class == .valid);
+    std.debug.assert(vector.label.len != 0);
+
+    var public_key = try decode_hex_fixed(32, vector.public_key_hex);
+    var message_digest = try decode_hex_fixed(32, vector.message_hex);
+    var signature = try decode_hex_fixed(64, vector.signature_hex);
+
+    apply_mutation(
+        mutation_class,
+        vector_index,
+        &public_key,
+        &message_digest,
+        &signature,
+    );
+
+    const boundary_class = classify_boundary(&public_key, &message_digest, &signature);
+    const direct_class = classify_direct(&public_key, &message_digest, &signature);
+
+    try std.testing.expectEqual(direct_class, boundary_class);
+    try expect_mutation_mapping(mutation_class, boundary_class);
+}
+
 test "bip340 vectors classify with boundary-direct parity" {
     reset_counters();
     for (bip340_vectors) |vector| {
@@ -377,28 +531,50 @@ test "bip340 vectors classify with boundary-direct parity" {
     try std.testing.expect(get_verify_signature_call_count() != 0);
 }
 
-test "mutation from valid bip340 vector is rejected and matches direct classifier" {
-    const valid_vector = Bip340Vector{
-        .label = "official-1-valid-base",
-        .public_key_hex = "DFF1D77F2A671C5F36183726DB2341BE58FEAE1DA2DECED843240F7B502BA659",
-        .message_hex = "243F6A8885A308D313198A2E03707344A4093822299F31D0082EFA98EC4E6C89",
-        .signature_hex = "6896BD60EEAE296DB48A229FF71DFE071BDE413E6D43F917DC8DCF8C78DE3341" ++
-            "8906D11AC976ABCCB20B091292BFF4EA897EFCB639EA871CFA95F6DE339E4B0A",
-        .expected_class = .valid,
+test "mutation matrix from valid bip340 vectors keeps boundary-direct parity" {
+    const mutation_classes = [_]MutationClass{
+        .message_bitflip,
+        .signature_bitflip,
+        .public_key_bitflip,
     };
 
-    const public_key = try decode_hex_fixed(32, valid_vector.public_key_hex);
-    var message_digest = try decode_hex_fixed(32, valid_vector.message_hex);
-    const signature = try decode_hex_fixed(64, valid_vector.signature_hex);
+    reset_counters();
+    var valid_vector_count: u32 = 0;
+    for (bip340_vectors, 0..) |vector, vector_index| {
+        if (vector.expected_class == .valid) {
+            valid_vector_count += 1;
+            const vector_index_u32: u32 = @intCast(vector_index);
+            for (mutation_classes) |mutation_class| {
+                try run_mutation_case(vector, vector_index_u32, mutation_class);
+            }
+        }
+    }
 
-    message_digest[31] ^= 1;
+    const mutation_class_count: u32 = mutation_classes.len;
+    const expected_calls: u32 = valid_vector_count * mutation_class_count;
+    try std.testing.expectEqual(expected_calls, get_verify_signature_call_count());
+    try std.testing.expect(get_verify_signature_call_count() != 0);
+}
 
-    const boundary_class = classify_boundary(&public_key, &message_digest, &signature);
-    const direct_class = classify_direct(&public_key, &message_digest, &signature);
-
-    try std.testing.expectEqual(direct_class, boundary_class);
-    try std.testing.expectEqual(VerifyClass.invalid_signature, boundary_class);
-    try std.testing.expect(boundary_class != .invalid_public_key);
+test "wrong-length public key classifies with boundary-direct parity" {
+    for (bip340_vectors) |vector| {
+        if (vector.expected_class == .valid) {
+            const short_public_key_hex = vector.public_key_hex[0 .. vector.public_key_hex.len - 2];
+            const short_boundary_class = classify_boundary_hex_inputs(
+                short_public_key_hex,
+                vector.message_hex,
+                vector.signature_hex,
+            );
+            const short_direct_class = classify_direct_hex_inputs(
+                short_public_key_hex,
+                vector.message_hex,
+                vector.signature_hex,
+            );
+            try std.testing.expectEqual(short_direct_class, short_boundary_class);
+            try std.testing.expectEqual(VerifyClass.invalid_public_key, short_boundary_class);
+            try std.testing.expect(short_boundary_class != .backend_unavailable);
+        }
+    }
 }
 
 test "deterministic sign path yields stable signature verified by boundary" {

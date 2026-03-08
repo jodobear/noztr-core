@@ -15,12 +15,17 @@ Purpose: start Phase F execution tracking on the post-I7 baseline without changi
 - Default-policy posture is unchanged (`D-001`..`D-004` and accepted strictness defaults remain frozen).
 - Phase F first concrete burn-down pass is executed and recorded in
   `docs/plans/phase-f-risk-burndown.md`.
+- Phase F Step 2 replay-input artifact is now recorded in
+  `docs/plans/phase-f-replay-inputs.md` (`UT-E-003-FX-001`..`UT-E-003-FX-005`).
+- Phase F Step 3 `UT-E-004` replay expansion is recorded in
+  `docs/plans/phase-f-risk-burndown.md` with expanded mutation classes and `no-drift`
+  typed-class mapping stability.
 
 ## UT-E-003 and UT-E-004 Burn-Down Worklist
 
 `UT-E-003` NIP-44 differential replay depth beyond pinned corpus
 - Immediate task 1: define the Phase F replay matrix (pinned vectors plus differential references).
-- Immediate task 2: run and record first replay pass results in execution evidence notes.
+- Immediate task 2: define explicit replay input fixtures with stable IDs and replay fields.
 - Immediate task 3: classify any mismatch as `vector-gap`, `behavior-drift`, or `harness-issue`.
 
 `UT-E-004` secp256k1/BIP340 differential hardening depth beyond I1 baseline
@@ -34,8 +39,16 @@ Burn-down guardrail: execute these tasks as depth expansion only; do not change 
 
 - First replay/boundary pass status: executed.
 - First replay delta run status: executed with build-wired NIP-44 and secp parity commands.
+- Step 2 replay-input set status: executed (`UT-E-003` input set defined and linked).
+- Step 3 `UT-E-004` replay expansion status: executed (expanded secp mutation matrix plus
+  wrong-length seam classification).
 - Canonical evidence artifact: `docs/plans/phase-f-risk-burndown.md`.
+- Canonical replay input artifact: `docs/plans/phase-f-replay-inputs.md`.
 - Defaults/frozen policy status: unchanged.
+- Step 5 documentation lock status: frozen strict defaults remained unchanged during Steps 1-3.
+- Trigger evaluation result for `UT-E-001`/`A-D-001`: no trigger criteria fired in current passes.
+- Reminder: any future trigger firing requires an explicit `docs/plans/decision-log.md` entry before
+  default changes.
 
 ## Optional Corpus Review Triggers (`UT-E-001` / `A-D-001`)
 

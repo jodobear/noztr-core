@@ -10,8 +10,20 @@ This handoff captures the current documentation status and immediate direction f
 - Phase F kickoff tracking is active in `docs/plans/phase-f-kickoff.md`.
 - Phase F risk burn-down started with first replay pass evidence in
   `docs/plans/phase-f-risk-burndown.md`.
+- Phase F Step 2 replay-input set is defined in `docs/plans/phase-f-replay-inputs.md`
+  (`UT-E-003-FX-001`..`UT-E-003-FX-005`).
 - First replay delta run is executed with build-wired NIP-44 and secp parity commands;
   defaults remain unchanged.
+- Step 2 local replay outcome classification for `UT-E-003` is recorded as `pass` in
+  `docs/plans/phase-f-risk-burndown.md`.
+- Step 3 local replay expansion for `UT-E-004` is recorded as `pass` in
+  `docs/plans/phase-f-risk-burndown.md`.
+- Step 3 typed-class mapping stability for `UT-E-004` is recorded as `no-drift`;
+  defaults remain unchanged.
+- Step 5 documentation lock status: frozen strict defaults remained unchanged during Steps 1-3.
+- Trigger evaluation result for `UT-E-001`/`A-D-001`: no trigger criteria fired in current passes.
+- Reminder: any future trigger firing requires an explicit `docs/plans/decision-log.md` entry before
+  default changes.
 - No frozen-default or strictness-policy changes are introduced by kickoff activation.
 - Implementation status snapshot: I0-I7 are complete and validated on current protocol fixes.
 - I4 optional modules are implemented with required non-interference coverage.
@@ -290,7 +302,12 @@ This handoff captures the current documentation status and immediate direction f
   - `docs/plans/decision-log.md`
   - `docs/plans/v1-api-contracts.md`
   - `docs/plans/security-hardening-register.md`
+  - `docs/plans/phase-f-risk-burndown.md`
+  - `docs/plans/phase-f-kickoff.md`
   - `handoff.md`
+
+- Created (Phase F replay inputs):
+  - `docs/plans/phase-f-replay-inputs.md`
 
 ## Next Steps To Continue
 

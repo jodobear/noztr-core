@@ -372,6 +372,22 @@ Immutable record of accepted planning decisions.
 
 - Policy note: this evidence-capture decision introduces no frozen-default or strictness-policy change.
 
+## D-023: Phase F Step 5 documentation lock for trigger governance
+
+- Date: 2026-03-08
+- Status: accepted
+- Decision: lock Phase F Step 5 documentation status as follows: frozen strict defaults remained
+  unchanged during Steps 1-3, and trigger evaluation for `UT-E-001`/`A-D-001` fired no criteria in
+  current passes.
+- Why: keeps default-governance state explicit while burn-down work progresses.
+- Tradeoff: one additional documentation update versus lower policy-state drift.
+- Related Tradeoff: T-0-004, T-E-001.
+- Reversal Trigger: future trigger criteria fire and require default-policy change consideration.
+- Supersedes: none
+
+- Policy note: if future `UT-E-001`/`A-D-001` trigger criteria fire, add an explicit decision-log
+  entry before changing defaults.
+
 ## Phase Closure Evidence
 
 ### P0-E-001: Phase 0 closure record

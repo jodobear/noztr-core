@@ -60,6 +60,49 @@ Delta-pass conclusion:
 - No behavior-drift evidence observed in this delta pass.
 - Defaults and strictness policy remain unchanged.
 
+## Step 2 Pass Entry (UT-E-003 Replay Inputs)
+
+- Step: 2 (explicit cross-implementation replay input set).
+- Input set: `docs/plans/phase-f-replay-inputs.md` (`UT-E-003-FX-001`..`UT-E-003-FX-005`).
+- Local replay run reference: `2026-03-08T20:38:39Z` baseline plus build-wired delta pass in this artifact.
+
+| Step | Risk ID | Input evidence | Replay command reference | Outcome classification | Notes |
+| --- | --- | --- | --- | --- | --- |
+| `2` | `UT-E-003` | `docs/plans/phase-f-replay-inputs.md` | `zig build test --summary all -- --test-filter "nip44 valid vectors derive conversation keys"`; `zig build test --summary all` | `pass` | replay input set is explicit and stable; no local drift signal |
+
+Step 2 conclusion:
+- `UT-E-003` replay inputs are now explicit and replay-ready for cross-implementation checks.
+- Current local replay outcome classification is `pass`.
+- Defaults and strictness policy remain unchanged.
+
+## Step 3 Pass Entry (UT-E-004 Replay Expansion)
+
+- Step: 3 (expanded secp boundary mutation/differential replay depth).
+- Scope: `src/crypto/secp256k1_backend.zig` deterministic mutation matrix expansion over valid
+  BIP340 baseline vectors.
+- Mutation classes covered:
+  - message bitflip
+  - signature bitflip
+  - pubkey bitflip
+  - wrong-length public key class via existing hex-input seam
+
+| Step | Risk ID | Replay command reference | Outcome classification | Typed-class mapping stability | Notes |
+| --- | --- | --- | --- | --- | --- |
+| `3` | `UT-E-004` | `zig build test --summary all`; `zig build` | `pass` | `no-drift` | expanded replay matrix passes; boundary classifier parity with direct shim classifier remains stable |
+
+Step 3 conclusion:
+- `UT-E-004` replay depth is expanded beyond the prior single mutation case.
+- Typed class mapping stability outcome is `no-drift` (boundary/direct parity holds for all new
+  mutation classes, and wrong-length seam classification remains stable).
+- Defaults and strictness policy remain unchanged.
+
+## Step 5 Documentation Lock
+
+- Frozen strict defaults remained unchanged during Steps 1-3 execution.
+- Trigger evaluation result for `UT-E-001`/`A-D-001`: no trigger criteria fired in current passes.
+- Reminder: any future trigger firing requires an explicit `docs/plans/decision-log.md` entry before
+  default changes.
+
 ## Next Burndown Tasks
 
 1. `UT-E-003` owner: Phase F owner
