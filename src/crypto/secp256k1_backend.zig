@@ -520,6 +520,43 @@ fn run_mutation_case(
     try expect_mutation_mapping(mutation_class, boundary_class);
 }
 
+fn run_hex_input_parity_case(
+    public_key_hex: []const u8,
+    message_hex: []const u8,
+    signature_hex: []const u8,
+    expected_class: VerifyClass,
+) !void {
+    std.debug.assert(public_key_hex.len > 0);
+    std.debug.assert(signature_hex.len > 0);
+
+    const boundary_class = classify_boundary_hex_inputs(
+        public_key_hex,
+        message_hex,
+        signature_hex,
+    );
+    const direct_class = classify_direct_hex_inputs(
+        public_key_hex,
+        message_hex,
+        signature_hex,
+    );
+
+    try std.testing.expectEqual(direct_class, boundary_class);
+    try std.testing.expectEqual(expected_class, boundary_class);
+}
+
+fn build_non_hex_input(comptime input_len: usize, hex_input: []const u8) [input_len]u8 {
+    std.debug.assert(input_len > 0);
+    std.debug.assert(hex_input.len == input_len);
+
+    var non_hex_input: [input_len]u8 = undefined;
+    std.mem.copyForwards(u8, non_hex_input[0..], hex_input);
+    non_hex_input[input_len - 1] = 'Z';
+
+    std.debug.assert(non_hex_input[input_len - 1] == 'Z');
+    std.debug.assert(non_hex_input.len == input_len);
+    return non_hex_input;
+}
+
 test "bip340 vectors classify with boundary-direct parity" {
     reset_counters();
     for (bip340_vectors) |vector| {
@@ -573,6 +610,58 @@ test "wrong-length public key classifies with boundary-direct parity" {
             try std.testing.expectEqual(short_direct_class, short_boundary_class);
             try std.testing.expectEqual(VerifyClass.invalid_public_key, short_boundary_class);
             try std.testing.expect(short_boundary_class != .backend_unavailable);
+        }
+    }
+}
+
+test "wrong-length message and signature classes keep boundary-direct parity" {
+    for (bip340_vectors) |vector| {
+        if (vector.expected_class == .valid) {
+            const short_message_hex = vector.message_hex[0 .. vector.message_hex.len - 2];
+            try run_hex_input_parity_case(
+                vector.public_key_hex,
+                short_message_hex,
+                vector.signature_hex,
+                .invalid_signature,
+            );
+
+            const short_signature_hex = vector.signature_hex[0 .. vector.signature_hex.len - 2];
+            try run_hex_input_parity_case(
+                vector.public_key_hex,
+                vector.message_hex,
+                short_signature_hex,
+                .invalid_signature,
+            );
+        }
+    }
+}
+
+test "non-hex seam classes keep boundary-direct parity" {
+    for (bip340_vectors) |vector| {
+        if (vector.expected_class == .valid) {
+            var non_hex_public_key = build_non_hex_input(64, vector.public_key_hex);
+            try run_hex_input_parity_case(
+                non_hex_public_key[0..],
+                vector.message_hex,
+                vector.signature_hex,
+                .invalid_public_key,
+            );
+
+            var non_hex_message = build_non_hex_input(64, vector.message_hex);
+            try run_hex_input_parity_case(
+                vector.public_key_hex,
+                non_hex_message[0..],
+                vector.signature_hex,
+                .invalid_signature,
+            );
+
+            var non_hex_signature = build_non_hex_input(128, vector.signature_hex);
+            try run_hex_input_parity_case(
+                vector.public_key_hex,
+                vector.message_hex,
+                non_hex_signature[0..],
+                .invalid_signature,
+            );
         }
     }
 }

@@ -60,6 +60,23 @@ Delta-pass conclusion:
 - No behavior-drift evidence observed in this delta pass.
 - Defaults and strictness policy remain unchanged.
 
+## Step 1 Pass Entry (External Cross-Language Replay)
+
+- Step: 1 (run replay fixtures through an external implementation).
+- External implementation: `github.com/nbd-wtf/go-nostr/nip44`.
+- Temporary harness path: `/workspace/projects/noztr/.phasef-go/main.go`.
+- Fixture set replayed: `docs/plans/phase-f-replay-inputs.md` (`UT-E-003-FX-001`..`UT-E-003-FX-005`).
+
+| Step | Risk ID | Command | Result | Outcome classification | Notes |
+| --- | --- | --- | --- | --- | --- |
+| `1` | `UT-E-003` | `go get github.com/nbd-wtf/go-nostr/nip44@v0.52.3` | pass | `pass` | dependency hydration for temporary harness only |
+| `1` | `UT-E-003` | `go run .` (in `.phasef-go`) | pass (`5/5` fixtures) | `pass` | each fixture passed decrypt parity and custom-nonce encrypt parity |
+
+Step 1 conclusion:
+- External cross-language replay evidence is now recorded with concrete command output.
+- `UT-E-003` classification outcome for this step is `pass`.
+- Defaults and strictness policy remain unchanged.
+
 ## Step 2 Pass Entry (UT-E-003 Replay Inputs)
 
 - Step: 2 (explicit cross-implementation replay input set).
@@ -73,6 +90,9 @@ Delta-pass conclusion:
 Step 2 conclusion:
 - `UT-E-003` replay inputs are now explicit and replay-ready for cross-implementation checks.
 - Current local replay outcome classification is `pass`.
+- Aggregate dual-run gate cadence check executed after this increment pass (`enable_i6_extensions=true`
+  and `enable_i6_extensions=false`): `zig build test --summary all` pass (`448/450`, `2` skipped)
+  and `zig build` pass.
 - Defaults and strictness policy remain unchanged.
 
 ## Step 3 Pass Entry (UT-E-004 Replay Expansion)
@@ -96,11 +116,42 @@ Step 3 conclusion:
   mutation classes, and wrong-length seam classification remains stable).
 - Defaults and strictness policy remain unchanged.
 
+## Step 4 Pass Entry (UT-E-004 Next-Step 2 Matrix Notch)
+
+- Step: 4 (UT-E-004 next-step 2 matrix notch over hex-input seams).
+- Scope: `src/crypto/secp256k1_backend.zig` tests-only expansion; production API/behavior unchanged.
+- Added seam classes:
+  - wrong-length message hex,
+  - wrong-length signature hex,
+  - non-hex public key hex input,
+  - non-hex message hex input,
+  - non-hex signature hex input.
+- Parity requirement: each new class asserts boundary classifier parity with direct classifier and
+  deterministic typed class expectation (`invalid_public_key` or `invalid_signature`).
+
+| Step | Risk ID | Command | Result | Outcome classification | Notes |
+| --- | --- | --- | --- | --- | --- |
+| `4` | `UT-E-004` | `zig fmt src/crypto/secp256k1_backend.zig` | pass | `pass` | formatting gate applied before aggregate rerun |
+| `4` | `UT-E-004` | `zig build test --summary all` | pass (`8/8` steps, `454/456` tests passed, `2` skipped) | `pass` | expanded seam/mutation matrix remains parity-stable |
+| `4` | `UT-E-004` | `zig build` | pass | `pass` | static library build remains healthy after matrix expansion |
+
+Step 4 conclusion:
+- `UT-E-004` next-step 2 matrix expansion outcome classification is `pass`.
+- Typed-class mapping stability remains `no-drift` for all new seam classes.
+- Aggregate dual-run gate cadence check executed after this expanded-matrix increment pass
+  (`enable_i6_extensions=true` and `enable_i6_extensions=false`): latest `zig build test --summary all`
+  pass (`454/456`, `2` skipped) and `zig build` pass.
+- Explicit no-default-change note: frozen defaults and strictness policy remain unchanged.
+
 ## Step 5 Documentation Lock
 
-- Frozen strict defaults remained unchanged during Steps 1-3 execution.
-- Trigger evaluation result for `UT-E-001`/`A-D-001`: no trigger criteria fired in current passes.
-- Reminder: any future trigger firing requires an explicit `docs/plans/decision-log.md` entry before
+- Aggregate dual-run gates were executed after each increment pass for Step 2 and Step 4
+  (expanded matrix).
+- Latest aggregate result: `zig build test --summary all` pass (`454/456`, `2` skipped), `zig build`
+  pass.
+- Trigger-governance status: no `UT-E-001`/`A-D-001` trigger criteria fired, so no policy/default
+  changes were considered.
+- Rule remains: any future trigger firing must be captured in `docs/plans/decision-log.md` before
   default changes.
 
 ## Next Burndown Tasks

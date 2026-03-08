@@ -388,6 +388,22 @@ Immutable record of accepted planning decisions.
 - Policy note: if future `UT-E-001`/`A-D-001` trigger criteria fire, add an explicit decision-log
   entry before changing defaults.
 
+## D-024: Phase F cadence/governance check (Step 2 and Step 4)
+
+- Date: 2026-03-08
+- Status: accepted
+- Decision: record that aggregate dual-run gates were executed after each increment pass in Step 2 and
+  Step 4 (expanded matrix); latest aggregate result is `454/456` passed, `2` skipped.
+- Why: keeps execution cadence and gate posture explicit while burn-down increments proceed.
+- Tradeoff: one additional status record versus lower governance-state drift.
+- Related Tradeoff: T-0-004, T-E-001.
+- Reversal Trigger: trigger criteria fire and governance requires default-policy change consideration.
+- Supersedes: none
+
+- Policy note: no `UT-E-001`/`A-D-001` trigger criteria fired in this cadence check, so no
+  policy/default changes were considered.
+- Rule note: any future trigger firing must be captured in this decision log before default changes.
+
 ## Phase Closure Evidence
 
 ### P0-E-001: Phase 0 closure record

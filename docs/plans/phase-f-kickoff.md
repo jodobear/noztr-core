@@ -17,9 +17,17 @@ Purpose: start Phase F execution tracking on the post-I7 baseline without changi
   `docs/plans/phase-f-risk-burndown.md`.
 - Phase F Step 2 replay-input artifact is now recorded in
   `docs/plans/phase-f-replay-inputs.md` (`UT-E-003-FX-001`..`UT-E-003-FX-005`).
+- Phase F Step 1 external cross-language replay is now executed via
+  `/workspace/projects/noztr/.phasef-go/main.go` using `github.com/nbd-wtf/go-nostr/nip44`.
 - Phase F Step 3 `UT-E-004` replay expansion is recorded in
   `docs/plans/phase-f-risk-burndown.md` with expanded mutation classes and `no-drift`
   typed-class mapping stability.
+- Phase F Step 4 `UT-E-004` next-step 2 expansion is recorded in
+  `docs/plans/phase-f-risk-burndown.md` with additional hex-input seam classes
+  (wrong-length message/signature and non-hex message/signature/pubkey) and
+  `pass` outcome classification.
+- Aggregate dual-run gates were executed after each increment pass for Step 2 and Step 4
+  (expanded matrix); latest aggregate result is `454/456` passed, `2` skipped.
 
 ## UT-E-003 and UT-E-004 Burn-Down Worklist
 
@@ -39,16 +47,20 @@ Burn-down guardrail: execute these tasks as depth expansion only; do not change 
 
 - First replay/boundary pass status: executed.
 - First replay delta run status: executed with build-wired NIP-44 and secp parity commands.
+- Step 1 external cross-language replay status: executed (`UT-E-003-FX-001`..`UT-E-003-FX-005`
+  passed in go-nostr harness).
 - Step 2 replay-input set status: executed (`UT-E-003` input set defined and linked).
 - Step 3 `UT-E-004` replay expansion status: executed (expanded secp mutation matrix plus
   wrong-length seam classification).
+- Step 4 `UT-E-004` next-step 2 status: executed (expanded hex-input seam matrix and typed
+  class parity assertions for wrong-length/non-hex classes).
 - Canonical evidence artifact: `docs/plans/phase-f-risk-burndown.md`.
 - Canonical replay input artifact: `docs/plans/phase-f-replay-inputs.md`.
 - Defaults/frozen policy status: unchanged.
-- Step 5 documentation lock status: frozen strict defaults remained unchanged during Steps 1-3.
-- Trigger evaluation result for `UT-E-001`/`A-D-001`: no trigger criteria fired in current passes.
-- Reminder: any future trigger firing requires an explicit `docs/plans/decision-log.md` entry before
-  default changes.
+- Step 5 governance status: no `UT-E-001`/`A-D-001` trigger criteria fired, so no policy/default
+  changes were considered.
+- Rule remains: any future trigger firing must be captured in
+  `docs/plans/decision-log.md` before default changes.
 
 ## Optional Corpus Review Triggers (`UT-E-001` / `A-D-001`)
 

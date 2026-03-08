@@ -86,10 +86,12 @@ Implementation status snapshot (post-I7 closure):
   `docs/plans/phase-f-risk-burndown.md` (`UT-E-003`/`UT-E-004`).
 - Current implementation state remains post-I7 closure baseline; no default-policy changes are
   introduced by kickoff tracking.
-- Step 5 documentation lock status: frozen strict defaults remained unchanged during Steps 1-3.
-- Trigger evaluation result for `UT-E-001`/`A-D-001`: no trigger criteria fired in current passes.
-- Reminder: any future trigger firing requires an explicit `docs/plans/decision-log.md` entry before
-  default changes.
+- Aggregate dual-run gates were executed after each increment pass for Step 2 and Step 4
+  (expanded matrix); latest aggregate result is `454/456` passed, `2` skipped.
+- Trigger-governance status: no `UT-E-001`/`A-D-001` trigger criteria fired, so no policy/default
+  changes were considered.
+- Rule remains: any future trigger firing must be captured in
+  `docs/plans/decision-log.md` before default changes.
 - Layer 2 compatibility/ergonomic adapter work remains deferred until Layer 1 execution and
   `OQ-E-006` closure.
 

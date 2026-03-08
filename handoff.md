@@ -16,14 +16,25 @@ This handoff captures the current documentation status and immediate direction f
   defaults remain unchanged.
 - Step 2 local replay outcome classification for `UT-E-003` is recorded as `pass` in
   `docs/plans/phase-f-risk-burndown.md`.
+- Step 1 external cross-language replay for `UT-E-003` is recorded as `pass` in
+  `docs/plans/phase-f-risk-burndown.md` using temporary harness
+  `/workspace/projects/noztr/.phasef-go/main.go` with `github.com/nbd-wtf/go-nostr/nip44`.
 - Step 3 local replay expansion for `UT-E-004` is recorded as `pass` in
   `docs/plans/phase-f-risk-burndown.md`.
 - Step 3 typed-class mapping stability for `UT-E-004` is recorded as `no-drift`;
   defaults remain unchanged.
-- Step 5 documentation lock status: frozen strict defaults remained unchanged during Steps 1-3.
-- Trigger evaluation result for `UT-E-001`/`A-D-001`: no trigger criteria fired in current passes.
-- Reminder: any future trigger firing requires an explicit `docs/plans/decision-log.md` entry before
-  default changes.
+- Step 4 local replay expansion (`UT-E-004` next-step 2) is recorded as `pass` in
+  `docs/plans/phase-f-risk-burndown.md`.
+- Step 4 seam-matrix additions are recorded: wrong-length message/signature and non-hex
+  message/signature/pubkey classes through existing hex-input seams.
+- Step 4 typed-class mapping stability remains `no-drift`; frozen defaults and strictness
+  policy remain unchanged.
+- Aggregate dual-run gates were executed after each increment pass in Step 2 and Step 4
+  (expanded matrix); latest aggregate result is `454/456` passed, `2` skipped.
+- Trigger-governance status: no `UT-E-001`/`A-D-001` trigger criteria fired, so no
+  policy/default changes were considered.
+- Rule remains: any future trigger firing must be captured in
+  `docs/plans/decision-log.md` before default changes.
 - No frozen-default or strictness-policy changes are introduced by kickoff activation.
 - Implementation status snapshot: I0-I7 are complete and validated on current protocol fixes.
 - I4 optional modules are implemented with required non-interference coverage.
