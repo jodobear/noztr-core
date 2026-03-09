@@ -41,6 +41,8 @@ Purpose: track active burn-down for `UT-E-003` and `UT-E-004` from the rust-deep
   and passing in active rust parity-all harness.
 - `UT-E-003` malformed-boundary increment expanded: version-looking single-byte `Ag==` reject case
   executed and passing in active rust parity-all harness.
+- `UT-E-003` malformed-boundary increment expanded: unsupported-version `Aw==` reject case executed
+  and passing in active rust parity-all harness.
 - Frozen defaults and strictness policy remain unchanged.
 
 ## Active Gate Commands
