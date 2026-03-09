@@ -24,9 +24,11 @@ Current project context for the Phase G kickoff baseline.
 
 - Active lane: rust only (`tools/interop/rust-nostr-parity-all`).
 - Current rust status: `16/16 HARNESS_COVERED`, `DEEP`, `PASS`.
-- Latest validation run (2026-03-09): rust parity harness `SUMMARY pass=16 fail=0 total=16`.
-- Latest validation run (2026-03-09): `zig build test --summary all` passed (`460/460 tests`).
-- Latest validation run (2026-03-09): `zig build` passed.
+- Baseline cadence run (2026-03-09): rust parity harness passed
+  (`SUMMARY pass=16 fail=0 harness_covered=16 total=16`).
+- Baseline cadence run (2026-03-09): `zig build test --summary all` passed
+  (`Build Summary: 8/8 steps succeeded; 460/460 tests passed`).
+- Baseline cadence run (2026-03-09): `zig build` passed.
 - Active cadence commands:
   - `cargo run --manifest-path tools/interop/rust-nostr-parity-all/Cargo.toml`
   - `zig build test --summary all && zig build`
@@ -76,9 +78,9 @@ Current project context for the Phase G kickoff baseline.
 ## Pending Actions
 
 1. Keep TypeScript references archive-only in docs and prevent active-cadence wording regressions.
-2. Re-run rust parity plus aggregate Zig gates on dependency or toolchain changes and record outcomes
-   in Phase F parity artifacts.
+2. Continue maintenance cadence reruns (rust parity + aggregate Zig gates) on dependency or toolchain
+   changes and record outcomes in Phase G kickoff and handoff docs.
 3. Run periodic docs consistency checks across `handoff.md`, `docs/plans/phase-g-kickoff.md`, and
    `docs/plans/build-plan.md` for rust-active / TS-archived wording continuity.
-4. Track and update Phase G release-readiness checklist progress that can proceed without remote setup.
+4. Keep progressing the Phase G release-readiness checklist items that do not require remote setup.
 5. Keep `no-3uj` visible as deferred-by-operator until remote setup returns to active execution focus.

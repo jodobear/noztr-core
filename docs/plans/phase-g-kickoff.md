@@ -19,6 +19,14 @@ Purpose: establish the minimal Phase G execution baseline while preserving final
 - `UT-E-003` and `UT-E-004` are in maintenance mode.
 - Rust lane remains active for cadence checks; TypeScript lane remains archived historical evidence only.
 
+## Baseline Cadence Evidence
+
+- Date: 2026-03-09.
+- `cargo run --manifest-path tools/interop/rust-nostr-parity-all/Cargo.toml`: PASS
+  (`SUMMARY pass=16 fail=0 harness_covered=16 total=16`).
+- `zig build test --summary all`: PASS (`Build Summary: 8/8 steps succeeded; 460/460 tests passed`).
+- `zig build`: PASS (completed without errors).
+
 ## Reopen Triggers
 
 - Reopen `UT-E-003` only if a new NIP-44 behavior class is discovered.
@@ -28,10 +36,11 @@ Purpose: establish the minimal Phase G execution baseline while preserving final
 
 ## Release-Readiness Checklist
 
-- Keep rust-active parity cadence current (`tools/interop/rust-nostr-parity-all`).
-- Run aggregate Zig gates after parity cadence reruns (`zig build test --summary all`, `zig build`).
-- Keep Phase G and handoff docs consistent with rust-active / TS-archived governance.
-- Track checklist progress and evidence updates without requiring remote setup work.
+- [done] Keep rust-active parity cadence current (`tools/interop/rust-nostr-parity-all`).
+- [done] Run aggregate Zig gates after parity cadence reruns
+  (`zig build test --summary all`, `zig build`).
+- [done] Keep Phase G and handoff docs consistent with rust-active / TS-archived governance.
+- [in_progress] Track checklist progress and evidence updates without requiring remote setup work.
 
 ## Blocker Visibility
 
