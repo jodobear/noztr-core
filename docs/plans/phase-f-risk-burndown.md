@@ -62,6 +62,8 @@ Purpose: track active burn-down for `UT-E-003` and `UT-E-004` from the rust-deep
   (`UT-E-003-MAL-007`, payload `AgAA`) executed and passing in active rust parity-all harness.
 - `UT-E-003` malformed-boundary increment expanded: length-4 truncated-body reject case
   (`UT-E-003-MAL-008`, payload `AgAAAA==`) executed and passing in active rust parity-all harness.
+- `UT-E-003` malformed-boundary increment expanded: length-5 truncated-body reject case
+  (`UT-E-003-MAL-009`, payload `AgAAAAA=`) executed and passing in active rust parity-all harness.
 - Frozen defaults and strictness policy remain unchanged.
 
 ## Active Gate Commands
