@@ -799,6 +799,30 @@ test "multi-invalid non-hex full-length precedence keeps boundary-direct parity"
     }
 }
 
+test "mixed-stage precedence keeps boundary-direct parity" {
+    for (bip340_vectors) |vector| {
+        if (vector.expected_class == .valid) {
+            var non_hex_public_key = build_non_hex_input(64, vector.public_key_hex);
+            const odd_message_hex = vector.message_hex[0..63];
+            const signature_hex = vector.signature_hex;
+            const boundary_class = classify_boundary_hex_inputs(
+                non_hex_public_key[0..],
+                odd_message_hex,
+                signature_hex,
+            );
+            const direct_class = classify_direct_hex_inputs(
+                non_hex_public_key[0..],
+                odd_message_hex,
+                signature_hex,
+            );
+
+            try std.testing.expectEqual(direct_class, boundary_class);
+            try std.testing.expectEqual(VerifyClass.invalid_signature, boundary_class);
+            try std.testing.expect(boundary_class != .backend_unavailable);
+        }
+    }
+}
+
 test "non-hex seam classes keep boundary-direct parity" {
     for (bip340_vectors) |vector| {
         if (vector.expected_class == .valid) {

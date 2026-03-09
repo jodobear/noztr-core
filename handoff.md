@@ -46,7 +46,9 @@ Current project context for the next Phase F execution slice.
   plus multi-invalid odd-length precedence coverage (`63` pubkey + `63` message + `127` signature)
   passing with deterministic `invalid_public_key` precedence, plus multi-invalid full-length
   non-hex precedence coverage (`64` pubkey + `64` message + `128` signature) passing with the same
-  deterministic `invalid_public_key` no-drift mapping.
+  deterministic `invalid_public_key` no-drift mapping, plus mixed-stage precedence coverage
+  (non-hex `64` pubkey + odd-length `63` message + valid `128` signature) passing with
+  deterministic `invalid_signature` no-drift mapping.
 - Trigger-governance status unchanged: no `UT-E-001`/`A-D-001` trigger criteria fired.
 
 ## Pending Actions
