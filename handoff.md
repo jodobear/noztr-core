@@ -17,7 +17,8 @@ Current project context for the Phase G kickoff baseline.
 
 - Active execution state is Phase G kickoff baseline.
 - `UT-E-003` and `UT-E-004` are maintenance-mode only; reopen only on new behavior-class discovery.
-- Active blocker: `no-3uj` (git/Dolt remote + sync readiness).
+- Blocker visibility: `no-3uj` (git/Dolt remote + sync readiness) is deferred-by-operator and not in
+  current execution focus.
 
 ## Active Parity Gate
 
@@ -75,8 +76,9 @@ Current project context for the Phase G kickoff baseline.
 ## Pending Actions
 
 1. Keep TypeScript references archive-only in docs and prevent active-cadence wording regressions.
-2. Re-run rust parity on dependency/version bumps and update parity matrix/ledger.
-3. Continue `UT-E-003` replay-depth burn-down.
-4. Continue `UT-E-004` secp-boundary burn-down.
-5. Keep rust-active cadence with aggregate `zig` gates (`zig build test --summary all`, `zig build`)
-   after each material depth increment.
+2. Re-run rust parity plus aggregate Zig gates on dependency or toolchain changes and record outcomes
+   in Phase F parity artifacts.
+3. Run periodic docs consistency checks across `handoff.md`, `docs/plans/phase-g-kickoff.md`, and
+   `docs/plans/build-plan.md` for rust-active / TS-archived wording continuity.
+4. Track and update Phase G release-readiness checklist progress that can proceed without remote setup.
+5. Keep `no-3uj` visible as deferred-by-operator until remote setup returns to active execution focus.

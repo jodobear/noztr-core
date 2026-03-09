@@ -17,14 +17,28 @@ Purpose: establish the minimal Phase G execution baseline while preserving final
 
 - Active execution state is Phase G kickoff baseline.
 - `UT-E-003` and `UT-E-004` are in maintenance mode.
-- Reopen `UT-E-003`/`UT-E-004` only when a new behavior class is discovered.
 - Rust lane remains active for cadence checks; TypeScript lane remains archived historical evidence only.
+
+## Reopen Triggers
+
+- Reopen `UT-E-003` only if a new NIP-44 behavior class is discovered.
+- Reopen `UT-E-004` only if a new secp-boundary behavior class is discovered.
+- Depth-only reruns, fixture refreshes, dependency bumps, and toolchain updates are maintenance cadence
+  work and do not reopen either item by default.
+
+## Release-Readiness Checklist
+
+- Keep rust-active parity cadence current (`tools/interop/rust-nostr-parity-all`).
+- Run aggregate Zig gates after parity cadence reruns (`zig build test --summary all`, `zig build`).
+- Keep Phase G and handoff docs consistent with rust-active / TS-archived governance.
+- Track checklist progress and evidence updates without requiring remote setup work.
 
 ## Blocker Visibility
 
-- `no-3uj` is the active blocker for git/Dolt remote + sync readiness.
+- `no-3uj` remains visible for git/Dolt remote + sync readiness.
+- Operator note: `no-3uj` is deferred-by-operator for now and is not the current execution focus.
 
 ## Immediate Next Action
 
-1. Clear `no-3uj`.
-2. Continue the release-readiness cadence from the Phase G baseline.
+1. Continue maintenance-mode cadence from the Phase G baseline.
+2. Advance the release-readiness checklist items that do not require remote setup.

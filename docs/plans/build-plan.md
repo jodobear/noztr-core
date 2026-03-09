@@ -110,10 +110,12 @@ Implementation status snapshot (post-I7 closure):
 - Layer 2 compatibility/ergonomic adapter work remains deferred until Layer 1 execution and
   `OQ-E-006` closure.
 
-Phase F next actions from current baseline:
+Phase G execution focus from current baseline:
 - keep TypeScript references archive-only and prevent active-cadence wording regressions.
-- maintain rust parity gate reruns on dependency/version bumps.
-- continue `UT-E-003` and `UT-E-004` burn-down depth tasks.
+- run rust parity cadence plus aggregate Zig gates on dependency/toolchain changes.
+- treat `UT-E-003`/`UT-E-004` as maintenance-mode items; reopen only on new behavior-class discovery.
+- progress release-readiness checklist items that do not require remote setup.
+- keep blocker `no-3uj` visible as deferred-by-operator and out of current execution focus.
 
 ## Phase F hard-gate closure status (epic `no-dr3`)
 
