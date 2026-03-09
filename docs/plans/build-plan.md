@@ -115,6 +115,24 @@ Phase F next actions from current baseline:
 - maintain rust parity gate reruns on dependency/version bumps.
 - continue `UT-E-003` and `UT-E-004` burn-down depth tasks.
 
+## Phase F hard-gate closure status (epic `no-dr3`)
+
+- `no-21a` Gate 1 (scope freeze first): complete.
+  Representative-set freeze is recorded and locked before gate reruns
+  (`docs/plans/phase-f-replay-inputs.md`, `docs/plans/phase-f-parity-matrix.md`).
+- `no-hbo` Gate 2 (three consecutive full-gate runs): complete.
+  Full sequence executed three times consecutively from controlled state with stable pass outcomes.
+- `no-fof` Gate 3 (fail-fast on drift): complete.
+  No drift detected across the three-run window; all three runs are recorded in
+  `docs/plans/phase-f-risk-burndown.md`.
+- `no-6jx` Gate 4 (no-new-findings closure rationale): complete.
+  Closure rationale based on latest incremental candidates is recorded in
+  `docs/plans/phase-f-risk-burndown.md`.
+- `no-1jh` Gate 5 (governance/docs closure with open P0/P1 check): complete.
+  `bd query "status=open AND (priority=0 OR priority=1)" --json --limit 0`
+  pre-check: `count=0`, ids: none; post-check: `count=0`, ids: none.
+- Policy note: rust lane remains active and TS lane remains archived historical evidence only.
+
 ### Phase I0 - Foundation and Shared Contracts
 
 - Modules/files: `src/root.zig`, `src/limits.zig`, `src/errors.zig`, `build.zig` test wiring.

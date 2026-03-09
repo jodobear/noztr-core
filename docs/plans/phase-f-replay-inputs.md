@@ -47,3 +47,17 @@ Malformed boundary increment (deterministic reject corpus):
   payload `AgAAAAAA`, expectation `decrypt_reject`.
 - Added case: `UT-E-003-MAL-011` using the same known-good key,
   payload `AgAAAAAAAA==`, expectation `decrypt_reject`.
+
+## UT-E-003 representative coverage lock
+
+- Representative malformed classes for this hard-gate pass are frozen to:
+  single-byte malformed payloads (`AQ==`, `AA==`, `Ag==`, `Aw==`), empty payload,
+  and truncated-body payloads (`AgA=`, `AgAA`, `AgAAAA==`, `AgAAAAA=`,
+  `AgAAAAAA`, `AgAAAAAAAA==`).
+- Freeze criteria for this pass:
+  - no new malformed-class family is added while these representatives remain
+    `decrypt_reject` with parity `PASS` on the active rust lane;
+  - expansion is allowed only when a new behavior class is discovered
+    (classifier mismatch, parity drift, or non-deterministic result).
+- Governance note: this lock is execution-scope control only and does not change
+  strict defaults or frozen policy (`D-001`..`D-004`).

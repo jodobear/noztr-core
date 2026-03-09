@@ -54,4 +54,18 @@ Rust deep-pass note:
 - Active rust lane now records `DEEP` depth for all implemented NIPs (`16/16`) with added malformed
   or negative assertions per check function.
 
+## UT-E-004 representative matrix completeness
+
+- Declaration: representative secp-boundary classifier families are complete for this hard-gate pass.
+- Covered families:
+  - `invalid_public_key`: overlength wrong-shape, odd-length wrong-shape,
+    and multi-invalid precedence where pubkey invalidity dominates.
+  - `invalid_signature`: overlength message/signature wrong-shape,
+    odd-length message/signature wrong-shape, and mixed-stage precedence cases.
+- Negative-space assertion coverage is present for each representative family:
+  expected classifier is asserted and non-expected classifier branches are
+  asserted absent in boundary/direct parity mapping (`no-drift`).
+- Scope lock: representative families are frozen in this pass;
+  incremental expansion is deferred unless a new behavior class is discovered.
+
 Policy note: this governance-scope change introduces no frozen-default or strictness-policy change.

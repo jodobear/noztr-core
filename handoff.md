@@ -18,7 +18,7 @@ Current project context for the next Phase F execution slice.
 - Active lane: rust only (`tools/interop/rust-nostr-parity-all`).
 - Current rust status: `16/16 HARNESS_COVERED`, `DEEP`, `PASS`.
 - Latest validation run (2026-03-09): rust parity harness `SUMMARY pass=16 fail=0 total=16`.
-- Latest validation run (2026-03-09): `zig build test --summary all` passed (`450/450 tests`).
+- Latest validation run (2026-03-09): `zig build test --summary all` passed (`460/460 tests`).
 - Latest validation run (2026-03-09): `zig build` passed.
 - Active cadence commands:
   - `cargo run --manifest-path tools/interop/rust-nostr-parity-all/Cargo.toml`
@@ -55,6 +55,16 @@ Current project context for the next Phase F execution slice.
   coverage (non-hex `64` pubkey + valid `64` message + odd-length `127` signature) passing with
   deterministic `invalid_signature` no-drift mapping.
 - Trigger-governance status unchanged: no `UT-E-001`/`A-D-001` trigger criteria fired.
+
+## Hard-Gate Snapshot (epic `no-dr3`)
+
+- Scope freeze: representative sets are locked for `UT-E-003` and `UT-E-004`; no class expansion
+  during this pass.
+- Stability window: three consecutive controlled runs completed with no drift
+  (rust parity `pass=16 fail=0`; zig tests `460/460`; `zig build` pass each run).
+- No-new-findings closure: latest incremental candidates produced no new behavior-class findings.
+- Governance closure: open high-priority check (`P0/P1`) is `0` before and after gate sequence.
+- Policy continuity: rust-active lane maintained; TS remains archived historical evidence.
 
 ## Pending Actions
 

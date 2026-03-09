@@ -75,8 +75,30 @@ Purpose: track active burn-down for `UT-E-003` and `UT-E-004` from the rust-deep
 | Scope | Command | Latest result |
 | --- | --- | --- |
 | Rust parity gate | `cargo run --manifest-path tools/interop/rust-nostr-parity-all/Cargo.toml` | pass (`SUMMARY pass=16 fail=0 total=16`) |
-| Aggregate quality gates | `zig build test --summary all && zig build` | pass (`450/450 tests passed`; `zig build` passed) |
+| Aggregate quality gates | `zig build test --summary all && zig build` | pass (`460/460 tests passed`; `zig build` passed) |
 | NIP-59 comparative focus | `zig build test --summary all -- --test-filter "nip59"` | pass |
+
+## Stability window (3 consecutive runs)
+
+- Controlled-state sequence executed three consecutive times:
+  `cargo run --manifest-path tools/interop/rust-nostr-parity-all/Cargo.toml` ->
+  `zig build test --summary all` -> `zig build`.
+- Run #1 outcome: rust parity `SUMMARY pass=16 fail=0 total=16`; zig tests `460/460` pass;
+  `zig build` pass.
+- Run #2 outcome: rust parity `SUMMARY pass=16 fail=0 total=16`; zig tests `460/460` pass;
+  `zig build` pass.
+- Run #3 outcome: rust parity `SUMMARY pass=16 fail=0 total=16`; zig tests `460/460` pass;
+  `zig build` pass.
+- Drift check result: no drift observed across all three consecutive runs.
+
+## No-new-findings closure check
+
+- Latest incremental candidates were the added malformed/truncated NIP-44 payload representatives
+  (`UT-E-003-MAL-001`..`UT-E-003-MAL-011`) and secp classifier-precedence additions under `UT-E-004`.
+- Closure rationale: latest candidates produced stable deterministic outcomes with no new classifier
+  family, no parity mismatch, and no boundary/direct mapping drift.
+- Result: no new findings opened from latest increment set in this pass.
+- Incremental expansion status: frozen pending discovery of a new behavior class.
 
 ## Historical Evidence (Archived)
 
