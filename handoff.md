@@ -42,7 +42,9 @@ Current project context for the next Phase F execution slice.
   including overlength pubkey wrong-shape (`64+2` hex) classified `invalid_public_key` with
   boundary/direct parity, plus overlength message (`64+2`) and signature (`128+2`) wrong-shape
   cases classified `invalid_signature` with boundary/direct parity, and odd-length wrong-shape
-  coverage (`63` pubkey/message, `127` signature) passing with the same no-drift parity mapping.
+  coverage (`63` pubkey/message, `127` signature) passing with the same no-drift parity mapping,
+  plus multi-invalid odd-length precedence coverage (`63` pubkey + `63` message + `127` signature)
+  passing with deterministic `invalid_public_key` precedence.
 - Trigger-governance status unchanged: no `UT-E-001`/`A-D-001` trigger criteria fired.
 
 ## Pending Actions

@@ -751,6 +751,30 @@ test "odd-length wrong-shape classes keep boundary-direct parity" {
     }
 }
 
+test "multi-invalid input precedence keeps boundary-direct parity" {
+    for (bip340_vectors) |vector| {
+        if (vector.expected_class == .valid) {
+            const odd_public_key_hex = vector.public_key_hex[0..63];
+            const odd_message_hex = vector.message_hex[0..63];
+            const odd_signature_hex = vector.signature_hex[0..127];
+            const boundary_class = classify_boundary_hex_inputs(
+                odd_public_key_hex,
+                odd_message_hex,
+                odd_signature_hex,
+            );
+            const direct_class = classify_direct_hex_inputs(
+                odd_public_key_hex,
+                odd_message_hex,
+                odd_signature_hex,
+            );
+
+            try std.testing.expectEqual(direct_class, boundary_class);
+            try std.testing.expectEqual(VerifyClass.invalid_public_key, boundary_class);
+            try std.testing.expect(boundary_class != .backend_unavailable);
+        }
+    }
+}
+
 test "non-hex seam classes keep boundary-direct parity" {
     for (bip340_vectors) |vector| {
         if (vector.expected_class == .valid) {
