@@ -1,6 +1,6 @@
 # noztr Build Plan (Phase E Final)
 
-Date: 2026-03-07
+Date: 2026-03-09
 
 This artifact is finalized for implementation execution and is aligned to:
 
@@ -86,19 +86,17 @@ Implementation status snapshot (post-I7 closure):
   `pow_meets_difficulty_verified_id`; unchecked helper behavior is internal-only.
 - Phase F execution is active on the post-I7 baseline; kickoff tracking is in
   `docs/plans/phase-f-kickoff.md`.
-- Phase F risk burn-down is started with first replay pass evidence in
+- Phase F risk burn-down is active with replay pass evidence in
   `docs/plans/phase-f-risk-burndown.md` (`UT-E-003`/`UT-E-004`).
 - Current implementation state remains post-I7 closure baseline; no default-policy changes are
   introduced by kickoff tracking.
-- Historical dual-lane cadence evidence remains recorded in Phase F artifacts.
-- Active parity cadence now runs rust parity-all plus aggregate `zig` gates only.
-- Rust parity depth update: `NIP-59` is now `DEEP` in active rust parity-all harness
-  (`check_nip59`: baseline + wrong-recipient + non-giftwrap + sender-mismatch + repeated-unwrap
-  consistency).
-- Comparative evidence path for NIP-59 remains:
+- Active parity cadence runs rust parity-all plus aggregate `zig` gates only.
+- Active rust parity status is `16/16 HARNESS_COVERED`, `DEEP`, `PASS`.
+- TypeScript parity lane is archived historical evidence only; records are preserved in canonical
+  Phase F artifacts.
+- Comparative evidence path for active NIP-59 deep parity remains:
   `cargo run --manifest-path tools/interop/rust-nostr-parity-all/Cargo.toml` and
   `zig build test --summary all -- --test-filter "nip59"` (`src/nip59_wrap.zig`).
-- Latest aggregate `zig` result remains `454/456` passed, `2` skipped.
 - Trigger-governance status: no `UT-E-001`/`A-D-001` trigger criteria fired, so no
   policy/default changes were considered.
 - Rule remains: any future trigger firing requires a decision-log entry before any default changes.
@@ -111,6 +109,11 @@ Implementation status snapshot (post-I7 closure):
   policy and library behavior remain unchanged.
 - Layer 2 compatibility/ergonomic adapter work remains deferred until Layer 1 execution and
   `OQ-E-006` closure.
+
+Phase F next actions from current baseline:
+- keep TypeScript references archive-only and prevent active-cadence wording regressions.
+- maintain rust parity gate reruns on dependency/version bumps.
+- continue `UT-E-003` and `UT-E-004` burn-down depth tasks.
 
 ### Phase I0 - Foundation and Shared Contracts
 

@@ -610,6 +610,25 @@ test "wrong-length public key classifies with boundary-direct parity" {
             try std.testing.expectEqual(short_direct_class, short_boundary_class);
             try std.testing.expectEqual(VerifyClass.invalid_public_key, short_boundary_class);
             try std.testing.expect(short_boundary_class != .backend_unavailable);
+
+            var overlength_public_key_hex: [66]u8 = undefined;
+            std.mem.copyForwards(u8, overlength_public_key_hex[0..64], vector.public_key_hex);
+            overlength_public_key_hex[64] = '0';
+            overlength_public_key_hex[65] = '0';
+
+            const overlength_boundary_class = classify_boundary_hex_inputs(
+                overlength_public_key_hex[0..],
+                vector.message_hex,
+                vector.signature_hex,
+            );
+            const overlength_direct_class = classify_direct_hex_inputs(
+                overlength_public_key_hex[0..],
+                vector.message_hex,
+                vector.signature_hex,
+            );
+            try std.testing.expectEqual(overlength_direct_class, overlength_boundary_class);
+            try std.testing.expectEqual(VerifyClass.invalid_public_key, overlength_boundary_class);
+            try std.testing.expect(overlength_boundary_class != .backend_unavailable);
         }
     }
 }

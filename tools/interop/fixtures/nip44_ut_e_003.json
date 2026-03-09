@@ -37,5 +37,13 @@
       "plaintext": "pepper👀їжак",
       "payload_expectation_base64": "Ao1EQnE+udR5EXXLBA2Y1vxb6IZNbsL4nPCJWisrctGxY3AduCS+jTUgAAnfvKafkmpy15+i9YMwCdccisRa8SvzW671T2JO4LFSPX31K4kYUKelSAdSPwe9NwO6LhOsnoJ+"
     }
+  ],
+  "malformed_fixtures": [
+    {
+      "id": "UT-E-003-MAL-001",
+      "conversation_key_hex": "c41c775356fd92eadc63ff5a0dc1da211b268cbea22316767095b2871ea1412d",
+      "payload_base64": "AQ==",
+      "expectation": "decrypt_reject"
+    }
   ]
 }

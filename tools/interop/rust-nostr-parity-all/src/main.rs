@@ -85,6 +85,7 @@ struct NipResult {
 #[derive(Deserialize)]
 struct FixtureSet {
     fixtures: Vec<Fixture>,
+    malformed_fixtures: Option<Vec<MalformedFixture>>,
 }
 
 #[derive(Deserialize)]
@@ -93,6 +94,14 @@ struct Fixture {
     nonce_hex: String,
     plaintext: String,
     payload_expectation_base64: String,
+}
+
+#[derive(Deserialize)]
+struct MalformedFixture {
+    id: String,
+    conversation_key_hex: String,
+    payload_base64: String,
+    expectation: String,
 }
 
 struct FixedNonceRng {
@@ -510,6 +519,28 @@ fn check_nip44() -> Result<(), String> {
             malformed_mac[last_index] ^= 0x01;
             if decrypt_to_bytes(&conversation_key, &malformed_mac).is_ok() {
                 return Err("tampered-mac payload accepted".to_string());
+            }
+        }
+    }
+
+    if let Some(malformed_fixtures) = set.malformed_fixtures {
+        for fixture in malformed_fixtures {
+            if fixture.expectation != "decrypt_reject" {
+                return Err(format!(
+                    "malformed fixture {} expectation mismatch",
+                    fixture.id
+                ));
+            }
+
+            let conversation_key = parse_array_32("key", &fixture.conversation_key_hex)
+                .map(ConversationKey::new)
+                .map_err(|e| format!("malformed fixture key parse: {e}"))?;
+            let payload = STANDARD
+                .decode(&fixture.payload_base64)
+                .map_err(|e| format!("malformed fixture payload decode: {e}"))?;
+
+            if decrypt_to_bytes(&conversation_key, &payload).is_ok() {
+                return Err(format!("malformed fixture {} decrypt accepted", fixture.id));
             }
         }
     }

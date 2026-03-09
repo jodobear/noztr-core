@@ -9,6 +9,9 @@ Governance status:
 - TypeScript lane (`nostr-tools`) is archived for historical evidence only.
 - Historical TypeScript evidence is preserved here and remains referenceable.
 
+Current active rust status:
+- `16/16` implemented NIPs are `HARNESS_COVERED`, `DEEP`, `PASS`.
+
 ## Taxonomy and Depth
 
 - Taxonomy: `LIB_SUPPORTED`, `HARNESS_COVERED`, `NOT_COVERED_IN_THIS_PASS`, `LIB_UNSUPPORTED`.
@@ -20,7 +23,7 @@ Governance status:
 
 ## Matrix
 
-| NIP | Rust taxonomy (active) | Rust depth | Rust result | Rust evidence command | TS taxonomy (archived) | TS depth | TS result | TS evidence command | Notes |
+| NIP | Rust taxonomy (active) | Rust depth | Rust result | Rust evidence command | TS taxonomy (archived snapshot) | TS depth | TS result | TS evidence command (historical) | Notes |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | NIP-01 | `HARNESS_COVERED` | `DEEP` | `PASS` | `cargo run --manifest-path tools/interop/rust-nostr-parity-all/Cargo.toml` | `HARNESS_COVERED` | `EDGE` | `PASS` | `npm run run` (in `tools/interop/ts-nostr-parity-all`) | rust deep adds tampered-content rejection in addition to tampered-signature rejection |
 | NIP-02 | `HARNESS_COVERED` | `DEEP` | `PASS` | `cargo run --manifest-path tools/interop/rust-nostr-parity-all/Cargo.toml` | `HARNESS_COVERED` | `BASELINE` | `PASS` | `npm run run` (in `tools/interop/ts-nostr-parity-all`) | rust deep adds malformed `p`-tag non-hex rejection path |
@@ -31,7 +34,7 @@ Governance status:
 | NIP-21 | `HARNESS_COVERED` | `DEEP` | `PASS` | `cargo run --manifest-path tools/interop/rust-nostr-parity-all/Cargo.toml` | `HARNESS_COVERED` | `EDGE` | `PASS` | `npm run run` (in `tools/interop/ts-nostr-parity-all`) | rust deep adds malformed `nostr:npub...` decode rejection |
 | NIP-40 | `HARNESS_COVERED` | `DEEP` | `PASS` | `cargo run --manifest-path tools/interop/rust-nostr-parity-all/Cargo.toml` | `HARNESS_COVERED` | `EDGE` | `PASS` | `npm run run` (in `tools/interop/ts-nostr-parity-all`) | rust deep adds missing-expiration-value negative plus existing boundary/malformed checks |
 | NIP-42 | `HARNESS_COVERED` | `DEEP` | `PASS` | `cargo run --manifest-path tools/interop/rust-nostr-parity-all/Cargo.toml` | `HARNESS_COVERED` | `EDGE` | `PASS` | `npm run run` (in `tools/interop/ts-nostr-parity-all`) | rust deep adds missing-challenge-tag rejection via auth-tag mutation |
-| NIP-44 | `HARNESS_COVERED` | `DEEP` | `PASS` | `cargo run --manifest-path tools/interop/rust-nostr-parity-all/Cargo.toml` | `HARNESS_COVERED` | `DEEP` | `PASS` | `npm run run` (in `tools/interop/ts-nostr-parity-all`) | rust deep adds tampered-payload MAC-bitflip rejection on top of fixture replay |
+| NIP-44 | `HARNESS_COVERED` | `DEEP` | `PASS` | `cargo run --manifest-path tools/interop/rust-nostr-parity-all/Cargo.toml` | `HARNESS_COVERED` | `DEEP` | `PASS` | `npm run run` (in `tools/interop/ts-nostr-parity-all`) | rust deep adds tampered-payload MAC-bitflip rejection plus malformed boundary `AQ==` decrypt reject check |
 | NIP-45 | `HARNESS_COVERED` | `DEEP` | `PASS` | `cargo run --manifest-path tools/interop/rust-nostr-parity-all/Cargo.toml` | `HARNESS_COVERED` | `EDGE` | `PASS` | `npm run run` (in `tools/interop/ts-nostr-parity-all`) | rust deep adds malformed relay top-level object rejection |
 | NIP-50 | `HARNESS_COVERED` | `DEEP` | `PASS` | `cargo run --manifest-path tools/interop/rust-nostr-parity-all/Cargo.toml` | `HARNESS_COVERED` | `EDGE` | `PASS` | `npm run run` (in `tools/interop/ts-nostr-parity-all`) | rust deep adds array-typed `search` rejection in parser boundary checks |
 | NIP-59 | `HARNESS_COVERED` | `DEEP` | `PASS` | `cargo run --manifest-path tools/interop/rust-nostr-parity-all/Cargo.toml` | `HARNESS_COVERED` | `EDGE` | `PASS` | `npm run run` (in `tools/interop/ts-nostr-parity-all`) | rust deep now includes malformed gift-wrap payload-content rejection in addition to prior deep checks |
@@ -40,7 +43,7 @@ Governance status:
 | NIP-77 | `HARNESS_COVERED` | `DEEP` | `PASS` | `cargo run --manifest-path tools/interop/rust-nostr-parity-all/Cargo.toml` | `HARNESS_COVERED` | `EDGE` | `PASS` | `npm run run` (in `tools/interop/ts-nostr-parity-all`) | rust deep adds malformed NEG-MSG subscription-id type rejection |
 
 Active cadence note: active pass/fail cadence uses only the rust parity harness plus aggregate `zig`
-gates.
+gates. TS command entries in this matrix are historical evidence pointers only.
 
 NIP-59 comparative note:
 - rust deep evidence command: `cargo run --manifest-path tools/interop/rust-nostr-parity-all/Cargo.toml`

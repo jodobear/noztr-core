@@ -9,8 +9,8 @@ actions.
 
 | Scope | Status | Evidence |
 | --- | --- | --- |
-| Rust lane (`tools/interop/rust-nostr-parity-all`) | Active parity gate lane; `HARNESS_COVERED` for 16/16 implemented NIPs; `0` `NOT_COVERED_IN_THIS_PASS`; `0` `LIB_UNSUPPORTED` | `cargo run --manifest-path tools/interop/rust-nostr-parity-all/Cargo.toml` |
-| TypeScript lane (`tools/interop/ts-nostr-parity-all`) | Archived/historical evidence lane; not part of active pass/fail cadence | Historical evidence retained in this ledger, matrix, and `docs/plans/phase-f-risk-burndown.md` |
+| Rust lane (`tools/interop/rust-nostr-parity-all`) | Active parity gate lane; `16/16` implemented NIPs are `HARNESS_COVERED`, `DEEP`, `PASS`; `0` `NOT_COVERED_IN_THIS_PASS`; `0` `LIB_UNSUPPORTED` | `cargo run --manifest-path tools/interop/rust-nostr-parity-all/Cargo.toml` |
+| TypeScript lane (`tools/interop/ts-nostr-parity-all`) | Archived historical evidence only; excluded from active pass/fail cadence | Historical evidence retained in this ledger, matrix, and `docs/plans/phase-f-risk-burndown.md` |
 | Full side-by-side matrix | canonical and current | `docs/plans/phase-f-parity-matrix.md` |
 | Incremental depth raise (current pass) | rust lane deep-pass raised all implemented NIPs (`16/16`) to `DEEP` with additional malformed/negative assertions; defaults unchanged | `tools/interop/rust-nostr-parity-all/src/main.rs` |
 
@@ -18,26 +18,27 @@ actions.
 
 | Delta | Why deliberate | Current taxonomy | Next smallest action |
 | --- | --- | --- | --- |
-| NIP-40 TS path uses implementation-file fallback when package export is absent | `nostr-tools` version used here does not export `./nip40`; executable semantics still available in `lib/esm/nip40.js` | `HARNESS_COVERED` | keep fallback documented and re-check if package exports change |
-| TS NIP-70 has no dedicated helper export in this package version | structural `['-']` semantics are covered through event/tag APIs | `HARNESS_COVERED` | keep structural semantics coverage until helper API exists |
+| NIP-40 TS path uses implementation-file fallback when package export is absent | `nostr-tools` version used here does not export `./nip40`; executable semantics still available in `lib/esm/nip40.js` | archived historical evidence | keep fallback documented in archive notes and re-check only if TS lane is reactivated |
+| TS NIP-70 has no dedicated helper export in this package version | structural `['-']` semantics are covered through event/tag APIs | archived historical evidence | keep structural semantics note in archive section until helper API exists |
 | Strict default boundary behavior differs from permissive SDK defaults in selected paths | intentional Layer 1 strictness preserves deterministic trust-boundary semantics | `HARNESS_COVERED` parity reporting + documented divergence | keep release note current in `docs/release/intentional-divergences.md` |
-| `LIB_UNSUPPORTED` claims still require executable proof of no public API path | preserve model-v1 semantics and avoid unsupported over-claims | none emitted in either lane | keep explicit proof requirement |
+| `LIB_UNSUPPORTED` claims still require executable proof of no public API path | preserve model-v1 semantics and avoid unsupported over-claims | none emitted in rust active lane | keep explicit proof requirement |
 
 ## noztr Uniqueness Points
 
 | Point | Why it matters | Evidence |
 | --- | --- | --- |
-| Strict taxonomy + depth model in harness output | keeps pass/fail semantics machine-readable and stable | `tools/interop/rust-nostr-parity-all/src/main.rs`, `tools/interop/ts-nostr-parity-all/index.ts` |
+| Strict taxonomy + depth model in harness output | keeps pass/fail semantics machine-readable and stable | `tools/interop/rust-nostr-parity-all/src/main.rs`, archived historical TS harness: `tools/interop/ts-nostr-parity-all/index.ts` |
 | Exit code policy tied only to `HARNESS_COVERED` failures | avoids false negatives from intentionally deferred checks | same harness files |
 | Canonical-only public Layer 1 APIs | unreleased surface avoids alias drift and trust-boundary ambiguity | `src/nip01_message.zig`, `src/nip13_pow.zig`, `src/root.zig` |
 | Strict default wording preserved | parity model does not alter strictness/default policy | `docs/plans/decision-log.md`, `docs/plans/build-plan.md` |
 
 ## Next Actions
 
-1. Keep matrix and ledger authoritative for parity-model v1 status.
-2. Re-run only the rust parity-all harness for active parity gates on dependency bumps.
-3. Preserve frozen defaults posture; parity expansion remains reporting/test depth only.
-4. Keep release-facing divergence guidance synchronized in `docs/release/intentional-divergences.md`.
+1. Move any remaining old TS cadence wording into archive-only sections.
+2. Re-run rust parity (`tools/interop/rust-nostr-parity-all`) on dependency/version bumps.
+3. Continue `UT-E-003` and `UT-E-004` depth burn-down work and append results in
+   `docs/plans/phase-f-risk-burndown.md`.
+4. Keep matrix/ledger authoritative and keep frozen defaults unchanged.
 
 ## NIP-59 Deep Comparison
 
