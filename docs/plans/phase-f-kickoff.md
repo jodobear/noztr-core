@@ -42,6 +42,17 @@ Purpose: start Phase F execution tracking on the post-I7 baseline without changi
 - Phase F Step 9 rust-nostr parity-all depth notch (malformed/edge expansion with same
   coverage set) is recorded in `docs/plans/phase-f-risk-burndown.md` and
   `docs/plans/phase-f-rust-nostr-parity.md`.
+- Phase F Step 11 parity-expansion pass is recorded in
+  `docs/plans/phase-f-risk-burndown.md` with:
+  - rust lane deeper negatives on covered checks plus explicit capability probes for
+    uncovered `NIP-40/45/50/70/77`.
+  - TS lane new covered checks for `NIP-11`, `NIP-59`, `NIP-77`.
+- Phase F Step 12 TS thorough parity expansion is recorded in
+  `docs/plans/phase-f-risk-burndown.md` with:
+  - TS lane promoted `NIP-02`, `NIP-09`, and `NIP-65` to `HARNESS_COVERED` structural
+    baselines.
+  - Remaining TS uncovered NIPs (`NIP-40/45/50/70`) use explicit runtime capability probes and
+    classify as `NOT_COVERED_IN_THIS_PASS` (no proven `LIB_UNSUPPORTED` entries).
 - Phase F Step 3 `UT-E-004` replay expansion is recorded in
   `docs/plans/phase-f-risk-burndown.md` with expanded mutation classes and `no-drift`
   typed-class mapping stability.
@@ -86,6 +97,11 @@ Burn-down guardrail: execute these tasks as depth expansion only; do not change 
   untested NIPs explicitly reported as `NOT_COVERED_IN_THIS_PASS`).
 - Step 9 rust-nostr parity-all depth-notch status: executed (supported overlap checks passed with
   added malformed/edge negatives for `NIP-19/21/42/44/65`; implemented untested NIPs unchanged).
+- Step 11 parity-expansion status: executed (rust summary `pass=11/fail=0` with probe-backed
+  uncovered classifications; TS summary `pass=9/fail=0`, including new covered `NIP-11/59/77`).
+- Step 12 TS thorough parity expansion status: executed (TS summary `pass=12/fail=0`,
+  with `NIP-02/09/65` now covered and `NIP-40/45/50/70` probe-backed as
+  `NOT_COVERED_IN_THIS_PASS`; `lib_unsupported=0`).
 - Canonical evidence artifact: `docs/plans/phase-f-risk-burndown.md`.
 - Canonical parity matrix artifact: `docs/plans/phase-f-parity-matrix.md`.
 - Canonical parity ledger artifact: `docs/plans/phase-f-parity-ledger.md`.

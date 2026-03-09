@@ -39,12 +39,22 @@ This handoff captures the current documentation status and immediate direction f
 - Persistent ts-nostr parity-all harness is now maintained at
   `tools/interop/ts-nostr-parity-all` for full implemented-NIP overlap checks in the
   TypeScript lane.
-- ts-nostr parity-all matrix pass is recorded as `pass` in
-  `docs/plans/phase-f-ts-nostr-tools-parity.md` with `NOT_COVERED_IN_THIS_PASS` reporting for
-  `NIP-02`, `NIP-09`, `NIP-11`, `NIP-40`, `NIP-45`, `NIP-50`, `NIP-59`, `NIP-65`,
-  `NIP-70`, `NIP-77`.
+- Current ts-nostr parity-all status is recorded in canonical model-v1 artifacts with
+  `HARNESS_COVERED` for 12/16 implemented NIPs and probe-backed
+  `NOT_COVERED_IN_THIS_PASS` for `NIP-40/45/50/70`.
 - Parity execution model v1 is now adopted with canonical taxonomy/depth output in both
   parity-all harnesses.
+- Phase F Step 11 parity-expansion pass is recorded as `pass` in
+  `docs/plans/phase-f-risk-burndown.md`:
+  - rust lane keeps 11 covered checks and adds explicit capability-probe details for uncovered
+    `NIP-40/45/50/70/77` (`NOT_COVERED_IN_THIS_PASS`, no unsupported proof).
+  - TS lane expands to 9 covered checks by adding `NIP-11`, `NIP-59`, `NIP-77`.
+- Phase F Step 12 TS thorough parity expansion pass is recorded as `pass` in
+  `docs/plans/phase-f-risk-burndown.md`:
+  - TS lane now covers 12 implemented NIPs by adding structural-baseline checks for
+    `NIP-02`, `NIP-09`, and `NIP-65`.
+  - Remaining TS uncovered NIPs (`NIP-40/45/50/70`) are runtime probe-backed as supported
+    public API paths and are classified `NOT_COVERED_IN_THIS_PASS` (`lib_unsupported=0`).
 - Canonical parity artifacts are now:
   - `docs/plans/phase-f-parity-matrix.md`
   - `docs/plans/phase-f-parity-ledger.md`

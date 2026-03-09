@@ -241,6 +241,52 @@ Step 10 conclusion:
 - No overloaded `unsupported` wording remains in parity-all lane reporting.
 - Explicit no-default-change note: frozen defaults and strictness policy remain unchanged.
 
+## Step 11 Pass Entry (Parity Expansion + Capability Proof)
+
+- Step: 11 (depth expansion on existing HARNESS_COVERED checks plus explicit capability probes for
+  uncovered NIPs in both lanes).
+- Scope:
+  - rust lane depth negatives expanded on covered checks (`NIP-01/02/09/11/13/59/65`) and runtime
+    capability probes added for uncovered `NIP-40/45/50/70/77`.
+  - TS lane adds new covered checks for `NIP-11`, `NIP-59`, and `NIP-77`, expands edge negatives on
+    prior checks, and adds runtime export probes for remaining uncovered NIPs.
+
+| Step | Risk ID | Command | Result | Outcome classification | Notes |
+| --- | --- | --- | --- | --- | --- |
+| `11` | `UT-E-003` | `cargo run --manifest-path tools/interop/rust-nostr-parity-all/Cargo.toml` | pass (`SUMMARY pass=11 fail=0 harness_covered=11 lib_supported=0 not_covered_in_this_pass=5 lib_unsupported=0 total=16`) | `pass` | rust uncovered NIPs now include explicit probe evidence in detail fields; no unsupported proof surfaced |
+| `11` | `UT-E-003` | `npm install && npm run run` (in `tools/interop/ts-nostr-parity-all`) | pass (`SUMMARY pass=9 fail=0 harness_covered=9 lib_supported=0 not_covered_in_this_pass=0 lib_unsupported=7 total=16`) | `pass` | TS lane now covers `NIP-11/59/77`; remaining uncovered NIPs are proven `LIB_UNSUPPORTED` via runtime export probes |
+| `11` | `UT-E-004` | `zig build test --summary all && zig build` | pass (`454/456` tests passed, `2` skipped; build pass) | `pass` | aggregate gates remain green after parity-expansion increment |
+
+Step 11 conclusion:
+- Parity coverage depth increased in both lanes without widening non-covered false negatives.
+- Capability proof now explicitly separates support-vs-coverage in harness output and docs.
+- Explicit no-default-change note: frozen defaults and strictness policy remain unchanged.
+
+## Step 12 Pass Entry (TS thorough parity now expansion)
+
+- Step: 12 (practical parity-breadth expansion in TS lane with truthful probe-only classification
+  for remaining uncovered NIPs).
+- TS harness: `tools/interop/ts-nostr-parity-all` (`nostr-tools` `v2.23.3`).
+- Scope:
+  - promote `NIP-02`, `NIP-09`, and `NIP-65` from probe-only to `HARNESS_COVERED` structural
+    baseline checks.
+  - keep existing `NIP-59` and `NIP-77` checks unchanged.
+  - run explicit runtime capability probes for remaining uncovered TS NIPs (`NIP-40/45/50/70`) and
+    classify by model v1 (`LIB_UNSUPPORTED` only when no public API path is proven).
+
+| Step | Risk ID | Command | Result | Outcome classification | Notes |
+| --- | --- | --- | --- | --- | --- |
+| `12` | `UT-E-003` | `npm install && npm run run` (in `tools/interop/ts-nostr-parity-all`) | pass (`SUMMARY pass=12 fail=0 harness_covered=12 lib_supported=0 not_covered_in_this_pass=4 lib_unsupported=0 total=16`) | `pass` | TS breadth increased to 12 covered NIPs; remaining 4 are probe-backed supported-but-not-covered |
+| `12` | `UT-E-003` | `cargo run --manifest-path tools/interop/rust-nostr-parity-all/Cargo.toml` | pass (`SUMMARY pass=11 fail=0 harness_covered=11 lib_supported=0 not_covered_in_this_pass=5 lib_unsupported=0 total=16`) | `pass` | rust lane unchanged and still truthful/consistent with model v1 |
+| `12` | `UT-E-004` | `zig build test --summary all && zig build` | pass (`454/456` tests passed, `2` skipped; build pass) | `pass` | aggregate gates remain green after TS parity expansion |
+
+Step 12 conclusion:
+- TS lane now performs practical parity-breadth checks for implemented optional modules with clear
+  structural scope limits.
+- Remaining TS uncovered NIPs are explicitly probe-classified as supported public-paths and therefore
+  `NOT_COVERED_IN_THIS_PASS`, not `LIB_UNSUPPORTED`.
+- Explicit no-default-change note: frozen defaults and strictness policy remain unchanged.
+
 ## Next Burndown Tasks
 
 1. `UT-E-003` owner: Phase F owner
