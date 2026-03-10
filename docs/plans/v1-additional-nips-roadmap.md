@@ -2,6 +2,10 @@
 
 Date: 2026-03-05
 
+Supersession note (2026-03-10): active additional-NIP execution planning now lives in
+`docs/plans/phase-h-kickoff.md` and `docs/plans/phase-h-additional-nips-plan.md`. NIP-06
+build-vs-buy is resolved by `D-030` in favor of a vetted `libwally-core` boundary.
+
 ## Decisions
 
 - `X-001`: this addendum records user-requested extra NIP scope evaluation as a post-v1 extension lane

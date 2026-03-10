@@ -484,6 +484,154 @@ Immutable record of accepted planning decisions.
 - Policy note: this parity-depth evidence decision does not change frozen defaults or strictness/library
   behavior.
 
+## D-029: Normalize dependency policy to stdlib-first plus approved pinned crypto backends
+
+- Date: 2026-03-10
+- Status: accepted
+- Decision: normalize the repository dependency policy to `stdlib-first` rather than absolute
+  zero-dependency wording. Public protocol modules remain `@import("std")` by default, while
+  approved pinned crypto backend exceptions are allowed only when recorded in this decision log.
+  Every approved exception must stay behind one narrow boundary module, use pinned source identity,
+  expose typed error mapping, preserve bounded runtime behavior, and carry vector/differential
+  verification evidence.
+- Why: the pinned `bitcoin-core/secp256k1` backend is already an accepted implementation choice and
+  the canonical policy should describe the real dependency posture without allowing ad hoc drift.
+- Tradeoff: slightly broader dependency policy surface versus truthful canonical guidance and tighter
+  control over security-sensitive exceptions.
+- Related Tradeoff: T-0-003, T-0-004.
+- Reversal Trigger: all approved backend exceptions are removed and the repository returns to a true
+  zero-external-dependency posture.
+- Supersedes: none
+
+## D-030: Select libwally-core as the vetted NIP-06 dependency path
+
+- Date: 2026-03-10
+- Status: accepted
+- Decision: for planned NIP-06 support, adopt `libwally-core` as the vetted external implementation
+  path for BIP39/BIP32 rather than in-house implementation. The integration must follow `D-029`:
+  pinned source identity, one narrow boundary module, typed error mapping, deterministic vectors, and
+  no unbounded runtime allocation introduced by the boundary.
+- Why: BIP39/BIP32 are security-sensitive key-management primitives; using a mature vetted library is
+  lower risk than in-house implementation and keeps Phase H focused on bounded boundary contracts.
+- Tradeoff: additional supply-chain surface versus lower wallet-primitive implementation risk and
+  faster convergence on a defensible NIP-06 plan.
+- Related Tradeoff: T-X-004.
+- Reversal Trigger: `libwally-core` cannot satisfy pinned-boundary, typed-error, deterministic-corpus,
+  or bounded-runtime requirements for noztr.
+- Supersedes: none
+
+## D-031: Close Phase G locally and start Phase H expansion planning
+
+- Date: 2026-03-10
+- Status: accepted
+- Decision: close Phase G on local-only non-remote release-readiness criteria, explicitly defer
+  remote readiness blocker `no-3uj` outside the completed Phase G closure gate, and start Phase H
+  kickoff for additional NIP expansion planning in:
+  - `docs/plans/phase-h-kickoff.md`
+  - `docs/plans/phase-h-additional-nips-plan.md`
+- Why: no remote is currently configured/in active scope, so tying phase closure to unavailable
+  remote infrastructure would mis-state the actual operator environment and block planning progress.
+- Tradeoff: Phase G closes without remote push evidence versus an accurate local execution-state
+  record and continued roadmap progress.
+- Related Tradeoff: T-0-004.
+- Reversal Trigger: remote setup returns to active scope and requires reopening release-readiness
+  closure criteria.
+- Supersedes: none
+
+## D-032: Freeze Phase H NIP-06 minimum functional boundary and acceptance posture
+
+- Date: 2026-03-10
+- Status: accepted
+- Decision: for Phase H, NIP-06 scope is frozen to the minimum fully functional Nostr derivation
+  boundary: mnemonic validation, mnemonic plus optional passphrase to seed, BIP32 master-key
+  creation, and derivation of Nostr keys at `m/44'/1237'/<account>'/0/0`. Acceptance requires strict
+  zeroization of sensitive temporary material and typed errors on every public boundary. Broader
+  rust-nostr parity depth and deeper edge-case expansion remain a later-phase follow-up after the
+  initial narrow boundary lands.
+- Why: keeps the Phase H NIP-06 surface useful for real Nostr workflows without expanding into a
+  broad wallet API before the boundary is proven.
+- Tradeoff: narrower short-term API breadth versus lower security review surface and clearer
+  acceptance criteria.
+- Related Tradeoff: T-H-ANIP-002, T-H-ANIP-003.
+- Reversal Trigger: actual Nostr integrator demand proves the frozen minimum boundary is insufficient
+  for core workflows.
+- Supersedes: none
+
+## D-033: Adopt a serial autonomous closure loop for Phase H Wave 1
+
+- Date: 2026-03-10
+- Status: accepted
+- Decision: execute Phase H Wave 1 serially, one NIP at a time, through an explicit closure loop in
+  `docs/plans/phase-h-wave1-loop.md` with mandatory stages for contract freeze, implementation,
+  correctness/edge-case tests, rust parity review, overengineering review, style review, gates, and
+  tracker closure before advancing.
+- Why: converts the implementation process from operator memory into a repeatable system that keeps
+  correctness, parity, and style checks mandatory under low-supervision execution.
+- Tradeoff: lower parallel throughput versus cleaner defect isolation, lower policy drift, and higher
+  review consistency.
+- Related Tradeoff: T-H-W1-001.
+- Reversal Trigger: evidence shows serial loop execution adds delay without reducing rework or review
+  misses.
+- Supersedes: none
+
+## D-034: Expand the Phase H Wave 1 loop to dual-review and mandatory documentation capture
+
+- Date: 2026-03-10
+- Status: accepted
+- Decision: expand the Phase H Wave 1 execution loop so every NIP must complete two review cycles
+  before closure, must capture implementation learnings in existing canonical artifacts or beads
+  issue evidence, and must be reviewed from correctness, edge-case, rust parity, overengineering,
+  style, LLM usability, human usability, and Zig pattern/anti-pattern perspectives.
+- Why: the original loop was not strict enough to guarantee autonomous execution quality without
+  relying on operator memory for review depth or documentation follow-through.
+- Tradeoff: more per-NIP review/documentation work versus lower defect escape risk and lower loss of
+  reasoning between sessions.
+- Related Tradeoff: T-H-W1-001.
+- Reversal Trigger: evidence shows the added review/documentation stages do not materially improve
+  implementation quality or traceability.
+- Supersedes: none
+
+## D-035: Freeze the Phase H0 NIP-06 libwally boundary, pin target, and corpus floor
+
+- Date: 2026-03-10
+- Status: accepted
+- Decision: complete the Phase H0 checkpoint for NIP-06 by freezing the integration target on
+  `ElementsProject/libwally-core` release tag `release_1.5.2` at commit
+  `6439e6e3262c47ce0e51aa95d7b4ff67d9952c52`. Freeze the implementation boundary to one module,
+  `src/nip06_mnemonic.zig`, with this public surface only:
+  - `mnemonic_validate`
+  - `mnemonic_to_seed`
+  - `derive_nostr_secret_key_from_seed`
+  - `derive_nostr_secret_key`
+  External `libwally-core` usage is limited to mnemonic validation, mnemonic-to-seed conversion,
+  master-key creation from seed, and hardened/non-hardened derivation for the canonical Nostr path
+  `m/44'/1237'/<account>'/0/0`. Public-key derivation remains on the existing secp boundary rather
+  than expanding the `libwally-core` boundary. The minimum required corpus is frozen to:
+  - valid:
+    - official BIP39 mnemonic-to-seed vectors
+    - the two official NIP-06 mnemonic-to-secret-key vectors from `docs/nips/06.md`
+    - the additional pinned rust-nostr mnemonic-to-secret-key vector in
+      `/workspace/pkgs/nostr/crates/nostr/src/nips/nip06/mod.rs`
+    - at least one higher-account derivation vector for `account = 1`
+  - invalid:
+    - malformed mnemonic length
+    - unknown word
+    - checksum mismatch
+    - invalid UTF-8 / normalization failure at the boundary
+    - `account >= 2^31` reject
+    - seed/output buffer too small reject
+  Sensitive buffers requiring strict zeroization are frozen to: mnemonic-derived seed, master key
+  material, derived child private keys, and temporary output staging used before copy-out.
+- Why: this turns H0 from a generic dependency intent into a concrete, reviewable implementation
+  contract that satisfies the refined loop requirements before further Wave 1 work continues.
+- Tradeoff: tighter up-front boundary/corpus decisions versus less flexibility during eventual NIP-06
+  coding.
+- Related Tradeoff: T-H-ANIP-002, T-H-ANIP-003.
+- Reversal Trigger: the selected `libwally-core` release or the frozen surface cannot satisfy
+  bounded-runtime, typed-error, deterministic-corpus, or strict-zeroization requirements during
+  implementation.
+- Supersedes: none
+
 ## Phase Closure Evidence
 
 ### P0-E-001: Phase 0 closure record
@@ -595,5 +743,15 @@ Immutable record of accepted planning decisions.
 - Gate Result: pass
 - Ambiguity Snapshot: carry-forward accepted risks only (`UT-E-001`, `UT-E-002`, `UT-E-003`,
   `UT-E-004`, `A-D-001`).
+- Decision-Needed Count (High Impact): 0
+- Owner: active phase owner
+
+### PG-E-001: Phase G local-only closure record
+
+- Phase: G
+- Closure Date: 2026-03-10
+- Gate Result: pass (local-only closure)
+- Ambiguity Snapshot: carry-forward only (`OQ-E-006` in progress for RC freeze; `no-3uj` remote
+  readiness deferred-by-operator and outside closure scope).
 - Decision-Needed Count (High Impact): 0
 - Owner: active phase owner

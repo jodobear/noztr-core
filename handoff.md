@@ -1,28 +1,61 @@
 # Handoff
 
-Current project context for the Phase G kickoff baseline.
+Current project context for the Phase H kickoff baseline.
 
 ## Current Phase Status
 
 - Planning phase records remain closed in `docs/plans/decision-log.md`.
-- Active execution state is Phase G on post-`no-dr3` baseline.
+- Active execution state is Phase H on post-Phase G local-only closure baseline.
 - Frozen defaults and strictness posture remain unchanged.
 - Canonical Phase F trackers:
   - `docs/plans/phase-f-kickoff.md`
   - `docs/plans/phase-f-parity-matrix.md`
   - `docs/plans/phase-f-parity-ledger.md`
   - `docs/plans/phase-f-risk-burndown.md`
+  - `docs/plans/phase-g-kickoff.md`
 
-## Phase G Kickoff
+## Phase H Kickoff
 
-- Active execution state is Phase G kickoff baseline.
+- Active execution state is Phase H kickoff baseline.
+- Phase G local-only closure is complete.
 - `UT-E-003` and `UT-E-004` are maintenance-mode only; reopen only on new behavior-class discovery.
 - Blocker visibility: `no-3uj` (git/Dolt remote + sync readiness) is deferred-by-operator and not in
   current execution focus.
+- Remote readiness remains deferred-by-operator and is not required for the completed Phase G local
+  closure.
+- Additional-NIP planning now lives in:
+  - `docs/plans/phase-h-kickoff.md`
+  - `docs/plans/phase-h-additional-nips-plan.md`
+  - `docs/plans/phase-h-wave1-loop.md`
+- H0 status:
+  - NIP-06 pin target, one-module boundary, typed failure posture, zeroization set, and corpus floor
+    are frozen
+- Wave 1 progress:
+  - `NIP-25` is complete in `src/nip25_reactions.zig` with reviewed strict custom-emoji shortcode
+    and URL validation retained as an accepted strict-path improvement
+  - `NIP-10` is complete in `src/nip10_threads.zig` with reviewed strict rejection of four-slot
+    pubkey-in-marker-position `e` tags; compatibility pressure follow-up is tracked in `no-4iw`
+  - `NIP-18` is complete in `src/nip18_reposts.zig` with strict embedded-event consistency checks
+    across `e`, `p`, `k`, and `a` tags; core builder semantics are parity-covered and the
+    addressable repost builder shape is source-reviewed in this pass
+  - `NIP-22` is complete in `src/nip22_comments.zig` with strict root/parent linkage validation,
+    mandatory `K/k`, required author linkage for Nostr targets, accepted support for addressable
+    `a+e` comment targets, NIP-73-consistent external validation, and accepted strict rejection of
+    permissive rust-style missing-root / optional-kind extraction
+  - `NIP-27` is complete in `src/nip27_references.zig` with strict `nostr:` URI extraction,
+    stable byte spans, decoded NIP-21 entities, and accepted malformed-fragment fallback that
+    matches rust parser tokenization behavior
+  - `NIP-51` is complete in `src/nip51_lists.zig` with strict public-list extraction for the
+    supported Wave 1 kinds, required `d` metadata handling for set kinds, coordinate-kind
+    validation where NIP-51 specifies it, bounded broader bookmark/emoji tag builders, and deep
+    rust parity coverage across all supported rust-backed public-list builders
+  - deferred NIP-51 follow-up `no-e7b` now tracks private encrypted list content plus any future
+    decision to widen extraction beyond the current strict Wave 1 subset
+  - Wave 1 is complete; next phase-order item is Wave 2 / `NIP-46` tracked in `no-czg`
 
-## Phase G Checklist Snapshot (non-remote)
+## Phase G Closure Snapshot (non-remote)
 
-- Status: non-remote release-readiness checklist pass is in progress.
+- Status: non-remote release-readiness checklist pass is complete for local closure.
 - Completed: rust parity baseline and aggregate Zig gates are current for kickoff baseline.
 - Completed: rust-active / TS-archived governance wording is aligned across active Phase G artifacts.
 - Completed: `UT-E-003`/`UT-E-004` remain maintenance-mode only with no burn-down expansion unless a
@@ -32,12 +65,14 @@ Current project context for the Phase G kickoff baseline.
 ## Active Parity Gate
 
 - Active lane: rust only (`tools/interop/rust-nostr-parity-all`).
-- Current rust status: `16/16 HARNESS_COVERED`, `DEEP`, `PASS`.
+- Current rust status: `22/22 HARNESS_COVERED`, `DEEP`, `PASS`.
 - Baseline cadence run (2026-03-09): rust parity harness passed
   (`SUMMARY pass=16 fail=0 harness_covered=16 total=16`).
-- Baseline cadence run (2026-03-09): `zig build test --summary all` passed
-  (`Build Summary: 8/8 steps succeeded; 460/460 tests passed`).
-- Baseline cadence run (2026-03-09): `zig build` passed.
+- Latest cadence run (2026-03-10): rust parity harness passed
+  (`SUMMARY pass=22 fail=0 harness_covered=22 total=22`).
+- Latest cadence run (2026-03-10): `zig build test --summary all` passed
+  (`Build Summary: 8/8 steps succeeded; 572/572 tests passed`).
+- Latest cadence run (2026-03-10): `zig build` passed.
 - Active cadence commands:
   - `cargo run --manifest-path tools/interop/rust-nostr-parity-all/Cargo.toml`
   - `zig build test --summary all && zig build`
@@ -71,8 +106,21 @@ Current project context for the Phase G kickoff baseline.
 
 1. Keep TypeScript references archive-only in docs and prevent active-cadence wording regressions.
 2. Continue maintenance cadence reruns (rust parity + aggregate Zig gates) on dependency or toolchain
-   changes and record outcomes in Phase G kickoff and handoff docs.
-3. Run periodic docs consistency checks across `handoff.md`, `docs/plans/phase-g-kickoff.md`, and
-   `docs/plans/build-plan.md` for rust-active / TS-archived wording continuity.
-4. Keep progressing the Phase G release-readiness checklist items that do not require remote setup.
-5. Keep `no-3uj` visible as deferred-by-operator until remote setup returns to active execution focus.
+   changes and record outcomes in Phase H kickoff and handoff docs.
+3. Continue Phase H expansion sequencing from `docs/plans/phase-h-additional-nips-plan.md`.
+   Wave 1 is complete: `25`, `10`, `18`, `22`, `27`, `51`.
+4. Start Wave 2 / `NIP-46` under the same strict contract, review, parity, and closure discipline
+   in `no-czg`.
+5. Resolve `no-4iw` evidence gathering for the provisional NIP-10 four-slot pubkey strictness rule
+   before treating that divergence as a settled quality improvement.
+6. Keep `no-3uj` visible as deferred-by-operator until remote setup returns to active execution focus.
+
+## Additional Assets
+
+- Process-boilerplate extraction task `no-6tu` is closed; starter-consistency and shared-corpus
+  evaluation task `no-tdt` is the active follow-on.
+- New reusable starter assets now live under `docs/process/` and `template/`.
+- Shared-corpus evaluation docs
+  (`docs/process/shared-knowledge-strategy.md`, `docs/process/research-guides-catalog.md`)
+  are process-evaluation artifacts only and are not canonical inputs for active Phase H execution.
+- These additions do not change Phase H strict defaults, parity cadence, or current Wave 1 order.

@@ -2,6 +2,10 @@
 
 Date: 2026-03-05
 
+Supersession note (2026-03-10): current dependency policy is normalized by `D-029` in
+`docs/plans/decision-log.md` as `stdlib-first` with approved pinned crypto backend exceptions.
+The strict `stdlib-only` wording below remains historical Phase A closure evidence.
+
 ## Decisions
 
 - `A-001`: product target is frozen as a low-level Zig Nostr protocol library with stdlib-only

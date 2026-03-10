@@ -27,6 +27,39 @@ Release-facing note for behavior differences that are intentional in `noztr` str
   strict integration entry points are explicit (`pow_meets_difficulty_verified_id`,
   `delete_extract_targets_checked`, `transcript_mark_client_req`, `transcript_apply_relay`) to avoid
   partial/unchecked call paths.
+- **Strict NIP-10 removed-marker rejection:**
+  `noztr` rejects the removed `mention` marker in strict NIP-10 thread parsing, while permissive
+  ecosystem parsers may ignore it or treat it as non-fatal compatibility input. This remains an
+  accepted strict-path improvement because it removes ambiguity with low compatibility value.
+- **Strict NIP-10 fifth-slot pubkey enforcement:**
+  `noztr` accepts author pubkeys only in the canonical fifth `e`-tag slot and rejects the
+  permissive four-slot pubkey-in-marker-position shape that `rust-nostr` still accepts when parsing
+  standardized event tags. This is currently a provisional strict Layer 1 divergence, not a settled
+  improvement; compatibility pressure is tracked for follow-up in `no-4iw` to determine whether a
+  future explicit adapter should absorb this shape.
+- **Strict NIP-25 NIP-30 shortcode enforcement:**
+  `noztr` requires custom emoji shortcodes to satisfy the NIP-30 alphanumeric-or-underscore rule,
+  while `rust-nostr` currently accepts broader shortcode text as long as the emoji tag URL parses.
+  This remains an accepted strict-path improvement because it preserves a deterministic, spec-aligned
+  trust-boundary contract.
+- **Strict NIP-22 root/parent linkage validation:**
+  `noztr` requires comments to carry both uppercase root scope and lowercase parent scope, mandates
+  `K`/`k`, rejects ambiguous competing target families, and requires explicit `P`/`p` author
+  linkage for Nostr targets while still accepting the valid address-scoped `a+e` companion-id form.
+  `rust-nostr` builders can emit parent-only comment tags and its extraction remains permissive
+  about missing root scope and optional `K`/`k`. `noztr` keeps the stricter contract because it
+  produces deterministic trust-boundary parsing, validates `I/i` against `K/k` instead of treating
+  external targets as opaque text, and preserves NIP-10 as the only reply path for kind-1 notes.
+- **Strict NIP-51 bookmark-family scope:**
+  `noztr` Wave 1 public-list helper keeps `bookmarks` and `bookmark_set` aligned to the NIP-51
+  table (`e` and `a` only), while `rust-nostr` bookmark builders also expose hashtag and URL tags.
+  `noztr` now exposes bounded bookmark tag builders for the broader emission shapes, but keeps the
+  narrower extraction boundary to preserve a deterministic trust-boundary contract instead of
+  silently widening Layer 1 defaults.
+- **NIP-51 emoji fourth-slot builder support:**
+  `noztr` can emit the optional fourth-slot NIP-30 emoji-set coordinate on `emoji` tags, while
+  `rust-nostr` standardizes only the three-item shape. This is a spec-driven builder enhancement,
+  not a parsing-default change.
 
 ## Interoperability impact and migration guidance
 

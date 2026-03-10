@@ -1,19 +1,25 @@
 # noztr
 
-Pure Zig Nostr protocol library with zero external dependencies (`@import("std")` only).
+Pure Zig Nostr protocol library with a stdlib-first dependency policy and approved pinned crypto
+backend exceptions.
 
 ## What noztr is
 
 - A strict-by-default protocol-kernel implementation for Nostr.
 - Built as a static library with deterministic, bounded behavior targets.
 - Focused on protocol parsing, validation, serialization, and trust-boundary helpers.
+- Keeps non-crypto surfaces stdlib-first and isolates approved crypto backends behind narrow boundary
+  modules.
 
 ## Current status
 
-- Current baseline: Phase G maintenance mode (`docs/plans/phase-g-kickoff.md`).
+- Current baseline: Phase H kickoff for additional-NIP expansion planning on top of a completed
+  local-only Phase G closure (`docs/plans/phase-h-kickoff.md`).
 - Implemented NIPs from `src/root.zig` exports:
   - `NIP-01` (event, filter, message)
-  - `NIP-02`, `NIP-09`, `NIP-11`, `NIP-13`
+  - `NIP-02`, `NIP-09`, `NIP-10`, `NIP-11`, `NIP-13`, `NIP-18`
+  - `NIP-22`, `NIP-25`, `NIP-27`
+  - `NIP-51` (Wave 1 public-list subset + bounded bookmark/emoji tag builders)
   - `NIP-19`, `NIP-21`, `NIP-40`, `NIP-42`
   - `NIP-44`, `NIP-59`, `NIP-65`, `NIP-70`
   - Optional I6 extension exports (build-flag gated): `NIP-45`, `NIP-50`, `NIP-77`
@@ -36,5 +42,7 @@ zig build
 ## Planning documents
 
 - Build baseline: `docs/plans/build-plan.md`
-- Phase G kickoff baseline: `docs/plans/phase-g-kickoff.md`
-- Additional NIP planning (Phase G): `docs/plans/phase-g-additional-nips-plan.md`
+- Phase G closure baseline: `docs/plans/phase-g-kickoff.md`
+- Phase H kickoff baseline: `docs/plans/phase-h-kickoff.md`
+- Additional NIP planning (Phase H): `docs/plans/phase-h-additional-nips-plan.md`
+- Phase H Wave 1 execution loop: `docs/plans/phase-h-wave1-loop.md`

@@ -1,6 +1,7 @@
 # AGENTS.md — noztr
 
-Pure Zig Nostr protocol library. Zero external dependencies — Zig stdlib only.
+Pure Zig Nostr protocol library. Zig stdlib only by default, with approved pinned crypto backend
+exceptions recorded in the decision log.
 
 ## Session Startup
 
@@ -61,7 +62,8 @@ Read `docs/guides/TIGER_STYLE.md` — every word. Non-negotiable. The critical r
 - **Minimum 2 assertions per function** — pre/postconditions and invariants
 - Pair assertions: positive AND negative space
 - **Static allocation only** — no dynamic allocation after init
-- **Zero dependencies** — Zig stdlib only
+- **Dependency default** — Zig stdlib only unless an approved pinned crypto backend exception is
+  recorded in `docs/plans/decision-log.md`
 - Follow KISS — prefer the simplest solution that satisfies requirements
 - Reuse approved implementations before writing from scratch — approved means Zig stdlib or existing in-repo modules/utilities only
 - `defer` for cleanup, `errdefer` for error paths
@@ -83,7 +85,8 @@ Read `docs/guides/TIGER_STYLE.md` — every word. Non-negotiable. The critical r
 
 ## What NOT To Do
 
-- Do NOT add external dependencies — only `@import("std")` is allowed
+- Do NOT add unapproved dependencies — only `@import("std")` is allowed unless a pinned crypto
+  backend exception is accepted in `docs/plans/decision-log.md`
 - Do NOT use `ArrayList` or unbounded dynamic allocation
 - Do NOT use recursion
 - Do NOT silently swallow errors with `try`/`catch`
@@ -179,28 +182,36 @@ For more details, see README.md and docs/QUICKSTART.md.
 
 ## Landing the Plane (Session Completion)
 
-**When ending a work session**, you MUST complete ALL steps below. Work is NOT complete until `git push` succeeds.
+**When ending a work session**, you MUST complete ALL steps below. If a git remote is configured and
+in active scope, work is NOT complete until `git push` succeeds. If remote readiness is explicitly
+deferred or no git remote is configured, complete the local-only workflow and record the deferred
+remote state in `handoff.md`.
 
 **MANDATORY WORKFLOW:**
 
 1. **File issues for remaining work** - Create issues for anything that needs follow-up
 2. **Run quality gates** (if code changed) - Tests, linters, builds
 3. **Update issue status** - Close finished work, update in-progress items
-4. **PUSH TO REMOTE** - This is MANDATORY:
+4. **PUSH TO REMOTE WHEN REMOTE READINESS IS IN SCOPE**:
    ```bash
+   git remote -v
    git pull --rebase
    bd sync
    git push
    git status  # MUST show "up to date with origin"
    ```
+   If no remote is configured or remote readiness is deferred-by-operator, skip push and record that
+   deferred state in `handoff.md`.
 5. **Clean up** - Clear stashes, prune remote branches
 6. **Verify** - All changes committed AND pushed
 7. **Hand off** - Provide context for next session
 
 **CRITICAL RULES:**
-- Work is NOT complete until `git push` succeeds
-- NEVER stop before pushing - that leaves work stranded locally
-- NEVER say "ready to push when you are" - YOU must push
-- If push fails, resolve and retry until it succeeds
+- If a git remote is configured and in scope, work is NOT complete until `git push` succeeds
+- NEVER stop before pushing when remote readiness is in scope - that leaves work stranded locally
+- NEVER say "ready to push when you are" when remote readiness is in scope - YOU must push
+- If push fails and remote readiness is in scope, resolve and retry until it succeeds
+- If remote readiness is deferred or unavailable, record that explicitly and do not present local-only
+  completion as remotely landed
 
 <!-- END BEADS INTEGRATION -->

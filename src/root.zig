@@ -48,6 +48,24 @@ pub const nip02_contacts = @import("nip02_contacts.zig");
 /// Phase I4 concrete export for the NIP-65 relay metadata module.
 pub const nip65_relays = @import("nip65_relays.zig");
 
+/// Phase H concrete export for the NIP-10 thread/reply helper module.
+pub const nip10_threads = @import("nip10_threads.zig");
+
+/// Phase H concrete export for the NIP-18 repost module.
+pub const nip18_reposts = @import("nip18_reposts.zig");
+
+/// Phase H concrete export for the NIP-22 comment module.
+pub const nip22_comments = @import("nip22_comments.zig");
+
+/// Phase H concrete export for the NIP-27 text-reference module.
+pub const nip27_references = @import("nip27_references.zig");
+
+/// Phase H concrete export for the NIP-25 reactions module.
+pub const nip25_reactions = @import("nip25_reactions.zig");
+
+/// Phase H concrete export for the NIP-51 public-list module.
+pub const nip51_lists = @import("nip51_lists.zig");
+
 /// Phase I5 concrete export for the NIP-44 encrypted direct-message module.
 pub const nip44 = @import("nip44.zig");
 
@@ -109,6 +127,12 @@ test "root exports limits and error namespaces" {
     try std.testing.expect(@TypeOf(nip21_uri.Nip21Error) == type);
     try std.testing.expect(@TypeOf(nip02_contacts.ContactsError) == type);
     try std.testing.expect(@TypeOf(nip65_relays.RelaysError) == type);
+    try std.testing.expect(@TypeOf(nip10_threads.ThreadError) == type);
+    try std.testing.expect(@TypeOf(nip18_reposts.RepostError) == type);
+    try std.testing.expect(@TypeOf(nip22_comments.CommentError) == type);
+    try std.testing.expect(@TypeOf(nip27_references.ReferencesError) == type);
+    try std.testing.expect(@TypeOf(nip25_reactions.ReactionError) == type);
+    try std.testing.expect(@TypeOf(nip51_lists.ListError) == type);
     try std.testing.expect(@TypeOf(nip44.Nip44Error) == type);
     try std.testing.expect(@TypeOf(nip59_wrap.WrapError) == type);
     try std.testing.expectEqual(i6_extensions_enabled, @hasDecl(nip45_count, "CountError"));
@@ -121,6 +145,14 @@ test "root exports limits and error namespaces" {
     try std.testing.expect(@TypeOf(nip21_uri.Nip21Reference) == type);
     try std.testing.expect(@TypeOf(nip02_contacts.ContactEntry) == type);
     try std.testing.expect(@TypeOf(nip65_relays.RelayPermission) == type);
+    try std.testing.expect(@TypeOf(nip10_threads.ThreadInfo) == type);
+    try std.testing.expect(@TypeOf(nip18_reposts.RepostTarget) == type);
+    try std.testing.expect(@TypeOf(nip22_comments.CommentInfo) == type);
+    try std.testing.expect(@TypeOf(nip27_references.ContentReference) == type);
+    try std.testing.expect(@TypeOf(nip25_reactions.ReactionTarget) == type);
+    try std.testing.expect(@TypeOf(nip51_lists.BuiltTag) == type);
+    try std.testing.expect(@TypeOf(nip51_lists.BookmarkBuilderItem) == type);
+    try std.testing.expect(@TypeOf(nip51_lists.ListItem) == type);
     try std.testing.expect(@TypeOf(PowVerifiedIdError) == type);
     try std.testing.expect(@TypeOf(DeleteExtractCheckedError) == type);
     try std.testing.expect(
@@ -153,6 +185,67 @@ test "root exports limits and error namespaces" {
                 *const nip01_event.Event,
                 []nip65_relays.RelayPermission,
             ) nip65_relays.RelaysError!u16,
+    );
+    try std.testing.expect(
+        @TypeOf(nip10_threads.thread_extract) ==
+            fn (
+                *const nip01_event.Event,
+                []nip10_threads.ThreadReference,
+            ) nip10_threads.ThreadError!nip10_threads.ThreadInfo,
+    );
+    try std.testing.expect(
+        @TypeOf(nip18_reposts.repost_parse) ==
+            fn (
+                *const nip01_event.Event,
+            ) nip18_reposts.RepostError!nip18_reposts.RepostTarget,
+    );
+    try std.testing.expect(
+        @TypeOf(nip22_comments.comment_parse) ==
+            fn (
+                *const nip01_event.Event,
+            ) nip22_comments.CommentError!nip22_comments.CommentInfo,
+    );
+    try std.testing.expect(
+        @TypeOf(nip27_references.reference_extract) ==
+            fn (
+                []const u8,
+                []nip27_references.ContentReference,
+                []u8,
+            ) nip27_references.ReferencesError!u16,
+    );
+    try std.testing.expect(
+        @TypeOf(nip25_reactions.reaction_parse) ==
+            fn (
+                *const nip01_event.Event,
+            ) nip25_reactions.ReactionError!nip25_reactions.ReactionTarget,
+    );
+    try std.testing.expect(
+        @TypeOf(nip51_lists.list_extract) ==
+            fn (
+                *const nip01_event.Event,
+                []nip51_lists.ListItem,
+            ) nip51_lists.ListError!nip51_lists.ListInfo,
+    );
+    try std.testing.expect(
+        @TypeOf(nip51_lists.list_build_identifier_tag) ==
+            fn (
+                *nip51_lists.BuiltTag,
+                []const u8,
+            ) nip51_lists.ListError!nip01_event.EventTag,
+    );
+    try std.testing.expect(
+        @TypeOf(nip51_lists.bookmark_build_tag) ==
+            fn (
+                *nip51_lists.BuiltTag,
+                nip51_lists.BookmarkBuilderItem,
+            ) nip51_lists.ListError!nip01_event.EventTag,
+    );
+    try std.testing.expect(
+        @TypeOf(nip51_lists.emoji_build_tag) ==
+            fn (
+                *nip51_lists.BuiltTag,
+                *const nip51_lists.ListEmoji,
+            ) nip51_lists.ListError!nip01_event.EventTag,
     );
     try std.testing.expect(
         @TypeOf(nip44.nip44_get_conversation_key) ==
@@ -314,6 +407,45 @@ test "I4 optional paths do not interfere with strict core defaults" {
     var relays_output: [1]nip65_relays.RelayPermission = undefined;
     const relay_count = try nip65_relays.relay_list_extract(&relay_event, relays_output[0..]);
     try std.testing.expectEqual(@as(u16, 1), relay_count);
+
+    const list_d_tag = [_][]const u8{ "d", "team" };
+    const list_p_tag = [_][]const u8{
+        "p",
+        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    };
+    const list_tags = [_]nip01_event.EventTag{
+        .{ .items = list_d_tag[0..] },
+        .{ .items = list_p_tag[0..] },
+    };
+    const list_event: nip01_event.Event = .{
+        .id = [_]u8{0} ** 32,
+        .pubkey = [_]u8{0} ** 32,
+        .sig = [_]u8{0} ** 64,
+        .kind = 30000,
+        .created_at = 0,
+        .content = "",
+        .tags = list_tags[0..],
+    };
+    var list_output: [1]nip51_lists.ListItem = undefined;
+    const list_info = try nip51_lists.list_extract(&list_event, list_output[0..]);
+    try std.testing.expectEqual(nip51_lists.ListKind.follow_set, list_info.kind);
+    try std.testing.expectEqual(@as(u16, 1), list_info.item_count);
+    try std.testing.expectEqualStrings("team", list_info.metadata.identifier.?);
+    try std.testing.expect(list_output[0] == .pubkey);
+
+    var built_tag: nip51_lists.BuiltTag = .{};
+    const emoji_tag = try nip51_lists.emoji_build_tag(&built_tag, &.{
+        .shortcode = "soapbox",
+        .image_url = "https://cdn.example/soapbox.png",
+        .set_coordinate = .{
+            .kind = 30030,
+            .pubkey = [_]u8{0xaa} ** 32,
+            .identifier = "icons",
+        },
+    });
+    try std.testing.expectEqual(@as(usize, 4), emoji_tag.items.len);
+    try std.testing.expectEqualStrings("emoji", emoji_tag.items[0]);
+    try std.testing.expectEqualStrings("soapbox", emoji_tag.items[1]);
 
     try std.testing.expectError(
         error.InvalidFilter,

@@ -16,6 +16,15 @@ It complements TigerStyle and v1 planning artifacts with project-specific defaul
   growth.
 - Prefer pure helpers plus explicit state transition points so behavior remains testable and auditable.
 
+## Dependency Policy
+
+- Default policy is stdlib-first: protocol modules and public API surfaces should rely on
+  `@import("std")` unless a narrower exception is explicitly accepted.
+- Approved pinned crypto backend exceptions are allowed only when recorded in
+  `docs/plans/decision-log.md`.
+- Every approved backend exception must stay behind one narrow boundary module with typed error
+  mapping, pinned source identity, differential/vector coverage, and no unbounded runtime allocation.
+
 ## Zig Tenets
 
 - Explicit memory management: why it matters is predictable resource limits; noztr applies this with

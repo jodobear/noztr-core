@@ -1,0 +1,113 @@
+# Phase H Kickoff
+
+Date: 2026-03-10
+
+Purpose: start additional-NIP expansion planning after Phase G local-only closure while preserving
+the validated maintenance baseline.
+
+## Baseline
+
+- Phase G local-only release-readiness closure is complete.
+- Phase G historical closure evidence remains in:
+  - `docs/plans/phase-g-kickoff.md`
+  - `docs/plans/phase-f-risk-burndown.md`
+- Active parity cadence and aggregate Zig gates remain the same as the completed local baseline.
+
+## Operating Mode
+
+- Active execution state is Phase H kickoff baseline.
+- Remote readiness `no-3uj` remains deferred-by-operator and is not part of current execution scope.
+- Additional-NIP expansion planning is tracked in `docs/plans/phase-h-additional-nips-plan.md`.
+- Wave 1 autonomous execution loop is tracked in `docs/plans/phase-h-wave1-loop.md`.
+- NIP-06 dependency strategy is selected: `libwally-core` behind the approved pinned crypto backend
+  policy and a narrow boundary module.
+- Phase H0 is complete:
+  - NIP-06 pin target, one-module boundary, typed failure posture, zeroization set, and vector
+    corpus floor are frozen in `docs/plans/phase-h-additional-nips-plan.md`
+
+## Wave 1 Status
+
+- `NIP-25` is complete in the current Wave 1 loop:
+  - native kind-7 reaction parsing/helpers implemented in `src/nip25_reactions.zig`
+  - strict target semantics use the last `e` tag and last `p` tag, with `e`-tag pubkey fallback
+    only when no target `p` tag is present
+  - strict custom-emoji validation requires exactly one matching `emoji` tag, a NIP-30-valid
+    shortcode, and a URL-shaped image field; malformed, duplicate, or non-custom `emoji` tag usage
+    is rejected
+  - current judgment: retained as a material strict-path improvement over permissive reference
+    behavior
+  - optional empty relay-hint fields are normalized to absent rather than treated as a target change
+- `NIP-10` is complete in the current Wave 1 loop:
+  - strict kind-1 thread/reply helpers implemented in `src/nip10_threads.zig`
+  - marked `e` tags support `root` and `reply` only; duplicate marked targets are rejected
+  - author pubkeys are accepted only in the canonical fifth `e`-tag slot; four-slot
+    pubkey-in-marker-position input is rejected in the strict path for now
+  - unmarked `e` tags fall back to positional NIP-10 semantics when no marked tags are present
+  - empty relay-hint fields normalize to absent
+  - removed `mention` marker is rejected in the strict path and recorded as an intentional
+    divergence from permissive ecosystem parsing
+  - follow-up: compatibility pressure for the four-slot pubkey shape is tracked in `no-4iw` before
+    any adapter/default change
+- `NIP-18` is complete in the current Wave 1 loop:
+  - strict repost helpers implemented in `src/nip18_reposts.zig`
+  - kind-6 reposts require a relay-hinted `e` tag
+  - kind-16 reposts require either an embedded event payload or an address coordinate
+  - when embedded event JSON is present, `e`, `p`, `k`, and `a` tags must match the embedded event
+    deterministically rather than being treated as loose hints
+  - rust parity harness covers the core kind-6 and kind-16 builder paths
+  - addressable repost builder shape was source-reviewed against `rust-nostr` but not split into a
+    separate parity-harness case in this pass
+- `NIP-22` is complete in the current Wave 1 loop:
+  - strict comment helpers implemented in `src/nip22_comments.zig`
+  - comments require one uppercase root target and one lowercase parent target on every event
+  - `K` and `k` are mandatory and must match the referenced event, coordinate, or external target
+  - Nostr targets require explicit `P` and `p` author linkage; kind-1 text-note targets are
+    rejected so NIP-10 remains the reply path for notes
+  - address-scoped comments accept a companion concrete `E/e` id and replaceable coordinates may
+    carry an empty trailing `d` component
+  - external targets validate `I/i` and `K/k` as a consistent NIP-73 pair, and malformed trailing
+    fields on linkage tags are rejected
+  - parity harness covers event, coordinate, and external rust-nostr comment builder paths
+  - current judgment: retained as a material strict-path improvement over permissive rust-nostr
+    extraction that tolerates missing root scope or optional `K/k`
+- `NIP-27` is complete in the current Wave 1 loop:
+  - strict inline `nostr:` reference extraction implemented in `src/nip27_references.zig`
+  - extracted references preserve stable byte spans and decoded NIP-21 entities
+  - malformed, uppercase, forbidden, or payload-empty `nostr:` fragments are ignored as plain text
+    rather than failing the whole content scan
+  - parity harness covers bracketed references, punctuation boundaries, duplicates, and malformed
+    fragment fallback against rust-nostr parser behavior
+- `NIP-51` is complete in the current Wave 1 loop:
+  - strict public-list helpers and bounded bookmark/emoji tag builders implemented in
+    `src/nip51_lists.zig`
+  - supported Wave 1 list kinds are `10000`, `10001`, `10003`, `10004`, `10005`, `10006`,
+    `10007`, `10015`, `10030`, `30000`, `30002`, `30003`, `30004`, `30015`, `30030`
+  - set kinds require exactly one `d` identifier and may carry one each of `title`, `image`, and
+    `description`
+  - bookmark and bookmark-set extraction stays aligned to the NIP-51 table (`e` and `a` only)
+  - bounded builder helpers now support broader bookmark emission (`e`, `a`, `t`, `url`) without
+    widening strict extraction
+  - coordinate-backed list kinds enforce the expected coordinate kind where NIP-51 specifies one
+  - `emoji` items accept the optional NIP-30 emoji-set address and validate it as a `30030`
+    coordinate when present
+  - builder helpers now emit the optional fourth-slot NIP-30 emoji-set coordinate when present
+  - private encrypted list content and remaining public list variants are deferred to follow-up
+    `no-e7b`
+  - parity harness now covers all supported rust-backed public-list builders at `DEEP` depth
+  - rust-nostr bookmark builders remain broader than the current strict bookmark-family extractor,
+    and optional fourth-slot NIP-30 emoji-set builder support remains Zig/spec-driven coverage
+- Wave 1 status: complete.
+- Active next phase-order item: Wave 2 / `NIP-46` in `no-czg`
+
+## Immediate Work Tracks
+
+- Maintain rust-active parity cadence and aggregate Zig quality gates on dependency/toolchain changes.
+- Keep Wave 1 closure evidence current and retain the serial loop doc as the canonical execution
+  model.
+- Begin Wave 2 planning/execution for `46` in `no-czg`.
+- Keep TypeScript parity references archive-only in current docs.
+
+## Blocker Visibility
+
+- `no-3uj` remains visible for git/Dolt remote + sync readiness.
+- Operator note: remote readiness remains deferred and is not a Phase H blocker.

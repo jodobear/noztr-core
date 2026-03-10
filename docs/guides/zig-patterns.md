@@ -3,7 +3,8 @@
 Date: 2026-03-05
 
 This guide is the approved Zig implementation baseline for v1 modules. Every pattern here is
-stdlib-only, bounded, deterministic, and enforceable with direct tests.
+stdlib-first, bounded, deterministic, and enforceable with direct tests. Approved pinned crypto
+backends remain boundary-only exceptions recorded in the decision log.
 
 ## Decisions
 

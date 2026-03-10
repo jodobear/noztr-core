@@ -109,13 +109,31 @@ Implementation status snapshot (post-I7 closure):
   policy and library behavior remain unchanged.
 - Layer 2 compatibility/ergonomic adapter work remains deferred until Layer 1 execution and
   `OQ-E-006` closure.
+- Phase G local-only release-readiness closure is complete as of 2026-03-10; remote readiness
+  `no-3uj` remains deferred-by-operator and outside the completed local closure gate.
+- Active planning state has moved to Phase H kickoff for additional NIP expansion in
+  `docs/plans/phase-h-kickoff.md` and `docs/plans/phase-h-additional-nips-plan.md`.
+- NIP-06 dependency strategy is resolved for current planning: adopt `libwally-core` behind the
+  approved pinned crypto backend policy and a narrow boundary module.
+- Phase H Wave 1 execution has started:
+  - required Phase H0 NIP-06 freeze is complete.
+  - `NIP-25` strict native reaction parsing/helpers are implemented in `src/nip25_reactions.zig`.
+  - `NIP-10` strict kind-1 thread/reply helpers are implemented in `src/nip10_threads.zig`.
+  - `NIP-18` strict repost helpers are implemented in `src/nip18_reposts.zig`.
+  - `NIP-22` strict comment helpers are implemented in `src/nip22_comments.zig`.
+  - `NIP-27` strict inline `nostr:` reference helpers are implemented in
+    `src/nip27_references.zig`.
+  - `NIP-51` strict public-list helpers and bounded bookmark/emoji tag builders are implemented in
+    `src/nip51_lists.zig`.
+  - Wave 1 is complete; next phase-order item is Wave 2 / `NIP-46`.
 
-Phase G execution focus from current baseline:
+Phase G closure and Phase H transition from current baseline:
 - keep TypeScript references archive-only and prevent active-cadence wording regressions.
 - run rust parity cadence plus aggregate Zig gates on dependency/toolchain changes.
 - treat `UT-E-003`/`UT-E-004` as maintenance-mode items; reopen only on new behavior-class discovery.
-- progress release-readiness checklist items that do not require remote setup.
-- keep blocker `no-3uj` visible as deferred-by-operator and out of current execution focus.
+- treat remote readiness `no-3uj` as deferred-by-operator and outside the completed Phase G local
+  closure gate.
+- execute additional-NIP expansion planning and sequencing in Phase H artifacts.
 
 ## Phase F hard-gate closure status (epic `no-dr3`)
 
@@ -135,16 +153,19 @@ Phase G execution focus from current baseline:
   pre-check: `count=0`, ids: none; post-check: `count=0`, ids: none.
 - Policy note: rust lane remains active and TS lane remains archived historical evidence only.
 
-### Phase G transition note (kickoff baseline)
+### Phase G closure note (local-only baseline)
 
 - Phase F hard-gate closure (`no-dr3`) is complete and preserved as historical evidence.
-- Active execution state is now Phase G kickoff baseline.
+- Phase G local-only release-readiness checklist is complete.
 - `UT-E-003` and `UT-E-004` are in maintenance mode; reopen only on new behavior-class discovery.
 - Blocker visibility: `no-3uj` remains open for git/Dolt remote + sync readiness.
+- Remote readiness is deferred-by-operator and is not a Phase G closure gate in the current local
+  execution environment.
+- Active planning state moves to Phase H kickoff.
 
 ### Phase G non-remote release-readiness checklist status
 
-- Status: non-remote checklist pass is active and baseline items are current.
+- Status: non-remote checklist pass is complete for local closure.
 - Cadence/gates: rust parity cadence plus aggregate `zig` gates are current for kickoff baseline.
 - Policy reaffirmed: `UT-E-003`/`UT-E-004` remain maintenance-mode only, with no burn-down expansion
   unless a new behavior class is discovered.
@@ -152,6 +173,7 @@ Phase G execution focus from current baseline:
   only.
 - Scope note: remote readiness (`no-3uj`) remains deferred-by-operator and outside this
   non-remote checklist pass.
+- Transition note: additional-NIP expansion planning now proceeds in Phase H artifacts.
 
 ### Phase I0 - Foundation and Shared Contracts
 
@@ -354,8 +376,8 @@ Phase G execution focus from current baseline:
 - `A-E-002` assumes parity source snapshots (`D-001`) remain sufficient for v1 execution window.
 - `A-E-003` assumes the selected secp256k1 backend path can be pinned and wrapped without violating
   zero-unbounded-runtime-work and typed-error boundary requirements.
-- `A-E-004` notes that H2 NIP-06 requires an explicit build-vs-buy checkpoint for BIP39/BIP32
-  correctness and security burden before implementation starts.
+- `A-E-004` was resolved post-Phase E by `D-030`: NIP-06 will use the vetted `libwally-core`
+  path behind the approved pinned crypto backend policy and a narrow boundary module.
 
 ## Edge-Case Audit Closure
 
@@ -430,8 +452,8 @@ Phase G execution focus from current baseline:
   required CI gate before first release candidate.
 - `OQ-E-004`: what additional differential hardening depth beyond I1 baseline should become mandatory
   before first release candidate.
-- `OQ-E-005`: for H2 NIP-06, what build-vs-buy threshold is required before selecting in-house
-  BIP39/BIP32 implementation versus vetted helper/wrapper.
+- `OQ-E-005`: resolved post-Phase E by `D-030`; H-phase NIP-06 planning now assumes
+  `libwally-core` behind the approved pinned crypto backend policy and a narrow boundary module.
 - `OQ-E-006`: complete LLM-first usability evaluation closure criteria in
   `docs/plans/llm-usability-pass.md` before release-candidate API freeze. Status: in-progress.
   This question is the gate for freezing Layer 2 compatibility adapter defaults under

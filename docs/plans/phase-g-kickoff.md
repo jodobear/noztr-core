@@ -46,14 +46,25 @@ Purpose: establish the minimal Phase G execution baseline while preserving final
 - [done] Artifact consistency confirmed: `docs/plans/build-plan.md`,
   `docs/plans/phase-g-kickoff.md`, and `handoff.md` are aligned; `docs/plans/phase-f-risk-burndown.md`
   is retained as historical evidence for this checklist baseline.
-- [in_progress] Keep non-remote checklist evidence current while remote setup remains out of scope.
+- [done] Complete local-only Phase G closure while remote setup remains deferred and out of scope.
 
 ## Blocker Visibility
 
 - `no-3uj` remains visible for git/Dolt remote + sync readiness.
 - Operator note: `no-3uj` is deferred-by-operator for now and is not the current execution focus.
 
+## Closure Update
+
+- Date: 2026-03-10.
+- Phase G is complete on local-only release-readiness criteria.
+- Remote readiness `no-3uj` remains deferred-by-operator and is not part of the completed local
+  closure gate.
+- Next active phase is Phase H kickoff for additional NIP expansion planning.
+- Active successor artifacts:
+  - `docs/plans/phase-h-kickoff.md`
+  - `docs/plans/phase-h-additional-nips-plan.md`
+
 ## Immediate Next Action
 
-1. Continue maintenance-mode cadence from the Phase G baseline.
-2. Advance the release-readiness checklist items that do not require remote setup.
+1. Preserve Phase G as the historical local-closure baseline.
+2. Start Phase H kickoff and additional-NIP expansion planning.

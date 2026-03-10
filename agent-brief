@@ -63,7 +63,20 @@ plan_docs=(
     "CODEX-PROMPT.md"
     "docs/plans/decision-log.md"
     "docs/plans/build-plan.md"
+    "docs/plans/phase-g-kickoff.md"
+    "docs/plans/phase-h-kickoff.md"
+    "docs/plans/phase-h-additional-nips-plan.md"
+    "docs/plans/phase-h-wave1-loop.md"
     "handoff.md"
+)
+
+process_docs=(
+    "docs/process/process-review.md"
+    "docs/process/process-principles.md"
+    "docs/process/starter-framework.md"
+    "docs/process/project-profile-template.md"
+    "docs/process/agent-prompt-template.md"
+    "docs/process/phase-prompt-template.md"
 )
 
 phase_prompts=(
@@ -101,6 +114,9 @@ done
 for rel in "${plan_docs[@]}"; do
     collect_missing "${rel}"
 done
+for rel in "${process_docs[@]}"; do
+    collect_missing "${rel}"
+done
 for rel in "${phase_prompts[@]}"; do
     collect_missing "${rel}"
 done
@@ -128,6 +144,7 @@ printf -- '- src zig files: `%s`\n\n' "${zig_file_count}"
 
 report_section "Research Artifacts" "${research_docs[@]}"
 report_section "Planning Artifacts" "${plan_docs[@]}"
+report_section "Process Boilerplate Artifacts" "${process_docs[@]}"
 report_section "Phase Prompt Artifacts" "${phase_prompts[@]}"
 report_section "Roadmap Artifacts" "${roadmap_docs[@]}"
 
