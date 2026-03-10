@@ -36,11 +36,17 @@ Purpose: establish the minimal Phase G execution baseline while preserving final
 
 ## Release-Readiness Checklist
 
-- [done] Keep rust-active parity cadence current (`tools/interop/rust-nostr-parity-all`).
-- [done] Run aggregate Zig gates after parity cadence reruns
+- [done] Non-remote cadence baseline is current on rust-active lane
+  (`tools/interop/rust-nostr-parity-all`).
+- [done] Aggregate Zig quality gates are current for the same non-remote pass
   (`zig build test --summary all`, `zig build`).
-- [done] Keep Phase G and handoff docs consistent with rust-active / TS-archived governance.
-- [in_progress] Track checklist progress and evidence updates without requiring remote setup work.
+- [done] `UT-E-003` and `UT-E-004` remain maintenance-mode only; no burn-down expansion without new
+  behavior-class discovery.
+- [done] rust-active / TS-archived governance wording is aligned in active Phase G docs.
+- [done] Artifact consistency confirmed: `docs/plans/build-plan.md`,
+  `docs/plans/phase-g-kickoff.md`, and `handoff.md` are aligned; `docs/plans/phase-f-risk-burndown.md`
+  is retained as historical evidence for this checklist baseline.
+- [in_progress] Keep non-remote checklist evidence current while remote setup remains out of scope.
 
 ## Blocker Visibility
 

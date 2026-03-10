@@ -20,6 +20,15 @@ Current project context for the Phase G kickoff baseline.
 - Blocker visibility: `no-3uj` (git/Dolt remote + sync readiness) is deferred-by-operator and not in
   current execution focus.
 
+## Phase G Checklist Snapshot (non-remote)
+
+- Status: non-remote release-readiness checklist pass is in progress.
+- Completed: rust parity baseline and aggregate Zig gates are current for kickoff baseline.
+- Completed: rust-active / TS-archived governance wording is aligned across active Phase G artifacts.
+- Completed: `UT-E-003`/`UT-E-004` remain maintenance-mode only with no burn-down expansion unless a
+  new behavior class is discovered.
+- Deferred scope: `no-3uj` remote readiness remains deferred-by-operator.
+
 ## Active Parity Gate
 
 - Active lane: rust only (`tools/interop/rust-nostr-parity-all`).
@@ -44,26 +53,9 @@ Current project context for the Phase G kickoff baseline.
 
 ## Burn-Down Status
 
-- `UT-E-003`: active, with persistent NIP-44 replay harnesses and fixture evidence in place,
-  including deterministic malformed boundary `AQ==`, `AA==`, `Ag==`, and `Aw==` plus empty-payload
-  and truncated-version (`AgA=`) plus short-truncated (`AgAA`) reject coverage in active rust
-  parity-all checks, plus length-4 truncated-body (`AgAAAA==`) and length-5 truncated-body
-  (`AgAAAAA=`) reject coverage, plus length-6 truncated-body (`AgAAAAAA`) reject coverage,
-  plus length-7 truncated-body (`AgAAAAAAAA==`) reject coverage.
-- `UT-E-004`: active, with expanded typed boundary replay checks recorded as `pass`/`no-drift`,
-  including overlength pubkey wrong-shape (`64+2` hex) classified `invalid_public_key` with
-  boundary/direct parity, plus overlength message (`64+2`) and signature (`128+2`) wrong-shape
-  cases classified `invalid_signature` with boundary/direct parity, and odd-length wrong-shape
-  coverage (`63` pubkey/message, `127` signature) passing with the same no-drift parity mapping,
-  plus multi-invalid odd-length precedence coverage (`63` pubkey + `63` message + `127` signature)
-  passing with deterministic `invalid_public_key` precedence, plus multi-invalid full-length
-  non-hex precedence coverage (`64` pubkey + `64` message + `128` signature) passing with the same
-  deterministic `invalid_public_key` no-drift mapping, plus mixed-stage precedence coverage
-  (non-hex `64` pubkey + odd-length `63` message + valid `128` signature) passing with
-  deterministic `invalid_signature` no-drift mapping, plus mixed-stage signature-length precedence
-  coverage (non-hex `64` pubkey + valid `64` message + odd-length `127` signature) passing with
-  deterministic `invalid_signature` no-drift mapping.
-- Trigger-governance status unchanged: no `UT-E-001`/`A-D-001` trigger criteria fired.
+- `UT-E-003` and `UT-E-004` remain maintenance-mode only; no active burn-down expansion.
+- Canonical evidence baseline remains in `docs/plans/phase-f-risk-burndown.md`.
+- Trigger-governance status remains unchanged: no `UT-E-001`/`A-D-001` trigger criteria fired.
 
 ## Hard-Gate Snapshot (epic `no-dr3`)
 

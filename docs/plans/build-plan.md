@@ -142,6 +142,17 @@ Phase G execution focus from current baseline:
 - `UT-E-003` and `UT-E-004` are in maintenance mode; reopen only on new behavior-class discovery.
 - Blocker visibility: `no-3uj` remains open for git/Dolt remote + sync readiness.
 
+### Phase G non-remote release-readiness checklist status
+
+- Status: non-remote checklist pass is active and baseline items are current.
+- Cadence/gates: rust parity cadence plus aggregate `zig` gates are current for kickoff baseline.
+- Policy reaffirmed: `UT-E-003`/`UT-E-004` remain maintenance-mode only, with no burn-down expansion
+  unless a new behavior class is discovered.
+- Governance reaffirmed: rust lane is active; TypeScript lane remains archived historical evidence
+  only.
+- Scope note: remote readiness (`no-3uj`) remains deferred-by-operator and outside this
+  non-remote checklist pass.
+
 ### Phase I0 - Foundation and Shared Contracts
 
 - Modules/files: `src/root.zig`, `src/limits.zig`, `src/errors.zig`, `build.zig` test wiring.

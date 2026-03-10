@@ -126,13 +126,15 @@ Guardrail:
 
 ## Next Actions
 
-1. Continue `UT-E-003` replay-depth additions and append concise outcomes here.
-2. Continue `UT-E-004` boundary-depth additions and append typed mapping outcomes here.
-3. Re-run rust parity + aggregate zig gates after each material depth increment.
-4. Keep TS references archive-only and avoid active-cadence wording.
+1. Keep `UT-E-003` and `UT-E-004` evidence frozen at this baseline unless a new behavior class is
+   discovered.
+2. Re-run rust parity plus aggregate Zig gates only as maintenance cadence (for dependency/toolchain
+   changes).
+3. Keep TS references archive-only and avoid active-cadence wording.
 
 ## Transition Note (Phase G kickoff)
 
 - After `no-dr3` hard-gate closure, this artifact is retained as historical Phase F evidence.
 - Burn-down expansion is frozen at current baseline and remains frozen pending new behavior-class
   discovery.
+- This artifact remains the historical-evidence source used for Phase G checklist consistency.
