@@ -67,9 +67,11 @@ the validated maintenance baseline.
     carry an empty trailing `d` component
   - external targets validate `I/i` and `K/k` as a consistent NIP-73 pair, and malformed trailing
     fields on linkage tags are rejected
-  - parity harness covers event, coordinate, and external rust-nostr comment builder paths
-  - current judgment: retained as a material strict-path improvement over permissive rust-nostr
-    extraction that tolerates missing root scope or optional `K/k`
+  - rust parity harness now records event, coordinate, external, and parent-only extraction
+    behavior; `nostr-tools` provides no dedicated NIP-22 helper beyond the exported kind constant
+  - audit outcome: retained as an accepted strict trust-boundary divergence because the current
+    parser follows the NIP text and the richer producer-side reference behavior without obvious
+    ecosystem breakage
 - `NIP-27` is complete in the current Wave 1 loop:
   - strict inline `nostr:` reference extraction implemented in `src/nip27_references.zig`
   - extracted references preserve stable byte spans and decoded NIP-21 entities

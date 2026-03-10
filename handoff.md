@@ -42,8 +42,8 @@ Current project context for the Phase H kickoff baseline.
     addressable repost builder shape is source-reviewed in this pass
   - `NIP-22` is complete in `src/nip22_comments.zig` with strict root/parent linkage validation,
     mandatory `K/k`, required author linkage for Nostr targets, accepted support for addressable
-    `a+e` comment targets, NIP-73-consistent external validation, and accepted strict rejection of
-    permissive rust-style missing-root / optional-kind extraction
+    `a+e` comment targets, NIP-73-consistent external validation, and an accepted strict
+    trust-boundary divergence from permissive rust-style missing-root / optional-kind extraction
   - `NIP-27` is complete in `src/nip27_references.zig` with strict `nostr:` URI extraction,
     stable byte spans, decoded NIP-21 entities, and accepted malformed-fragment fallback that
     matches rust parser tokenization behavior
@@ -116,7 +116,7 @@ Current project context for the Phase H kickoff baseline.
    in `docs/plans/build-plan.md`, with `rust-nostr` as the active parity lane and archived
    `nostr-tools` as a secondary non-gating ecosystem signal. Every implemented NIP must be
    cross-checked against both references during the audit.
-5. Continue from the completed NIP-10 audit to the next implemented NIP audit item.
+5. Continue from the completed NIP-10 and NIP-22 audits to the next implemented NIP audit item.
 6. Start Wave 2 / `NIP-46` only after the implemented-NIP audit reaches an acceptable stopping
    point or explicitly recorded partial cutoff.
 7. Keep `no-3uj` visible as deferred-by-operator until remote setup returns to active execution focus.

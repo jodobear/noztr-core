@@ -42,7 +42,7 @@ completes.
 | 18 | pending | - | - | - | - | - | - |
 | 19 | pending | - | - | - | - | - | - |
 | 21 | pending | - | - | - | - | - | - |
-| 22 | pending | - | - | - | - | - | - |
+| 22 | complete | `HARNESS_COVERED DEEP PASS` | `SOURCE_REVIEW_ONLY no dedicated NIP-22 helper beyond kind constant` | No Layer 1 change required; current root/parent, `K/k`, `P/p`, and kind-1 rejection posture remains justified | none | none | `rust-nostr` emits canonical full linkage when given a root target but still extracts parent-only / optional-kind shapes; `noztr` keeps the stricter trust-boundary contract |
 | 25 | pending | - | - | - | - | - | - |
 | 27 | pending | - | - | - | - | - | - |
 | 40 | pending | - | - | - | - | - | - |
@@ -62,6 +62,9 @@ completes.
   the helper on that input.
 - NIP-10: accept four-slot `e` tags with a valid slot-four pubkey as bounded compatibility input
   instead of rejecting the whole extract path.
+- NIP-22: keep strict root/parent scope, mandatory `K/k`, mandatory `P/p` for Nostr targets, and
+  kind-1 rejection; `rust-nostr` permissive extraction is treated as a compatibility signal, not a
+  reason to weaken the Layer 1 parser.
 
 ## Accepted Risks
 

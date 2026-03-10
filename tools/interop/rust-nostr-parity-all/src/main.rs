@@ -717,6 +717,34 @@ fn check_nip22() -> Result<(), String> {
         _ => return Err("external comment parent target kind mismatch".to_string()),
     }
 
+    let parent_only_comment = EventBuilder::comment("parent only", &target, None::<&Event>)
+        .sign_with_keys(&keys)
+        .map_err(|e| format!("sign parent-only comment: {e}"))?;
+    if nip22::extract_root(&parent_only_comment).is_some() {
+        return Err("parent-only comment unexpectedly produced a root target".to_string());
+    }
+    let parent_only_target =
+        nip22::extract_parent(&parent_only_comment).ok_or("parent-only comment missing parent")?;
+    match parent_only_target {
+        Nip22CommentTarget::Event {
+            id,
+            pubkey_hint,
+            kind,
+            ..
+        } => {
+            if id != target.id {
+                return Err("parent-only comment parent id mismatch".to_string());
+            }
+            if pubkey_hint != Some(target.pubkey) {
+                return Err("parent-only comment parent pubkey mismatch".to_string());
+            }
+            if kind != Some(target.kind) {
+                return Err("parent-only comment parent kind mismatch".to_string());
+            }
+        }
+        _ => return Err("parent-only comment target kind mismatch".to_string()),
+    }
+
     Ok(())
 }
 

@@ -48,10 +48,12 @@ Release-facing note for behavior differences that are intentional in `noztr` Lay
   `noztr` requires comments to carry both uppercase root scope and lowercase parent scope, mandates
   `K`/`k`, rejects ambiguous competing target families, and requires explicit `P`/`p` author
   linkage for Nostr targets while still accepting the valid address-scoped `a+e` companion-id form.
-  `rust-nostr` builders can emit parent-only comment tags and its extraction remains permissive
-  about missing root scope and optional `K`/`k`. `noztr` keeps the stricter contract because it
-  produces deterministic trust-boundary parsing, validates `I/i` against `K/k` instead of treating
-  external targets as opaque text, and preserves NIP-10 as the only reply path for kind-1 notes.
+  `rust-nostr` builders emit the canonical richer form when given a root target, but its comment
+  extraction still tolerates parent-only input and optional `K`/`k`. `nostr-tools` currently has no
+  dedicated NIP-22 helper beyond the exported kind constant, so the JS ecosystem signal here is
+  source-review only. `noztr` keeps the stricter contract because it matches the NIP text, produces
+  deterministic trust-boundary parsing, validates `I/i` against `K/k` instead of treating external
+  targets as opaque text, and preserves NIP-10 as the only reply path for kind-1 notes.
 - **Strict NIP-51 bookmark-family scope:**
   `noztr` Wave 1 public-list helper keeps `bookmarks` and `bookmark_set` aligned to the NIP-51
   table (`e` and `a` only), while `rust-nostr` bookmark builders also expose hashtag and URL tags.

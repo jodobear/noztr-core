@@ -75,7 +75,8 @@ bun --cwd tools/interop/ts-nostr-parity-all run run
 
 - Harness path: `tools/interop/rust-nostr-parity-all`
 - Scope: runtime overlap checks for implemented `noztr` NIPs against `nostr` crate (`v0.44.2`).
-- Current coverage: `HARNESS_COVERED` for all implemented NIPs (`NIP-01/02/09/11/13/19/21/40/42/44/45/50/59/65/70/77`).
+- Current runtime coverage: `HARNESS_COVERED` for
+  `NIP-01/02/09/10/11/13/18/19/21/22/25/27/40/42/44/45/50/51/59/65/70/77`.
 - NIP-59 depth: `DEEP`.
 - Per-NIP output format (stable parse shape):
   - `NIP-XX | taxonomy=<...> | depth=<...> | result=PASS|FAIL|NOT_RUN [| detail=<...>]`
@@ -101,7 +102,10 @@ bun --cwd tools/interop/ts-nostr-parity-all run run
 - Harness path: `tools/interop/ts-nostr-parity-all`
 - Status: non-gating audit evidence lane only (not part of active pass/fail cadence).
 - Scope: runtime overlap checks for implemented `noztr` NIPs against `nostr-tools`.
-- Current coverage: `HARNESS_COVERED` for all implemented NIPs (`NIP-01/02/09/11/13/19/21/40/42/44/45/50/59/65/70/77`).
+- Current runtime coverage: `HARNESS_COVERED` for
+  `NIP-01/02/09/10/11/13/19/21/40/42/44/45/50/59/65/70/77`.
+- Additional implemented NIPs are cross-checked during the audit with explicit source review when
+  `nostr-tools` does not expose a dedicated runtime helper.
 - NIP-40 implementation-path dependency:
   - `nostr-tools` does not export `./nip40` in package `exports` for this version.
   - harness uses file-URL fallback to `node_modules/nostr-tools/lib/esm/nip40.js` when needed.
