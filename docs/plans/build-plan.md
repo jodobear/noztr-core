@@ -8,13 +8,14 @@ This artifact is finalized for implementation execution and is aligned to:
 - `docs/plans/v1-api-contracts.md`
 - `docs/research/v1-implementation-decisions.md`
 - `docs/guides/NOZTR_STYLE.md`
-- frozen defaults `D-001`..`D-004` in `docs/plans/nostr-principles.md`
+- frozen defaults `D-001`, `D-002`, `D-004`, and `D-036` in `docs/plans/nostr-principles.md`
 
 ## Decisions
 
 - `PE-001`: freeze implementation sequencing into executable phases with measurable completion gates.
-- `PE-002`: keep strict-by-default behavior (`D-003`) as canonical in all core entry points; compatibility
-  remains explicit opt-in and must not alter strict defaults.
+- `PE-002`: keep the deterministic-and-compatible Layer 1 posture (`D-036`) as canonical in all
+  core entry points; compatibility remains explicit where it would blur trust-boundary contracts and
+  must not degrade bounded deterministic behavior.
 - `PE-003`: require parity-core `nip11` in the core delivery schedule and gate closure criteria.
 - `PE-004`: preserve extension-lane placeholders as documentation-only (`H2/H3` roadmap lanes) with no
   v1 scope expansion.
@@ -29,7 +30,7 @@ This artifact is finalized for implementation execution and is aligned to:
   low/edge security follow-ups.
 - `PE-008`: start and track LLM-usability evaluation in
   `docs/plans/llm-usability-pass.md` before RC API freeze closure (`OQ-E-006`).
-- `PE-009`: freeze Layer 1 strict defaults for current kernel boundaries (lowercase-only critical hex,
+- `PE-009`: freeze Layer 1 trust-boundary defaults for current kernel boundaries (lowercase-only critical hex,
    deterministic `ids`/`authors` lowercase-prefix filter semantics (`1..64`), unknown filter-field
    rejection, strict relay `OK` rejection status-prefix validation, and path-bound `ws`/`wss`
    NIP-42 origin policy).
@@ -48,8 +49,12 @@ This artifact is finalized for implementation execution and is aligned to:
 
 - Zig core-principles alignment: prioritize clarity, control, simplicity, explicit errors/memory,
   and deterministic outcomes because these properties preserve auditability and parity repeatability.
-- Strictness guarantee posture: Layer 1 optimizes for strong deterministic guarantees, while Layer 2
-  absorbs permissive ecosystem variance explicitly.
+- Layer 1 posture: choose the narrowest deterministic behavior that remains correct, bounded,
+  explicit, and ecosystem-compatible.
+- Compatibility rule: do not reject input merely to express purity when the broader shape is still
+  spec-valid, unambiguous, and bounded.
+- Adapter rule: keep explicit compatibility adapters only for cases where broader acceptance would
+  otherwise blur Layer 1 contracts.
 - Architecture intent: strict kernel and compatibility adapter remain separated so interop improves
   without weakening trust-boundary defaults.
 
@@ -91,7 +96,7 @@ Implementation status snapshot (post-I7 closure):
 - Current implementation state remains post-I7 closure baseline; no default-policy changes are
   introduced by kickoff tracking.
 - Active parity cadence runs rust parity-all plus aggregate `zig` gates only.
-- Active rust parity status is `16/16 HARNESS_COVERED`, `DEEP`, `PASS`.
+- Active rust parity status is `22/22 HARNESS_COVERED`, `DEEP`, `PASS`.
 - TypeScript parity lane is archived historical evidence only; records are preserved in canonical
   Phase F artifacts.
 - Comparative evidence path for active NIP-59 deep parity remains:
@@ -134,6 +139,43 @@ Phase G closure and Phase H transition from current baseline:
 - treat remote readiness `no-3uj` as deferred-by-operator and outside the completed Phase G local
   closure gate.
 - execute additional-NIP expansion planning and sequencing in Phase H artifacts.
+
+## Implemented NIP Review Criteria
+
+Use this matrix when reviewing implemented behavior for accidental over-narrowing or unnecessary
+ecosystem friction. The standard is not "be permissive"; it is "be deterministic, bounded, and
+compatible unless there is a concrete reason not to be."
+
+| NIP | Review Criteria From `D-036` |
+| --- | --- |
+| 01 | Preserve hard rejection for cryptographic invalidity and malformed critical fields; review filter-field rejection, lowercase-only critical hex, and relay `OK` status rules to confirm each narrowing is protocol-necessary or materially safer rather than merely tidier. |
+| 02 | Preserve kind scoping and pubkey validity; review whether valid relay-hint and petname shapes are accepted without forcing an unnecessarily narrow contact-tag interpretation. |
+| 09 | Preserve author-bound deletion integrity and typed target failures; review whether any accepted `e`/`a` delete shape from the NIP is being rejected without a safety reason. |
+| 10 | Preserve deterministic thread extraction and malformed marker rejection; review removed `mention` handling and four-slot pubkey rejection against real ecosystem pressure before treating them as settled improvements. |
+| 11 | Preserve typed known-field validation with unknown-field tolerance; review whether known-field typing or pubkey strictness rejects inputs the NIP intentionally leaves open. |
+| 13 | Preserve checked PoW truthfulness and bounded nonce handling; review nonce-tag shape rules only where real producers emit broader but still unambiguous forms. |
+| 18 | Preserve repost target consistency and embedded-event verification; review whether addressable repost/helper shapes accepted in the ecosystem remain deterministic enough for Layer 1. |
+| 19 | Preserve exact codec correctness and forbidden-secret handling; review only if bech32 casing or TLV acceptance is broader in practice while still standards-valid. |
+| 21 | Preserve deterministic `nostr:` URI parsing; review whether any lowercase-only or boundary-token rule is stricter than the URI/NIP actually requires. |
+| 22 | Preserve root/parent/linkage correctness and NIP-73 consistency; review mandatory `K/k`, `P/p`, and root-scope requirements against deployed comment traffic so we do not reject valid-but-common comment structures without strong justification. |
+| 25 | Preserve target determinism and NIP-30-valid custom emoji handling; review target heuristics and emoji-tag requirements to ensure we reject malformed reactions, not merely unfamiliar but still valid ones. |
+| 27 | Preserve stable spans and decoded references; review lowercase-only `nostr:` handling and malformed-fragment fallback so URI extraction remains spec-correct without dropping harmless real-world forms. |
+| 40 | Preserve explicit expiration parsing and typed boundary failures; review only if real traffic uses spec-valid but non-canonical timestamp/tag forms. |
+| 42 | Preserve replay safety, origin binding, and typed auth failures; review path binding, `ws`/`wss` distinction, and IPv6 rules against operational interoperability evidence before freezing them as unquestionable defaults. |
+| 44 | Preserve cryptographic staging, typed failures, and zeroization; compatibility review is secondary here and should only consider standards-backed variant handling, not permissive decoding. |
+| 45 | Preserve bounded extension parsing and state transitions; review whether extension message shapes are being narrowed beyond the extension spec or common peer behavior. |
+| 50 | Preserve bounded token parsing and explicit unsupported forms; review whether rejected search-token patterns are malformed or just broader than our current parser. |
+| 51 | Preserve set metadata bounds, coordinate-kind checks, and deterministic extraction; review bookmark/list-family narrowing, optional emoji-set coordinates, and future list-shape breadth against both the NIP tables and real producer behavior. |
+| 59 | Preserve staged unwrap integrity, sender continuity, and bounded scratch usage; review only if interoperability pressure appears on wrapper/seal/rumor envelope shapes that remain unambiguous and safe. |
+| 65 | Preserve relay URL validation, marker typing, and bounded extraction; review normalization and accepted marker breadth so we reject malformed relays rather than merely non-preferred formatting. |
+| 70 | Preserve deny-by-default protected-event semantics and exact tag meaning; review whether any tag-shape exactness exceeds what NIP-70 needs for deterministic behavior. |
+| 77 | Preserve bounded negentropy state transitions and strict session parsing; review message-shape rejection only where broader but still well-defined peer behavior exists. |
+
+Review execution rule:
+- A behavior is too strict when it creates material ecosystem incompatibility without improving
+  correctness, safety, determinism, or boundedness.
+- A behavior is acceptable to keep narrow when it closes ambiguity, prevents malformed input
+  acceptance, or protects a trust boundary in a way that a broader rule cannot.
 
 ## Phase F hard-gate closure status (epic `no-dr3`)
 
@@ -190,7 +232,7 @@ Phase G closure and Phase H transition from current baseline:
   - smoke tests for root exports and typed error imports.
 - Exit gate:
   - static library builds; tests pass with zero leaks.
-  - no public catch-all errors; strict defaults documented in module headers.
+  - no public catch-all errors; Layer 1 defaults documented in module headers.
 
 ### Phase I1 - Core Event and Filter Kernel
 
@@ -489,7 +531,8 @@ Ambiguity checkpoint result: high-impact `decision-needed` count = 0.
 - Implementation schedule accepted as executable with no architecture clarification blockers.
 - Every v1 module from `docs/plans/v1-api-contracts.md` is mapped to one implementation phase.
 - Parity-core gates explicitly include `nip11` completion and tests.
-- Strict-vs-compat policy is consistent with frozen default `D-003` (strict default, compat opt-in).
+- Strict-vs-compat policy is consistent with `D-036` (deterministic-and-compatible Layer 1 posture,
+  explicit compatibility where needed).
 - Unresolved tradeoffs are recorded with status, mitigation, reversal trigger, and owner.
 - Extension-lane placeholders remain documentation-only and do not add v1 module scope.
 - No high-impact ambiguity remains `decision-needed`.
@@ -528,17 +571,20 @@ Ambiguity checkpoint result: high-impact `decision-needed` count = 0.
 - Principles Impacted: P03, P05, P06.
 - Scope Impacted: I4, I6 optional modules.
 
-## Tradeoff T-E-003: Freeze strict/compat policy now versus defer policy reconciliation
+## Tradeoff T-E-003: Freeze Layer 1 posture now versus defer policy reconciliation
 
-- Context: prior artifacts contained stale strict-vs-compat uncertainty in build sequencing text.
+- Context: prior artifacts contained stale and overly blunt strict-vs-compat wording in build
+  sequencing text.
 - Options:
-  - O1: freeze policy now to `D-003` and remove contradiction.
+  - O1: freeze policy now to `D-036` and remove contradiction.
   - O2: defer strict/compat resolution into implementation phase.
 - Decision: O1.
-- Benefits: prevents default-behavior drift and reduces implementation ambiguity.
-- Costs: less flexibility for permissive-default experiments.
-- Risks: compatibility work may require extra adapter code.
-- Mitigations: explicit compatibility entry points remain available and test-backed.
+- Benefits: prevents default-behavior drift and makes it explicit that correctness and ecosystem
+  compatibility matter together.
+- Costs: more judgment is required when deciding whether a narrower rule is justified.
+- Risks: reviewers could still over-apply the old "strict is better" shorthand.
+- Mitigations: explicit compatibility entry points remain available and test-backed, and the
+  implemented-NIP review criteria matrix is canonical.
 - Reversal Trigger: frozen default update accepted in decision log.
 - Principles Impacted: P01, P03, P05.
 - Scope Impacted: all parser/validator module boundaries.

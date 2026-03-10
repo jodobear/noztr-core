@@ -5,7 +5,7 @@ backend exceptions.
 
 ## What noztr is
 
-- A strict-by-default protocol-kernel implementation for Nostr.
+- A deterministic, bounded, compatibility-aware protocol-kernel implementation for Nostr.
 - Built as a static library with deterministic, bounded behavior targets.
 - Focused on protocol parsing, validation, serialization, and trust-boundary helpers.
 - Keeps non-crypto surfaces stdlib-first and isolates approved crypto backends behind narrow boundary

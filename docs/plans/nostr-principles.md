@@ -24,9 +24,13 @@ Change requires a new entry in `docs/plans/decision-log.md`.
 - `D-002` Parity definition:
   - parity means behavior parity (parse, validate, serialize, verify, and tests),
     not API shape parity.
-- `D-003` Spec strictness default:
-  - strict mode is default.
-  - compatibility behavior is only added when explicitly documented with tradeoffs.
+- `D-036` Deterministic-and-compatible protocol posture:
+  - Layer 1 chooses the narrowest deterministic behavior that remains correct, bounded, explicit,
+    and ecosystem-compatible.
+  - malformed, cryptographically invalid, ambiguity-creating, or safety-eroding input is rejected
+    at trust boundaries.
+  - compatibility behavior remains explicit when it would otherwise blur Layer 1 contracts, but the
+    project does not optimize for strictness as an end in itself.
 - `D-004` Phase gate policy:
   - no phase closes without tradeoff records and ambiguity checkpoint results.
 
@@ -38,8 +42,10 @@ Change requires a new entry in `docs/plans/decision-log.md`.
     authenticity without trusted intermediaries.
 - `P02` Rule: keep core protocol modules minimal, composable, and transport-agnostic.
   - Rationale: simple primitives maximize implementability and reduce hidden coupling.
-- `P03` Rule: optimize for interop convergence and behavior parity before convenience.
-  - Rationale: network effects depend on shared behavior, not shared SDK ergonomics.
+- `P03` Rule: optimize for interop convergence and behavior parity before stylistic purity or
+  convenience.
+  - Rationale: network effects depend on shared behavior, and correctness is stronger when explicit
+    bounds do not create avoidable ecosystem friction.
 - `P04` Rule: encode relay routing as explicit heuristics and inputs, never implicit
   resolver magic.
   - Rationale: predictability and auditability are required for partition-tolerant
@@ -58,10 +64,13 @@ Change requires a new entry in `docs/plans/decision-log.md`.
   verifiable data ownership.
 - Anti-goal: add broad compatibility behavior that silently rewrites or normalizes
   invalid protocol data.
+- Anti-goal: reject valid or widely interoperable input solely to express implementation purity.
 - Anti-goal: optimize for one mega-relay or hidden global resolver assumptions.
 - Forbidden shortcut: accepting invalid signatures "for UX" or "for compatibility".
 - Forbidden shortcut: auto-repairing malformed fields during parse without emitting a
   typed error or explicit compatibility branch.
+- Forbidden shortcut: narrowing accepted behavior beyond the NIP or real ecosystem need without a
+  documented tradeoff and compatibility review.
 - Forbidden shortcut: coupling core APIs to one transport stack, one relay provider,
   or one app-specific workflow.
 - Forbidden shortcut: introducing dynamic, unbounded allocation growth in hot paths.
@@ -87,27 +96,34 @@ Change requires a new entry in `docs/plans/decision-log.md`.
 - Owner: active phase owner.
 
 `A-0-003`
-- Topic: strictness and fault tolerance boundary.
+- Topic: deterministic trust-boundary posture and compatibility boundary.
 - Impact: high.
 - Status: resolved.
-- Default: hard-reject cryptographic invalidity; allow scoped compatibility only with
-  explicit tradeoff record and forcing tests.
+- Default: hard-reject malformed, cryptographically invalid, ambiguity-creating, or unsafe input;
+  prefer the narrowest deterministic behavior that remains ecosystem-compatible, and document any
+  meaningful narrowing or widening with explicit tradeoffs and forcing tests.
 - Owner: active phase owner.
 
 ## Tradeoffs
 
-## Tradeoff T-0-001: Strict default versus broad compatibility
+## Tradeoff T-0-001: Deterministic trust boundaries versus broad compatibility
 
-- Context: ecosystem data quality varies; strictness can reject widely-seen input.
+- Context: ecosystem data quality varies, but NIPs also intentionally leave room for multiple valid
+  implementations; a kernel can become correct-yet-isolated if it rejects every broader shape.
 - Options:
-  - O1: strict by default, scoped compatibility exceptions.
-  - O2: compatibility by default, strict mode opt-in.
+  - O1: deterministic, explicit, bounded defaults with compatibility-preserving behavior where the
+    input remains unambiguous and safe.
+  - O2: broad permissive acceptance with minimal rejection and post-hoc normalization.
 - Decision: O1.
-- Benefits: predictable semantics, lower attack surface, stronger conformance.
-- Costs: some ecosystem inputs rejected unless exception is documented.
-- Risks: interop friction with permissive clients.
-- Mitigations: add narrowly-scoped compatibility rules with tests and rationale.
-- Reversal Trigger: compatibility exceptions exceed strict rules in core paths.
+- Benefits: predictable semantics, lower attack surface, stronger conformance, and lower risk of
+  needless ecosystem incompatibility.
+- Costs: more judgment is required when deciding whether a broader shape is valid compatibility or
+  unacceptable ambiguity.
+- Risks: some ecosystem inputs may still be rejected if the project over-narrows the boundary.
+- Mitigations: require parity review, real compatibility evidence, and explicit documented rationale
+  before freezing narrower behavior.
+- Reversal Trigger: the posture still produces recurring unnecessary incompatibility or, in the
+  other direction, starts to blur trust-boundary guarantees.
 - Principles Impacted: P01, P03, P05.
 - Scope Impacted: phase A classification, phase B parsing policy, phase D APIs.
 

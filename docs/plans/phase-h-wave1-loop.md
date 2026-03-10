@@ -15,7 +15,8 @@ bounded plan, coding, review, parity, and closure sequence with minimal operator
   - `22`
   - `27`
   - `51`
-- Applies only after Phase H kickoff and with current strict defaults unchanged.
+- Applies only after Phase H kickoff and with the current Layer 1 posture and bounded defaults
+  unchanged.
 - Rust lane remains the active parity reference lane.
 
 ## Autonomy Rule
@@ -63,7 +64,8 @@ Each Wave 1 NIP must complete the full loop below before the next NIP begins.
 
 3. Implementation step
    - implement one module/file slice at a time.
-   - keep public APIs strict-by-default, caller-buffer-first where relevant, and bounded.
+   - keep public APIs caller-buffer-first where relevant, bounded, and aligned with `D-036`
+     (deterministic, explicit, and compatibility-preserving rather than strict for its own sake).
    - add assertions for positive and negative space in every function path.
    - add or update one exported-surface smoke test in `src/root.zig` for every new public module.
 
@@ -79,9 +81,11 @@ Each Wave 1 NIP must complete the full loop below before the next NIP begins.
      - `HARNESS_COVERED`
      - `SOURCE_REVIEW_ONLY`
      - `NO_REFERENCE_COVERAGE`
-   - record any strict intentional divergence rather than silently adjusting Layer 1 behavior.
+   - record any intentional divergence rather than silently adjusting Layer 1 behavior.
    - if parity evidence shows a required semantic mismatch, stop and record the decision point before
      changing defaults.
+   - consult the implemented-NIP review criteria in `docs/plans/build-plan.md` when deciding
+     whether a narrower behavior is justified or is creating unnecessary incompatibility.
 
 6. Review Cycle A
    - review for correctness first: trust boundaries, malformed input handling, typed failures,

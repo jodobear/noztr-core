@@ -632,6 +632,29 @@ Immutable record of accepted planning decisions.
   implementation.
 - Supersedes: none
 
+## D-036: Adopt deterministic-and-compatible trust-boundary posture
+
+- Date: 2026-03-10
+- Status: accepted
+- Decision: replace the blunt "strict-by-default" shorthand with this canonical posture for Layer 1
+  protocol behavior:
+  - choose the narrowest deterministic behavior that remains correct, bounded, explicit, and
+    ecosystem-compatible.
+  - do not reject input merely to enforce stylistic purity when the NIP intentionally leaves room
+    and the broader shape remains unambiguous and bounded.
+  - do reject malformed, cryptographically invalid, ambiguity-creating, or safety-eroding input at
+    trust boundaries.
+  - keep compatibility adaptations explicit when they would otherwise blur Layer 1 contracts, but do
+    not treat compatibility itself as suspect.
+- Why: Nostr NIPs intentionally leave implementation room in several places, and the project goal is
+  not "strict for strictness' sake" but deterministic correctness with low-friction ecosystem
+  interoperability.
+- Tradeoff: more case-by-case review effort versus a more accurate and useful protocol posture.
+- Related Tradeoff: T-0-001, T-0-003.
+- Reversal Trigger: evidence shows this posture causes ambiguous Layer 1 behavior or compatibility
+  exceptions expand without bounded, explicit contracts.
+- Supersedes: D-003
+
 ## Phase Closure Evidence
 
 ### P0-E-001: Phase 0 closure record

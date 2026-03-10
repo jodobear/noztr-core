@@ -2,15 +2,17 @@
 
 Date: 2026-03-09
 
-Release-facing note for behavior differences that are intentional in `noztr` strict defaults.
+Release-facing note for behavior differences that are intentional in `noztr` Layer 1 defaults.
 
-## Strictness defaults and why
+## Layer 1 posture and why
 
-- `noztr` is strict-by-default (`D-003`): trust-boundary parsing and validation prefer deterministic
-  rejection over permissive normalization.
-- This keeps cryptographic and protocol behavior predictable across relays, reduces silent acceptance
-  of malformed inputs, and preserves typed failure contracts.
-- Compatibility behavior remains an explicit adapter concern and does not weaken Layer 1 defaults.
+- `noztr` follows the deterministic-and-compatible trust-boundary posture (`D-036`): Layer 1 picks
+  the narrowest deterministic behavior that remains correct, bounded, explicit, and
+  ecosystem-compatible.
+- This keeps cryptographic and protocol behavior predictable across relays, reduces silent
+  acceptance of malformed inputs, and avoids making strictness an end in itself.
+- Compatibility behavior remains explicit where it would blur Layer 1 contracts, but compatibility
+  itself is not treated as a smell.
 
 ## Known intentional divergences
 

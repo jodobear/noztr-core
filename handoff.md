@@ -6,7 +6,7 @@ Current project context for the Phase H kickoff baseline.
 
 - Planning phase records remain closed in `docs/plans/decision-log.md`.
 - Active execution state is Phase H on post-Phase G local-only closure baseline.
-- Frozen defaults and strictness posture remain unchanged.
+- Frozen defaults and Layer 1 posture remain unchanged.
 - Canonical Phase F trackers:
   - `docs/plans/phase-f-kickoff.md`
   - `docs/plans/phase-f-parity-matrix.md`
@@ -123,4 +123,4 @@ Current project context for the Phase H kickoff baseline.
 - Shared-corpus evaluation docs
   (`docs/process/shared-knowledge-strategy.md`, `docs/process/research-guides-catalog.md`)
   are process-evaluation artifacts only and are not canonical inputs for active Phase H execution.
-- These additions do not change Phase H strict defaults, parity cadence, or current Wave 1 order.
+- These additions do not change Phase H Layer 1 defaults, parity cadence, or current Wave 1 order.

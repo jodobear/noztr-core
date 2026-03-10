@@ -3,14 +3,14 @@
 Date: 2026-03-10
 
 Purpose: classify and sequence the requested additional NIPs for Phase H planning without changing
-frozen defaults or current strict kernel behavior.
+frozen defaults or the current deterministic-and-compatible Layer 1 kernel posture.
 
 ## Decisions
 
 - `H-ANIP-001`: this plan covers only NIPs `03`, `06`, `07`, `10`, `17`, `18`, `22`, `23`, `24`,
   `25`, `27`, `29`, `39`, `46`, `51`.
-- `H-ANIP-002`: frozen defaults remain unchanged (`D-001`..`D-004`); strict-by-default behavior
-  remains canonical.
+- `H-ANIP-002`: frozen defaults remain unchanged; `D-036` deterministic-and-compatible Layer 1
+  posture remains canonical.
 - `H-ANIP-003`: expansion work is limited to bounded protocol-kernel additions and explicit
   trust-boundary contracts.
 - `H-ANIP-004`: app-runtime/platform integration surfaces remain out-of-scope for core library scope.
@@ -27,7 +27,7 @@ frozen defaults or current strict kernel behavior.
 
 - No unapproved dependencies; stdlib-first policy remains in force and approved pinned crypto backend
   exceptions require a decision-log entry.
-- No policy drift from current strict defaults, typed errors, and bounded-memory requirements.
+- No policy drift from current Layer 1 posture, typed errors, and bounded-memory requirements.
 - Behavior parity remains the target, not API-shape parity.
 - Sequencing favors lower-ambiguity protocol primitives before high-ambiguity trust/policy surfaces.
 
@@ -66,10 +66,10 @@ frozen defaults or current strict kernel behavior.
 - Tests
   - Minimum vector floor per new module/API surface: valid + invalid corpus with typed error forcing.
   - Determinism checks for parse/serialize/validation behavior on repeated inputs.
-  - Non-interference checks proving unchanged strict defaults in existing core modules.
+  - Non-interference checks proving unchanged Layer 1 defaults in existing core modules.
 - Parity evidence
   - Comparative behavior notes against pinned parity references for every implemented wave item.
-  - Explicit mismatch ledger entries if ecosystem behavior diverges from strict defaults.
+  - Explicit mismatch ledger entries if ecosystem behavior diverges from current Layer 1 defaults.
   - Documentation evidence
   - Update contracts/build-plan references for accepted wave outputs.
   - Record any default-affecting choice in `docs/plans/decision-log.md` before adoption.
@@ -342,7 +342,7 @@ frozen defaults or current strict kernel behavior.
 - `OQ-H-ANIP-003` (NIP-29, high): what fixed-capacity state model is acceptable for relay-group
   semantics without unbounded or policy-coupled behavior.
 - `OQ-H-ANIP-004` (NIP-39, high): what trust model and verification policy are acceptable for
-  external identity claims under strict defaults.
+  external identity claims under current Layer 1 defaults.
 - `OQ-H-ANIP-005` (NIP-03, medium): what bounded proof-shape and verification-depth floor is required
   for deterministic OpenTimestamps validation.
 
@@ -355,4 +355,4 @@ frozen defaults or current strict kernel behavior.
 - `P03`: sequencing prioritizes interoperability primitives and behavior parity evidence.
 - `P04`: relay/group and connection semantics (`29`, `46`) remain explicit policy surfaces.
 - `P05`: deterministic parse/validation and typed-error forcing are required in wave exits.
-- `P06`: bounded memory/work and strict defaults remain unchanged across all classifications.
+- `P06`: bounded memory/work and Layer 1 defaults remain unchanged across all classifications.

@@ -6,8 +6,8 @@ Scope: implementation-ready contracts for all Phase A H1 v1 modules.
 
 ## Decisions
 
-- `PD-001`: all strict APIs are canonical; compatibility behavior remains explicit and outside
-  default entry points.
+- `PD-001`: all Layer 1 APIs are canonical; compatibility behavior remains explicit and outside
+  default entry points when broader acceptance would blur trust-boundary contracts.
 - `PD-002`: all runtime encode/decode/verify/encrypt APIs are caller-buffer-first with explicit
   typed failures and fixed bounds.
 - `PD-003`: every module contract includes deterministic behavior, assertion pairs, and required
@@ -26,7 +26,9 @@ Scope: implementation-ready contracts for all Phase A H1 v1 modules.
   in wire/state contracts.
 - Public parse/verify/encode APIs must return typed error sets; no catch-all `error.Invalid`.
 - Output-writing APIs must return `error.BufferTooSmall` without truncation.
-- Strict mode is default (`D-003`); compatibility behavior is opt-in only.
+- Layer 1 follows `D-036`: choose the narrowest deterministic behavior that remains correct,
+  bounded, explicit, and ecosystem-compatible; keep compatibility behavior explicit when it would
+  otherwise blur the core contract.
 - Root export semantics for I6 optional modules are feature-gated by build option
   `enable_i6_extensions` (default `true`):
   - when enabled, `root.nip45_count`, `root.nip50_search`, and `root.nip77_negentropy` export full
@@ -680,7 +682,7 @@ Placeholder gate requirements:
 - Benefits: tighter typed integrity and deterministic error surfaces.
 - Costs: stricter behavior than permissive peers.
 - Risks: compatibility friction with malformed inputs.
-- Mitigations: compatibility adapters can exist outside strict default path.
+- Mitigations: compatibility adapters can exist outside the Layer 1 default path.
 - Reversal Trigger: standards-backed requirement mandates permissive handling.
 - Principles Impacted: P01, P03, P05.
 - Scope Impacted: `nip19_bech32`, `nip21_uri`.

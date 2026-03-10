@@ -32,8 +32,9 @@ execution guidance.
 
 - `PF-001`: start implementation with `I0` then `I1` only; do not begin `I2+` until `I1` exit gate
   is passed.
-- `PF-002`: keep strict-by-default behavior (`D-003`) as canonical in all first-slice APIs;
-  compatibility paths are out of scope for `I0`/`I1`.
+- `PF-002`: keep the `D-036` deterministic-and-compatible Layer 1 posture as canonical in all
+  first-slice APIs; compatibility paths are out of scope for `I0`/`I1` unless they are required to
+  avoid unnecessary incompatibility without weakening bounds or explicitness.
 - `PF-003`: enforce typed boundary errors and deterministic behavior checks before adding any optional
   extension behavior.
 - `PF-004`: treat ambiguity discovery as a hard stop when it affects trust boundaries, crypto
