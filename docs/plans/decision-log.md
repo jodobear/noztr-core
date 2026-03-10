@@ -36,6 +36,8 @@ Immutable record of accepted planning decisions.
     - local path: `/workspace/pkgs/libnostr-z`
     - commit: `a849dc804521801971f42d71c172aa681ecdc573`
   - pin date: `2026-03-04`
+- Reference role: these sources are pinned to make analysis and parity evidence reproducible. They
+  are strong implementation references, not protocol authority.
 - Why: reproducible analysis across phased planning.
 - Tradeoff: stale source risk versus reproducibility.
 - Related Tradeoff: T-0-002.
@@ -48,8 +50,12 @@ Immutable record of accepted planning decisions.
 - Date: 2026-03-04
 - Status: accepted
 - Decision: parity means behavioral parity (parse, validate, serialize, verify,
-  and tests), not API shape parity.
-- Why: preserve Zig-native API quality and constraints.
+  and tests), not API shape parity. Treat `rust-nostr` as the primary active parity lane because it
+  is a strong production reference and ecosystem proxy, not because it is the canonical truth of
+  the protocol. Improvements over the reference remain allowed when they are NIP-grounded,
+  explicitly reasoned, bounded, and test-backed.
+- Why: preserve Zig-native API quality and constraints while using a strong ecosystem reference to
+  improve compatibility confidence.
 - Tradeoff: adapter work versus cleaner long-term core API.
 - Related Tradeoff: T-0-002.
 - Reversal Trigger: explicit product requirement for source-compatible APIs.
@@ -646,6 +652,9 @@ Immutable record of accepted planning decisions.
     trust boundaries.
   - keep compatibility adaptations explicit when they would otherwise blur Layer 1 contracts, but do
     not treat compatibility itself as suspect.
+- Parity note: parity review should learn from strong deployed references such as `rust-nostr`, but
+  should not copy reference-library edge behavior blindly when a more correct or more Zig-appropriate
+  bounded contract is justified and documented.
 - Why: Nostr NIPs intentionally leave implementation room in several places, and the project goal is
   not "strict for strictness' sake" but deterministic correctness with low-friction ecosystem
   interoperability.

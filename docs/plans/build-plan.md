@@ -44,13 +44,20 @@ This artifact is finalized for implementation execution and is aligned to:
   and no default use of overloaded `unsupported` wording.
 - `PE-013`: restrict active parity gate operations to the rust lane (`rust-nostr`) and archive the
   TypeScript `nostr-tools` parity-all lane as historical evidence only.
+  - rationale note: `rust-nostr` is the active lane because it is a strong production reference and
+    ecosystem proxy, not because it overrides NIP authority or Zig-native design goals.
 
 ## Strategic Notes
 
 - Zig core-principles alignment: prioritize clarity, control, simplicity, explicit errors/memory,
   and deterministic outcomes because these properties preserve auditability and parity repeatability.
+- Reference posture: active parity against `rust-nostr` is meant to increase ecosystem confidence
+  and surface lessons from a strong deployed implementation, not to require mimicry of every edge
+  behavior.
 - Layer 1 posture: choose the narrowest deterministic behavior that remains correct, bounded,
   explicit, and ecosystem-compatible.
+- Zig posture: preserve Zig-native API shape and bounded-system guarantees where they improve the
+  library without breaking protocol or ecosystem correctness.
 - Compatibility rule: do not reject input merely to express purity when the broader shape is still
   spec-valid, unambiguous, and bounded.
 - Adapter rule: keep explicit compatibility adapters only for cases where broader acceptance would
@@ -176,6 +183,9 @@ Review execution rule:
   correctness, safety, determinism, or boundedness.
 - A behavior is acceptable to keep narrow when it closes ambiguity, prevents malformed input
   acceptance, or protects a trust boundary in a way that a broader rule cannot.
+- A divergence from `rust-nostr` is acceptable when it is NIP-grounded, test-backed, bounded, and
+  materially improves correctness, determinism, or Zig-native contract quality without causing
+  disproportionate ecosystem friction.
 
 ## Phase F hard-gate closure status (epic `no-dr3`)
 

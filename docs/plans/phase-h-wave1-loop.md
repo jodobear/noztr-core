@@ -77,15 +77,19 @@ Each Wave 1 NIP must complete the full loop below before the next NIP begins.
 
 5. Parity step
    - compare behavior against the active rust reference lane where coverage exists.
+   - treat rust parity as a compatibility-confidence and learning tool, not as an instruction to
+     clone every reference edge behavior.
    - classify parity evidence for the implemented surface using one of:
      - `HARNESS_COVERED`
      - `SOURCE_REVIEW_ONLY`
      - `NO_REFERENCE_COVERAGE`
    - record any intentional divergence rather than silently adjusting Layer 1 behavior.
    - if parity evidence shows a required semantic mismatch, stop and record the decision point before
-     changing defaults.
+      changing defaults.
    - consult the implemented-NIP review criteria in `docs/plans/build-plan.md` when deciding
      whether a narrower behavior is justified or is creating unnecessary incompatibility.
+   - preserve Zig-native guarantees and API clarity when they improve the implementation without
+     weakening protocol correctness, bounds, or compatibility posture.
 
 6. Review Cycle A
    - review for correctness first: trust boundaries, malformed input handling, typed failures,
@@ -200,6 +204,8 @@ Each Wave 1 NIP must complete the full loop below before the next NIP begins.
   - parity taxonomy is recorded as `HARNESS_COVERED`, `SOURCE_REVIEW_ONLY`, or
     `NO_REFERENCE_COVERAGE`
   - intentional divergences are documented, not implied
+  - reference-library differences are judged against NIPs, ecosystem compatibility, and Zig-native
+    bounded-contract quality rather than copied automatically
 - Overengineering
   - no abstraction introduced without direct domain need
   - no broad generic helper introduced where one explicit helper is clearer

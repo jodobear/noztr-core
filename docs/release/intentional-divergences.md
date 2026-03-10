@@ -13,6 +13,9 @@ Release-facing note for behavior differences that are intentional in `noztr` Lay
   acceptance of malformed inputs, and avoids making strictness an end in itself.
 - Compatibility behavior remains explicit where it would blur Layer 1 contracts, but compatibility
   itself is not treated as a smell.
+- `rust-nostr` remains the strongest active comparison lane because it is widely used and provides
+  good ecosystem signal, but divergences can still be intentional improvements when they are
+  NIP-grounded, bounded, and documented.
 
 ## Known intentional divergences
 

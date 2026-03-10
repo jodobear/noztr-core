@@ -21,9 +21,15 @@ Change requires a new entry in `docs/plans/decision-log.md`.
     - upstream: `git@github.com:privkeyio/libnostr-z.git`
     - commit: `a849dc804521801971f42d71c172aa681ecdc573`
   - pin date: `2026-03-04`
+  - parity sources are strong implementation references and ecosystem signals, not protocol
+    authority.
 - `D-002` Parity definition:
   - parity means behavior parity (parse, validate, serialize, verify, and tests),
     not API shape parity.
+  - `rust-nostr` is the primary active parity lane because it is a strong production reference and a
+    useful ecosystem-compatibility proxy, not because it is cardinal truth.
+  - parity review is intended to improve compatibility confidence and teach implementation lessons;
+    it does not forbid a better Zig-native contract when the NIPs and explicit reasoning support it.
 - `D-036` Deterministic-and-compatible protocol posture:
   - Layer 1 chooses the narrowest deterministic behavior that remains correct, bounded, explicit,
     and ecosystem-compatible.
@@ -46,6 +52,10 @@ Change requires a new entry in `docs/plans/decision-log.md`.
   convenience.
   - Rationale: network effects depend on shared behavior, and correctness is stronger when explicit
     bounds do not create avoidable ecosystem friction.
+- `P07` Rule: keep Zig-native API and implementation guarantees as a first-class feature, not a
+  concession.
+  - Rationale: behavior parity does not require foreign API mimicry, and Zig's explicit,
+    bounded-system style is part of the library's value.
 - `P04` Rule: encode relay routing as explicit heuristics and inputs, never implicit
   resolver magic.
   - Rationale: predictability and auditability are required for partition-tolerant
@@ -137,7 +147,8 @@ Change requires a new entry in `docs/plans/decision-log.md`.
 - Benefits: Zig-native, bounded interfaces aligned with project constraints.
 - Costs: migration from external APIs needs adapters.
 - Risks: parity claims could be interpreted ambiguously.
-- Mitigations: define parity as behavior+tests in scope and decision log.
+- Mitigations: define parity as behavior+tests in scope and decision log, and state explicitly that
+  reference libraries inform compatibility confidence rather than override NIP authority.
 - Reversal Trigger: adopter demand for API-level parity exceeds maintenance cost.
 - Principles Impacted: P03, P05, P06.
 - Scope Impacted: phase A scope semantics, C3 parity mapping, D contracts.
