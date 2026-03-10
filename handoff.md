@@ -27,6 +27,7 @@ Current project context for the Phase H kickoff baseline.
   - `docs/plans/phase-h-kickoff.md`
   - `docs/plans/phase-h-additional-nips-plan.md`
   - `docs/plans/phase-h-wave1-loop.md`
+  - implemented-NIP audit execution policy now lives in `docs/plans/build-plan.md`
 - H0 status:
   - NIP-06 pin target, one-module boundary, typed failure posture, zeroization set, and corpus floor
     are frozen
@@ -51,7 +52,8 @@ Current project context for the Phase H kickoff baseline.
     rust parity coverage across all supported rust-backed public-list builders
   - deferred NIP-51 follow-up `no-e7b` now tracks private encrypted list content plus any future
     decision to widen extraction beyond the current strict Wave 1 subset
-  - Wave 1 is complete; next phase-order item is Wave 2 / `NIP-46` tracked in `no-czg`
+  - Wave 1 is complete; the next execution focus is the implemented-NIP audit before Wave 2 /
+    `NIP-46`
 
 ## Phase G Closure Snapshot (non-remote)
 
@@ -109,11 +111,14 @@ Current project context for the Phase H kickoff baseline.
    changes and record outcomes in Phase H kickoff and handoff docs.
 3. Continue Phase H expansion sequencing from `docs/plans/phase-h-additional-nips-plan.md`.
    Wave 1 is complete: `25`, `10`, `18`, `22`, `27`, `51`.
-4. Start Wave 2 / `NIP-46` under the same strict contract, review, parity, and closure discipline
-   in `no-czg`.
-5. Resolve `no-4iw` evidence gathering for the provisional NIP-10 four-slot pubkey strictness rule
+4. Run the implemented-NIP audit serially using the canonical review criteria and execution policy
+   in `docs/plans/build-plan.md`, with `rust-nostr` as the active parity lane and archived
+   `nostr-tools` as a secondary non-gating ecosystem signal.
+5. Start Wave 2 / `NIP-46` only after the implemented-NIP audit reaches an acceptable stopping
+   point or explicitly recorded partial cutoff.
+6. Resolve `no-4iw` evidence gathering for the provisional NIP-10 four-slot pubkey strictness rule
    before treating that divergence as a settled quality improvement.
-6. Keep `no-3uj` visible as deferred-by-operator until remote setup returns to active execution focus.
+7. Keep `no-3uj` visible as deferred-by-operator until remote setup returns to active execution focus.
 
 ## Additional Assets
 

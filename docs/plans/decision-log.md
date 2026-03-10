@@ -664,6 +664,22 @@ Immutable record of accepted planning decisions.
   exceptions expand without bounded, explicit contracts.
 - Supersedes: D-003
 
+## D-037: Use `nostr-tools` as a secondary non-gating ecosystem audit signal
+
+- Date: 2026-03-10
+- Status: accepted
+- Decision: keep `rust-nostr` as the only active parity gate lane, but include archived
+  `nostr-tools` evidence as a secondary non-gating signal during implemented-NIP audits where it
+  helps estimate broader ecosystem compatibility. `nostr-tools` evidence informs audit judgment; it
+  does not become an active pass/fail release gate or override NIP authority.
+- Why: `nostr-tools` is a major deployed library and improves ecosystem-confidence review, while a
+  single active gate lane keeps execution cadence simpler and more reliable.
+- Tradeoff: more audit evidence to weigh versus better visibility into real compatibility pressure.
+- Related Tradeoff: T-0-001, T-0-002.
+- Reversal Trigger: the extra audit signal adds sustained review noise without improving decisions,
+  or needs to become an active gate lane to remain useful.
+- Supersedes: none
+
 ## Phase Closure Evidence
 
 ### P0-E-001: Phase 0 closure record

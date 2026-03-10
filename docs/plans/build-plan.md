@@ -158,6 +158,8 @@ Review axes for every implemented NIP:
 - Real ecosystem prevalence: what widely deployed producers and consumers appear to emit or accept.
 - `rust-nostr` parity signal: what a strong production reference does in practice and what that
   implies for compatibility confidence.
+- `nostr-tools` ecosystem signal: what the largest widely used JavaScript library appears to emit or
+  accept, used as a secondary non-gating compatibility signal rather than an active release gate.
 - Security / trust-boundary impact: whether acceptance or rejection preserves cryptographic
   validity, typed failures, explicit bounds, deterministic state transitions, zeroization where
   required, and resistance to ambiguity or malformed input.
@@ -208,6 +210,44 @@ Review execution rule:
 - A divergence from `rust-nostr` is acceptable when it is NIP-grounded, test-backed, bounded, and
   materially improves correctness, determinism, or Zig-native contract quality without causing
   disproportionate ecosystem friction.
+- A mismatch with `nostr-tools` is a compatibility signal to evaluate, not an automatic defect; its
+  weight is highest when it reinforces other ecosystem evidence.
+
+### Implemented NIP Audit Execution
+
+Run the audit serially, one implemented NIP at a time, before further phase expansion work.
+
+Per-NIP audit steps:
+1. Create or claim one beads audit issue for the NIP and freeze the exact review target.
+2. Gather evidence from:
+   - relevant NIP text
+   - current `noztr` code and tests
+   - `rust-nostr` harness/source behavior
+   - archived `nostr-tools` harness/source behavior where available
+   - existing in-repo notes about real producer or ecosystem behavior
+3. Review with the required axes and cross-cutting lenses above.
+4. Record findings only when they are evidence-backed:
+   - likely bug
+   - likely unnecessary incompatibility
+   - likely trust-boundary/security problem
+   - likely overengineering or unnecessary reinvention
+5. Run a second-pass challenge on the draft findings to remove false positives, preference-only
+   comments, or conclusions unsupported by the evidence.
+6. Resolve each accepted finding by one of:
+   - immediate fix
+   - documented accepted-risk
+   - linked follow-up issue
+   - explicit intentional divergence
+7. Update canonical docs only where policy, accepted behavior, or current status changed; keep the
+   remaining audit evidence in the beads issue.
+8. Close the audit issue only when findings, evidence classes, outcome, and any follow-up items are
+   all recorded explicitly.
+
+Audit quality rules:
+- No NIP is audited by vibe or memory only.
+- No reference library is treated as protocol authority.
+- No finding is accepted without a severity, evidence basis, and interoperability rationale.
+- "No issue found" is recorded explicitly when that is the result.
 
 ## Phase F hard-gate closure status (epic `no-dr3`)
 
