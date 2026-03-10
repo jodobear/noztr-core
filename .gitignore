@@ -9,3 +9,4 @@
 .claude/
 .logs/
 __pycache__/
+tools/interop/*/node_modules/

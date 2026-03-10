@@ -19,7 +19,7 @@ Purpose: record one-pass `nostr-tools` overlap validation for all currently impl
 
 ## TypeScript Lane Evidence
 
-- Command: `npm run run` (in `tools/interop/ts-nostr-parity-all`).
+- Command: `bun run run` (in `tools/interop/ts-nostr-parity-all`).
 - Output contract: `NIP-XX | taxonomy=<...> | depth=<...> | result=<...>` with summary counters.
 - Current lane result: `pass` (`HARNESS_COVERED` checks all `PASS`; remaining implemented NIPs are
   `NOT_COVERED_IN_THIS_PASS`).

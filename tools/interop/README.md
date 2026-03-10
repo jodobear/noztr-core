@@ -4,8 +4,10 @@ Persistent interop harnesses for NIP-44 replay and parity-all checks.
 
 Governance status:
 - Active parity gate lane: rust (`tools/interop/rust-nostr-parity-all`).
-- TypeScript parity-all lane (`tools/interop/ts-nostr-parity-all`) is archived/historical evidence only.
+- TypeScript parity-all lane (`tools/interop/ts-nostr-parity-all`) is not an active gate lane; it is
+  preserved historical evidence and may be re-run as a secondary ecosystem audit signal.
 - Historical evidence is preserved; this scope change does not alter library defaults or strictness.
+- Use `bun` for local TypeScript harness install/run commands in this repo; do not use `npm`.
 
 ## Parity Model v1 (taxonomy + depth)
 
@@ -58,10 +60,10 @@ zig build test --summary all && zig build
 ```bash
 go run ./tools/interop/go-nostr-nip44
 cargo run --manifest-path tools/interop/rust-nostr-nip44/Cargo.toml
-npm --prefix tools/interop/ts-nostr-tools-nip44 install
-npm --prefix tools/interop/ts-nostr-tools-nip44 run run
-npm --prefix tools/interop/ts-nostr-parity-all install
-npm --prefix tools/interop/ts-nostr-parity-all run run
+bun --cwd tools/interop/ts-nostr-tools-nip44 install
+bun --cwd tools/interop/ts-nostr-tools-nip44 run run
+bun --cwd tools/interop/ts-nostr-parity-all install
+bun --cwd tools/interop/ts-nostr-parity-all run run
 ```
 
 ## Expected success output shape
@@ -97,7 +99,7 @@ npm --prefix tools/interop/ts-nostr-parity-all run run
 ## ts-nostr parity-all harness
 
 - Harness path: `tools/interop/ts-nostr-parity-all`
-- Status: archived historical evidence only (not part of active pass/fail cadence).
+- Status: non-gating audit evidence lane only (not part of active pass/fail cadence).
 - Scope: runtime overlap checks for implemented `noztr` NIPs against `nostr-tools`.
 - Current coverage: `HARNESS_COVERED` for all implemented NIPs (`NIP-01/02/09/11/13/19/21/40/42/44/45/50/59/65/70/77`).
 - NIP-40 implementation-path dependency:

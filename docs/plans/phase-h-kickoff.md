@@ -97,15 +97,18 @@ the validated maintenance baseline.
   - rust-nostr bookmark builders remain broader than the current strict bookmark-family extractor,
     and optional fourth-slot NIP-30 emoji-set builder support remains Zig/spec-driven coverage
 - Wave 1 status: complete.
-- Active next phase-order item: Wave 2 / `NIP-46` in `no-czg`
+- Active next execution focus: implemented-NIP audit.
+- Next expansion phase-order item: Wave 2 / `NIP-46` in `no-czg`
 
 ## Immediate Work Tracks
 
 - Maintain rust-active parity cadence and aggregate Zig quality gates on dependency/toolchain changes.
 - Keep Wave 1 closure evidence current and retain the serial loop doc as the canonical execution
   model.
-- Begin Wave 2 planning/execution for `46` in `no-czg`.
-- Keep TypeScript parity references archive-only in current docs.
+- Run the implemented-NIP audit before beginning Wave 2 execution.
+- Resolve `no-4iw` as part of the NIP-10 audit, not after the audit.
+- Keep TypeScript parity references non-gating and use them only as secondary ecosystem audit
+  evidence.
 
 ## Blocker Visibility
 

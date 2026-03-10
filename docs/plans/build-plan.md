@@ -137,7 +137,8 @@ Implementation status snapshot (post-I7 closure):
     `src/nip27_references.zig`.
   - `NIP-51` strict public-list helpers and bounded bookmark/emoji tag builders are implemented in
     `src/nip51_lists.zig`.
-  - Wave 1 is complete; next phase-order item is Wave 2 / `NIP-46`.
+  - Wave 1 is complete; next execution focus is the implemented-NIP audit.
+  - Next expansion phase-order item remains Wave 2 / `NIP-46` after the audit.
 
 Phase G closure and Phase H transition from current baseline:
 - keep TypeScript references archive-only and prevent active-cadence wording regressions.
@@ -239,7 +240,8 @@ Per-NIP audit steps:
    - linked follow-up issue
    - explicit intentional divergence
 7. Update canonical docs only where policy, accepted behavior, or current status changed; keep the
-   remaining audit evidence in the beads issue.
+   remaining audit evidence in the beads issue and update the consolidated audit report in
+   `docs/plans/implemented-nip-audit-report.md`.
 8. Close the audit issue only when findings, evidence classes, outcome, and any follow-up items are
    all recorded explicitly.
 
@@ -248,6 +250,11 @@ Audit quality rules:
 - No reference library is treated as protocol authority.
 - No finding is accepted without a severity, evidence basis, and interoperability rationale.
 - "No issue found" is recorded explicitly when that is the result.
+
+Consolidated audit artifact:
+- `docs/plans/implemented-nip-audit-report.md` is the canonical summary for audit findings,
+  decisions, accepted risks, and follow-up links after the autonomous audit completes.
+- beads issues hold per-NIP raw evidence; the report holds the systematic review-ready synthesis.
 
 ## Phase F hard-gate closure status (epic `no-dr3`)
 

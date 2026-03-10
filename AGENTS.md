@@ -34,6 +34,11 @@ zig build                      # build static library
 
 Run tests after every code change.
 
+## Tooling Rule
+
+- Use `bun` for local JavaScript/TypeScript tooling in this repo.
+- Do not use `npm` for local interop harness setup or execution.
+
 ## Phase-Gated Workflow
 
 - Use one prompt per phase from `docs/plans/prompts/`.
