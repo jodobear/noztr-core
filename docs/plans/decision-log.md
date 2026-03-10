@@ -696,6 +696,23 @@ Immutable record of accepted planning decisions.
   reasons beyond the existing fixed-state limit.
 - Supersedes: none
 
+## D-039: Widen NIP-51 bookmark extraction and ignore unrelated unknown tags
+
+- Date: 2026-03-10
+- Status: accepted
+- Decision: widen `nip51_lists` extraction so `bookmarks` and `bookmark_set` accept bounded hashtag
+  and URL items in addition to `e` and `a`, and ignore unrelated unknown tags instead of failing
+  the entire extract path. Malformed supported tags still return typed errors.
+- Why: `rust-nostr` bookmark builders emit broader bounded hashtag/URL shapes, NIP-51 is meant to
+  carry references broadly, and failing whole extraction on unrelated extra tags created
+  unnecessary compatibility loss without improving trust-boundary safety.
+- Tradeoff: slightly broader public-list extraction surface versus materially better compatibility
+  with real producer output and future extension tags.
+- Related Tradeoff: T-0-001, T-0-002, T-0-003.
+- Reversal Trigger: broader bookmark extraction causes ambiguous semantics or ecosystem evidence
+  shows the narrower table-only interpretation is required for interoperable behavior.
+- Supersedes: none
+
 ## Phase Closure Evidence
 
 ### P0-E-001: Phase 0 closure record

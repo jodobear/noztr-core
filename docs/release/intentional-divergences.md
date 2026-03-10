@@ -56,12 +56,6 @@ Release-facing note for behavior differences that are intentional in `noztr` Lay
   source-review only. `noztr` keeps the stricter contract because it matches the NIP text, produces
   deterministic trust-boundary parsing, validates `I/i` against `K/k` instead of treating external
   targets as opaque text, and preserves NIP-10 as the only reply path for kind-1 notes.
-- **Strict NIP-51 bookmark-family scope:**
-  `noztr` Wave 1 public-list helper keeps `bookmarks` and `bookmark_set` aligned to the NIP-51
-  table (`e` and `a` only), while `rust-nostr` bookmark builders also expose hashtag and URL tags.
-  `noztr` now exposes bounded bookmark tag builders for the broader emission shapes, but keeps the
-  narrower extraction boundary to preserve a deterministic trust-boundary contract instead of
-  silently widening Layer 1 defaults.
 - **NIP-51 emoji fourth-slot builder support:**
   `noztr` can emit the optional fourth-slot NIP-30 emoji-set coordinate on `emoji` tags, while
   `rust-nostr` standardizes only the three-item shape. This is a spec-driven builder enhancement,

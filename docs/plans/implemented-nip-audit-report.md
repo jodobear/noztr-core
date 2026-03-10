@@ -50,7 +50,7 @@ completes.
 | 44 | pending | - | - | - | - | - | - |
 | 45 | pending | - | - | - | - | - | - |
 | 50 | pending | - | - | - | - | - | - |
-| 51 | pending | - | - | - | - | - | - |
+| 51 | complete | `HARNESS_COVERED DEEP PASS` | `SOURCE_REVIEW_ONLY no dedicated NIP-51 helper beyond kind constants` | Widened bookmark extraction to accept bounded hashtag/URL items and changed unrelated unknown tags from fatal to ignored; kept typed failures for malformed supported tags and coordinate-kind enforcement | none | none | `rust-nostr` bookmark builders were broader than the old parser; `nostr-tools` provides kind-level signal only in this pass |
 | 59 | pending | - | - | - | - | - | - |
 | 65 | pending | - | - | - | - | - | - |
 | 70 | pending | - | - | - | - | - | - |
@@ -68,6 +68,8 @@ completes.
 - NIP-42: widen the challenge bound to `255` bytes, but keep path-bound websocket origin matching,
   duplicate required-tag rejection, and unbracketed IPv6 rejection as accepted trust-boundary
   behavior.
+- NIP-51: accept bounded hashtag/URL bookmark items and ignore unrelated unknown tags during
+  extraction, while keeping typed rejection for malformed supported tags.
 
 ## Accepted Risks
 

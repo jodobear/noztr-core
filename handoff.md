@@ -52,8 +52,9 @@ Current project context for the Phase H kickoff baseline.
     matches rust parser tokenization behavior
   - `NIP-51` is complete in `src/nip51_lists.zig` with strict public-list extraction for the
     supported Wave 1 kinds, required `d` metadata handling for set kinds, coordinate-kind
-    validation where NIP-51 specifies it, bounded broader bookmark/emoji tag builders, and deep
-    rust parity coverage across all supported rust-backed public-list builders
+    validation where NIP-51 specifies it, accepted broader bookmark extraction for bounded hashtag
+    and URL items, ignored unrelated unknown tags, bounded broader bookmark/emoji tag builders, and
+    deep rust parity coverage across all supported rust-backed public-list builders
   - deferred NIP-51 follow-up `no-e7b` now tracks private encrypted list content plus any future
     decision to widen extraction beyond the current strict Wave 1 subset
   - Wave 1 is complete; the next execution focus is the implemented-NIP audit before Wave 2 /
@@ -119,8 +120,8 @@ Current project context for the Phase H kickoff baseline.
    in `docs/plans/build-plan.md`, with `rust-nostr` as the active parity lane and archived
    `nostr-tools` as a secondary non-gating ecosystem signal. Every implemented NIP must be
    cross-checked against both references during the audit.
-5. Continue from the completed NIP-10, NIP-22, and NIP-42 audits to the next implemented NIP audit
-   item.
+5. Continue from the completed NIP-10, NIP-22, NIP-42, and NIP-51 audits to the next implemented
+   NIP audit item.
 6. Start Wave 2 / `NIP-46` only after the implemented-NIP audit reaches an acceptable stopping
    point or explicitly recorded partial cutoff.
 7. Keep `no-3uj` visible as deferred-by-operator until remote setup returns to active execution focus.

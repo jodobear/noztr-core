@@ -85,12 +85,9 @@ frozen defaults or the current deterministic-and-compatible Layer 1 kernel postu
         `10015`, `10030`, `30000`, `30002`, `30003`, `30004`, `30015`, `30030`
       - set kinds require exactly one non-empty `d` identifier and may carry one each of `title`,
         `image`, and `description`
-      - public list items are extracted in encounter order with typed errors on malformed or
-        disallowed tag families
-      - bookmark and bookmark-set strict extraction follows the NIP-51 table (`e` and `a` only)
-        rather than the broader rust struct shape
-      - bounded builder helpers now support broader bookmark emission (`e`, `a`, `t`, `url`)
-        without widening strict extraction
+      - public list items are extracted in encounter order with typed errors on malformed supported
+        tags; unrelated unknown tags are ignored instead of failing the entire extract path
+      - bookmark and bookmark-set extraction accepts bounded `e`, `a`, `t`, and `url` item shapes
       - coordinate-backed lists enforce the expected coordinate kind where NIP-51 specifies one
         (`34550`, `30023`, `30015`, `30030`)
       - `emoji` items accept the optional NIP-30 emoji-set address and require it to be a
@@ -101,8 +98,8 @@ frozen defaults or the current deterministic-and-compatible Layer 1 kernel postu
     - review outcome:
       - rust parity harness now covers all supported rust-backed public-list builders at `DEEP`
         depth
-      - rust-nostr bookmark builders still expose broader hashtag/url bookmark shapes than the
-        current strict Wave 1 extractor; that narrower boundary remains intentional
+      - broader rust-style hashtag/url bookmark shapes are now accepted in the extractor rather
+        than treated as intentional incompatibility
       - optional fourth-slot NIP-30 emoji-set builder support remains Zig/spec-driven coverage only
         because rust-nostr standardizes three-item `emoji` tags
   - `27`

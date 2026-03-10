@@ -83,6 +83,7 @@ pub const ListItem = union(enum) {
     event: ListEvent,
     coordinate: ListCoordinate,
     hashtag: []const u8,
+    url: []const u8,
     word: []const u8,
     relay_url: []const u8,
     emoji: ListEmoji,
@@ -120,6 +121,7 @@ const ItemFamily = enum {
     event,
     coordinate,
     hashtag,
+    url,
     word,
     relay_url,
     emoji,
@@ -182,11 +184,14 @@ pub fn list_extract(event: *const nip01_event.Event, out: []ListItem) ListError!
         if (try apply_metadata_tag(kind, tag, &info.metadata)) {
             continue;
         }
+        const parsed_item = parse_item_tag(kind, tag) catch |parse_error| switch (parse_error) {
+            error.UnexpectedTag => continue,
+            else => return parse_error,
+        };
         if (info.item_count == out.len) {
             return error.BufferTooSmall;
         }
-
-        out[info.item_count] = try parse_item_tag(kind, tag);
+        out[info.item_count] = parsed_item;
         info.item_count += 1;
     }
 
@@ -369,6 +374,7 @@ fn parse_item_tag(kind: ListKind, tag: nip01_event.EventTag) ListError!ListItem 
     if (std.mem.eql(u8, tag_name, "e")) return parse_event_item(kind, tag);
     if (std.mem.eql(u8, tag_name, "a")) return parse_coordinate_item(kind, tag);
     if (std.mem.eql(u8, tag_name, "t")) return parse_hashtag_item(kind, tag);
+    if (std.mem.eql(u8, tag_name, "url")) return parse_url_item(kind, tag);
     if (std.mem.eql(u8, tag_name, "word")) return parse_word_item(kind, tag);
     if (std.mem.eql(u8, tag_name, "relay")) return parse_relay_item(kind, tag);
     if (std.mem.eql(u8, tag_name, "emoji")) return parse_emoji_item(kind, tag);
@@ -511,6 +517,15 @@ fn parse_hashtag_item(kind: ListKind, tag: nip01_event.EventTag) ListError!ListI
     return .{ .hashtag = value };
 }
 
+fn parse_url_item(kind: ListKind, tag: nip01_event.EventTag) ListError!ListItem {
+    std.debug.assert(tag.items.len <= limits.tag_items_max);
+    std.debug.assert(@intFromEnum(kind) <= @intFromEnum(ListKind.emoji_set));
+
+    try require_family(kind, .url);
+    const value = try parse_single_url_value(tag, error.InvalidUrlTag);
+    return .{ .url = value };
+}
+
 fn parse_word_item(kind: ListKind, tag: nip01_event.EventTag) ListError!ListItem {
     std.debug.assert(tag.items.len <= limits.tag_items_max);
     std.debug.assert(@intFromEnum(kind) <= @intFromEnum(ListKind.emoji_set));
@@ -577,7 +592,10 @@ fn kind_allows_family(kind: ListKind, family: ItemFamily) bool {
     return switch (kind) {
         .mute_list => mute_list_allows_family(family),
         .pinned_notes, .public_chats => family == .event,
-        .bookmarks, .bookmark_set => family == .event or family == .coordinate,
+        .bookmarks, .bookmark_set => {
+            return family == .event or family == .coordinate or family == .hashtag or
+                family == .url;
+        },
         .communities => family == .coordinate,
         .articles_curation_set => family == .coordinate or family == .event,
         .blocked_relays, .search_relays, .relay_set => family == .relay_url,
@@ -990,11 +1008,11 @@ test "bookmark builders emit bounded identifier event and coordinate tags" {
     );
 }
 
-test "bookmark and emoji builders widen emission without widening extraction" {
+test "bookmark and emoji builders widen emission and bookmark extraction accepts breadth" {
     var hashtag_tag: BuiltTag = .{};
     var url_tag: BuiltTag = .{};
     var emoji_tag: BuiltTag = .{};
-    var items: [1]ListItem = undefined;
+    var items: [2]ListItem = undefined;
 
     const built_hashtag = try bookmark_build_tag(&hashtag_tag, .{ .hashtag = "nostr" });
     const built_url = try bookmark_build_tag(&url_tag, .{ .url = "https://example.com/post" });
@@ -1020,10 +1038,13 @@ test "bookmark and emoji builders widen emission without widening extraction" {
             "30030:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc:icons",
         },
     );
-    try std.testing.expectError(
-        error.UnexpectedTag,
-        list_extract(&list_event(10003, "", tags[0..]), items[0..]),
-    );
+    const parsed = try list_extract(&list_event(10003, "", tags[0..]), items[0..]);
+    try std.testing.expectEqual(ListKind.bookmarks, parsed.kind);
+    try std.testing.expectEqual(@as(u16, 2), parsed.item_count);
+    try std.testing.expect(items[0] == .hashtag);
+    try std.testing.expect(items[1] == .url);
+    try std.testing.expectEqualStrings("nostr", items[0].hashtag);
+    try std.testing.expectEqualStrings("https://example.com/post", items[1].url);
 }
 
 test "bookmark and emoji builders reject invalid inputs" {
@@ -1385,7 +1406,7 @@ test "list extract rejects unsupported kinds and missing identifier" {
     );
 }
 
-test "list extract rejects duplicate metadata and unexpected tags" {
+test "list extract rejects duplicate metadata and ignores unknown tags" {
     const d_one = [_][]const u8{ "d", "a" };
     const d_two = [_][]const u8{ "d", "b" };
     const relay_tag = [_][]const u8{ "relay", "wss://relay.example" };
@@ -1402,14 +1423,16 @@ test "list extract rejects duplicate metadata and unexpected tags" {
         error.DuplicateIdentifierTag,
         list_extract(&duplicate_event, items[0..]),
     );
-    try std.testing.expectError(error.UnexpectedTag, list_extract(&unexpected_event, items[0..]));
+    const parsed = try list_extract(&unexpected_event, items[0..]);
+    try std.testing.expectEqual(ListKind.mute_list, parsed.kind);
+    try std.testing.expectEqual(@as(u16, 0), parsed.item_count);
 }
 
-test "list extract rejects invalid image metadata and bookmark drift tags" {
+test "list extract rejects invalid image metadata and accepts broad bookmark tags" {
     const invalid_image = [_][]const u8{ "image", "not a url" };
     const d_tag = [_][]const u8{ "d", "saved" };
     const hashtag = [_][]const u8{ "t", "nostr" };
-    const url_tag = [_][]const u8{ "r", "https://example.com/post" };
+    const url_tag = [_][]const u8{ "url", "https://example.com/post" };
     const invalid_image_tags = [_]nip01_event.EventTag{
         .{ .items = d_tag[0..] },
         .{ .items = invalid_image[0..] },
@@ -1422,20 +1445,27 @@ test "list extract rejects invalid image metadata and bookmark drift tags" {
         .{ .items = d_tag[0..] },
         .{ .items = url_tag[0..] },
     };
-    var items: [1]ListItem = undefined;
+    var image_items: [1]ListItem = undefined;
+    var bookmark_items: [2]ListItem = undefined;
 
     try std.testing.expectError(
         error.InvalidImageTag,
-        list_extract(&list_event(30030, "", invalid_image_tags[0..]), items[0..]),
+        list_extract(&list_event(30030, "", invalid_image_tags[0..]), image_items[0..]),
     );
-    try std.testing.expectError(
-        error.UnexpectedTag,
-        list_extract(&list_event(30003, "", bookmark_hashtag_tags[0..]), items[0..]),
+    const hashtag_parsed = try list_extract(
+        &list_event(30003, "", bookmark_hashtag_tags[0..]),
+        bookmark_items[0..],
     );
-    try std.testing.expectError(
-        error.UnexpectedTag,
-        list_extract(&list_event(30003, "", bookmark_url_tags[0..]), items[0..]),
+    try std.testing.expectEqual(ListKind.bookmark_set, hashtag_parsed.kind);
+    try std.testing.expectEqual(@as(u16, 1), hashtag_parsed.item_count);
+    try std.testing.expect(bookmark_items[0] == .hashtag);
+    const url_parsed = try list_extract(
+        &list_event(30003, "", bookmark_url_tags[0..]),
+        bookmark_items[0..],
     );
+    try std.testing.expectEqual(ListKind.bookmark_set, url_parsed.kind);
+    try std.testing.expectEqual(@as(u16, 1), url_parsed.item_count);
+    try std.testing.expect(bookmark_items[0] == .url);
 }
 
 test "list extract rejects malformed pubkey event and coordinate tags" {

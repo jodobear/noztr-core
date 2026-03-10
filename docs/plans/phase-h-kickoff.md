@@ -86,9 +86,9 @@ the validated maintenance baseline.
     `10007`, `10015`, `10030`, `30000`, `30002`, `30003`, `30004`, `30015`, `30030`
   - set kinds require exactly one `d` identifier and may carry one each of `title`, `image`, and
     `description`
-  - bookmark and bookmark-set extraction stays aligned to the NIP-51 table (`e` and `a` only)
-  - bounded builder helpers now support broader bookmark emission (`e`, `a`, `t`, `url`) without
-    widening strict extraction
+  - bookmark and bookmark-set extraction now accepts bounded `e`, `a`, `t`, and `url` items
+  - unrelated unknown tags are ignored during list extraction; malformed supported tags still
+    return typed failures
   - coordinate-backed list kinds enforce the expected coordinate kind where NIP-51 specifies one
   - `emoji` items accept the optional NIP-30 emoji-set address and validate it as a `30030`
     coordinate when present
@@ -96,14 +96,16 @@ the validated maintenance baseline.
   - private encrypted list content and remaining public list variants are deferred to follow-up
     `no-e7b`
   - parity harness now covers all supported rust-backed public-list builders at `DEEP` depth
-  - rust-nostr bookmark builders remain broader than the current strict bookmark-family extractor,
-    and optional fourth-slot NIP-30 emoji-set builder support remains Zig/spec-driven coverage
+  - audit outcome: widened bookmark extraction to remove unnecessary incompatibility with broader
+    rust producer output while keeping malformed supported-tag rejection and coordinate-kind checks
 - Wave 1 status: complete.
 - Active next execution focus: implemented-NIP audit.
 - Implemented-NIP audit status:
-  - `NIP-10`, `NIP-22`, and `NIP-42` audits are complete
+  - `NIP-10`, `NIP-22`, `NIP-42`, and `NIP-51` audits are complete
   - `NIP-42` widened the auth challenge bound from `64` to `255` after reference review; remaining
     path-bound websocket origin strictness is retained
+  - `NIP-51` widened bookmark extraction to accept bounded hashtag/URL items and now ignores
+    unrelated unknown tags
 - Next expansion phase-order item: Wave 2 / `NIP-46` in `no-czg`
 
 ## Immediate Work Tracks
