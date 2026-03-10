@@ -34,8 +34,11 @@ the validated maintenance baseline.
   - strict custom-emoji validation requires exactly one matching `emoji` tag, a NIP-30-valid
     shortcode, and a URL-shaped image field; malformed, duplicate, or non-custom `emoji` tag usage
     is rejected
-  - current judgment: retained as a material strict-path improvement over permissive reference
-    behavior
+  - audit outcome: accepted the optional NIP-30 fourth-slot emoji-set coordinate on reaction
+    `emoji` tags while retaining strict shortcode and URL validation as the accepted Layer 1
+    posture
+  - contradictory optional target metadata across `e`-author, `p`, `a`, and `k` now rejects the
+    parse path, and `a` tags are limited to replaceable/addressable kinds
   - optional empty relay-hint fields are normalized to absent rather than treated as a target change
 - `NIP-10` is complete in the current Wave 1 loop:
   - strict kind-1 thread/reply helpers implemented in `src/nip10_threads.zig`
@@ -101,7 +104,10 @@ the validated maintenance baseline.
 - Wave 1 status: complete.
 - Active next execution focus: implemented-NIP audit.
 - Implemented-NIP audit status:
-  - `NIP-10`, `NIP-22`, `NIP-42`, and `NIP-51` audits are complete
+  - `NIP-10`, `NIP-22`, `NIP-25`, `NIP-42`, and `NIP-51` audits are complete
+  - `NIP-25` now accepts the optional NIP-30 emoji-set coordinate on reaction `emoji` tags; strict
+    shortcode and URL validation remain intact, and contradictory optional target metadata now
+    rejects the parse path
   - `NIP-42` widened the auth challenge bound from `64` to `255` after reference review; remaining
     path-bound websocket origin strictness is retained
   - `NIP-51` widened bookmark extraction to accept bounded hashtag/URL items and now ignores

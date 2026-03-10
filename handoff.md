@@ -32,8 +32,10 @@ Current project context for the Phase H kickoff baseline.
   - NIP-06 pin target, one-module boundary, typed failure posture, zeroization set, and corpus floor
     are frozen
 - Wave 1 progress:
-  - `NIP-25` is complete in `src/nip25_reactions.zig` with reviewed strict custom-emoji shortcode
-    and URL validation retained as an accepted strict-path improvement
+  - `NIP-25` audit is complete in `src/nip25_reactions.zig`: reaction `emoji` tags now accept the
+    optional NIP-30 fourth-slot emoji-set coordinate when it is a valid `30030` address, while
+    strict shortcode and URL validation remain retained as the accepted Layer 1 posture, and
+    contradictory optional target metadata plus unsupported `a` kinds now reject the parse path
   - `NIP-10` audit is complete in `src/nip10_threads.zig`: legacy `mention` markers now parse as
     explicit mentions, four-slot pubkey fallback is accepted, rust parity remains `DEEP PASS`, TS
     audit parity is now `HARNESS_COVERED EDGE PASS`, and `no-4iw` is resolved by the audit
@@ -120,7 +122,7 @@ Current project context for the Phase H kickoff baseline.
    in `docs/plans/build-plan.md`, with `rust-nostr` as the active parity lane and archived
    `nostr-tools` as a secondary non-gating ecosystem signal. Every implemented NIP must be
    cross-checked against both references during the audit.
-5. Continue from the completed NIP-10, NIP-22, NIP-42, and NIP-51 audits to the next implemented
+5. Continue from the completed NIP-10, NIP-22, NIP-25, NIP-42, and NIP-51 audits to the next implemented
    NIP audit item.
 6. Start Wave 2 / `NIP-46` only after the implemented-NIP audit reaches an acceptable stopping
    point or explicitly recorded partial cutoff.

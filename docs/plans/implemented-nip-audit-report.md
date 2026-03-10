@@ -43,7 +43,7 @@ completes.
 | 19 | pending | - | - | - | - | - | - |
 | 21 | pending | - | - | - | - | - | - |
 | 22 | complete | `HARNESS_COVERED DEEP PASS` | `SOURCE_REVIEW_ONLY no dedicated NIP-22 helper beyond kind constant` | No Layer 1 change required; current root/parent, `K/k`, `P/p`, and kind-1 rejection posture remains justified | none | none | `rust-nostr` emits canonical full linkage when given a root target but still extracts parent-only / optional-kind shapes; `noztr` keeps the stricter trust-boundary contract |
-| 25 | pending | - | - | - | - | - | - |
+| 25 | complete | `HARNESS_COVERED DEEP PASS` | `HARNESS_COVERED EDGE PASS` | Accepted the optional NIP-30 fourth-slot emoji-set coordinate on reaction `emoji` tags; retained strict shortcode and URL validation; now reject contradictory optional target metadata and unsupported `a` kinds | none | none | `rust-nostr` remains permissive on shortcode text and still standardizes only three-slot emoji tags; `nostr-tools` aligns on last-`e`/last-`p` target selection and strict shortcode matching |
 | 27 | pending | - | - | - | - | - | - |
 | 40 | pending | - | - | - | - | - | - |
 | 42 | complete | `HARNESS_COVERED DEEP PASS` | `HARNESS_COVERED EDGE PASS` | Widened NIP-42 challenge bound from `64` to `255`; retained path-bound websocket origin matching, duplicate-tag rejection, and unbracketed IPv6 rejection | none | none | `rust-nostr` and `nostr-tools` both accept long challenges; current remaining strictness is judged trust-boundary-positive rather than ecosystem-hostile |
@@ -65,6 +65,9 @@ completes.
 - NIP-22: keep strict root/parent scope, mandatory `K/k`, mandatory `P/p` for Nostr targets, and
   kind-1 rejection; `rust-nostr` permissive extraction is treated as a compatibility signal, not a
   reason to weaken the Layer 1 parser.
+- NIP-25: accept the optional NIP-30 emoji-set address on reaction `emoji` tags, while keeping
+  strict shortcode and image-URL validation, and reject contradictory `e`/`p`/`a`/`k` target
+  metadata plus unsupported `a` kinds.
 - NIP-42: widen the challenge bound to `255` bytes, but keep path-bound websocket origin matching,
   duplicate required-tag rejection, and unbracketed IPv6 rejection as accepted trust-boundary
   behavior.

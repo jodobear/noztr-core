@@ -123,6 +123,7 @@ pub fn reaction_parse(event: *const nip01_event.Event) ReactionError!ReactionTar
     if (!found_pubkey_tag) {
         parsed.author_pubkey = event_author_pubkey;
     }
+    try validate_target_metadata(&parsed, event_author_pubkey);
 
     return parsed;
 }
@@ -265,7 +266,10 @@ fn parse_emoji_tag(
     if (reaction_type != .custom_emoji) {
         return error.InvalidEmojiTag;
     }
-    if (tag.items.len != 3) {
+    if (tag.items.len < 3) {
+        return error.InvalidEmojiTag;
+    }
+    if (tag.items.len > 4) {
         return error.InvalidEmojiTag;
     }
 
@@ -275,9 +279,71 @@ fn parse_emoji_tag(
     if (!std.mem.eql(u8, tag.items[1], shortcode)) {
         return error.InvalidEmojiTag;
     }
+    if (tag.items.len == 4) {
+        try parse_emoji_set_coordinate(tag.items[3]);
+    }
     return parse_image_url(tag.items[2]) catch {
         return error.InvalidEmojiTag;
     };
+}
+
+fn parse_emoji_set_coordinate(text: []const u8) ReactionError!void {
+    std.debug.assert(text.len <= limits.tag_item_bytes_max);
+    std.debug.assert(limits.kind_max <= std.math.maxInt(u32));
+
+    const coordinate = parse_address_coordinate(text) catch {
+        return error.InvalidEmojiTag;
+    };
+    if (coordinate.kind != 30030) {
+        return error.InvalidEmojiTag;
+    }
+}
+
+fn validate_target_metadata(
+    parsed: *const ReactionTarget,
+    event_author_pubkey: ?[32]u8,
+) ReactionError!void {
+    std.debug.assert(@intFromPtr(parsed) != 0);
+    std.debug.assert(limits.kind_max <= std.math.maxInt(u32));
+
+    if (parsed.coordinate) |coordinate| {
+        if (!coordinate_kind_supports_a_tag(coordinate.kind)) {
+            return error.InvalidCoordinate;
+        }
+        if (parsed.reacted_kind) |reacted_kind| {
+            if (coordinate.kind != reacted_kind) {
+                return error.InvalidKindTag;
+            }
+        }
+    }
+    if (parsed.author_pubkey) |author_pubkey| {
+        if (event_author_pubkey) |event_pubkey| {
+            if (!std.mem.eql(u8, &author_pubkey, &event_pubkey)) {
+                return error.InvalidPubkey;
+            }
+        }
+        if (parsed.coordinate) |coordinate| {
+            if (!std.mem.eql(u8, &coordinate.pubkey, &author_pubkey)) {
+                return error.InvalidPubkey;
+            }
+        }
+    }
+}
+
+fn coordinate_kind_supports_a_tag(kind: u32) bool {
+    std.debug.assert(kind <= limits.kind_max);
+    std.debug.assert(limits.kind_max <= std.math.maxInt(u32));
+
+    if (kind == 0 or kind == 3) {
+        return true;
+    }
+    if (kind >= 10000 and kind < 20000) {
+        return true;
+    }
+    if (kind >= 30000 and kind < 40000) {
+        return true;
+    }
+    return false;
 }
 
 fn parse_address_coordinate(text: []const u8) ReactionError!ReactionCoordinate {
@@ -477,7 +543,7 @@ test "reaction parse valid like path uses last e and last p tags" {
         "e",
         "2222222222222222222222222222222222222222222222222222222222222222",
         "wss://relay.two",
-        "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
     };
     const first_p = [_][]const u8{
         "p",
@@ -567,6 +633,31 @@ test "reaction parse valid custom emoji path requires matching emoji tag" {
     try std.testing.expectEqualStrings("wss://coord.hint", parsed.coordinate.?.relay_hint.?);
 }
 
+test "reaction parse accepts optional emoji-set coordinate on emoji tag" {
+    const e_tag = [_][]const u8{
+        "e",
+        "1111111111111111111111111111111111111111111111111111111111111111",
+    };
+    const emoji_tag = [_][]const u8{
+        "emoji",
+        "soapbox",
+        "https://cdn.example/soapbox.png",
+        "30030:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa:icons",
+    };
+    const tags = [_]nip01_event.EventTag{
+        .{ .items = e_tag[0..] },
+        .{ .items = emoji_tag[0..] },
+    };
+
+    const parsed = try reaction_parse(&reaction_event(7, ":soapbox:", tags[0..]));
+
+    try std.testing.expectEqual(ReactionType.custom_emoji, parsed.reaction_type);
+    try std.testing.expectEqualStrings(
+        "https://cdn.example/soapbox.png",
+        parsed.custom_emoji_url.?,
+    );
+}
+
 test "reaction parse valid e tag pubkey fallback works without p tag" {
     const e_tag = [_][]const u8{
         "e",
@@ -628,6 +719,12 @@ test "reaction parse rejects malformed a k and emoji tags" {
     const empty_emoji_url_items = [_][]const u8{ "emoji", "soapbox", "" };
     const invalid_shortcode_items = [_][]const u8{ "emoji", "soap-box", "https://cdn" };
     const invalid_url_items = [_][]const u8{ "emoji", "soapbox", "not a url" };
+    const invalid_emoji_set_items = [_][]const u8{
+        "emoji",
+        "soapbox",
+        "https://cdn.example/soapbox.png",
+        "30000:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa:icons",
+    };
 
     const bad_a_tags = [_]nip01_event.EventTag{
         .{ .items = e_tag[0..] },
@@ -656,6 +753,10 @@ test "reaction parse rejects malformed a k and emoji tags" {
     const invalid_url_tags = [_]nip01_event.EventTag{
         .{ .items = e_tag[0..] },
         .{ .items = invalid_url_items[0..] },
+    };
+    const invalid_emoji_set_tags = [_]nip01_event.EventTag{
+        .{ .items = e_tag[0..] },
+        .{ .items = invalid_emoji_set_items[0..] },
     };
 
     try std.testing.expectError(
@@ -686,6 +787,10 @@ test "reaction parse rejects malformed a k and emoji tags" {
         error.InvalidEmojiTag,
         reaction_parse(&reaction_event(7, ":soapbox:", invalid_url_tags[0..])),
     );
+    try std.testing.expectError(
+        error.InvalidEmojiTag,
+        reaction_parse(&reaction_event(7, ":soapbox:", invalid_emoji_set_tags[0..])),
+    );
 }
 
 test "reaction parse accepts empty relay hints as absent" {
@@ -693,7 +798,7 @@ test "reaction parse accepts empty relay hints as absent" {
         "e",
         "1111111111111111111111111111111111111111111111111111111111111111",
         "",
-        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
     };
     const p_tag = [_][]const u8{
         "p",
@@ -702,7 +807,7 @@ test "reaction parse accepts empty relay hints as absent" {
     };
     const a_tag = [_][]const u8{
         "a",
-        "30023:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc:ident",
+        "30023:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb:ident",
         "",
     };
     const tags = [_]nip01_event.EventTag{
@@ -768,5 +873,70 @@ test "reaction parse rejects emoji tag on non-custom reaction content" {
     try std.testing.expectError(
         error.InvalidEmojiTag,
         reaction_parse(&reaction_event(7, "+", tags[0..])),
+    );
+}
+
+test "reaction parse rejects inconsistent target metadata and unsupported coordinate kinds" {
+    const mismatched_author_tags = [_]nip01_event.EventTag{
+        .{ .items = (&[_][]const u8{
+            "e",
+            "1111111111111111111111111111111111111111111111111111111111111111",
+            "",
+            "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        })[0..] },
+        .{ .items = (&[_][]const u8{
+            "p",
+            "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        })[0..] },
+    };
+    const mismatched_coordinate_tags = [_]nip01_event.EventTag{
+        .{ .items = (&[_][]const u8{
+            "e",
+            "1111111111111111111111111111111111111111111111111111111111111111",
+            "",
+            "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        })[0..] },
+        .{ .items = (&[_][]const u8{
+            "a",
+            "30023:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb:article",
+        })[0..] },
+    };
+    const mismatched_kind_tags = [_]nip01_event.EventTag{
+        .{ .items = (&[_][]const u8{
+            "e",
+            "1111111111111111111111111111111111111111111111111111111111111111",
+        })[0..] },
+        .{ .items = (&[_][]const u8{
+            "a",
+            "30023:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa:article",
+        })[0..] },
+        .{ .items = (&[_][]const u8{ "k", "1" })[0..] },
+    };
+    const unsupported_coordinate_kind_tags = [_]nip01_event.EventTag{
+        .{ .items = (&[_][]const u8{
+            "e",
+            "1111111111111111111111111111111111111111111111111111111111111111",
+        })[0..] },
+        .{ .items = (&[_][]const u8{
+            "a",
+            "1:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa:note",
+        })[0..] },
+    };
+
+    try std.testing.expectError(
+        error.InvalidPubkey,
+        reaction_parse(&reaction_event(7, "+", mismatched_author_tags[0..])),
+    );
+    try std.testing.expectError(
+        error.InvalidPubkey,
+        reaction_parse(&reaction_event(7, "+", mismatched_coordinate_tags[0..])),
+    );
+    try std.testing.expectError(
+        error.InvalidKindTag,
+        reaction_parse(&reaction_event(7, "+", mismatched_kind_tags[0..])),
+    );
+    try std.testing.expectError(
+        error.InvalidCoordinate,
+        reaction_parse(&reaction_event(7, "+", unsupported_coordinate_kind_tags[0..])),
     );
 }

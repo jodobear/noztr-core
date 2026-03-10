@@ -41,11 +41,18 @@ Release-facing note for behavior differences that are intentional in `noztr` Lay
   This aligns the trust-boundary helper better with deployed ecosystem behavior while staying
   deterministic. `nostr-tools` still drops the author in the four-slot case, so `noztr` remains
   slightly richer than the JS reference on that one shape.
-- **Strict NIP-25 NIP-30 shortcode enforcement:**
+- **Strict NIP-25 shortcode enforcement with spec-complete emoji-tag acceptance:**
   `noztr` requires custom emoji shortcodes to satisfy the NIP-30 alphanumeric-or-underscore rule,
   while `rust-nostr` currently accepts broader shortcode text as long as the emoji tag URL parses.
-  This remains an accepted strict-path improvement because it preserves a deterministic, spec-aligned
-  trust-boundary contract.
+  `noztr` now also accepts the optional NIP-30 fourth-slot emoji-set coordinate on reaction
+  `emoji` tags when it is a valid `30030` address, even though the current Rust standardized tag
+  model remains three-slot only. This keeps the strict shortcode contract while removing needless
+  rejection of a spec-valid reaction-tag shape.
+- **Strict NIP-25 target-metadata consistency:**
+  `noztr` rejects contradictory reaction target metadata when `e`-author, `p`, `a`, and `k` do not
+  describe the same target, and rejects `a` coordinates outside replaceable/addressable kind
+  ranges. This keeps the extracted target deterministic instead of surfacing conflicting optional
+  hints as if they were trustworthy.
 - **Strict NIP-22 root/parent linkage validation:**
   `noztr` requires comments to carry both uppercase root scope and lowercase parent scope, mandates
   `K`/`k`, rejects ambiguous competing target families, and requires explicit `P`/`p` author

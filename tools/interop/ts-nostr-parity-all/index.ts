@@ -12,6 +12,8 @@ import {
 import * as nostr_tools from "nostr-tools";
 import { getPow } from "nostr-tools/nip13";
 import { decode, noteEncode, npubEncode } from "nostr-tools/nip19";
+import * as nip25 from "nostr-tools/nip25";
+import * as nip30 from "nostr-tools/nip30";
 import { makeAuthEvent } from "nostr-tools/nip42";
 import { decrypt, encrypt } from "nostr-tools/nip44";
 import * as nip10 from "nostr-tools/nip10";
@@ -682,6 +684,39 @@ function check_nip10(): void {
     ensure(parsed_widened.mentions.length === 0, "NIP-10 widened tag produced mentions");
 }
 
+function check_nip25(): void {
+    const secret_key = to_bytes_32(FIXED_SECRET_KEY_HEX);
+    const target_private = to_bytes_32(
+        "7b911fd37cdf5c81d4c0adb1ab7fa822ed253ab0ad9aa18d77257c88b29b718e",
+    );
+    const reacted = finalizeEvent(
+        {
+            kind: 1,
+            created_at: 1_708_000_125,
+            tags: [
+                ["e", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"],
+                ["p", "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"],
+            ],
+            content: "nip25 target",
+        },
+        target_private,
+    );
+    const reaction = nip25.finishReactionEvent({ created_at: 1_708_000_126 }, reacted, secret_key);
+    const pointer = nip25.getReactedEventPointer(reaction);
+    const valid_shortcode = Array.from(nip30.matchAll("x :soapbox: y"));
+    const widened_shortcode = Array.from(nip30.matchAll("x :soap-box: y"));
+
+    ensure(reaction.kind === kinds.Reaction, "NIP-25 reaction builder kind mismatch");
+    ensure(reaction.content === "+", "NIP-25 reaction builder default content mismatch");
+    ensure(pointer !== undefined, "NIP-25 pointer extraction returned undefined");
+    ensure(pointer?.id === reacted.id, "NIP-25 pointer target id mismatch");
+    ensure(pointer?.author === reacted.pubkey, "NIP-25 pointer author mismatch");
+    ensure((pointer?.relays.length ?? 0) === 0, "NIP-25 pointer relay list mismatch");
+    ensure(valid_shortcode.length === 1, "NIP-25 nostr-tools shortcode match count mismatch");
+    ensure(valid_shortcode[0].name === "soapbox", "NIP-25 shortcode name mismatch");
+    ensure(widened_shortcode.length === 0, "NIP-25 widened shortcode unexpectedly matched");
+}
+
 function check_nip77(): void {
     const local = new nostr_tools.nip77.NegentropyStorageVector();
     const remote = new nostr_tools.nip77.NegentropyStorageVector();
@@ -734,6 +769,7 @@ async function main(): Promise<void> {
     await push_harness_covered(results, "NIP-11", "EDGE", check_nip11);
     await push_harness_covered(results, "NIP-13", "EDGE", check_nip13);
     await push_harness_covered(results, "NIP-19", "EDGE", check_nip19);
+    await push_harness_covered(results, "NIP-25", "EDGE", check_nip25);
     await push_harness_covered(results, "NIP-21", "EDGE", check_nip21);
     await push_harness_covered(results, "NIP-42", "EDGE", check_nip42);
     await push_harness_covered(results, "NIP-44", "DEEP", check_nip44);

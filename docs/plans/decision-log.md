@@ -713,6 +713,40 @@ Immutable record of accepted planning decisions.
   shows the narrower table-only interpretation is required for interoperable behavior.
 - Supersedes: none
 
+## D-040: Accept optional NIP-30 emoji-set coordinates in NIP-25 reactions
+
+- Date: 2026-03-10
+- Status: accepted
+- Decision: widen `nip25_reactions` so reaction `emoji` tags accept the optional fourth-slot
+  NIP-30 emoji-set coordinate when it is a valid `30030` address, while keeping strict shortcode
+  and URL validation.
+- Why: NIP-30 explicitly allows the optional emoji-set address on kind-7 custom-emoji tags, and
+  rejecting it created unnecessary incompatibility with spec-valid reaction events without
+  improving trust-boundary safety.
+- Tradeoff: slightly broader reaction emoji-tag acceptance versus materially better compatibility
+  with spec-valid NIP-30 producer output.
+- Related Tradeoff: T-0-001, T-0-002, T-0-003.
+- Reversal Trigger: production evidence shows the optional fourth slot creates ambiguity or
+  ecosystem incompatibility that outweighs the spec-valid compatibility gain.
+- Supersedes: none
+
+## D-041: Reject contradictory NIP-25 target metadata and unsupported `a` kinds
+
+- Date: 2026-03-10
+- Status: accepted
+- Decision: tighten `nip25_reactions` so it rejects reaction targets with contradictory optional
+  metadata (`e`-author versus `p`, `a` pubkey versus author pubkey, `a` kind versus `k`) and
+  rejects `a` coordinates whose kind is neither replaceable nor addressable.
+- Why: these shapes create ambiguous target descriptions without adding compatibility value, and
+  `a` tags are only defined for replaceable or addressable events in NIP-01.
+- Tradeoff: stricter rejection of internally inconsistent optional metadata versus clearer
+  trust-boundary target extraction semantics.
+- Related Tradeoff: T-0-001, T-0-003.
+- Reversal Trigger: ecosystem evidence shows deployed producers emit these contradictory shapes in a
+  way that must be tolerated for interoperability, without sacrificing deterministic target
+  handling.
+- Supersedes: none
+
 ## Phase Closure Evidence
 
 ### P0-E-001: Phase 0 closure record
