@@ -52,6 +52,9 @@ Current project context for the Phase H kickoff baseline.
   - `NIP-19` audit is complete in `src/nip19_bech32.zig`: `naddr` encode/decode now accepts an
     empty identifier for normal replaceable coordinates, matching the NIP text plus both reference
     lanes instead of rejecting that valid replaceable-address shape
+  - `NIP-21` audit is complete in `src/nip21_uri.zig`: no separate Layer 1 change was required,
+    but replaceable `nostr:naddr...` URIs with empty identifiers are now explicitly covered so the
+    inherited NIP-19 compatibility fix is pinned at the URI layer as well
   - `NIP-25` audit is complete in `src/nip25_reactions.zig`: reaction `emoji` tags now accept the
     optional NIP-30 fourth-slot emoji-set coordinate when it is a valid `30030` address, while
     strict shortcode and URL validation remain retained as the accepted Layer 1 posture, and
@@ -152,7 +155,8 @@ Current project context for the Phase H kickoff baseline.
    a secondary non-gating ecosystem signal. Every implemented NIP must be cross-checked against
    both references during the audit.
 5. Continue from the completed NIP-01, NIP-02, NIP-09, NIP-10, NIP-11, NIP-13, NIP-18, NIP-19,
-   NIP-22, NIP-25, NIP-27, NIP-42, and NIP-51 audits to the next implemented NIP audit item.
+   NIP-21, NIP-22, NIP-25, NIP-27, NIP-42, and NIP-51 audits to the next implemented NIP audit
+   item.
 6. Start Wave 2 / `NIP-46` only after the implemented-NIP audit reaches an acceptable stopping
    point or explicitly recorded partial cutoff.
 7. Keep `no-3uj` visible as deferred-by-operator until remote setup returns to active execution focus.

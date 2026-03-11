@@ -638,6 +638,19 @@ fn check_nip21() -> Result<(), String> {
     if Nip21::parse("nostr:npub1invalid").is_ok() {
         return Err("malformed npub nostr uri accepted".to_string());
     }
+
+    let replaceable = Coordinate::new(Kind::MuteList, pubkey);
+    let replaceable_uri = replaceable
+        .to_nostr_uri()
+        .map_err(|e| format!("replaceable to nostr uri: {e}"))?;
+    let replaceable_parsed =
+        Nip21::parse(&replaceable_uri).map_err(|e| format!("replaceable parse: {e}"))?;
+    let replaceable_roundtrip = replaceable_parsed
+        .to_nostr_uri()
+        .map_err(|e| format!("replaceable uri roundtrip: {e}"))?;
+    if replaceable_roundtrip != replaceable_uri {
+        return Err("replaceable naddr uri roundtrip mismatch".to_string());
+    }
     Ok(())
 }
 

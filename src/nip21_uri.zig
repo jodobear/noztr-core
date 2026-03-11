@@ -141,6 +141,22 @@ test "nip21 valid vectors parse strict nostr entities" {
     const nprofile_reference = try nip21_parse(nprofile_uri, tlv_scratch[0..]);
     try std.testing.expect(nprofile_reference.entity == .nprofile);
     try std.testing.expectEqualStrings(nprofile_identifier, nprofile_reference.identifier);
+
+    const naddr_identifier = try nip19_bech32.nip19_encode(
+        bech32_output[0..],
+        .{
+            .naddr = .{
+                .identifier = "",
+                .pubkey = [_]u8{0x34} ** 32,
+                .kind = 10002,
+            },
+        },
+    );
+    const naddr_uri = try to_nostr_uri(uri_output[0..], naddr_identifier);
+    const naddr_reference = try nip21_parse(naddr_uri, tlv_scratch[0..]);
+    try std.testing.expect(naddr_reference.entity == .naddr);
+    try std.testing.expectEqualStrings("", naddr_reference.entity.naddr.identifier);
+    try std.testing.expectEqualStrings(naddr_identifier, naddr_reference.identifier);
 }
 
 test "nip21 invalid vectors reject scheme forbidden entity and malformed encoding" {

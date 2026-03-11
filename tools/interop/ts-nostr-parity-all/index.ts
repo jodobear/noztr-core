@@ -531,6 +531,23 @@ function check_nip21(): void {
     ensure(parsed.decoded.type === "npub", "NIP-21 decoded type mismatch");
     ensure(parsed.decoded.data === pubkey_hex, "NIP-21 decoded pubkey mismatch");
 
+    const replaceable_uri = `nostr:${naddrEncode({
+        identifier: "",
+        pubkey: pubkey_hex,
+        kind: 10002,
+        relays: ["wss://relay.replaceable"],
+    })}`;
+    const replaceable_parsed = parseNostrUri(replaceable_uri);
+    ensure(replaceable_parsed.uri === replaceable_uri, "replaceable NIP-21 uri mismatch");
+    ensure(replaceable_parsed.decoded.type === "naddr", "replaceable NIP-21 type mismatch");
+    ensure(
+        typeof replaceable_parsed.decoded.data === "object" &&
+            replaceable_parsed.decoded.data !== null &&
+            "identifier" in replaceable_parsed.decoded.data &&
+            replaceable_parsed.decoded.data.identifier === "",
+        "replaceable NIP-21 identifier mismatch",
+    );
+
     let invalid_uri_rejected = false;
     try {
         parseNostrUri("https://relay.damus.io");
