@@ -112,8 +112,8 @@ the validated maintenance baseline.
 - Wave 1 status: complete.
 - Active next execution focus: implemented-NIP audit.
 - Implemented-NIP audit status:
-  - `NIP-01`, `NIP-02`, `NIP-09`, `NIP-10`, `NIP-11`, `NIP-18`, `NIP-22`, `NIP-25`, `NIP-27`,
-    `NIP-42`, and `NIP-51` audits are complete
+  - `NIP-01`, `NIP-02`, `NIP-09`, `NIP-10`, `NIP-11`, `NIP-13`, `NIP-18`, `NIP-22`, `NIP-25`,
+    `NIP-27`, `NIP-42`, and `NIP-51` audits are complete
   - `NIP-01` now accepts uppercase single-letter `#X` filter keys to match the protocol text and
     reference behavior; unknown filter-field rejection and prefixed rejection-status enforcement are
     retained as accepted Layer 1 trust-boundary behavior
@@ -125,6 +125,9 @@ the validated maintenance baseline.
   - `NIP-11` required no Layer 1 change; the current bounded partial relay-information surface
     remains acceptable, and the audit now pins a full-spec-shaped compatibility vector so broader
     relay documents continue to preserve the supported subset
+  - `NIP-13` required no Layer 1 change; the current PoW helper already keeps the full `0..256`
+    difficulty domain and the checked-ID trust-boundary entry point, which the audit keeps as an
+    accepted Zig-native improvement over narrower helper typing in the Rust reference
   - `NIP-18` now rejects contradictory optional repost target metadata without embedded-event proof;
     existing embedded-event consistency checks remain intact
   - `NIP-25` now accepts the optional NIP-30 emoji-set coordinate on reaction `emoji` tags; strict

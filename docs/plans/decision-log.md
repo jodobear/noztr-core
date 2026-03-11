@@ -820,6 +820,25 @@ Immutable record of accepted planning decisions.
   coordinate semantics that remain unambiguous and safe.
 - Supersedes: none
 
+## D-046: Preserve the full `0..256` NIP-13 difficulty domain
+
+- Date: 2026-03-11
+- Status: accepted
+- Decision: keep the current `nip13_pow` surface unchanged. `noztr` continues to count leading zero
+  bits across the full `0..256` range and keeps `pow_meets_difficulty_verified_id` as the explicit
+  checked-ID trust-boundary entry point.
+- Why: NIP-13 defines difficulty as the number of leading zero bits in the 32-byte event id, which
+  is naturally a `0..256` property. The Rust reference remains the active runtime parity lane for
+  normal PoW behavior, but its standalone leading-zero helper is typed as `u8`. Narrowing `noztr`
+  to match that helper type would lose a correct bounded edge case without improving compatibility
+  or safety.
+- Tradeoff: one documented Zig-native divergence from a reference helper type versus a more correct
+  and fully bounded NIP-13 domain.
+- Related Tradeoff: T-0-001, T-0-002, T-0-003.
+- Reversal Trigger: future protocol guidance or strong ecosystem evidence establishes that the full
+  `256`-bit edge should not be represented or checked as part of PoW difficulty semantics.
+- Supersedes: none
+
 ## Phase Closure Evidence
 
 ### P0-E-001: Phase 0 closure record

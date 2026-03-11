@@ -475,6 +475,9 @@ function check_nip13(): void {
 
     const no_pow_bits = getPow("ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
     ensure(no_pow_bits === 0, `getPow mismatch: got ${no_pow_bits}, want 0`);
+
+    const max_pow_bits = getPow("0000000000000000000000000000000000000000000000000000000000000000");
+    ensure(max_pow_bits === 256, `getPow mismatch: got ${max_pow_bits}, want 256`);
 }
 
 function check_nip19(): void {

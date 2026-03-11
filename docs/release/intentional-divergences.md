@@ -34,6 +34,12 @@ Release-facing note for behavior differences that are intentional in `noztr` Lay
   strict integration entry points are explicit (`pow_meets_difficulty_verified_id`,
   `delete_extract_targets_checked`, `transcript_mark_client_req`, `transcript_apply_relay`) to avoid
   partial/unchecked call paths.
+- **NIP-13 full-256 PoW domain:**
+  `noztr` keeps the full `0..256` leading-zero-bit domain for PoW helpers, including the all-zero
+  edge case, and pairs that with an explicit checked-ID trust-boundary entry point. `rust-nostr`
+  remains the strongest runtime parity lane for normal PoW behavior, but its standalone leading-zero
+  helper is typed as `u8`, so `noztr` intentionally keeps the broader bounded domain instead of
+  copying that narrower helper ceiling.
 - **NIP-10 bounded compatibility handling:**
   `noztr` no longer rejects legacy `mention` markers or four-slot pubkey fallback in NIP-10 thread
   extraction. It accepts `mention` as an explicit mention reference and accepts a valid slot-four
