@@ -41,7 +41,8 @@ Current project context for the Phase H kickoff baseline.
     audit parity is now `HARNESS_COVERED EDGE PASS`, and `no-4iw` is resolved by the audit
   - `NIP-18` is complete in `src/nip18_reposts.zig` with strict embedded-event consistency checks
     across `e`, `p`, `k`, and `a` tags; core builder semantics are parity-covered and the
-    addressable repost builder shape is source-reviewed in this pass
+    addressable repost builder shape is source-reviewed in this pass; contradictory optional repost
+    target metadata now rejects the parse path even without embedded-event proof
   - `NIP-22` is complete in `src/nip22_comments.zig` with strict root/parent linkage validation,
     mandatory `K/k`, required author linkage for Nostr targets, accepted support for addressable
     `a+e` comment targets, NIP-73-consistent external validation, and an accepted strict
@@ -122,7 +123,7 @@ Current project context for the Phase H kickoff baseline.
    in `docs/plans/build-plan.md`, with `rust-nostr` as the active parity lane and archived
    `nostr-tools` as a secondary non-gating ecosystem signal. Every implemented NIP must be
    cross-checked against both references during the audit.
-5. Continue from the completed NIP-10, NIP-22, NIP-25, NIP-42, and NIP-51 audits to the next implemented
+5. Continue from the completed NIP-10, NIP-18, NIP-22, NIP-25, NIP-42, and NIP-51 audits to the next implemented
    NIP audit item.
 6. Start Wave 2 / `NIP-46` only after the implemented-NIP audit reaches an acceptable stopping
    point or explicitly recorded partial cutoff.

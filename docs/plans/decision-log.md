@@ -747,6 +747,24 @@ Immutable record of accepted planning decisions.
   handling.
 - Supersedes: none
 
+## D-042: Reject contradictory NIP-18 target metadata without embedded-event proof
+
+- Date: 2026-03-10
+- Status: accepted
+- Decision: tighten `nip18_reposts` so repost parsing rejects contradictory optional target
+  metadata when no embedded event proves the target (`kind 6` with non-`1` `k` or any `a` tag,
+  `kind 16` with `k == 1`, `a` kinds outside replaceable/addressable ranges, `a`/`p` pubkey
+  mismatch, or `a`/`k` kind mismatch).
+- Why: these shapes describe impossible or internally inconsistent repost targets, and accepting
+  them surfaced ambiguous target state without adding real compatibility value.
+- Tradeoff: stricter rejection of contradictory optional repost metadata versus clearer
+  trust-boundary extraction semantics when repost content is empty or does not carry the full
+  embedded event.
+- Related Tradeoff: T-0-001, T-0-003.
+- Reversal Trigger: ecosystem evidence shows these contradictory shapes are common and must be
+  tolerated for interoperability without weakening deterministic repost semantics.
+- Supersedes: none
+
 ## Phase Closure Evidence
 
 ### P0-E-001: Phase 0 closure record

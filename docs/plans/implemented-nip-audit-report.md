@@ -39,7 +39,7 @@ completes.
 | 10 | complete | `HARNESS_COVERED DEEP PASS` | `HARNESS_COVERED EDGE PASS` | Removed unnecessary rejection of legacy `mention`; removed unnecessary rejection of four-slot pubkey fallback | none | `no-4iw` closed | `noztr` now preserves four-slot author pubkey; `nostr-tools` accepts the shape but drops author |
 | 11 | pending | - | - | - | - | - | - |
 | 13 | pending | - | - | - | - | - | - |
-| 18 | pending | - | - | - | - | - | - |
+| 18 | complete | `HARNESS_COVERED DEEP PASS` | `HARNESS_COVERED EDGE PASS` | Reject contradictory repost target metadata without embedded-event proof; retained existing embedded-event consistency checks and kind-6 relay-hint requirement | none | none | `rust-nostr` builders already emit coherent repost metadata and add `a` only for coordinate-capable targets; `nostr-tools` runtime coverage now confirms kind-6/kind-16 builder behavior and protected-event empty-content handling |
 | 19 | pending | - | - | - | - | - | - |
 | 21 | pending | - | - | - | - | - | - |
 | 22 | complete | `HARNESS_COVERED DEEP PASS` | `SOURCE_REVIEW_ONLY no dedicated NIP-22 helper beyond kind constant` | No Layer 1 change required; current root/parent, `K/k`, `P/p`, and kind-1 rejection posture remains justified | none | none | `rust-nostr` emits canonical full linkage when given a root target but still extracts parent-only / optional-kind shapes; `noztr` keeps the stricter trust-boundary contract |
@@ -62,6 +62,9 @@ completes.
   the helper on that input.
 - NIP-10: accept four-slot `e` tags with a valid slot-four pubkey as bounded compatibility input
   instead of rejecting the whole extract path.
+- NIP-18: reject contradictory repost target metadata when empty-content reposts cannot prove the
+  target via embedded JSON, while retaining current embedded-event consistency checks and the kind-6
+  relay-hint requirement.
 - NIP-22: keep strict root/parent scope, mandatory `K/k`, mandatory `P/p` for Nostr targets, and
   kind-1 rejection; `rust-nostr` permissive extraction is treated as a compatibility signal, not a
   reason to weaken the Layer 1 parser.

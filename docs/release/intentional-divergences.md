@@ -63,6 +63,11 @@ Release-facing note for behavior differences that are intentional in `noztr` Lay
   source-review only. `noztr` keeps the stricter contract because it matches the NIP text, produces
   deterministic trust-boundary parsing, validates `I/i` against `K/k` instead of treating external
   targets as opaque text, and preserves NIP-10 as the only reply path for kind-1 notes.
+- **Strict NIP-18 repost-target consistency:**
+  `noztr` rejects contradictory repost metadata when `k`, `a`, and `p` cannot describe the same
+  target, rejects `kind 6` reposts that try to carry `a` coordinates or non-`1` `k` tags, and
+  limits `a` tags to replaceable/addressable kinds. This keeps repost extraction deterministic when
+  the event does not carry a full embedded target JSON blob.
 - **NIP-51 emoji fourth-slot builder support:**
   `noztr` can emit the optional fourth-slot NIP-30 emoji-set coordinate on `emoji` tags, while
   `rust-nostr` standardizes only the three-item shape. This is a spec-driven builder enhancement,

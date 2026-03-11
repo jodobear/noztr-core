@@ -60,6 +60,9 @@ the validated maintenance baseline.
   - rust parity harness covers the core kind-6 and kind-16 builder paths
   - addressable repost builder shape was source-reviewed against `rust-nostr` but not split into a
     separate parity-harness case in this pass
+  - audit outcome: contradictory optional target metadata now rejects the parse path even without
+    embedded-event proof, so empty-content reposts cannot surface impossible `k`/`a`/`p`
+    combinations as if they were valid targets
 - `NIP-22` is complete in the current Wave 1 loop:
   - strict comment helpers implemented in `src/nip22_comments.zig`
   - comments require one uppercase root target and one lowercase parent target on every event
@@ -104,7 +107,9 @@ the validated maintenance baseline.
 - Wave 1 status: complete.
 - Active next execution focus: implemented-NIP audit.
 - Implemented-NIP audit status:
-  - `NIP-10`, `NIP-22`, `NIP-25`, `NIP-42`, and `NIP-51` audits are complete
+  - `NIP-10`, `NIP-18`, `NIP-22`, `NIP-25`, `NIP-42`, and `NIP-51` audits are complete
+  - `NIP-18` now rejects contradictory optional repost target metadata without embedded-event proof;
+    existing embedded-event consistency checks remain intact
   - `NIP-25` now accepts the optional NIP-30 emoji-set coordinate on reaction `emoji` tags; strict
     shortcode and URL validation remain intact, and contradictory optional target metadata now
     rejects the parse path

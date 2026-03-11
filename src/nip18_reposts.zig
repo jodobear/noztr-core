@@ -88,6 +88,7 @@ pub fn repost_parse(event: *const nip01_event.Event) RepostError!RepostTarget {
             return error.MissingEmbeddedEvent;
         }
     }
+    try validate_target_metadata(event.kind, &parsed);
     try validate_embedded_event_consistency(event.kind, &parsed);
     return parsed;
 }
@@ -206,6 +207,62 @@ fn parse_embedded_event_json(content: []const u8) RepostError!?[]const u8 {
         return error.InvalidEmbeddedEvent;
     }
     return content;
+}
+
+fn validate_target_metadata(
+    repost_kind: u32,
+    parsed: *const RepostTarget,
+) RepostError!void {
+    std.debug.assert(repost_kind <= std.math.maxInt(u32));
+    std.debug.assert(@intFromPtr(parsed) != 0);
+
+    if (repost_kind == repost_event_kind) {
+        if (parsed.reposted_kind) |tag_kind| {
+            if (tag_kind != 1) {
+                return error.InvalidKindTag;
+            }
+        }
+        if (parsed.coordinate != null) {
+            return error.InvalidCoordinate;
+        }
+        return;
+    }
+    if (parsed.reposted_kind) |tag_kind| {
+        if (tag_kind == 1) {
+            return error.InvalidKindTag;
+        }
+    }
+    if (parsed.coordinate) |coordinate| {
+        if (!coordinate_kind_supports_a_tag(coordinate.kind)) {
+            return error.InvalidCoordinate;
+        }
+        if (parsed.reposted_kind) |tag_kind| {
+            if (coordinate.kind != tag_kind) {
+                return error.InvalidKindTag;
+            }
+        }
+        if (parsed.author_pubkey) |pubkey| {
+            if (!std.mem.eql(u8, &coordinate.pubkey, &pubkey)) {
+                return error.InvalidPubkey;
+            }
+        }
+    }
+}
+
+fn coordinate_kind_supports_a_tag(kind: u32) bool {
+    std.debug.assert(kind <= limits.kind_max);
+    std.debug.assert(limits.kind_max <= std.math.maxInt(u32));
+
+    if (kind == 0 or kind == 3) {
+        return true;
+    }
+    if (kind >= 10000 and kind < 20000) {
+        return true;
+    }
+    if (kind >= 30000 and kind < 40000) {
+        return true;
+    }
+    return false;
 }
 
 fn validate_embedded_event_consistency(
@@ -657,6 +714,84 @@ test "repost parse rejects duplicate tags and malformed payloads" {
     try std.testing.expectError(error.InvalidEmbeddedEvent, repost_parse(&bad_object));
 }
 
+test "repost parse rejects contradictory target metadata without embedded event" {
+    const kind6_bad_k = [_]nip01_event.EventTag{
+        .{ .items = (&[_][]const u8{
+            "e",
+            "1111111111111111111111111111111111111111111111111111111111111111",
+            "wss://relay",
+        })[0..] },
+        .{ .items = (&[_][]const u8{ "k", "42" })[0..] },
+    };
+    const kind6_bad_a = [_]nip01_event.EventTag{
+        .{ .items = (&[_][]const u8{
+            "e",
+            "1111111111111111111111111111111111111111111111111111111111111111",
+            "wss://relay",
+        })[0..] },
+        .{ .items = (&[_][]const u8{
+            "a",
+            "30023:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa:article",
+        })[0..] },
+    };
+    const generic_bad_kind = [_]nip01_event.EventTag{
+        .{ .items = (&[_][]const u8{
+            "e",
+            "2222222222222222222222222222222222222222222222222222222222222222",
+        })[0..] },
+        .{ .items = (&[_][]const u8{
+            "a",
+            "30023:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb:article",
+        })[0..] },
+        .{ .items = (&[_][]const u8{ "k", "1" })[0..] },
+    };
+    const generic_bad_pubkey = [_]nip01_event.EventTag{
+        .{ .items = (&[_][]const u8{
+            "e",
+            "3333333333333333333333333333333333333333333333333333333333333333",
+        })[0..] },
+        .{ .items = (&[_][]const u8{
+            "p",
+            "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        })[0..] },
+        .{ .items = (&[_][]const u8{
+            "a",
+            "30023:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb:article",
+        })[0..] },
+    };
+    const generic_bad_coordinate_kind = [_]nip01_event.EventTag{
+        .{ .items = (&[_][]const u8{
+            "e",
+            "4444444444444444444444444444444444444444444444444444444444444444",
+        })[0..] },
+        .{ .items = (&[_][]const u8{
+            "a",
+            "42:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa:note",
+        })[0..] },
+    };
+
+    try std.testing.expectError(
+        error.InvalidKindTag,
+        repost_parse(&repost_event(6, "", kind6_bad_k[0..])),
+    );
+    try std.testing.expectError(
+        error.InvalidCoordinate,
+        repost_parse(&repost_event(6, "", kind6_bad_a[0..])),
+    );
+    try std.testing.expectError(
+        error.InvalidKindTag,
+        repost_parse(&repost_event(16, "", generic_bad_kind[0..])),
+    );
+    try std.testing.expectError(
+        error.InvalidPubkey,
+        repost_parse(&repost_event(16, "", generic_bad_pubkey[0..])),
+    );
+    try std.testing.expectError(
+        error.InvalidCoordinate,
+        repost_parse(&repost_event(16, "", generic_bad_coordinate_kind[0..])),
+    );
+}
+
 test "repost parse rejects embedded event mismatches" {
     const e_tag = [_][]const u8{
         "e",
@@ -670,7 +805,7 @@ test "repost parse rejects embedded event mismatches" {
     const k_tag = [_][]const u8{ "k", "30023" };
     const a_tag = [_][]const u8{
         "a",
-        "30023:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb:article",
+        "30023:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa:article",
     };
     const tags = [_]nip01_event.EventTag{
         .{ .items = e_tag[0..] },

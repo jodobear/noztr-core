@@ -684,6 +684,57 @@ function check_nip10(): void {
     ensure(parsed_widened.mentions.length === 0, "NIP-10 widened tag produced mentions");
 }
 
+function check_nip18(): void {
+    const secret_key = to_bytes_32(FIXED_SECRET_KEY_HEX);
+    const target_private = to_bytes_32(
+        "7b911fd37cdf5c81d4c0adb1ab7fa822ed253ab0ad9aa18d77257c88b29b718e",
+    );
+    const text_note = finalizeEvent(
+        { kind: 1, created_at: 1_708_000_130, tags: [], content: "nip18 note" },
+        target_private,
+    );
+    const repost = nostr_tools.nip18.finishRepostEvent(
+        { created_at: 1_708_000_131 },
+        text_note,
+        "wss://relay.example",
+        secret_key,
+    );
+    const protected_note = finalizeEvent(
+        { kind: 1, created_at: 1_708_000_132, tags: [["-"]], content: "nip18 protected" },
+        target_private,
+    );
+    const protected_repost = nostr_tools.nip18.finishRepostEvent(
+        { created_at: 1_708_000_133 },
+        protected_note,
+        "wss://relay.example",
+        secret_key,
+    );
+    const generic_target = finalizeEvent(
+        { kind: 10000, created_at: 1_708_000_134, tags: [], content: "nip18 generic" },
+        target_private,
+    );
+    const generic_repost = nostr_tools.nip18.finishRepostEvent(
+        { created_at: 1_708_000_135 },
+        generic_target,
+        "wss://relay.example",
+        secret_key,
+    );
+    const pointer = nostr_tools.nip18.getRepostedEventPointer(repost);
+    const embedded = nostr_tools.nip18.getRepostedEvent(repost, { skipVerification: true });
+
+    ensure(repost.kind === kinds.Repost, "NIP-18 text repost kind mismatch");
+    ensure(pointer?.id === text_note.id, "NIP-18 repost pointer id mismatch");
+    ensure(pointer?.author === text_note.pubkey, "NIP-18 repost pointer author mismatch");
+    ensure(pointer?.relays[0] === "wss://relay.example", "NIP-18 repost relay hint mismatch");
+    ensure(embedded?.id === text_note.id, "NIP-18 embedded repost extraction mismatch");
+    ensure(protected_repost.content === "", "NIP-18 protected repost content mismatch");
+    ensure(generic_repost.kind === kinds.GenericRepost, "NIP-18 generic repost kind mismatch");
+    ensure(
+        generic_repost.tags.some(tag => tag[0] === "k" && tag[1] === "10000"),
+        "NIP-18 generic repost missing k tag",
+    );
+}
+
 function check_nip25(): void {
     const secret_key = to_bytes_32(FIXED_SECRET_KEY_HEX);
     const target_private = to_bytes_32(
@@ -768,6 +819,7 @@ async function main(): Promise<void> {
     await push_harness_covered(results, "NIP-10", "EDGE", check_nip10);
     await push_harness_covered(results, "NIP-11", "EDGE", check_nip11);
     await push_harness_covered(results, "NIP-13", "EDGE", check_nip13);
+    await push_harness_covered(results, "NIP-18", "EDGE", check_nip18);
     await push_harness_covered(results, "NIP-19", "EDGE", check_nip19);
     await push_harness_covered(results, "NIP-25", "EDGE", check_nip25);
     await push_harness_covered(results, "NIP-21", "EDGE", check_nip21);
