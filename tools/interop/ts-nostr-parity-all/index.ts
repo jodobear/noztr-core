@@ -11,7 +11,7 @@ import {
 } from "nostr-tools/pure";
 import * as nostr_tools from "nostr-tools";
 import { getPow } from "nostr-tools/nip13";
-import { decode, noteEncode, nsecEncode, npubEncode } from "nostr-tools/nip19";
+import { decode, naddrEncode, noteEncode, nsecEncode, npubEncode } from "nostr-tools/nip19";
 import * as nip25 from "nostr-tools/nip25";
 import * as nip30 from "nostr-tools/nip30";
 import { makeAuthEvent } from "nostr-tools/nip42";
@@ -495,6 +495,22 @@ function check_nip19(): void {
     const note_decoded = decode(note);
     ensure(note_decoded.type === "note", "note decode type mismatch");
     ensure(note_decoded.data === event_id_hex, "note decode payload mismatch");
+
+    const replaceable_addr = naddrEncode({
+        identifier: "",
+        pubkey: pubkey_hex,
+        kind: 10002,
+        relays: ["wss://relay.replaceable"],
+    });
+    const replaceable_addr_decoded = decode(replaceable_addr);
+    ensure(replaceable_addr_decoded.type === "naddr", "naddr decode type mismatch");
+    ensure(
+        typeof replaceable_addr_decoded.data === "object" &&
+            replaceable_addr_decoded.data !== null &&
+            "identifier" in replaceable_addr_decoded.data &&
+            replaceable_addr_decoded.data.identifier === "",
+        "replaceable naddr identifier mismatch",
+    );
 
     let invalid_decode_rejected = false;
     try {

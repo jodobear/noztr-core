@@ -40,7 +40,7 @@ completes.
 | 11 | complete | `HARNESS_COVERED DEEP PASS` | `HARNESS_COVERED EDGE PASS` | No Layer 1 change required; current bounded partial-document parse remains acceptable and now has an explicit full-spec-shaped compatibility vector | none | none | `noztr` intentionally exposes a typed subset of relay-info fields, but it ignores additional NIP-11 fields without disturbing the supported subset; both reference lanes tolerate the broader document shape |
 | 13 | complete | `HARNESS_COVERED DEEP PASS` | `HARNESS_COVERED EDGE PASS` | No Layer 1 change required; current PoW helper already preserves the full `0..256` difficulty domain and trust-boundary checked-ID entry point | none | none | `rust-nostr` remains the stronger runtime reference for normal PoW checks, but its standalone leading-zero helper is typed as `u8`; `noztr` keeps the full `256`-bit edge, and `nostr-tools` runtime evidence confirms the broader domain |
 | 18 | complete | `HARNESS_COVERED DEEP PASS` | `HARNESS_COVERED EDGE PASS` | Reject contradictory repost target metadata without embedded-event proof; retained existing embedded-event consistency checks and kind-6 relay-hint requirement | none | none | `rust-nostr` builders already emit coherent repost metadata and add `a` only for coordinate-capable targets; `nostr-tools` runtime coverage now confirms kind-6/kind-16 builder behavior and protected-event empty-content handling |
-| 19 | pending | - | - | - | - | - | - |
+| 19 | complete | `HARNESS_COVERED DEEP PASS` | `HARNESS_COVERED EDGE PASS` | Accepted empty-identifier `naddr` encode/decode for normal replaceable coordinates | none | none | NIP-19 explicitly allows empty `d` for replaceable coordinates; both reference lanes roundtrip that shape, so the prior rejection was unnecessary incompatibility |
 | 21 | pending | - | - | - | - | - | - |
 | 22 | complete | `HARNESS_COVERED DEEP PASS` | `SOURCE_REVIEW_ONLY no dedicated NIP-22 helper beyond kind constant` | No Layer 1 change required; current root/parent, `K/k`, `P/p`, and kind-1 rejection posture remains justified | none | none | `rust-nostr` emits canonical full linkage when given a root target but still extracts parent-only / optional-kind shapes; `noztr` keeps the stricter trust-boundary contract |
 | 25 | complete | `HARNESS_COVERED DEEP PASS` | `HARNESS_COVERED EDGE PASS` | Accepted the optional NIP-30 fourth-slot emoji-set coordinate on reaction `emoji` tags; retained strict shortcode and URL validation; now reject contradictory optional target metadata and unsupported `a` kinds | none | none | `rust-nostr` remains permissive on shortcode text and still standardizes only three-slot emoji tags; `nostr-tools` aligns on last-`e`/last-`p` target selection and strict shortcode matching |
@@ -74,6 +74,8 @@ completes.
   preserve compatibility with full spec-shaped documents by ignoring unmodeled fields cleanly.
 - NIP-13: no Layer 1 change required; keep the current checked-ID trust-boundary API and the full
   `0..256` difficulty domain instead of mirroring narrower helper typing from the Rust reference.
+- NIP-19: accept empty-identifier `naddr` values for normal replaceable coordinates during both
+  encode and decode instead of rejecting them as malformed.
 - NIP-18: reject contradictory repost target metadata when empty-content reposts cannot prove the
   target via embedded JSON, while retaining current embedded-event consistency checks and the kind-6
   relay-hint requirement.

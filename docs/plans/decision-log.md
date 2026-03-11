@@ -839,6 +839,22 @@ Immutable record of accepted planning decisions.
   `256`-bit edge should not be represented or checked as part of PoW difficulty semantics.
 - Supersedes: none
 
+## D-047: Accept empty-identifier `naddr` values for replaceable coordinates
+
+- Date: 2026-03-11
+- Status: accepted
+- Decision: widen `nip19_bech32` so `naddr` encode/decode accepts an empty identifier in TLV type
+  `0` when representing a normal replaceable coordinate.
+- Why: NIP-19 explicitly says the `naddr` identifier uses an empty string for normal replaceable
+  events. Both `rust-nostr` and `nostr-tools` roundtrip that shape. The prior `noztr` rejection was
+  unnecessary incompatibility, not a useful trust-boundary safeguard.
+- Tradeoff: slightly broader accepted `naddr` value surface versus materially better spec and
+  ecosystem compatibility for replaceable coordinates.
+- Related Tradeoff: T-0-001, T-0-002, T-0-003.
+- Reversal Trigger: future NIP guidance removes empty-identifier replaceable coordinates or strong
+  ecosystem evidence shows the widened shape is harmful or ambiguous.
+- Supersedes: none
+
 ## Phase Closure Evidence
 
 ### P0-E-001: Phase 0 closure record

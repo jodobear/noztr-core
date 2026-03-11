@@ -592,6 +592,16 @@ fn check_nip19() -> Result<(), String> {
     if event_id_back != event_id {
         return Err("event id bech32 roundtrip mismatch".to_string());
     }
+
+    let replaceable = Coordinate::new(Kind::MuteList, pubkey);
+    let replaceable_naddr = replaceable
+        .to_bech32()
+        .map_err(|e| format!("replaceable naddr encode: {e}"))?;
+    let replaceable_back =
+        Coordinate::from_bech32(&replaceable_naddr).map_err(|e| format!("naddr decode: {e}"))?;
+    if replaceable_back != replaceable {
+        return Err("replaceable naddr roundtrip mismatch".to_string());
+    }
     Ok(())
 }
 

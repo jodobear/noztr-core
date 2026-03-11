@@ -164,16 +164,12 @@ fn encode_naddr(output: []u8, pointer: NaddrPointer) Nip19Error![]const u8 {
     std.debug.assert(pointer.pubkey.len == 32);
     std.debug.assert(pointer.identifier.len <= limits.nip19_identifier_tlv_bytes_max);
 
-    if (pointer.identifier.len == 0) {
-        return error.ValueOutOfRange;
-    }
-
     var payload: [limits.nip19_tlv_scratch_bytes_max]u8 = undefined;
     var payload_len: u16 = 0;
     var kind_bytes: [4]u8 = undefined;
 
     std.mem.writeInt(u32, &kind_bytes, pointer.kind, .big);
-    try append_tlv(&payload, &payload_len, 0, pointer.identifier, true);
+    try append_tlv(&payload, &payload_len, 0, pointer.identifier, false);
     try append_relays_tlv(&payload, &payload_len, pointer.relays);
     try append_tlv(&payload, &payload_len, 2, pointer.pubkey[0..], true);
     try append_tlv(&payload, &payload_len, 3, kind_bytes[0..], true);
@@ -611,7 +607,7 @@ fn decode_naddr(payload: []const u8) Nip19Error!NaddrPointer {
 
     while (try tlv_next(payload, &index, &count)) |entry| {
         if (entry.tlv_type == 0) {
-            if (entry.value.len == 0 or have_identifier) return error.InvalidPayload;
+            if (have_identifier) return error.InvalidPayload;
             pointer.identifier = entry.value;
             have_identifier = true;
         } else if (entry.tlv_type == 1) {
@@ -727,6 +723,19 @@ test "nip19 valid vectors include nsec naddr and nrelay" {
     try std.testing.expectEqual(@as(u32, 30023), decoded_naddr.naddr.kind);
     try std.testing.expectEqual(@as(u8, 1), decoded_naddr.naddr.relays.count);
     try std.testing.expectEqualStrings("wss://relay.naddr", decoded_naddr.naddr.relays.values[0]);
+
+    const replaceable_naddr_entity = Nip19Entity{
+        .naddr = .{
+            .identifier = "",
+            .pubkey = [_]u8{0xBC} ** 32,
+            .kind = 10002,
+        },
+    };
+    const replaceable_naddr_text = try nip19_encode(output[0..], replaceable_naddr_entity);
+    const decoded_replaceable_naddr = try nip19_decode(replaceable_naddr_text, scratch[0..]);
+    try std.testing.expect(decoded_replaceable_naddr == .naddr);
+    try std.testing.expectEqualStrings("", decoded_replaceable_naddr.naddr.identifier);
+    try std.testing.expectEqual(@as(u32, 10002), decoded_replaceable_naddr.naddr.kind);
 
     const nrelay_entity = Nip19Entity{
         .nrelay = .{ .relay = "wss://relay.only" },
@@ -866,19 +875,5 @@ test "nip19 encode forces ValueOutOfRange for empty required string fields" {
     try std.testing.expectError(
         error.ValueOutOfRange,
         nip19_encode(output[0..], .{ .nrelay = .{ .relay = "" } }),
-    );
-
-    try std.testing.expectError(
-        error.ValueOutOfRange,
-        nip19_encode(
-            output[0..],
-            .{
-                .naddr = .{
-                    .identifier = "",
-                    .pubkey = [_]u8{0x33} ** 32,
-                    .kind = 30023,
-                },
-            },
-        ),
     );
 }
