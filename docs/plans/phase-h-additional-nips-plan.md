@@ -180,7 +180,7 @@ frozen defaults or the current deterministic-and-compatible Layer 1 kernel postu
 - Wave 1 status:
   - Wave 1 is complete.
   - Wave 2 / `46` is complete.
-  - Wave 3 / `06` is implemented and ready for closure.
+  - Wave 3 / `06` is complete.
 
 ## Wave 2 Status Snapshot
 
@@ -225,7 +225,7 @@ frozen defaults or the current deterministic-and-compatible Layer 1 kernel postu
 
 ## Wave 3 Status Snapshot
 
-- Implemented / ready for closure:
+- Complete:
   - `06`
     - implemented scope in `src/nip06_mnemonic.zig`:
       - English mnemonic validation
@@ -245,7 +245,8 @@ frozen defaults or the current deterministic-and-compatible Layer 1 kernel postu
     - accepted temporary normalization boundary:
       - current Phase H behavior accepts ASCII-only mnemonic/passphrase input after UTF-8
         validation and rejects non-ASCII input with typed `InvalidNormalization`
-      - full BIP39-compatible NFKD normalization remains explicit follow-up `no-09f`
+      - `no-09f` review is complete: full BIP39-compatible NFKD normalization remains future
+        feature `no-2gp`, not immediate kernel scope
 
 ## NIP-06 Phase H Boundary Scope
 
@@ -264,7 +265,7 @@ frozen defaults or the current deterministic-and-compatible Layer 1 kernel postu
 - Follow-up note: broader rust-nostr parity and deep edge-case expansion for NIP-06 remains a later
   phase after the initial narrow boundary is stable.
   - Additional accepted follow-up from implementation: full Unicode normalization parity for
-    non-ASCII mnemonic/passphrase input remains explicit follow-up `no-09f`.
+    non-ASCII mnemonic/passphrase input remains future feature `no-2gp`.
 
 ## NIP-06 H0 Freeze Snapshot
 

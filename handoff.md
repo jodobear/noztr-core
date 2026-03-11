@@ -31,7 +31,7 @@ Current project context for the Phase H kickoff baseline.
   - H0 status:
   - NIP-06 pin target, one-module boundary, typed failure posture, zeroization set, and corpus floor
     are frozen
-  - Wave 3 / `NIP-06` is implemented in `src/nip06_mnemonic.zig` and ready for tracker closure:
+  - Wave 3 / `NIP-06` is implemented in `src/nip06_mnemonic.zig` and closed:
     - current implemented scope:
       - English mnemonic validation
       - mnemonic plus optional passphrase to 64-byte seed
@@ -49,7 +49,8 @@ Current project context for the Phase H kickoff baseline.
     - accepted temporary normalization boundary:
       - current Phase H behavior accepts ASCII-only mnemonic/passphrase input after UTF-8
         validation and rejects non-ASCII input with typed `InvalidNormalization`
-      - full BIP39-compatible NFKD normalization remains explicit follow-up `no-09f`
+      - `no-09f` review is complete: full BIP39-compatible NFKD normalization remains future
+        feature `no-2gp`, not immediate kernel scope
 - Wave 1 progress:
   - `NIP-01` audit is complete across `src/nip01_event.zig`, `src/nip01_filter.zig`, and
     `src/nip01_message.zig`: strict parsing now accepts uppercase single-letter `#X` filter keys,
@@ -226,7 +227,7 @@ Current project context for the Phase H kickoff baseline.
    Accepted out-of-scope:
    - `nostrconnect_url` placeholder expansion or redirect/template rendering remains app-flow
      logic and is intentionally outside the protocol-kernel helper surface (`D-053`)
-6. Wave 3 / `NIP-06` is implemented and green, and `no-7lv` is ready to close.
+6. Wave 3 / `NIP-06` is implemented, green, and closed.
    Current status:
    - `src/nip06_mnemonic.zig` implements the frozen narrow libwally boundary with strict
      zeroization and typed errors.
@@ -237,7 +238,9 @@ Current project context for the Phase H kickoff baseline.
    - current Phase H behavior accepts ASCII-only mnemonic/passphrase input after UTF-8 validation
      and rejects non-ASCII input with typed `InvalidNormalization`.
    Explicit follow-up:
-   - `no-09f` tracks full BIP39-compatible NFKD normalization support for non-ASCII parity.
+   - `no-09f` review is complete.
+   - `no-2gp` tracks any future full BIP39-compatible NFKD normalization support for non-ASCII
+     parity.
 7. Keep `no-3uj` visible as deferred-by-operator until remote setup returns to active execution focus.
 
 ## Repo Boundary Note

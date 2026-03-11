@@ -987,6 +987,26 @@ Immutable record of accepted planning decisions.
   approved backend path gains spec-compliant normalization directly.
 - Supersedes: none
 
+## D-055: Keep full NIP-06 NFKD normalization out of the current kernel scope
+
+- Date: 2026-03-11
+- Status: accepted
+- Decision: complete the `no-09f` review by keeping `D-054` as the current accepted NIP-06
+  boundary and not implementing full in-repo Unicode NFKD normalization now. Track any future
+  full BIP39-compatible Unicode normalization work in `no-2gp` instead of expanding the current
+  kernel immediately.
+- Why: `noztr` currently exposes an English-only mnemonic boundary, so the practical parity gain
+  from full NFKD support is non-ASCII passphrase handling. The current ASCII-only rejection already
+  avoids silent cross-wallet seed mismatch. A direct in-repo normalization port would require a
+  substantial generated Unicode data surface, roughly `625 KB` from the upstream Rust reference
+  tables, or a new dependency-policy exception beyond the current approved crypto backend model.
+- Tradeoff: non-ASCII passphrases remain unsupported for now versus avoiding a large Unicode
+  subsystem or a new non-crypto dependency exception in the protocol kernel.
+- Related Tradeoff: T-H-ANIP-002, T-H-ANIP-003, T-0-001, T-0-003.
+- Reversal Trigger: clear integrator demand or interoperability evidence makes non-ASCII
+  passphrase support worth the additional code/data or dependency-policy cost.
+- Supersedes: none
+
 ## Phase Closure Evidence
 
 ### P0-E-001: Phase 0 closure record
