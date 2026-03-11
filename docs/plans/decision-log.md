@@ -948,6 +948,25 @@ Immutable record of accepted planning decisions.
   harmful.
 - Supersedes: none
 
+## D-053: Keep `nostrconnect_url` template rendering out of the NIP-46 kernel
+
+- Date: 2026-03-11
+- Status: accepted
+- Decision: keep `nostrconnect_url` parsing and validation in `nip46_remote_signing`, but leave
+  placeholder expansion or redirect/template rendering out of the module. `noztr` will not turn
+  the NIP-46 helper into an application-flow or connection-orchestration surface.
+- Why: replacing `<nostrconnect>` inside an HTTPS redirect template is not wire-format parsing; it
+  is application-flow behavior that depends on UI, redirect policy, and handoff semantics outside
+  the protocol kernel. The bounded kernel value is in validating the template field and exposing the
+  parsed discovery data, not in deciding how an app launches or hands off a connection.
+- Tradeoff: less turnkey convenience for client apps versus a cleaner kernel boundary, less
+  overengineering, and lower risk of mixing app UX policy into Layer 1 helpers.
+- Related Tradeoff: T-0-001, T-0-002, T-0-003.
+- Reversal Trigger: repeated downstream application code shows a single obvious, protocol-grounded,
+  low-policy rendering helper that materially improves interoperability without dragging UI or
+  redirect semantics into the kernel.
+- Supersedes: none
+
 ## Phase Closure Evidence
 
 ### P0-E-001: Phase 0 closure record

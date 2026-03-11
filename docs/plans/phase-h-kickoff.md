@@ -171,8 +171,8 @@ the validated maintenance baseline.
     path-bound websocket origin strictness is retained
   - `NIP-51` widened bookmark extraction to accept bounded hashtag/URL items and now ignores
     unrelated unknown tags
-- Wave 2 / `NIP-46` is now in progress in `no-czg`
-  - initial bounded `src/nip46_remote_signing.zig` surface is implemented
+- Wave 2 / `NIP-46` is complete in `no-czg`
+  - bounded `src/nip46_remote_signing.zig` surface is implemented
   - current implemented scope:
     - method parsing for `connect`, `sign_event`, `ping`, `get_public_key`,
       `nip04_encrypt`, `nip04_decrypt`, `nip44_encrypt`, `nip44_decrypt`,
@@ -201,9 +201,9 @@ the validated maintenance baseline.
     - current intentional divergence: pinned `rust-nostr` still uses the older
       `metadata=` client-URI shape and lacks `switch_relays`, while `noztr` and
       `nostr-tools` follow the current split-query URI and method surface
-  - current deferred scope inside the active Wave 2 item:
-    - any optional redirect/template rendering around `nostrconnect_url`, which remains app-flow
-      logic rather than protocol-kernel parsing
+  - accepted out-of-scope:
+    - `nostrconnect_url` placeholder expansion or redirect/template rendering remains app-flow
+      logic and is intentionally outside the protocol-kernel helper surface (`D-053`)
 
 ## Immediate Work Tracks
 

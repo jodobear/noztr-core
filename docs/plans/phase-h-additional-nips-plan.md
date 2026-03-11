@@ -179,11 +179,11 @@ frozen defaults or the current deterministic-and-compatible Layer 1 kernel postu
     - deferred scope: kind-17 external reactions pending NIP-73 support
 - Wave 1 status:
   - Wave 1 is complete.
-  - Wave 2 / `46` is now in progress.
+  - Wave 2 / `46` is complete.
 
 ## Wave 2 Status Snapshot
 
-- In progress:
+- Complete:
   - `46`
     - implemented scope so far: bounded core helpers in `src/nip46_remote_signing.zig`
     - current implemented semantics:
@@ -218,9 +218,9 @@ frozen defaults or the current deterministic-and-compatible Layer 1 kernel postu
       - accepted current-spec divergence: the pinned rust lane still exposes the older
         `metadata=` client-URI shape and omits `switch_relays`, while `noztr` follows the current
         split-query URI and method surface that matches `nostr-tools`
-    - still pending inside the active Wave 2 item:
-      - any optional redirect/template rendering around `nostrconnect_url`, which remains
-        app-flow logic rather than protocol-kernel parsing
+    - accepted out-of-scope:
+      - `nostrconnect_url` placeholder expansion or redirect/template rendering remains app-flow
+        logic and is intentionally outside the protocol-kernel helper surface (`D-053`)
 
 ## NIP-06 Phase H Boundary Scope
 

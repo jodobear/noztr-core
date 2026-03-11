@@ -181,8 +181,8 @@ Current project context for the Phase H kickoff baseline.
    Wave 1 is complete: `25`, `10`, `18`, `22`, `27`, `51`.
 4. Keep the implemented-NIP audit report current if future code changes reopen compatibility or
    strictness questions.
-5. Continue Wave 2 / `NIP-46`.
-   Current implemented baseline:
+5. Wave 2 / `NIP-46` is complete.
+   Implemented baseline:
    - `src/nip46_remote_signing.zig` now covers method parsing, permission parsing/formatting,
      JSON request/response parse+compose, current-spec `bunker://` and `nostrconnect://`
      URI parse+compose, and strict kind-24133 envelope validation.
@@ -204,9 +204,10 @@ Current project context for the Phase H kickoff baseline.
    - pinned `rust-nostr` still uses the older `metadata=` client-URI shape and omits
      `switch_relays`; `noztr` keeps the current-spec split-query URI and method surface that
      matches `nostr-tools`
-   Remaining Wave 2 work:
-   - decide whether optional `nostrconnect_url` redirect/template rendering belongs in this module
-     or should stay deferred as app-flow logic
+   Accepted out-of-scope:
+   - `nostrconnect_url` placeholder expansion or redirect/template rendering remains app-flow
+     logic and is intentionally outside the protocol-kernel helper surface (`D-053`)
+   Remaining admin work:
    - update tracker state when `bd` localhost access is available again in-session
 7. Keep `no-3uj` visible as deferred-by-operator until remote setup returns to active execution focus.
 
