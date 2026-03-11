@@ -170,6 +170,15 @@ Review axes for every implemented NIP:
   first where appropriate, bounded, simple to reason about, and production-useful for both humans
   and LLM agents.
 
+Temperament rule for review and implementation:
+- Apply KISS to protocol behavior as well as code structure: prefer the simplest bounded behavior
+  that is correct, deterministic, and ecosystem-compatible.
+- Do not add narrow helper rules, extra typed failures, or special-case parsing unless they produce
+  clear trust-boundary, correctness, or interoperability benefit.
+- When safe, prefer ignoring irrelevant or future-compatible input over poisoning the whole helper
+  path.
+- Explicit is good; fussy is not.
+
 Cross-cutting review lenses for every implemented NIP:
 - Compatibility cost versus benefit: do not pay ecosystem friction unless correctness, safety,
   determinism, or boundedness actually improves.

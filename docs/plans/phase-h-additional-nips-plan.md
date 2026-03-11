@@ -180,7 +180,7 @@ frozen defaults or the current deterministic-and-compatible Layer 1 kernel postu
 - Wave 1 status:
   - Wave 1 is complete.
   - Wave 2 / `46` is complete.
-  - Wave 3 / `06` is implemented and pending operator review before closure.
+  - Wave 3 / `06` is implemented and ready for closure.
 
 ## Wave 2 Status Snapshot
 
@@ -225,7 +225,7 @@ frozen defaults or the current deterministic-and-compatible Layer 1 kernel postu
 
 ## Wave 3 Status Snapshot
 
-- In progress / pending review:
+- Implemented / ready for closure:
   - `06`
     - implemented scope in `src/nip06_mnemonic.zig`:
       - English mnemonic validation

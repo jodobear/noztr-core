@@ -204,7 +204,7 @@ the validated maintenance baseline.
   - accepted out-of-scope:
     - `nostrconnect_url` placeholder expansion or redirect/template rendering remains app-flow
       logic and is intentionally outside the protocol-kernel helper surface (`D-053`)
-- Wave 3 / `NIP-06` is implemented in `no-7lv` and is pending operator review before closure
+- Wave 3 / `NIP-06` is implemented in `no-7lv` and is ready for tracker closure
   - `src/nip06_mnemonic.zig` now implements the frozen narrow boundary:
     - English mnemonic validation
     - mnemonic plus optional passphrase to 64-byte seed
@@ -234,8 +234,8 @@ the validated maintenance baseline.
 - `no-4iw` is resolved by the NIP-10 audit and no longer blocks interpretation of NIP-10 quality.
 - Keep TypeScript parity references non-gating and use them only as secondary ecosystem audit
   evidence.
-- Hold `no-7lv` open for operator review of the accepted ASCII-only NIP-06 normalization boundary,
-  with full NFKD remaining explicit follow-up `no-09f`.
+- Close `no-7lv` after recording the accepted ASCII-only NIP-06 normalization boundary; keep full
+  NFKD as explicit follow-up `no-09f`.
 
 ## Blocker Visibility
 

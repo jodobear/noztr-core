@@ -31,8 +31,7 @@ Current project context for the Phase H kickoff baseline.
   - H0 status:
   - NIP-06 pin target, one-module boundary, typed failure posture, zeroization set, and corpus floor
     are frozen
-  - Wave 3 / `NIP-06` is implemented in `src/nip06_mnemonic.zig` and pending operator review
-    before closure:
+  - Wave 3 / `NIP-06` is implemented in `src/nip06_mnemonic.zig` and ready for tracker closure:
     - current implemented scope:
       - English mnemonic validation
       - mnemonic plus optional passphrase to 64-byte seed
@@ -227,16 +226,18 @@ Current project context for the Phase H kickoff baseline.
    Accepted out-of-scope:
    - `nostrconnect_url` placeholder expansion or redirect/template rendering remains app-flow
      logic and is intentionally outside the protocol-kernel helper surface (`D-053`)
-6. Wave 3 / `NIP-06` is implemented and green, but do not close `no-7lv` yet.
+6. Wave 3 / `NIP-06` is implemented and green, and `no-7lv` is ready to close.
    Current status:
    - `src/nip06_mnemonic.zig` implements the frozen narrow libwally boundary with strict
      zeroization and typed errors.
    - `zig build test --summary all` and `zig build` are green after the NIP-06 corpus landed.
    - the fixed review finding from implementation was parent/output key aliasing during child
      derivation; separate key slots are now used.
-   Pending operator review point:
-   - decide whether the current UTF-8 validation without explicit NFKD normalization is an accepted
-     Phase H boundary limit or should be immediate follow-up work for non-ASCII parity.
+   Accepted temporary normalization boundary:
+   - current Phase H behavior accepts ASCII-only mnemonic/passphrase input after UTF-8 validation
+     and rejects non-ASCII input with typed `InvalidNormalization`.
+   Explicit follow-up:
+   - `no-09f` tracks full BIP39-compatible NFKD normalization support for non-ASCII parity.
 7. Keep `no-3uj` visible as deferred-by-operator until remote setup returns to active execution focus.
 
 ## Repo Boundary Note
