@@ -168,6 +168,8 @@ Each Wave 1 NIP must complete the full loop below before the next NIP begins.
      - classify remaining ambiguities as `resolved`, `accepted-risk`, or `decision-needed`
      - do not close the NIP if any high-impact ambiguity remains `decision-needed`
    - close the beads issue with the implemented acceptance evidence.
+   - create one local git commit scoped to the completed NIP after post-Review-B green gates and
+     canonical doc updates are in place.
    - confirm the next serial dependency is actually unblocked in beads before claiming the next NIP.
    - claim the next ready Wave 1 issue and continue.
 

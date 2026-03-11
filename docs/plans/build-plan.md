@@ -244,7 +244,9 @@ Per-NIP audit steps:
 7. Update canonical docs only where policy, accepted behavior, or current status changed; keep the
    remaining audit evidence in the beads issue and update the consolidated audit report in
    `docs/plans/implemented-nip-audit-report.md`.
-8. Close the audit issue only when findings, evidence classes, outcome, and any follow-up items are
+8. Create one local git commit scoped to the completed audit item after post-Review-B green gates
+   and canonical doc updates are in place.
+9. Close the audit issue only when findings, evidence classes, outcome, and any follow-up items are
    all recorded explicitly.
 
 Audit quality rules:
@@ -254,6 +256,8 @@ Audit quality rules:
 - "No issue found" is recorded explicitly when that is the result.
 - Every implemented NIP audit must record both `rust-nostr` and `nostr-tools` evidence status,
   even when one of them is only `SOURCE_REVIEW_ONLY`.
+- Every completed implemented-NIP audit that changes code or canonical docs must land as its own
+  local git commit before the next NIP audit begins.
 
 Consolidated audit artifact:
 - `docs/plans/implemented-nip-audit-report.md` is the canonical summary for audit findings,
