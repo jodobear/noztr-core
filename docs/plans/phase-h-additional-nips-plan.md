@@ -202,6 +202,8 @@ frozen defaults or the current deterministic-and-compatible Layer 1 kernel postu
         NIP-44 payload framing
       - explicit `result: null` is now preserved for valid `switch_relays` responses instead of
         being collapsed into the same state as an omitted `result` field
+      - typed parsed-request helpers now cover `connect`, `sign_event`, the current
+        pubkey-plus-text methods, and zero-param commands
       - typed result helpers now cover `connect`, `get_public_key`, `sign_event`, and
         `switch_relays`
       - executed overlap evidence is now in place for both active reference lanes:
@@ -211,8 +213,8 @@ frozen defaults or the current deterministic-and-compatible Layer 1 kernel postu
         `metadata=` client-URI shape and omits `switch_relays`, while `noztr` follows the current
         split-query URI and method surface that matches `nostr-tools`
     - still pending inside the active Wave 2 item:
-      - any additional typed request builders or broader discovery helpers beyond the current
-        bounded core and result-helper surface
+      - any optional typed request builders beyond the current typed-parse/result-helper surface
+      - any broader discovery helpers for the appendix `nostrconnect_url` / NIP-89 surfaces
 
 ## NIP-06 Phase H Boundary Scope
 

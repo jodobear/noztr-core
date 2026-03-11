@@ -63,6 +63,19 @@ pub const Permission = struct {
     scope: PermissionScope = .none,
 };
 
+/// Typed `connect` request parameters.
+pub const ConnectRequest = struct {
+    remote_signer_pubkey: [32]u8,
+    secret: ?[]const u8 = null,
+    requested_permissions: []const Permission = &.{},
+};
+
+/// Typed pubkey-plus-text request parameters.
+pub const PubkeyTextRequest = struct {
+    pubkey: [32]u8,
+    text: []const u8,
+};
+
 pub const Request = struct {
     id: []const u8,
     method: RemoteSigningMethod,
@@ -90,6 +103,19 @@ pub const Response = struct {
 pub const ConnectResult = union(enum) {
     ack,
     secret_echo: []const u8,
+};
+
+/// Typed request view over the bounded NIP-46 method set.
+pub const ParsedRequest = union(enum) {
+    connect: ConnectRequest,
+    sign_event_json: []const u8,
+    ping,
+    get_public_key,
+    nip04_encrypt: PubkeyTextRequest,
+    nip04_decrypt: PubkeyTextRequest,
+    nip44_encrypt: PubkeyTextRequest,
+    nip44_decrypt: PubkeyTextRequest,
+    switch_relays,
 };
 
 pub const Message = union(enum) {
@@ -279,6 +305,28 @@ pub fn request_validate(request: *const Request, scratch: std.mem.Allocator) Nip
             try validate_pubkey_text_params(request.params);
         },
     }
+}
+
+/// Parse a validated request into typed method-specific parameters.
+pub fn request_parse_typed(
+    request: *const Request,
+    scratch: std.mem.Allocator,
+) Nip46Error!ParsedRequest {
+    std.debug.assert(@intFromPtr(request) != 0);
+    std.debug.assert(@intFromPtr(scratch.ptr) != 0);
+
+    try request_validate(request, scratch);
+    return switch (request.method) {
+        .connect => .{ .connect = try parse_typed_connect_request(request.params, scratch) },
+        .sign_event => .{ .sign_event_json = request.params[0] },
+        .ping => .ping,
+        .get_public_key => .get_public_key,
+        .nip04_encrypt => .{ .nip04_encrypt = try parse_pubkey_text_request(request.params) },
+        .nip04_decrypt => .{ .nip04_decrypt = try parse_pubkey_text_request(request.params) },
+        .nip44_encrypt => .{ .nip44_encrypt = try parse_pubkey_text_request(request.params) },
+        .nip44_decrypt => .{ .nip44_decrypt = try parse_pubkey_text_request(request.params) },
+        .switch_relays => .switch_relays,
+    };
 }
 
 pub fn response_validate(
@@ -706,6 +754,25 @@ fn validate_connect_params(
     }
 }
 
+fn parse_typed_connect_request(
+    params: []const []const u8,
+    scratch: std.mem.Allocator,
+) Nip46Error!ConnectRequest {
+    std.debug.assert(params.len <= limits.nip46_message_params_max);
+    std.debug.assert(@intFromPtr(scratch.ptr) != 0);
+
+    var parsed = ConnectRequest{
+        .remote_signer_pubkey = parse_lower_hex_32(params[0]) catch return error.InvalidPubkey,
+    };
+    if (params.len >= 2) {
+        parsed.secret = params[1];
+    }
+    if (params.len == 3) {
+        parsed.requested_permissions = try parse_permissions_csv(params[2], scratch);
+    }
+    return parsed;
+}
+
 fn validate_sign_event_params(
     params: []const []const u8,
     scratch: std.mem.Allocator,
@@ -739,6 +806,16 @@ fn validate_pubkey_text_params(params: []const []const u8) Nip46Error!void {
     if (!std.unicode.utf8ValidateSlice(params[1])) {
         return error.InvalidParam;
     }
+}
+
+fn parse_pubkey_text_request(params: []const []const u8) Nip46Error!PubkeyTextRequest {
+    std.debug.assert(params.len <= limits.nip46_message_params_max);
+    std.debug.assert(limits.pubkey_hex_length == 64);
+
+    return .{
+        .pubkey = parse_lower_hex_32(params[0]) catch return error.InvalidPubkey,
+        .text = params[1],
+    };
 }
 
 fn validate_response_result(
@@ -1658,6 +1735,46 @@ test "request validation enforces current NIP-46 method contracts" {
         .params = &.{"extra"},
     };
     try std.testing.expectError(error.InvalidRequest, request_validate(&bad_ping, arena.allocator()));
+}
+
+test "typed request parsing exposes current NIP-46 method params" {
+    var arena = std.heap.ArenaAllocator.init(std.testing.allocator);
+    defer arena.deinit();
+
+    const connect_request = Request{
+        .id = "typed-1",
+        .method = .connect,
+        .params = &.{
+            "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+            "secret",
+            "sign_event:1,ping",
+        },
+    };
+    const connect = try request_parse_typed(&connect_request, arena.allocator());
+    try std.testing.expect(connect == .connect);
+    try std.testing.expectEqual(@as(usize, 2), connect.connect.requested_permissions.len);
+    try std.testing.expectEqualStrings("secret", connect.connect.secret.?);
+
+    const encrypt_request = Request{
+        .id = "typed-2",
+        .method = .nip44_encrypt,
+        .params = &.{
+            "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "hello",
+        },
+    };
+    const encrypt = try request_parse_typed(&encrypt_request, arena.allocator());
+    try std.testing.expect(encrypt == .nip44_encrypt);
+    try std.testing.expectEqualStrings("hello", encrypt.nip44_encrypt.text);
+
+    const switch_relays_request = Request{
+        .id = "typed-3",
+        .method = .switch_relays,
+        .params = &.{},
+    };
+    try std.testing.expect(
+        (try request_parse_typed(&switch_relays_request, arena.allocator())) == .switch_relays,
+    );
 }
 
 test "response validation covers ping and signed-event results" {

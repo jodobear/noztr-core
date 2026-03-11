@@ -185,6 +185,8 @@ the validated maintenance baseline.
       NIP-44 payload framing validation
     - explicit `result: null` preservation for valid `switch_relays` responses instead of
       collapsing `null` into an omitted result field
+    - typed parsed-request helpers for `connect`, `sign_event`, the current
+      pubkey-plus-text methods, and zero-param commands
     - typed result helpers for `connect`, `get_public_key`, `sign_event`, and
       `switch_relays`
   - parity/evidence status:
@@ -194,8 +196,8 @@ the validated maintenance baseline.
       `metadata=` client-URI shape and lacks `switch_relays`, while `noztr` and
       `nostr-tools` follow the current split-query URI and method surface
   - current deferred scope inside the active Wave 2 item:
-    - any additional typed request builders or broader discovery helpers beyond the current
-      bounded core and result-helper surface
+    - any optional typed request builders beyond the current typed-parse/result-helper surface
+    - any broader discovery helpers for the appendix `nostrconnect_url` / NIP-89 surfaces
 
 ## Immediate Work Tracks
 
