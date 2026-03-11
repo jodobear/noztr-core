@@ -200,8 +200,13 @@ frozen defaults or the current deterministic-and-compatible Layer 1 kernel postu
         the older rust `metadata=` shape
       - strict kind-24133 event-envelope validation requires exactly one `p` tag target and valid
         NIP-44 payload framing
+      - executed overlap evidence is now in place for both active reference lanes:
+        - `rust-nostr`: `HARNESS_COVERED`, `BASELINE`, `PASS`
+        - `nostr-tools`: `HARNESS_COVERED`, `BASELINE`, `PASS`
+      - accepted current-spec divergence: the pinned rust lane still exposes the older
+        `metadata=` client-URI shape and omits `switch_relays`, while `noztr` follows the current
+        split-query URI and method surface that matches `nostr-tools`
     - still pending inside the active Wave 2 item:
-      - parity harness/source coverage against `rust-nostr` overlap and `nostr-tools`
       - any decision to add richer typed wrappers for `sign_event` and `switch_relays`
 
 ## NIP-06 Phase H Boundary Scope

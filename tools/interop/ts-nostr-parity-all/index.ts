@@ -16,6 +16,7 @@ import * as nip25 from "nostr-tools/nip25";
 import * as nip30 from "nostr-tools/nip30";
 import { makeAuthEvent } from "nostr-tools/nip42";
 import { decrypt, encrypt } from "nostr-tools/nip44";
+import * as nip46 from "nostr-tools/nip46";
 import * as nip10 from "nostr-tools/nip10";
 import { parse as parseNostrUri } from "nostr-tools/nip21";
 import * as nip27 from "nostr-tools/nip27";
@@ -673,6 +674,71 @@ function check_nip44(): void {
     }
 }
 
+async function check_nip46(): Promise<void> {
+    const pubkey =
+        "b889ff5b1513b641e2a139f661a661364979c5beee91842f8f0ef42ab558e9d4";
+    const bunker = nip46.toBunkerURL({
+        pubkey,
+        relays: ["wss://relay.one", "wss://relay.two"],
+        secret: "abcd",
+    });
+    ensure(
+        bunker ===
+            "bunker://b889ff5b1513b641e2a139f661a661364979c5beee91842f8f0ef42ab558e9d4" +
+                "?relay=wss%3A%2F%2Frelay.one&relay=wss%3A%2F%2Frelay.two&secret=abcd",
+        "NIP-46 bunker URL serialization mismatch",
+    );
+
+    const parsed_bunker = await nip46.parseBunkerInput(bunker);
+    ensure(parsed_bunker !== null, "NIP-46 bunker URL parse returned null");
+    ensure(parsed_bunker?.pubkey === pubkey, "NIP-46 bunker pubkey mismatch");
+    ensure(
+        JSON.stringify(parsed_bunker?.relays) === JSON.stringify(["wss://relay.one", "wss://relay.two"]),
+        "NIP-46 bunker relay list mismatch",
+    );
+    ensure(parsed_bunker?.secret === "abcd", "NIP-46 bunker secret mismatch");
+
+    const client_uri = nip46.createNostrConnectURI({
+        clientPubkey: pubkey,
+        relays: ["wss://relay.one", "wss://relay.two"],
+        secret: "mysecret",
+        perms: ["sign_event:1", "ping"],
+        name: "My Client",
+        url: "https://client.example",
+        image: "https://client.example/app.png",
+    });
+    ensure(
+        client_uri.startsWith(`nostrconnect://${pubkey}?relay=wss%3A%2F%2Frelay.one`),
+        "NIP-46 client URI relay prefix mismatch",
+    );
+    ensure(
+        client_uri.includes("&relay=wss%3A%2F%2Frelay.two"),
+        "NIP-46 client URI missing second relay",
+    );
+    ensure(
+        client_uri.includes("&secret=mysecret"),
+        "NIP-46 client URI missing secret",
+    );
+    ensure(
+        client_uri.includes("&perms=sign_event%3A1%2Cping"),
+        "NIP-46 client URI missing perms",
+    );
+    ensure(client_uri.includes("&name=My+Client"), "NIP-46 client URI missing name");
+    ensure(
+        client_uri.includes("&url=https%3A%2F%2Fclient.example"),
+        "NIP-46 client URI missing url",
+    );
+    ensure(
+        client_uri.includes("&image=https%3A%2F%2Fclient.example%2Fapp.png"),
+        "NIP-46 client URI missing image",
+    );
+
+    ensure(
+        typeof nip46.BunkerSigner.prototype.switchRelays === "function",
+        "NIP-46 BunkerSigner missing switchRelays method",
+    );
+}
+
 function check_nip59(): void {
     const sender_private = to_bytes_32(FIXED_SECRET_KEY_HEX);
     const receiver_private = to_bytes_32(
@@ -954,6 +1020,7 @@ async function main(): Promise<void> {
     await push_harness_covered(results, "NIP-21", "EDGE", check_nip21);
     await push_harness_covered(results, "NIP-42", "EDGE", check_nip42);
     await push_harness_covered(results, "NIP-44", "DEEP", check_nip44);
+    await push_harness_covered(results, "NIP-46", "BASELINE", check_nip46);
     await push_harness_covered(results, "NIP-59", "EDGE", check_nip59);
     await push_harness_covered(results, "NIP-65", "BASELINE", check_nip65);
     await push_harness_covered(results, "NIP-77", "EDGE", check_nip77);

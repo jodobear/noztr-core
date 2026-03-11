@@ -78,6 +78,13 @@ Release-facing note for behavior differences that are intentional in `noztr` Lay
   `noztr` can emit the optional fourth-slot NIP-30 emoji-set coordinate on `emoji` tags, while
   `rust-nostr` standardizes only the three-item shape. This is a spec-driven builder enhancement,
   not a parsing-default change.
+- **NIP-46 current-spec client URI and method surface:**
+  `noztr` follows the current NIP-46 `nostrconnect://` query shape with split parameters
+  (`relay`, `secret`, `perms`, `name`, `url`, `image`) and supports `switch_relays` in the
+  bounded core method surface. `nostr-tools` matches that current-spec shape, while the pinned
+  `rust-nostr` lane still exposes the older `metadata=` client-URI shape and does not yet expose
+  `switch_relays` in its method enum. `noztr` keeps the current-spec surface instead of narrowing
+  itself to the stale Rust overlap.
 
 ## Interoperability impact and migration guidance
 

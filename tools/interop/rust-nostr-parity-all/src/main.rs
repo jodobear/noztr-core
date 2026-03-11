@@ -16,6 +16,7 @@ use nostr::nips::nip21::{Nip21, ToNostrUri};
 use nostr::nips::nip22::{self, CommentTarget as Nip22CommentTarget};
 use nostr::nips::nip42;
 use nostr::nips::nip44::v2::{decrypt_to_bytes, encrypt_to_bytes_with_rng, ConversationKey};
+use nostr::nips::nip46::{NostrConnectMessage, NostrConnectMethod, NostrConnectURI};
 use nostr::nips::nip51::{ArticlesCuration, Bookmarks, Emojis, Interests, MuteList};
 use nostr::nips::nip59::{self, UnwrappedGift};
 use nostr::nips::nip65::{self, RelayMetadata};
@@ -1259,6 +1260,66 @@ fn check_nip44() -> Result<(), String> {
     Ok(())
 }
 
+fn check_nip46() -> Result<(), String> {
+    let bunker_uri = NostrConnectURI::parse(
+        "bunker://b889ff5b1513b641e2a139f661a661364979c5beee91842f8f0ef42ab558e9d4?relay=wss://relay.damus.io&secret=abcd",
+    )
+    .map_err(|e| format!("nip46 bunker uri parse: {e}"))?;
+    if bunker_uri.to_string() != "bunker://b889ff5b1513b641e2a139f661a661364979c5beee91842f8f0ef42ab558e9d4?relay=wss://relay.damus.io&secret=abcd" {
+        return Err("nip46 bunker uri roundtrip mismatch".to_string());
+    }
+
+    let client_uri = NostrConnectURI::parse(
+        r#"nostrconnect://b889ff5b1513b641e2a139f661a661364979c5beee91842f8f0ef42ab558e9d4?metadata={"name":"Example"}&relay=wss://relay.damus.io&secret=mysecret"#,
+    )
+    .map_err(|e| format!("nip46 client uri parse: {e}"))?;
+    let client_uri_text = client_uri.to_string();
+    if !client_uri_text.starts_with("nostrconnect://b889ff5b1513b641e2a139f661a661364979c5beee91842f8f0ef42ab558e9d4?metadata=") {
+        return Err("nip46 client uri missing rust metadata field".to_string());
+    }
+    if !client_uri_text.contains("&relay=wss://relay.damus.io") {
+        return Err("nip46 client uri missing relay query".to_string());
+    }
+
+    let request = NostrConnectMessage::Request {
+        id: String::from("3047714669"),
+        method: NostrConnectMethod::SignEvent,
+        params: vec![String::from(
+            "{\"id\":\"236ad3390704e1bf435f40143fb3de163723aeaa8f25c3bf12a0ac4d9a4b56a7\",\"pubkey\":\"79dff8f82963424e0bb02708a22e44b4980893e3a4be0fa3cb60a43b946764e3\",\"created_at\":1710854115,\"kind\":1,\"tags\":[],\"content\":\"Testing rust-nostr NIP46 signer [bunker]\"}",
+        )],
+    };
+    let request_json = request.as_json();
+    let request_back =
+        NostrConnectMessage::from_json(&request_json).map_err(|e| format!("nip46 request parse: {e}"))?;
+    if request_back != request {
+        return Err("nip46 request message roundtrip mismatch".to_string());
+    }
+
+    let response_json = r#"{"id":"2581081643","result":"pong","error":null}"#;
+    let response = NostrConnectMessage::from_json(response_json)
+        .map_err(|e| format!("nip46 response parse: {e}"))?;
+    match response {
+        NostrConnectMessage::Response { id, result, error } => {
+            if id != "2581081643" {
+                return Err("nip46 response id mismatch".to_string());
+            }
+            if result.as_deref() != Some("pong") {
+                return Err("nip46 response result mismatch".to_string());
+            }
+            if error.is_some() {
+                return Err("nip46 response error mismatch".to_string());
+            }
+        }
+        _ => return Err("nip46 response parsed as request".to_string()),
+    }
+
+    if NostrConnectMethod::from_str("switch_relays").is_ok() {
+        return Err("nip46 rust method set unexpectedly includes switch_relays".to_string());
+    }
+
+    Ok(())
+}
+
 async fn check_nip59() -> Result<(), String> {
     let sender = Keys::parse("6b911fd37cdf5c81d4c0adb1ab7fa822ed253ab0ad9aa18d77257c88b29b718e")
         .map_err(|e| format!("sender key parse: {e}"))?;
@@ -1721,6 +1782,7 @@ async fn main() {
     push_harness_covered(&mut results, "NIP-51", Depth::Deep, check_nip51());
     push_harness_covered(&mut results, "NIP-42", Depth::Deep, check_nip42());
     push_harness_covered(&mut results, "NIP-44", Depth::Deep, check_nip44());
+    push_harness_covered(&mut results, "NIP-46", Depth::Baseline, check_nip46());
     push_harness_covered(&mut results, "NIP-59", Depth::Deep, check_nip59().await);
     push_harness_covered(&mut results, "NIP-65", Depth::Deep, check_nip65());
 

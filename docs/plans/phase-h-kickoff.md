@@ -183,8 +183,13 @@ the validated maintenance baseline.
     - current-spec `bunker://` and `nostrconnect://` URI parse/compose
     - strict kind-24133 event-envelope validation with exact single-`p` targeting and
       NIP-44 payload framing validation
+  - parity/evidence status:
+    - rust parity overlap is now `HARNESS_COVERED`, `BASELINE`, `PASS`
+    - TypeScript audit overlap is now `HARNESS_COVERED`, `BASELINE`, `PASS`
+    - current intentional divergence: pinned `rust-nostr` still uses the older
+      `metadata=` client-URI shape and lacks `switch_relays`, while `noztr` and
+      `nostr-tools` follow the current split-query URI and method surface
   - current deferred scope inside the active Wave 2 item:
-    - rust / `nostr-tools` parity harness coverage
     - any additional typed convenience wrappers beyond the current generic core surface
     - decision on whether to expose richer typed `sign_event` / `switch_relays` result wrappers
 

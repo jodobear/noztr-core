@@ -128,17 +128,17 @@ Current project context for the Phase H kickoff baseline.
 ## Active Parity Gate
 
 - Active lane: rust only (`tools/interop/rust-nostr-parity-all`).
-- Current rust status: `22/22 HARNESS_COVERED`, `DEEP`, `PASS`.
-- Current TS audit status: `20/20 HARNESS_COVERED`, mixed `BASELINE/EDGE/DEEP`, `PASS`
+- Current rust status: `23/23 HARNESS_COVERED`, mixed `BASELINE/DEEP`, `PASS`.
+- Current TS audit status: `21/21 HARNESS_COVERED`, mixed `BASELINE/EDGE/DEEP`, `PASS`
   (`tools/interop/ts-nostr-parity-all`; non-gating audit evidence lane).
 - Baseline cadence run (2026-03-09): rust parity harness passed
   (`SUMMARY pass=16 fail=0 harness_covered=16 total=16`).
 - Latest cadence run (2026-03-10): rust parity harness passed
   (`SUMMARY pass=22 fail=0 harness_covered=22 total=22`).
 - Latest cadence run (2026-03-11): rust parity harness passed
-  (`SUMMARY pass=22 fail=0 harness_covered=22 total=22`).
+  (`SUMMARY pass=23 fail=0 harness_covered=23 total=23`).
 - Latest cadence run (2026-03-11): TS audit harness passed
-  (`SUMMARY pass=20 fail=0 harness_covered=20 total=20`).
+  (`SUMMARY pass=21 fail=0 harness_covered=21 total=21`).
 - Latest cadence run (2026-03-11): `zig build test --summary all` passed
   (`Build Summary: 8/8 steps succeeded; 592/592 tests passed`).
 - Latest cadence run (2026-03-11): `zig build` passed.
@@ -186,8 +186,13 @@ Current project context for the Phase H kickoff baseline.
    - `src/nip46_remote_signing.zig` now covers method parsing, permission parsing/formatting,
      JSON request/response parse+compose, current-spec `bunker://` and `nostrconnect://`
      URI parse+compose, and strict kind-24133 envelope validation.
+   Completed evidence:
+   - rust overlap parity is now `HARNESS_COVERED`, `BASELINE`, `PASS`
+   - TypeScript overlap evidence is now `HARNESS_COVERED`, `BASELINE`, `PASS`
+   - pinned `rust-nostr` still uses the older `metadata=` client-URI shape and omits
+     `switch_relays`; `noztr` keeps the current-spec split-query URI and method surface that
+     matches `nostr-tools`
    Remaining Wave 2 work:
-   - add parity evidence against `rust-nostr` overlap and `nostr-tools`
    - decide whether to expose richer typed convenience wrappers beyond the current generic core
      message/result surface
    - update tracker state when `bd` localhost access is available again in-session
