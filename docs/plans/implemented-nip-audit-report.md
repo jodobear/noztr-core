@@ -53,7 +53,7 @@ completes.
 | 51 | complete | `HARNESS_COVERED DEEP PASS` | `SOURCE_REVIEW_ONLY no dedicated NIP-51 helper beyond kind constants` | Widened bookmark extraction to accept bounded hashtag/URL items and changed unrelated unknown tags from fatal to ignored; kept typed failures for malformed supported tags and coordinate-kind enforcement | none | none | `rust-nostr` bookmark builders were broader than the old parser; `nostr-tools` provides kind-level signal only in this pass |
 | 59 | complete | `HARNESS_COVERED DEEP PASS` | `HARNESS_COVERED EDGE PASS` | No Layer 1 change required; current staged wrap->seal->rumor validation remains justified and compatible | none | none | Wrap-kind, signed-seal, unsigned-rumor, sender-continuity, and decrypt-failure boundaries all match the protocol intent; the audit found no evidence-backed relaxation that would improve compatibility without weakening trust checks |
 | 65 | complete | `HARNESS_COVERED DEEP PASS` | `HARNESS_COVERED BASELINE PASS` | Ignore unrelated foreign tags during relay extraction while keeping malformed `r` relay tags strict | none | none | `rust-nostr` extraction tolerates surrounding non-relay tags and yields only valid relay entries; `nostr-tools` remains builder-only signal in this pass |
-| 70 | pending | - | - | - | - | - | - |
+| 70 | complete | `HARNESS_COVERED DEEP PASS` | `HARNESS_COVERED EDGE PASS` | No Layer 1 change required; exact one-item `["-"]` protected-tag semantics remain correct and compatible | none | none | The NIP and both reference lanes treat only the exact single-item `["-"]` tag as protected; malformed lookalikes remain safely ignored |
 | 77 | pending | - | - | - | - | - | - |
 
 ## Decision Summary
@@ -86,6 +86,8 @@ completes.
   continuity checks.
 - NIP-65: ignore unrelated foreign tags during relay extraction, while keeping malformed supported
   `r` tags, malformed relay URLs, and invalid markers as typed failures.
+- NIP-70: no Layer 1 change required; keep exact one-item `["-"]` protected-tag semantics and
+  ignore malformed lookalike tags.
 - NIP-18: reject contradictory repost target metadata when empty-content reposts cannot prove the
   target via embedded JSON, while retaining current embedded-event consistency checks and the kind-6
   relay-hint requirement.

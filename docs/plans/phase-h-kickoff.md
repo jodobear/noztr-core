@@ -148,6 +148,9 @@ the validated maintenance baseline.
     supported `r` tags, malformed relay URLs, and invalid markers as typed failures; this matches
     the accepted posture of staying deterministic and bounded without turning irrelevant metadata
     into whole-helper incompatibility
+  - `NIP-70` required no Layer 1 change; the current exact one-item `["-"]` protected-tag
+    semantics already match the NIP and both reference lanes, while malformed lookalikes remain
+    safely ignored rather than being treated as canonical protection markers
   - `NIP-18` now rejects contradictory optional repost target metadata without embedded-event proof;
     existing embedded-event consistency checks remain intact
   - `NIP-25` now accepts the optional NIP-30 emoji-set coordinate on reaction `emoji` tags; strict
