@@ -140,7 +140,7 @@ Current project context for the Phase H kickoff baseline.
 - Latest cadence run (2026-03-11): TS audit harness passed
   (`SUMMARY pass=21 fail=0 harness_covered=21 total=21`).
 - Latest cadence run (2026-03-11): `zig build test --summary all` passed
-  (`Build Summary: 8/8 steps succeeded; 624/624 tests passed`).
+  (`Build Summary: 8/8 steps succeeded; 628/628 tests passed`).
 - Latest cadence run (2026-03-11): `zig build` passed.
 - Active cadence commands:
   - `cargo run --manifest-path tools/interop/rust-nostr-parity-all/Cargo.toml`
@@ -190,6 +190,8 @@ Current project context for the Phase H kickoff baseline.
      being collapsed into the same state as an omitted `result` field.
    - typed parsed-request helpers now cover `connect`, `sign_event`, the current
      pubkey-plus-text methods, and zero-param commands.
+   - direct typed request builders now cover `connect`, `sign_event`, the current
+     pubkey-plus-text methods, and zero-param commands.
    - typed result helpers now cover `connect`, `get_public_key`, `sign_event`, and
      `switch_relays`.
    - appendix discovery helpers now parse signer `nostr.json?name=_` NIP-46 discovery data and
@@ -203,8 +205,6 @@ Current project context for the Phase H kickoff baseline.
      `switch_relays`; `noztr` keeps the current-spec split-query URI and method surface that
      matches `nostr-tools`
    Remaining Wave 2 work:
-   - decide whether to add optional typed request builders beyond the current typed-parse and
-     result-helper surface
    - decide whether optional `nostrconnect_url` redirect/template rendering belongs in this module
      or should stay deferred as app-flow logic
    - update tracker state when `bd` localhost access is available again in-session

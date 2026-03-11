@@ -159,6 +159,7 @@ test "root exports limits and error namespaces" {
     try std.testing.expect(@TypeOf(nip51_lists.ListItem) == type);
     try std.testing.expect(@TypeOf(nip46_remote_signing.ConnectRequest) == type);
     try std.testing.expect(@TypeOf(nip46_remote_signing.PubkeyTextRequest) == type);
+    try std.testing.expect(@TypeOf(nip46_remote_signing.BuiltRequest) == type);
     try std.testing.expect(@TypeOf(nip46_remote_signing.ConnectResult) == type);
     try std.testing.expect(@TypeOf(nip46_remote_signing.ParsedRequest) == type);
     try std.testing.expect(@TypeOf(nip46_remote_signing.DiscoveryInfo) == type);
@@ -272,6 +273,43 @@ test "root exports limits and error namespaces" {
                 *const nip46_remote_signing.Request,
                 std.mem.Allocator,
             ) nip46_remote_signing.Nip46Error!nip46_remote_signing.ParsedRequest,
+    );
+    try std.testing.expect(
+        @TypeOf(nip46_remote_signing.request_build_connect) ==
+            fn (
+                *nip46_remote_signing.BuiltRequest,
+                []const u8,
+                *const nip46_remote_signing.ConnectRequest,
+                std.mem.Allocator,
+            ) nip46_remote_signing.Nip46Error!nip46_remote_signing.Request,
+    );
+    try std.testing.expect(
+        @TypeOf(nip46_remote_signing.request_build_sign_event) ==
+            fn (
+                *nip46_remote_signing.BuiltRequest,
+                []const u8,
+                []const u8,
+                std.mem.Allocator,
+            ) nip46_remote_signing.Nip46Error!nip46_remote_signing.Request,
+    );
+    try std.testing.expect(
+        @TypeOf(nip46_remote_signing.request_build_pubkey_text) ==
+            fn (
+                *nip46_remote_signing.BuiltRequest,
+                []const u8,
+                nip46_remote_signing.RemoteSigningMethod,
+                *const nip46_remote_signing.PubkeyTextRequest,
+                std.mem.Allocator,
+            ) nip46_remote_signing.Nip46Error!nip46_remote_signing.Request,
+    );
+    try std.testing.expect(
+        @TypeOf(nip46_remote_signing.request_build_empty) ==
+            fn (
+                *nip46_remote_signing.BuiltRequest,
+                []const u8,
+                nip46_remote_signing.RemoteSigningMethod,
+                std.mem.Allocator,
+            ) nip46_remote_signing.Nip46Error!nip46_remote_signing.Request,
     );
     try std.testing.expect(
         @TypeOf(nip46_remote_signing.uri_parse) ==

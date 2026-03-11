@@ -88,6 +88,25 @@ pub const Request = struct {
     params: []const []const u8,
 };
 
+pub const BuiltRequest = struct {
+    params: [3][]const u8 = undefined,
+    pubkey_hex: [limits.pubkey_hex_length]u8 = undefined,
+    text_storage: [limits.tag_item_bytes_max]u8 = undefined,
+    param_count: u8 = 0,
+
+    /// Returns the built request view backed by this buffer.
+    pub fn as_request(self: *const BuiltRequest, id: []const u8, method: RemoteSigningMethod) Request {
+        std.debug.assert(self.param_count <= self.params.len);
+        std.debug.assert(id.len <= limits.nip46_message_id_bytes_max);
+
+        return .{
+            .id = id,
+            .method = method,
+            .params = self.params[0..self.param_count],
+        };
+    }
+};
+
 pub const ResponseResult = union(enum) {
     text: []const u8,
     relay_list: []const []const u8,
@@ -339,6 +358,98 @@ pub fn request_parse_typed(
         .nip44_decrypt => .{ .nip44_decrypt = try parse_pubkey_text_request(request.params) },
         .switch_relays => .switch_relays,
     };
+}
+
+/// Build a typed `connect` request using caller-provided id storage.
+pub fn request_build_connect(
+    output: *BuiltRequest,
+    id: []const u8,
+    request: *const ConnectRequest,
+    scratch: std.mem.Allocator,
+) Nip46Error!Request {
+    std.debug.assert(@intFromPtr(output) != 0);
+    std.debug.assert(@intFromPtr(request) != 0);
+    std.debug.assert(@intFromPtr(scratch.ptr) != 0);
+
+    output.pubkey_hex = std.fmt.bytesToHex(request.remote_signer_pubkey, .lower);
+    output.params[0] = output.pubkey_hex[0..];
+    output.param_count = 1;
+    if (request.secret) |secret| {
+        output.params[1] = secret;
+        output.param_count = 2;
+    }
+    if (request.requested_permissions.len != 0) {
+        output.params[2] = try join_permissions(
+            output.text_storage[0..],
+            request.requested_permissions,
+        );
+        output.param_count = 3;
+    }
+    const built = output.as_request(id, .connect);
+    try request_validate(&built, scratch);
+    return built;
+}
+
+/// Build a typed `sign_event` request using caller-provided unsigned event JSON.
+pub fn request_build_sign_event(
+    output: *BuiltRequest,
+    id: []const u8,
+    unsigned_event_json: []const u8,
+    scratch: std.mem.Allocator,
+) Nip46Error!Request {
+    std.debug.assert(@intFromPtr(output) != 0);
+    std.debug.assert(@intFromPtr(scratch.ptr) != 0);
+    std.debug.assert(unsigned_event_json.len <= limits.event_json_max);
+
+    output.params[0] = unsigned_event_json;
+    output.param_count = 1;
+    const built = output.as_request(id, .sign_event);
+    try request_validate(&built, scratch);
+    return built;
+}
+
+/// Build a typed pubkey-plus-text request for the current encrypt/decrypt methods.
+pub fn request_build_pubkey_text(
+    output: *BuiltRequest,
+    id: []const u8,
+    method: RemoteSigningMethod,
+    request: *const PubkeyTextRequest,
+    scratch: std.mem.Allocator,
+) Nip46Error!Request {
+    std.debug.assert(@intFromPtr(output) != 0);
+    std.debug.assert(@intFromPtr(request) != 0);
+    std.debug.assert(@intFromPtr(scratch.ptr) != 0);
+
+    if (!method_is_pubkey_text(method)) {
+        return error.InvalidMethod;
+    }
+    output.pubkey_hex = std.fmt.bytesToHex(request.pubkey, .lower);
+    output.params[0] = output.pubkey_hex[0..];
+    output.params[1] = request.text;
+    output.param_count = 2;
+    const built = output.as_request(id, method);
+    try request_validate(&built, scratch);
+    return built;
+}
+
+/// Build a typed zero-param request for `ping`, `get_public_key`, or `switch_relays`.
+pub fn request_build_empty(
+    output: *BuiltRequest,
+    id: []const u8,
+    method: RemoteSigningMethod,
+    scratch: std.mem.Allocator,
+) Nip46Error!Request {
+    std.debug.assert(@intFromPtr(output) != 0);
+    std.debug.assert(@intFromPtr(scratch.ptr) != 0);
+    std.debug.assert(@intFromEnum(method) <= @intFromEnum(RemoteSigningMethod.switch_relays));
+
+    if (!method_is_zero_param(method)) {
+        return error.InvalidMethod;
+    }
+    output.param_count = 0;
+    const built = output.as_request(id, method);
+    try request_validate(&built, scratch);
+    return built;
 }
 
 pub fn response_validate(
@@ -1025,6 +1136,26 @@ fn validate_connect_params(
     if (params.len == 3) {
         _ = try parse_permissions_csv(params[2], scratch);
     }
+}
+
+fn method_is_pubkey_text(method: RemoteSigningMethod) bool {
+    std.debug.assert(@intFromEnum(method) <= @intFromEnum(RemoteSigningMethod.switch_relays));
+    std.debug.assert(@sizeOf(RemoteSigningMethod) > 0);
+
+    return switch (method) {
+        .nip04_encrypt, .nip04_decrypt, .nip44_encrypt, .nip44_decrypt => true,
+        else => false,
+    };
+}
+
+fn method_is_zero_param(method: RemoteSigningMethod) bool {
+    std.debug.assert(@intFromEnum(method) <= @intFromEnum(RemoteSigningMethod.switch_relays));
+    std.debug.assert(@sizeOf(RemoteSigningMethod) > 0);
+
+    return switch (method) {
+        .ping, .get_public_key, .switch_relays => true,
+        else => false,
+    };
 }
 
 fn parse_typed_connect_request(
@@ -2047,6 +2178,86 @@ test "typed request parsing exposes current NIP-46 method params" {
     };
     try std.testing.expect(
         (try request_parse_typed(&switch_relays_request, arena.allocator())) == .switch_relays,
+    );
+}
+
+test "typed request builders produce validated current method shapes" {
+    var arena = std.heap.ArenaAllocator.init(std.testing.allocator);
+    defer arena.deinit();
+
+    var connect_output: BuiltRequest = .{};
+    const connect_request = try request_build_connect(
+        &connect_output,
+        "build-1",
+        &.{
+            .remote_signer_pubkey = [_]u8{0x01} ** 32,
+            .secret = "secret",
+            .requested_permissions = &.{
+                .{ .method = .ping },
+                .{ .method = .sign_event, .scope = .{ .event_kind = 1 } },
+            },
+        },
+        arena.allocator(),
+    );
+    try std.testing.expectEqual(RemoteSigningMethod.connect, connect_request.method);
+    try std.testing.expectEqual(@as(usize, 3), connect_request.params.len);
+
+    var sign_output: BuiltRequest = .{};
+    const sign_request = try request_build_sign_event(
+        &sign_output,
+        "build-2",
+        "{\"kind\":1,\"content\":\"hello\",\"tags\":[],\"created_at\":1}",
+        arena.allocator(),
+    );
+    try std.testing.expectEqual(RemoteSigningMethod.sign_event, sign_request.method);
+    try std.testing.expectEqual(@as(usize, 1), sign_request.params.len);
+
+    var dm_output: BuiltRequest = .{};
+    const dm_request = try request_build_pubkey_text(
+        &dm_output,
+        "build-3",
+        .nip44_encrypt,
+        &.{
+            .pubkey = [_]u8{0xaa} ** 32,
+            .text = "hello",
+        },
+        arena.allocator(),
+    );
+    try std.testing.expectEqual(RemoteSigningMethod.nip44_encrypt, dm_request.method);
+    try std.testing.expectEqual(@as(usize, 2), dm_request.params.len);
+
+    var empty_output: BuiltRequest = .{};
+    const empty_request = try request_build_empty(
+        &empty_output,
+        "build-4",
+        .switch_relays,
+        arena.allocator(),
+    );
+    try std.testing.expectEqual(RemoteSigningMethod.switch_relays, empty_request.method);
+    try std.testing.expectEqual(@as(usize, 0), empty_request.params.len);
+}
+
+test "typed request builders reject mismatched method families" {
+    var arena = std.heap.ArenaAllocator.init(std.testing.allocator);
+    defer arena.deinit();
+
+    var output: BuiltRequest = .{};
+    try std.testing.expectError(
+        error.InvalidMethod,
+        request_build_pubkey_text(
+            &output,
+            "bad-1",
+            .connect,
+            &.{
+                .pubkey = [_]u8{0} ** 32,
+                .text = "hello",
+            },
+            arena.allocator(),
+        ),
+    );
+    try std.testing.expectError(
+        error.InvalidMethod,
+        request_build_empty(&output, "bad-2", .sign_event, arena.allocator()),
     );
 }
 

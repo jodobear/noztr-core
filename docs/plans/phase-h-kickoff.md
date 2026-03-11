@@ -187,6 +187,8 @@ the validated maintenance baseline.
       collapsing `null` into an omitted result field
     - typed parsed-request helpers for `connect`, `sign_event`, the current
       pubkey-plus-text methods, and zero-param commands
+    - direct typed request builders for `connect`, `sign_event`, the current
+      pubkey-plus-text methods, and zero-param commands
     - typed result helpers for `connect`, `get_public_key`, `sign_event`, and
       `switch_relays`
     - appendix discovery helpers for `nostr.json?name=_` NIP-46 discovery data and
@@ -200,7 +202,6 @@ the validated maintenance baseline.
       `metadata=` client-URI shape and lacks `switch_relays`, while `noztr` and
       `nostr-tools` follow the current split-query URI and method surface
   - current deferred scope inside the active Wave 2 item:
-    - any optional typed request builders beyond the current typed-parse/result-helper surface
     - any optional redirect/template rendering around `nostrconnect_url`, which remains app-flow
       logic rather than protocol-kernel parsing
 

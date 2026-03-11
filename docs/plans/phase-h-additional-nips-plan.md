@@ -204,6 +204,8 @@ frozen defaults or the current deterministic-and-compatible Layer 1 kernel postu
         being collapsed into the same state as an omitted `result` field
       - typed parsed-request helpers now cover `connect`, `sign_event`, the current
         pubkey-plus-text methods, and zero-param commands
+      - direct typed request builders now cover `connect`, `sign_event`, the current
+        pubkey-plus-text methods, and zero-param commands
       - typed result helpers now cover `connect`, `get_public_key`, `sign_event`, and
         `switch_relays`
       - appendix discovery helpers now parse signer `nostr.json?name=_` NIP-46 discovery
@@ -217,7 +219,6 @@ frozen defaults or the current deterministic-and-compatible Layer 1 kernel postu
         `metadata=` client-URI shape and omits `switch_relays`, while `noztr` follows the current
         split-query URI and method surface that matches `nostr-tools`
     - still pending inside the active Wave 2 item:
-      - any optional typed request builders beyond the current typed-parse/result-helper surface
       - any optional redirect/template rendering around `nostrconnect_url`, which remains
         app-flow logic rather than protocol-kernel parsing
 
