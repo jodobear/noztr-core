@@ -35,7 +35,7 @@ completes.
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | 01 | complete | `HARNESS_COVERED DEEP PASS` | `HARNESS_COVERED EDGE PASS` | Accepted uppercase single-letter `#X` filter keys; retained unknown filter-field rejection and prefixed rejection-status enforcement as accepted trust-boundary behavior | none | none | NIP-01 allows `a-zA-Z` tag-filter keys, and both reference lanes support uppercase matching; current unknown-field and status-prefix strictness remains more policyful but still spec-defensible |
 | 02 | complete | `HARNESS_COVERED DEEP PASS` | `HARNESS_COVERED BASELINE PASS` | No Layer 1 change required; valid relay-hint and petname shapes are already accepted | none | none | `rust-nostr` builders emit canonical `p` tags with optional relay and alias, but the available reference extraction surfaces are generic tag iterators rather than a dedicated strict contact-list helper |
-| 09 | pending | - | - | - | - | - | - |
+| 09 | complete | `HARNESS_COVERED DEEP PASS` | `HARNESS_COVERED BASELINE PASS` | Tightened `a`-target deletion parsing so only valid replaceable/addressable coordinates are accepted | none | none | `rust-nostr` models delete coordinates through the NIP-01 coordinate type; TS coverage remains baseline builder/tag-shape signal only in this pass |
 | 10 | complete | `HARNESS_COVERED DEEP PASS` | `HARNESS_COVERED EDGE PASS` | Removed unnecessary rejection of legacy `mention`; removed unnecessary rejection of four-slot pubkey fallback | none | `no-4iw` closed | `noztr` now preserves four-slot author pubkey; `nostr-tools` accepts the shape but drops author |
 | 11 | pending | - | - | - | - | - | - |
 | 13 | pending | - | - | - | - | - | - |
@@ -64,6 +64,8 @@ completes.
 - NIP-02: no Layer 1 change required; current contact extraction already accepts the valid relay
   hint and petname shapes called for by the NIP, and current stricter whole-tag validation remains
   acceptable on the evidence gathered in this pass.
+- NIP-09: reject syntactically valid but semantically invalid `a` delete targets by enforcing the
+  NIP-01 replaceable/addressable coordinate rules during delete-target extraction.
 - NIP-10: accept legacy `mention` tags as explicit mentions in thread extraction instead of failing
   the helper on that input.
 - NIP-10: accept four-slot `e` tags with a valid slot-four pubkey as bounded compatibility input

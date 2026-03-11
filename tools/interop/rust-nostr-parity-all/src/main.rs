@@ -398,6 +398,14 @@ fn check_nip09() -> Result<(), String> {
         return Err("malformed delete e tag unexpectedly parsed as event id".to_string());
     }
 
+    let invalid_coordinate = Coordinate::parse(
+        "20500:aa4fc8665f5696e33db7e1a572e3b0f5b3d615837b0f362dcb1c8068b098c7b4:",
+    )
+    .map_err(|e| format!("invalid coordinate parse: {e}"))?;
+    if invalid_coordinate.verify().is_ok() {
+        return Err("ephemeral delete coordinate unexpectedly verified".to_string());
+    }
+
     Ok(())
 }
 

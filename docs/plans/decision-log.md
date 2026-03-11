@@ -802,6 +802,24 @@ Immutable record of accepted planning decisions.
   harmful or ambiguous at the trust boundary despite their NIP-01 allowance.
 - Supersedes: none
 
+## D-045: Reject semantically invalid NIP-09 delete coordinates
+
+- Date: 2026-03-11
+- Status: accepted
+- Decision: tighten `nip09_delete` so `a` delete targets must satisfy the NIP-01 coordinate rules
+  for replaceable/addressable events, not merely the `<kind>:<pubkey>:<identifier>` string shape.
+  Ephemeral kinds, replaceable kinds with a non-empty identifier, and addressable kinds without an
+  identifier now fail as `InvalidAddressCoordinate`.
+- Why: deletion requests should not accept coordinate forms that the protocol itself does not treat
+  as valid event addresses, and allowing them created a correctness bug rather than useful
+  compatibility.
+- Tradeoff: stricter rejection of semantically invalid delete coordinates versus clearer and safer
+  delete-target semantics.
+- Related Tradeoff: T-0-001, T-0-003.
+- Reversal Trigger: future NIP guidance or strong ecosystem evidence establishes broader delete
+  coordinate semantics that remain unambiguous and safe.
+- Supersedes: none
+
 ## Phase Closure Evidence
 
 ### P0-E-001: Phase 0 closure record

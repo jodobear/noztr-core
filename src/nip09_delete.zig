@@ -204,7 +204,28 @@ fn parse_address_coordinate(
     parse_lower_hex_into_32(pubkey_text, &pubkey) catch {
         return error.InvalidAddressCoordinate;
     };
+    try validate_coordinate_kind(kind, identifier);
     return .{ .kind = kind, .pubkey = pubkey, .identifier = identifier };
+}
+
+fn validate_coordinate_kind(
+    kind: u32,
+    identifier: []const u8,
+) error{InvalidAddressCoordinate}!void {
+    std.debug.assert(kind <= std.math.maxInt(u32));
+    std.debug.assert(identifier.len <= limits.tag_item_bytes_max);
+
+    const is_replaceable = kind == 0 or kind == 3 or (kind >= 10_000 and kind < 20_000);
+    const is_addressable = kind >= 30_000 and kind < 40_000;
+    if (!is_replaceable and !is_addressable) {
+        return error.InvalidAddressCoordinate;
+    }
+    if (is_replaceable and identifier.len != 0) {
+        return error.InvalidAddressCoordinate;
+    }
+    if (is_addressable and identifier.len == 0) {
+        return error.InvalidAddressCoordinate;
+    }
 }
 
 fn parse_lower_hex_32(text: []const u8) error{InvalidHex}![32]u8 {
@@ -583,6 +604,61 @@ test "delete invalid vectors cover invalid coordinate and cross-author" {
     try std.testing.expectError(
         error.InvalidAddressCoordinate,
         deletion_can_apply(&bad_coord_event, &no_targets),
+    );
+
+    const a_ephemeral = [_][]const u8{
+        "a",
+        "20500:2222222222222222222222222222222222222222222222222222222222222222:",
+    };
+    const tags_ephemeral = [_]nip01_event.EventTag{.{ .items = a_ephemeral[0..] }};
+    const ephemeral_event = test_event(
+        delete_event_kind,
+        pubkey,
+        100,
+        [_]u8{0} ** 32,
+        tags_ephemeral[0..],
+    );
+    try std.testing.expectError(
+        error.InvalidAddressCoordinate,
+        delete_extract_targets(&ephemeral_event, out_one[0..]),
+    );
+
+    const a_replaceable_with_identifier = [_][]const u8{
+        "a",
+        "10000:2222222222222222222222222222222222222222222222222222222222222222:room",
+    };
+    const tags_replaceable = [_]nip01_event.EventTag{
+        .{ .items = a_replaceable_with_identifier[0..] },
+    };
+    const replaceable_event = test_event(
+        delete_event_kind,
+        pubkey,
+        100,
+        [_]u8{0} ** 32,
+        tags_replaceable[0..],
+    );
+    try std.testing.expectError(
+        error.InvalidAddressCoordinate,
+        delete_extract_targets(&replaceable_event, out_one[0..]),
+    );
+
+    const a_addressable_without_identifier = [_][]const u8{
+        "a",
+        "30023:2222222222222222222222222222222222222222222222222222222222222222:",
+    };
+    const tags_addressable = [_]nip01_event.EventTag{
+        .{ .items = a_addressable_without_identifier[0..] },
+    };
+    const addressable_event = test_event(
+        delete_event_kind,
+        pubkey,
+        100,
+        [_]u8{0} ** 32,
+        tags_addressable[0..],
+    );
+    try std.testing.expectError(
+        error.InvalidAddressCoordinate,
+        delete_extract_targets(&addressable_event, out_one[0..]),
     );
 
     const valid_e = [_][]const u8{
