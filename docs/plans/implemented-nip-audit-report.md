@@ -47,7 +47,7 @@ completes.
 | 27 | complete | `HARNESS_COVERED DEEP PASS` | `HARNESS_COVERED EDGE PASS` | Narrowed inline extraction to profile/event/address references by dropping `nrelay` as a NIP-27 content reference; retained ignore-as-plain-text fallback for malformed, uppercase, forbidden, and payload-empty fragments | none | none | `rust-nostr` and `nostr-tools` both treat malformed and forbidden fragments as plain text; neither treats `nrelay` as an inline content reference in this pass |
 | 40 | complete | `HARNESS_COVERED DEEP PASS` | `HARNESS_COVERED EDGE PASS` | Malformed expiration metadata no longer hard-fails the helper path; the first valid expiration tag now wins deterministically | none | none | `rust-nostr` and `nostr-tools` both treat malformed expiration data as non-expiring rather than exceptional; the previous typed-error path created unnecessary compatibility friction for advisory metadata |
 | 42 | complete | `HARNESS_COVERED DEEP PASS` | `HARNESS_COVERED EDGE PASS` | Widened NIP-42 challenge bound from `64` to `255`; retained path-bound websocket origin matching, duplicate-tag rejection, and unbracketed IPv6 rejection | none | none | `rust-nostr` and `nostr-tools` both accept long challenges; current remaining strictness is judged trust-boundary-positive rather than ecosystem-hostile |
-| 44 | pending | - | - | - | - | - | - |
+| 44 | complete | `HARNESS_COVERED DEEP PASS` | `HARNESS_COVERED DEEP PASS` | No Layer 1 change required; current NIP-44 v2 surface remains aligned on vectors, staged failure order, and checked cryptographic boundaries | none | none | The audit found no unjustified strictness: unsupported `#` encoding, version-before-MAC ordering, MAC-before-padding ordering, and invalid-UTF8-as-invalid-padding all remain bounded and compatible |
 | 45 | pending | - | - | - | - | - | - |
 | 50 | pending | - | - | - | - | - | - |
 | 51 | complete | `HARNESS_COVERED DEEP PASS` | `SOURCE_REVIEW_ONLY no dedicated NIP-51 helper beyond kind constants` | Widened bookmark extraction to accept bounded hashtag/URL items and changed unrelated unknown tags from fatal to ignored; kept typed failures for malformed supported tags and coordinate-kind enforcement | none | none | `rust-nostr` bookmark builders were broader than the old parser; `nostr-tools` provides kind-level signal only in this pass |
@@ -80,6 +80,8 @@ completes.
   replaceable-`naddr` URI compatibility through explicit coverage.
 - NIP-40: treat malformed expiration metadata as absent and use the first valid expiration tag
   deterministically instead of failing the helper path on malformed or conflicting optional tags.
+- NIP-44: no Layer 1 change required; keep the current v2-only checked cryptographic surface and
+  staged failure ordering.
 - NIP-18: reject contradictory repost target metadata when empty-content reposts cannot prove the
   target via embedded JSON, while retaining current embedded-event consistency checks and the kind-6
   relay-hint requirement.
