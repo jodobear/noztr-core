@@ -78,6 +78,9 @@ Current project context for the Phase H kickoff baseline.
     decoupled from extension-token shape, and supported `key:value` extensions are extracted
     best-effort so malformed extension-like tokens remain searchable raw text instead of
     invalidating the helper path
+  - `NIP-45` audit is complete in `src/nip45_count.zig`: COUNT relay parsing now accepts uppercase
+    HLL hex and ignores unknown metadata keys while keeping malformed count values, malformed HLL
+    length/content, and malformed top-level COUNT shapes typed and strict
   - `NIP-25` audit is complete in `src/nip25_reactions.zig`: reaction `emoji` tags now accept the
     optional NIP-30 fourth-slot emoji-set coordinate when it is a valid `30030` address, while
     strict shortcode and URL validation remain retained as the accepted Layer 1 posture, and
@@ -178,8 +181,8 @@ Current project context for the Phase H kickoff baseline.
    a secondary non-gating ecosystem signal. Every implemented NIP must be cross-checked against
    both references during the audit.
 5. Continue from the completed NIP-01, NIP-02, NIP-09, NIP-10, NIP-11, NIP-13, NIP-18, NIP-19,
-   NIP-21, NIP-22, NIP-25, NIP-27, NIP-40, NIP-42, NIP-44, NIP-50, NIP-51, NIP-59, NIP-65, and
-   NIP-70 audits to the next implemented NIP audit item.
+   NIP-21, NIP-22, NIP-25, NIP-27, NIP-40, NIP-42, NIP-44, NIP-45, NIP-50, NIP-51, NIP-59,
+   NIP-65, and NIP-70 audits to the next implemented NIP audit item.
 6. Start Wave 2 / `NIP-46` only after the implemented-NIP audit reaches an acceptable stopping
    point or explicitly recorded partial cutoff.
 7. Keep `no-3uj` visible as deferred-by-operator until remote setup returns to active execution focus.

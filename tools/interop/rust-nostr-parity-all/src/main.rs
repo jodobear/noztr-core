@@ -1491,6 +1491,23 @@ fn check_nip45() -> Result<(), String> {
         return Err("relay COUNT parse did not return Count variant".to_string());
     }
 
+    let relay_count_with_unknown =
+        RelayMessage::from_json(r#"["COUNT","sub-a",{"count":7,"future":1}]"#)
+            .map_err(|e| format!("relay COUNT unknown-field parse failed unexpectedly: {e}"))?;
+    if !matches!(relay_count_with_unknown, RelayMessage::Count { .. }) {
+        return Err("relay COUNT unknown-field parse did not return Count variant".to_string());
+    }
+
+    let uppercase_hll = "A1".repeat(256);
+    let relay_count_with_uppercase_hll = RelayMessage::from_json(&format!(
+        "[\"COUNT\",\"sub-a\",{{\"count\":7,\"hll\":\"{}\"}}]",
+        uppercase_hll
+    ))
+    .map_err(|e| format!("relay COUNT uppercase hll parse failed unexpectedly: {e}"))?;
+    if !matches!(relay_count_with_uppercase_hll, RelayMessage::Count { .. }) {
+        return Err("relay COUNT uppercase hll parse did not return Count variant".to_string());
+    }
+
     if ClientMessage::from_json(r#"["COUNT","sub-a"]"#).is_ok() {
         return Err("COUNT malformed client shape was accepted".to_string());
     }

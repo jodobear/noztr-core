@@ -912,6 +912,23 @@ Immutable record of accepted planning decisions.
   unsafe relay behavior.
 - Supersedes: none
 
+## D-051: Accept uppercase HLL hex and ignore unknown NIP-45 COUNT metadata keys
+
+- Date: 2026-03-11
+- Status: accepted
+- Decision: widen `nip45_count` so COUNT relay parsing accepts uppercase hex digits in `hll` and
+  ignores unknown metadata keys inside the COUNT response object instead of rejecting the whole
+  response.
+- Why: NIP-45 describes `hll` as hex-encoded without requiring lowercase, and COUNT response
+  metadata is open enough that rejecting future unknown keys creates avoidable forward-compatibility
+  friction. Both reference lanes are more tolerant than the prior strict parser shape.
+- Tradeoff: slightly broader COUNT metadata acceptance versus materially better forward
+  compatibility and fewer unnecessary relay-response failures.
+- Related Tradeoff: T-0-001, T-0-002, T-0-003.
+- Reversal Trigger: future NIP guidance explicitly requires lowercase-only HLL encoding or bans
+  unknown COUNT metadata keys, or strong ecosystem evidence shows this tolerance causes ambiguity.
+- Supersedes: none
+
 ## Phase Closure Evidence
 
 ### P0-E-001: Phase 0 closure record

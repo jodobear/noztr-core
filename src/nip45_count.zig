@@ -93,7 +93,7 @@ pub fn count_metadata_validate(metadata: *const CountMetadata) CountError!void {
         if (hll.len != limits.nip45_hll_hex_length) {
             return error.InvalidHllLength;
         }
-        try validate_lower_hex(hll);
+        try validate_hex(hll);
     }
 }
 
@@ -220,8 +220,6 @@ fn parse_count_object(
             metadata.approximate = try parse_approximate(item);
         } else if (std.mem.eql(u8, key, "hll")) {
             metadata.hll = try parse_hll_owned(item, scratch);
-        } else {
-            return error.InvalidCountObject;
         }
     }
 
@@ -265,7 +263,7 @@ fn parse_hll_owned(value: std.json.Value, scratch: std.mem.Allocator) CountError
     return scratch.dupe(u8, value.string) catch return error.InvalidCountMessage;
 }
 
-fn validate_lower_hex(value: []const u8) CountError!void {
+fn validate_hex(value: []const u8) CountError!void {
     std.debug.assert(value.len <= limits.relay_message_bytes_max);
     std.debug.assert(limits.nip45_hll_hex_length == 512);
 
@@ -277,7 +275,8 @@ fn validate_lower_hex(value: []const u8) CountError!void {
             continue;
         }
         const is_lower_hex = byte >= 'a' and byte <= 'f';
-        if (!is_lower_hex) {
+        const is_upper_hex = byte >= 'A' and byte <= 'F';
+        if (!is_lower_hex and !is_upper_hex) {
             return error.InvalidHllHex;
         }
     }
@@ -343,10 +342,16 @@ test "count relay parser accepts strict valid vectors" {
         "[\"COUNT\",\"q2\",{\"count\":9,\"approximate\":true}]",
         arena.allocator(),
     );
+    const with_unknown = try count_relay_message_parse(
+        "[\"COUNT\",\"q2x\",{\"count\":11,\"future\":1}]",
+        arena.allocator(),
+    );
     const with_hll = try count_relay_message_parse(relay_hll, arena.allocator());
 
     try std.testing.expect(count_only.count == 42);
     try std.testing.expect(with_approx.metadata.approximate.?);
+    try std.testing.expect(with_unknown.count == 11);
+    try std.testing.expect(with_unknown.metadata.approximate == null);
     try std.testing.expect(with_hll.metadata.hll.?.len == limits.nip45_hll_hex_length);
 }
 
@@ -424,6 +429,12 @@ test "count metadata validator enforces optional field rules" {
 
     var valid = CountMetadata{ .approximate = false, .hll = hll_text[0..] };
     try count_metadata_validate(&valid);
+
+    var uppercase_hex = hll_text;
+    uppercase_hex[0] = 'A';
+    uppercase_hex[1] = 'B';
+    var uppercase_valid = CountMetadata{ .hll = uppercase_hex[0..] };
+    try count_metadata_validate(&uppercase_valid);
 
     var wrong_length = CountMetadata{ .hll = "ab" };
     try std.testing.expectError(error.InvalidHllLength, count_metadata_validate(&wrong_length));

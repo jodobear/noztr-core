@@ -213,6 +213,10 @@ class MockCountWebSocket {
             this.onmessage?.({ data: `["COUNT","${subscription_id}",{"count":2}]` });
             return;
         }
+        if (subscription_id === "count-future") {
+            this.onmessage?.({ data: `["COUNT","${subscription_id}",{"count":2,"future":1}]` });
+            return;
+        }
         if (subscription_id === "count-edge") {
             this.onmessage?.({ data: `["COUNT","${subscription_id}",{}]` });
         }
@@ -235,6 +239,9 @@ async function check_nip45(): Promise<void> {
             malformed_count === undefined,
             "NIP-45 malformed COUNT payload should resolve undefined",
         );
+
+        const future_count = await relay.count([{ kinds: [1] }], { id: "count-future" });
+        ensure(future_count === 2, `NIP-45 future metadata count mismatch: got ${String(future_count)}`);
     } finally {
         relay.close();
         useWebSocketImplementation(native_websocket as typeof WebSocket);
