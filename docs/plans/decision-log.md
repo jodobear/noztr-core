@@ -892,6 +892,26 @@ Immutable record of accepted planning decisions.
   unsafe relay selection.
 - Supersedes: none
 
+## D-050: Treat malformed NIP-50 extension-like tokens as raw search text
+
+- Date: 2026-03-11
+- Status: accepted
+- Decision: widen `nip50_search` so `search_field_validate` only enforces bounded UTF-8 shape, and
+  `search_tokens_parse` performs best-effort extraction of supported `key:value` tokens. Malformed
+  extension-like tokens such as `include:` or `language:en:us` are ignored instead of invalidating
+  the helper path.
+- Why: NIP-50 defines `search` as a human-readable query string and says unsupported extensions
+  should be ignored. `rust-nostr` and `nostr-tools` both treat malformed extension-like search text
+  as ordinary searchable text rather than invalid input. The prior `noztr` behavior created
+  unnecessary incompatibility by turning best-effort extension parsing into a whole-query failure.
+- Tradeoff: less typed rejection of malformed extension-like token syntax versus materially better
+  compatibility with the protocol's best-effort search model and both reference lanes.
+- Related Tradeoff: T-0-001, T-0-002, T-0-003.
+- Reversal Trigger: future NIP guidance requires malformed extension-like tokens to invalidate the
+  entire search query or strong ecosystem evidence shows best-effort parsing causes ambiguity or
+  unsafe relay behavior.
+- Supersedes: none
+
 ## Phase Closure Evidence
 
 ### P0-E-001: Phase 0 closure record

@@ -1,8 +1,8 @@
 const std = @import("std");
 const limits = @import("limits.zig");
 
-/// Typed strict search-validation failures.
-pub const SearchError = error{ InvalidSearchValue, InvalidSearchToken };
+/// Typed bounded search-validation failures.
+pub const SearchError = error{InvalidSearchValue};
 
 /// Supported NIP-50 strict extension token keys.
 pub const SearchTokenKey = enum {
@@ -23,7 +23,7 @@ pub const SearchToken = struct {
     value: []const u8,
 };
 
-/// Validates strict NIP-50 search-field bounds, UTF-8, and token shape.
+/// Validates bounded NIP-50 search-field size and UTF-8 shape.
 pub fn search_field_validate(value: []const u8) SearchError!void {
     std.debug.assert(limits.nip50_search_field_bytes_max > 0);
     std.debug.assert(limits.nip50_search_field_bytes_max <= limits.tag_item_bytes_max);
@@ -34,8 +34,6 @@ pub fn search_field_validate(value: []const u8) SearchError!void {
     if (!std.unicode.utf8ValidateSlice(value)) {
         return error.InvalidSearchValue;
     }
-
-    try strict_token_shapes_validate(value);
 }
 
 /// Parses supported strict `key:value` extension tokens from a `search` field.
@@ -51,19 +49,12 @@ pub fn search_tokens_parse(
     std.debug.assert(out_tokens.len <= std.math.maxInt(u16));
     std.debug.assert(limits.nip50_search_field_bytes_max > 0);
 
-    search_field_validate(value) catch |err| {
-        return switch (err) {
-            error.InvalidSearchValue => error.InvalidSearchValue,
-            error.InvalidSearchToken => error.InvalidSearchValue,
-        };
-    };
+    try search_field_validate(value);
 
     var count: u16 = 0;
     var token_index: usize = 0;
     while (token_next(value, &token_index)) |token| {
-        const parsed = strict_token_parse(token) catch {
-            return error.InvalidSearchValue;
-        };
+        const parsed = strict_token_parse(token);
         if (parsed) |supported_token| {
             if (count == out_tokens.len) {
                 return error.BufferTooSmall;
@@ -76,32 +67,22 @@ pub fn search_tokens_parse(
     return count;
 }
 
-fn strict_token_shapes_validate(value: []const u8) SearchError!void {
-    std.debug.assert(value.len <= limits.nip50_search_field_bytes_max);
-    std.debug.assert(std.unicode.utf8ValidateSlice(value));
-
-    var token_index: usize = 0;
-    while (token_next(value, &token_index)) |token| {
-        _ = try strict_token_parse(token);
-    }
-}
-
-fn strict_token_parse(token: []const u8) SearchError!?SearchToken {
+fn strict_token_parse(token: []const u8) ?SearchToken {
     std.debug.assert(token.len > 0);
     std.debug.assert(token.len <= limits.nip50_search_field_bytes_max);
 
     const first_colon = std.mem.indexOfScalar(u8, token, ':') orelse return null;
     if (first_colon == 0) {
-        return error.InvalidSearchToken;
+        return null;
     }
     const key_slice = token[0..first_colon];
     const token_key = search_token_key_parse(key_slice) orelse return null;
 
     if (first_colon + 1 >= token.len) {
-        return error.InvalidSearchToken;
+        return null;
     }
     if (std.mem.indexOfScalarPos(u8, token, first_colon + 1, ':') != null) {
-        return error.InvalidSearchToken;
+        return null;
     }
 
     const value_slice = token[first_colon + 1 ..];
@@ -176,9 +157,10 @@ test "search token parse emits supported tokens and ignores unsupported" {
     try std.testing.expectEqualStrings("true", out_tokens[1].value);
 }
 
-test "search field validate rejects malformed strict token shapes" {
-    try std.testing.expectError(error.InvalidSearchToken, search_field_validate("include:"));
-    try std.testing.expectError(error.InvalidSearchToken, search_field_validate(":spam"));
+test "search field validate accepts malformed extension-like tokens as raw search text" {
+    try search_field_validate("include:");
+    try search_field_validate(":spam");
+    try search_field_validate("language:en:us");
 }
 
 test "search field validate rejects invalid UTF-8" {
@@ -186,12 +168,13 @@ test "search field validate rejects invalid UTF-8" {
     try std.testing.expectError(error.InvalidSearchValue, search_field_validate(invalid_utf8[0..]));
 }
 
-test "search token parse maps malformed strict token to invalid search value" {
+test "search token parse ignores malformed supported strict tokens" {
     var out_tokens: [2]SearchToken = undefined;
-    try std.testing.expectError(
-        error.InvalidSearchValue,
-        search_tokens_parse("language:en:us", out_tokens[0..]),
-    );
+    const count = try search_tokens_parse("include: language:en:us domain:nostr.com", out_tokens[0..]);
+
+    try std.testing.expectEqual(@as(u16, 1), count);
+    try std.testing.expect(out_tokens[0].key == .domain);
+    try std.testing.expectEqualStrings("nostr.com", out_tokens[0].value);
 }
 
 test "search field validate ignores unsupported token with multiple colons" {

@@ -151,6 +151,9 @@ the validated maintenance baseline.
   - `NIP-70` required no Layer 1 change; the current exact one-item `["-"]` protected-tag
     semantics already match the NIP and both reference lanes, while malformed lookalikes remain
     safely ignored rather than being treated as canonical protection markers
+  - `NIP-50` now treats malformed extension-like tokens as ordinary bounded search text and parses
+    supported `key:value` extensions best-effort; this matches the NIP's best-effort search model
+    and both reference lanes instead of rejecting whole queries for malformed extension syntax
   - `NIP-18` now rejects contradictory optional repost target metadata without embedded-event proof;
     existing embedded-event consistency checks remain intact
   - `NIP-25` now accepts the optional NIP-30 emoji-set coordinate on reaction `emoji` tags; strict

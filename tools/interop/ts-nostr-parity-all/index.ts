@@ -262,6 +262,24 @@ function check_nip50(): void {
         event,
     );
     ensure(!unmatched, "NIP-50 negative filter unexpectedly matched event");
+
+    const malformed_extension_event = finalizeEvent(
+        {
+            kind: 1,
+            created_at: 1_708_000_056,
+            tags: [],
+            content: "include: language:en:us",
+        },
+        to_bytes_32(FIXED_SECRET_KEY_HEX),
+    );
+    const malformed_extension_matched = nostr_tools.matchFilter(
+        { search: "include: language:en:us" },
+        malformed_extension_event,
+    );
+    ensure(
+        malformed_extension_matched,
+        "NIP-50 malformed extension-like text was not treated as raw search text",
+    );
 }
 
 function check_nip70(): void {

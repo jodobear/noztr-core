@@ -1545,6 +1545,17 @@ fn check_nip50() -> Result<(), String> {
         return Err("array search field type accepted".to_string());
     }
 
+    let malformed_extension_filter = Filter::new().search("include: language:en:us");
+    let malformed_extension_event = EventBuilder::text_note("include: language:en:us")
+        .sign_with_keys(&keys)
+        .map_err(|e| format!("search malformed-extension event build failed: {e}"))?;
+    if !malformed_extension_filter.match_event(
+        &malformed_extension_event,
+        MatchEventOptions::new().nip50(true),
+    ) {
+        return Err("malformed extension-like search text was not treated as raw search text".to_string());
+    }
+
     Ok(())
 }
 
