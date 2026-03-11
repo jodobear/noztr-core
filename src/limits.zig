@@ -81,6 +81,11 @@ pub const Limits = struct {
     pub const nip46_permissions_max: u8 = 32;
     pub const nip46_secret_bytes_max: u16 = 256;
 
+    pub const nip06_mnemonic_bytes_max: u16 = 256;
+    pub const nip06_passphrase_bytes_max: u16 = 256;
+    pub const nip06_seed_bytes: u8 = 64;
+    pub const nip06_secret_key_bytes: u8 = 32;
+
     pub const nip50_search_field_bytes_max: u16 = Limits.tag_item_bytes_max;
 
     pub const nip77_negentropy_protocol_version: u8 = 0x61;
@@ -168,6 +173,11 @@ pub const nip46_message_params_max: u8 = Limits.nip46_message_params_max;
 pub const nip46_relays_max: u8 = Limits.nip46_relays_max;
 pub const nip46_permissions_max: u8 = Limits.nip46_permissions_max;
 pub const nip46_secret_bytes_max: u16 = Limits.nip46_secret_bytes_max;
+
+pub const nip06_mnemonic_bytes_max: u16 = Limits.nip06_mnemonic_bytes_max;
+pub const nip06_passphrase_bytes_max: u16 = Limits.nip06_passphrase_bytes_max;
+pub const nip06_seed_bytes: u8 = Limits.nip06_seed_bytes;
+pub const nip06_secret_key_bytes: u8 = Limits.nip06_secret_key_bytes;
 
 pub const nip50_search_field_bytes_max: u16 = Limits.nip50_search_field_bytes_max;
 
@@ -274,6 +284,10 @@ comptime {
     std.debug.assert(Limits.nip46_permissions_max > 0);
     std.debug.assert(Limits.nip46_secret_bytes_max > 0);
     std.debug.assert(Limits.nip46_secret_bytes_max <= Limits.tag_item_bytes_max);
+    std.debug.assert(Limits.nip06_mnemonic_bytes_max >= 128);
+    std.debug.assert(Limits.nip06_passphrase_bytes_max > 0);
+    std.debug.assert(Limits.nip06_seed_bytes == 64);
+    std.debug.assert(Limits.nip06_secret_key_bytes == 32);
 
     std.debug.assert(Limits.nip50_search_field_bytes_max > 0);
     std.debug.assert(Limits.nip50_search_field_bytes_max <= Limits.tag_item_bytes_max);
@@ -377,6 +391,11 @@ test "limits relation checks stay true" {
 
     try std.testing.expect(Limits.nip45_hll_hex_length == 512);
     try std.testing.expect(Limits.nip45_hll_hex_length % 2 == 0);
+
+    try std.testing.expect(Limits.nip06_mnemonic_bytes_max >= 128);
+    try std.testing.expect(Limits.nip06_passphrase_bytes_max > 0);
+    try std.testing.expect(Limits.nip06_seed_bytes == 64);
+    try std.testing.expect(Limits.nip06_secret_key_bytes == 32);
 
     try std.testing.expect(Limits.nip50_search_field_bytes_max > 0);
     try std.testing.expect(Limits.nip50_search_field_bytes_max <= Limits.tag_item_bytes_max);

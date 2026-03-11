@@ -12,11 +12,13 @@ pub fn build(builder: *std.Build) void {
         "Enable I6 optional extensions (NIP-45, NIP-50, NIP-77)",
     ) orelse true;
     const secp256k1_module = create_secp256k1_module(builder, target, optimize);
+    const libwally_module = create_libwally_module(builder, target, optimize);
     const root_module = create_root_module(
         builder,
         target,
         optimize,
         secp256k1_module,
+        libwally_module,
         enable_i6_extensions,
     );
 
@@ -25,6 +27,7 @@ pub fn build(builder: *std.Build) void {
         target,
         optimize,
         secp256k1_module,
+        libwally_module,
         false,
     );
 
@@ -54,6 +57,7 @@ fn create_root_module(
     target: std.Build.ResolvedTarget,
     optimize: std.builtin.OptimizeMode,
     secp256k1_module: *std.Build.Module,
+    libwally_module: *std.Build.Module,
     enable_i6_extensions: bool,
 ) *std.Build.Module {
     std.debug.assert(@sizeOf(std.Build.Module) > 0);
@@ -68,6 +72,7 @@ fn create_root_module(
         .optimize = optimize,
     });
     root_module.addImport("secp256k1", secp256k1_module);
+    root_module.addImport("libwally", libwally_module);
     root_module.addOptions("build_options", build_options);
     return root_module;
 }
@@ -122,7 +127,74 @@ fn configure_secp_c_bindings(builder: *std.Build, module: *std.Build.Module) voi
             "-DENABLE_MODULE_SCHNORRSIG=1",
             "-DENABLE_MODULE_EXTRAKEYS=1",
             "-DENABLE_MODULE_ECDH=1",
+            "-DENABLE_MODULE_RECOVERY=1",
         },
+    });
+}
+
+fn create_libwally_module(
+    builder: *std.Build,
+    target: std.Build.ResolvedTarget,
+    optimize: std.builtin.OptimizeMode,
+) *std.Build.Module {
+    std.debug.assert(@sizeOf(std.Build.Module) > 0);
+    std.debug.assert(@sizeOf(std.builtin.OptimizeMode) > 0);
+
+    const write_files = builder.addWriteFiles();
+    const shim_file = write_files.add("libwally_shim.zig", libwally_shim_source);
+    _ = write_files.add("config.h", libwally_config_source);
+
+    const libwally_module = builder.createModule(.{
+        .root_source_file = shim_file,
+        .target = target,
+        .optimize = optimize,
+        .link_libc = true,
+    });
+    configure_libwally_c_bindings(builder, write_files, libwally_module);
+    return libwally_module;
+}
+
+fn configure_libwally_c_bindings(
+    builder: *std.Build,
+    write_files: *std.Build.Step.WriteFile,
+    module: *std.Build.Module,
+) void {
+    std.debug.assert(@sizeOf(std.Build.Module) > 0);
+    std.debug.assert(!@inComptime());
+
+    const libwally_dependency = builder.dependency("libwally-core", .{});
+    const libwally_root = libwally_dependency.path("");
+    const secp_dependency = builder.dependency("secp256k1", .{});
+
+    module.addCMacro("WALLY_CORE_BUILD", "1");
+    module.addCMacro("BUILD_MINIMAL", "1");
+    module.addCMacro("BUILD_STANDARD_SECP", "1");
+    module.addCMacro("WALLY_ABI_NO_ELEMENTS", "1");
+    module.addIncludePath(write_files.getDirectory());
+    module.addIncludePath(libwally_root);
+    module.addIncludePath(libwally_dependency.path("include"));
+    module.addIncludePath(libwally_dependency.path("src"));
+    module.addIncludePath(libwally_dependency.path("src/ccan"));
+    module.addIncludePath(secp_dependency.path("include"));
+
+    const source_files = &.{
+        "src/internal.c",
+        "src/base_58.c",
+        "src/bip32.c",
+        "src/bip39.c",
+        "src/mnemonic.c",
+        "src/wordlist.c",
+        "src/pbkdf2.c",
+        "src/hmac.c",
+        "src/sign.c",
+        "src/ccan/ccan/crypto/sha256/sha256.c",
+        "src/ccan/ccan/crypto/sha512/sha512.c",
+        "src/ccan/ccan/crypto/ripemd160/ripemd160.c",
+    };
+    module.addCSourceFiles(.{
+        .root = libwally_root,
+        .files = source_files,
+        .flags = &.{},
     });
 }
 
@@ -368,4 +440,21 @@ const secp256k1_shim_source =
     \\        return error.InvalidSecretKey;
     \\    }
     \\}
+;
+
+const libwally_shim_source =
+    \\pub const c = @cImport({
+    \\    @cInclude("wally_core.h");
+    \\    @cInclude("wally_bip39.h");
+    \\    @cInclude("wally_bip32.h");
+    \\});
+;
+
+const libwally_config_source =
+    \\#ifndef LIBWALLYCORE_CONFIG_H
+    \\#define LIBWALLYCORE_CONFIG_H
+    \\
+    \\#include "ccan_config.h"
+    \\
+    \\#endif
 ;
