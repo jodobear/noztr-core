@@ -237,14 +237,15 @@ frozen defaults or the current deterministic-and-compatible Layer 1 kernel postu
       - the pinned rust-nostr extra mnemonic vector is covered
       - a fixed `account = 1` derivation vector is covered
       - invalid coverage includes malformed mnemonic length, unknown word, checksum mismatch,
-        invalid UTF-8, invalid seed boundary, invalid account, and buffer-too-small output paths
+        invalid UTF-8, invalid normalization, invalid seed boundary, invalid account, and
+        buffer-too-small output paths
     - implementation review finding fixed:
       - libwally child derivation no longer aliases parent and output key buffers; separate
         sensitive key slots are now used throughout the derivation path
-    - pending operator review point:
-      - current Phase H behavior validates UTF-8 but does not add an explicit NFKD normalization
-        adapter on top of `libwally-core`; review whether that should remain an accepted Phase H
-        boundary limit or become immediate follow-up work for non-ASCII parity
+    - accepted temporary normalization boundary:
+      - current Phase H behavior accepts ASCII-only mnemonic/passphrase input after UTF-8
+        validation and rejects non-ASCII input with typed `InvalidNormalization`
+      - full BIP39-compatible NFKD normalization remains explicit follow-up `no-09f`
 
 ## NIP-06 Phase H Boundary Scope
 
@@ -262,8 +263,8 @@ frozen defaults or the current deterministic-and-compatible Layer 1 kernel postu
   - convenience stateful key stores or orchestration helpers
 - Follow-up note: broader rust-nostr parity and deep edge-case expansion for NIP-06 remains a later
   phase after the initial narrow boundary is stable.
-  - Additional immediate review point from implementation: Unicode normalization parity for
-    non-ASCII mnemonic/passphrase input is still an explicit decision item before Wave 3 closure.
+  - Additional accepted follow-up from implementation: full Unicode normalization parity for
+    non-ASCII mnemonic/passphrase input remains explicit follow-up `no-09f`.
 
 ## NIP-06 H0 Freeze Snapshot
 

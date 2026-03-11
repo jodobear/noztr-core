@@ -219,11 +219,10 @@ the validated maintenance baseline.
   - review finding fixed during implementation:
     - child derivation now uses separate parent/child key slots; aliasing libwally parent/output
       buffers caused a real higher-account derivation failure and is no longer allowed
-  - operator review point before closure:
-    - current Phase H behavior validates UTF-8 but does not add an explicit NFKD normalization
-      adapter on top of `libwally-core`; this matters mainly for non-ASCII mnemonic/passphrase
-      cases and should be reviewed as an explicit compatibility decision rather than closed
-      implicitly
+  - accepted temporary normalization boundary:
+    - current Phase H behavior accepts ASCII-only mnemonic/passphrase input after UTF-8 validation
+      and rejects non-ASCII input with typed `InvalidNormalization`
+    - full BIP39-compatible NFKD normalization remains explicit follow-up `no-09f`
 
 ## Immediate Work Tracks
 
@@ -235,8 +234,8 @@ the validated maintenance baseline.
 - `no-4iw` is resolved by the NIP-10 audit and no longer blocks interpretation of NIP-10 quality.
 - Keep TypeScript parity references non-gating and use them only as secondary ecosystem audit
   evidence.
-- Hold `no-7lv` open until the NIP-06 Unicode-normalization review point is resolved or explicitly
-  accepted for the current Phase H boundary.
+- Hold `no-7lv` open for operator review of the accepted ASCII-only NIP-06 normalization boundary,
+  with full NFKD remaining explicit follow-up `no-09f`.
 
 ## Blocker Visibility
 

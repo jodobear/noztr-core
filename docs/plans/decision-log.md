@@ -967,6 +967,26 @@ Immutable record of accepted planning decisions.
   redirect semantics into the kernel.
 - Supersedes: none
 
+## D-054: Use an ASCII-only normalization boundary for Phase H NIP-06
+
+- Date: 2026-03-11
+- Status: accepted
+- Decision: for the current Phase H NIP-06 boundary, accept ASCII-only mnemonic and passphrase
+  input after UTF-8 validation and reject non-ASCII input with typed `InvalidNormalization`.
+  Full BIP39-compatible NFKD normalization remains follow-up issue `no-09f`; the current boundary
+  must not silently derive seeds from non-ASCII input that could disagree with spec-compliant
+  wallets.
+- Why: `libwally-core` does not normalize mnemonic or passphrase input, Zig stdlib does not provide
+  a small built-in NFKD path, and silent acceptance of non-ASCII input would create hidden
+  interoperability risk against BIP39- and rust-nostr-compatible derivation behavior. ASCII-only
+  rejection is the smallest deterministic workaround that preserves an honest boundary.
+- Tradeoff: temporary rejection of non-ASCII mnemonic/passphrase input versus avoiding silent
+  cross-wallet seed mismatch while keeping the Phase H implementation narrow and reviewable.
+- Related Tradeoff: T-H-ANIP-002, T-H-ANIP-003, T-0-001, T-0-003.
+- Reversal Trigger: a bounded, test-backed NFKD implementation is accepted for the repo or the
+  approved backend path gains spec-compliant normalization directly.
+- Supersedes: none
+
 ## Phase Closure Evidence
 
 ### P0-E-001: Phase 0 closure record

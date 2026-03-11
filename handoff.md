@@ -43,12 +43,14 @@ Current project context for the Phase H kickoff baseline.
       - pinned rust-nostr extra mnemonic vector covered
       - fixed `account = 1` vector covered
       - invalid matrix covered for malformed length, unknown word, checksum mismatch, invalid
-        UTF-8, invalid seed boundary, invalid account, and buffer-too-small outputs
+        UTF-8, invalid normalization, invalid seed boundary, invalid account, and
+        buffer-too-small outputs
     - review finding fixed:
       - higher-account derivation no longer aliases libwally parent/output key buffers
-    - pending operator review point:
-      - current Phase H behavior validates UTF-8 but does not add an explicit NFKD normalization
-        adapter for non-ASCII mnemonic/passphrase parity
+    - accepted temporary normalization boundary:
+      - current Phase H behavior accepts ASCII-only mnemonic/passphrase input after UTF-8
+        validation and rejects non-ASCII input with typed `InvalidNormalization`
+      - full BIP39-compatible NFKD normalization remains explicit follow-up `no-09f`
 - Wave 1 progress:
   - `NIP-01` audit is complete across `src/nip01_event.zig`, `src/nip01_filter.zig`, and
     `src/nip01_message.zig`: strict parsing now accepts uppercase single-letter `#X` filter keys,

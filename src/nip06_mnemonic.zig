@@ -11,6 +11,7 @@ pub const Nip06Error = error{
     UnknownMnemonicWord,
     InvalidChecksum,
     InvalidUtf8,
+    InvalidNormalization,
     InvalidSeed,
     InvalidAccount,
     DerivationFailure,
@@ -154,6 +155,7 @@ fn validate_mnemonic_text(mnemonic: []const u8) Nip06Error!void {
         return error.InvalidMnemonicLength;
     }
     if (!std.unicode.utf8ValidateSlice(mnemonic)) return error.InvalidUtf8;
+    try require_ascii(mnemonic);
     try require_mnemonic_word_count(mnemonic);
 }
 
@@ -164,6 +166,16 @@ fn validate_optional_utf8_text(text: ?[]const u8, max_len: u16) Nip06Error!void 
     const value = text orelse return;
     if (value.len > max_len) return error.InvalidUtf8;
     if (!std.unicode.utf8ValidateSlice(value)) return error.InvalidUtf8;
+    try require_ascii(value);
+}
+
+fn require_ascii(text: []const u8) Nip06Error!void {
+    std.debug.assert(text.len <= limits.content_bytes_max);
+    std.debug.assert(@sizeOf(u8) == 1);
+
+    for (text) |byte| {
+        if (byte > 0x7f) return error.InvalidNormalization;
+    }
 }
 
 fn require_mnemonic_word_count(mnemonic: []const u8) Nip06Error!void {
@@ -376,6 +388,7 @@ test "derive nostr secret key covers account one deterministically" {
 
 test "mnemonic boundary rejects malformed and invalid inputs" {
     const bad_utf8 = [_]u8{ 0xc3, 0x28 };
+    const non_ascii_mnemonic = "legal winner thank year wave sausage worth useful legal winner thank yéllow";
 
     try std.testing.expectError(
         error.InvalidMnemonicLength,
@@ -394,6 +407,10 @@ test "mnemonic boundary rejects malformed and invalid inputs" {
         ),
     );
     try std.testing.expectError(error.InvalidUtf8, mnemonic_validate(bad_utf8[0..]));
+    try std.testing.expectError(
+        error.InvalidNormalization,
+        mnemonic_validate(non_ascii_mnemonic),
+    );
 }
 
 test "derive boundary enforces account seed and output limits" {
@@ -409,6 +426,14 @@ test "derive boundary enforces account seed and output limits" {
             seed_bytes[0..],
             "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about",
             &[_]u8{ 0xc3, 0x28 },
+        ),
+    );
+    try std.testing.expectError(
+        error.InvalidNormalization,
+        mnemonic_to_seed(
+            seed_bytes[0..],
+            "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about",
+            "Trézor",
         ),
     );
     try std.testing.expectError(
