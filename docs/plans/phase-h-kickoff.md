@@ -353,12 +353,13 @@ the validated maintenance baseline.
 - Use the implemented-surface robustness / real-world validation execution in
   `docs/plans/build-plan.md` as the next execution model when we want more hardening work.
 - Current robustness progress:
-  - completed: `NIP-46`, `NIP-06`, `NIP-51` private lists, `NIP-44`, `NIP-59`
-  - recommended next surfaces: `NIP-24`, `NIP-23`, `NIP-46`, `NIP-06`, `NIP-51` private lists
+  - completed: `NIP-46`, `NIP-06`, `NIP-51` private lists, `NIP-44`, `NIP-59`, `NIP-03`,
+    `NIP-17`, `NIP-39`, `NIP-29`
+  - latest completed batch: `NIP-03`, `NIP-17`, `NIP-39`, `NIP-29`
 - Phase H planned expansion is now complete through deferred backlog item `NIP-29`.
 - Deferred backlog is now complete.
-- Recommended next sequence: start the next robustness batch instead of expanding protocol surface
-  further immediately.
+- Recommended next sequence: address deferred follow-up items or operator-directed robustness work
+  before any new protocol expansion.
 - `NIP-44` robustness outcome:
   - no Layer 1 behavior change was required after real-world review
   - the current v2-only surface, staged failure ordering, typed conversation-key boundary, and
@@ -372,6 +373,29 @@ the validated maintenance baseline.
     posture
   - existing Rust and TypeScript wrap/unwrap parity coverage plus source review of the deployed
     helper surfaces were sufficient to keep the API unchanged
+- `NIP-03` robustness outcome:
+  - standard long-form `e` tags are now accepted when they carry the deployed empty-relay /
+    marker / pubkey suffix shape used by generic event-tag tooling
+  - exact target-kind requirement, bounded base64 proof decoding, and caller-buffer proof output
+    remain unchanged
+  - deeper OpenTimestamps / Bitcoin attestation verification remains deferred in `no-y0i`
+- `NIP-17` robustness outcome:
+  - direct-message parsing now accepts standard long-form reply `e` tags with optional public-key
+    suffixes instead of rejecting those deployed generic event-tag shapes
+  - kind-14 plain-text content checks, required recipient enforcement, bounded relay-list
+    extraction, and `NIP-59` unwrap reuse remain unchanged
+  - kind-15 file-message handling remains deferred in `no-nv9`
+- `NIP-39` robustness outcome:
+  - no Layer 1 behavior change was required after real-world review
+  - current claim parsing, proof-URL derivation, expected-proof-text generation, and future-extra
+    `i`-tag item tolerance remain the accepted kernel posture
+  - live provider fetch verification remains deferred in `no-t9x`
+- `NIP-29` robustness outcome:
+  - no inbound extraction widening was required after real-world review
+  - outbound builders now reject empty admin role lists and empty optional member labels so the
+    kernel no longer emits invalid compatibility tags
+  - bounded relay-generated metadata/admin/member extraction remains the accepted kernel posture,
+    while broader group surfaces remain deferred in `no-ebj`
 - Keep the implemented-NIP audit report current if future code changes reopen compatibility
   questions.
 - `no-4iw` is resolved by the NIP-10 audit and no longer blocks interpretation of NIP-10 quality.

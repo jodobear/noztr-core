@@ -148,19 +148,29 @@ Current project context for the Phase H kickoff baseline.
   - deferred backlog `NIP-03` is now complete in `src/nip03_opentimestamps.zig` with strict
     kind-`1040` extraction, exact `e`/`k` target tags, caller-buffer base64 proof decoding, target
     reference validation, and direct `e`/`k` tag builders
+  - deferred backlog `NIP-03` robustness review is complete:
+    - standard long-form `e` tags with empty-relay / marker / pubkey suffixes are now accepted
+    - bounded proof decoding and exact target-reference validation remain unchanged
   - accepted bounded deferral: full OpenTimestamps / Bitcoin attestation verification remains out
     of current kernel scope
   - deferred backlog `NIP-17` is now complete in `src/nip17_private_messages.zig` with bounded
     kind-`14` message parsing, direct `NIP-59` unwrap-to-rumor reuse, kind-`10050` relay-list
     extraction, and direct `p`/`relay` tag builders
+  - deferred backlog `NIP-17` robustness review is complete:
+    - standard long-form reply `e` tags with optional public-key suffixes are now accepted
+    - kind-14 content, recipient, and relay-list boundaries remain unchanged
   - accepted bounded deferral: kind-`15` file-message handling remains deferred in `no-nv9`
   - deferred backlog `NIP-39` is now complete in `src/nip39_external_identities.zig` with bounded
     kind-`10011` claim extraction, canonical `i`-tag building, provider-specific proof-URL
     derivation, and expected proof-text generation
+  - deferred backlog `NIP-39` robustness review is complete with no Layer 1 behavior change
   - accepted bounded deferral: live provider fetch verification remains deferred in `no-t9x`
   - deferred backlog `NIP-29` is now complete in `src/nip29_relay_groups.zig` with bounded
     relay-generated group metadata/admin/member extraction and builders for kinds `39000`,
     `39001`, and `39002`
+  - deferred backlog `NIP-29` robustness review is complete:
+    - inbound extraction stayed unchanged
+    - outbound builders now reject empty admin role lists and empty optional member labels
   - accepted bounded deferral: group references, user/moderation event helpers, and relay
     orchestration remain deferred in `no-ebj`
   - Wave 1, the implemented-NIP audit, Wave 2 / `NIP-46`, Wave 3 / `NIP-06`, post-wave expansion
@@ -236,6 +246,13 @@ Current project context for the Phase H kickoff baseline.
 - Latest cadence run (2026-03-12): `zig build test --summary all` passed
   (`Build Summary: 9/9 steps succeeded; 714/714 tests passed`).
 - Latest cadence run (2026-03-12): `zig build` passed.
+- Latest cadence run (2026-03-12): rust parity harness passed
+  (`SUMMARY pass=29 fail=0 harness_covered=29 total=29`).
+- Latest cadence run (2026-03-12): TS audit harness passed
+  (`SUMMARY pass=29 fail=0 harness_covered=29 total=29`).
+- Latest cadence run (2026-03-12): `zig build test --summary all` passed
+  (`Build Summary: 9/9 steps succeeded; 720/720 tests passed`).
+- Latest cadence run (2026-03-12): `zig build` passed.
 - Active cadence commands:
   - `cargo run --manifest-path tools/interop/rust-nostr-parity-all/Cargo.toml`
   - `zig build test --summary all && zig build`
@@ -273,8 +290,8 @@ Current project context for the Phase H kickoff baseline.
    changes and record outcomes in Phase H kickoff and handoff docs.
 3. Phase H planned expansion is complete through deferred backlog item `NIP-29`.
    Recommended next step:
-   - start the next robustness batch on the newly expanded surfaces and the highest-risk
-     compatibility boundaries
+   - address deferred follow-up items (`no-y0i`, `no-nv9`, `no-t9x`, `no-ebj`) or other
+     operator-directed hardening work before any new protocol expansion
 4. Keep the implemented-NIP audit report current if future code changes reopen compatibility or
    strictness questions.
 5. Wave 2 / `NIP-46` is complete.
