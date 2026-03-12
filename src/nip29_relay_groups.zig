@@ -643,7 +643,8 @@ fn parse_admin_tag(
     if (tag.items.len < 2) return error.InvalidAdminTag;
     if (admin_count.* == out_admins.len) return error.BufferTooSmall;
     const roles_start = role_count.*;
-    for (tag.items[2..]) |role| {
+    const role_items = admin_role_items(tag);
+    for (role_items) |role| {
         if (role_count.* == out_roles.len) return error.BufferTooSmall;
         out_roles[role_count.*] = parse_role(role) catch return error.InvalidAdminTag;
         role_count.* += 1;
@@ -653,6 +654,15 @@ fn parse_admin_tag(
         .roles = out_roles[roles_start..role_count.*],
     };
     admin_count.* += 1;
+}
+
+fn admin_role_items(tag: nip01_event.EventTag) []const []const u8 {
+    std.debug.assert(tag.items.len >= 2);
+    std.debug.assert(tag.items.len <= limits.tag_items_max);
+
+    if (tag.items.len < 3) return tag.items[2..];
+    if (tag.items[2].len == 0) return tag.items[3..];
+    return tag.items[2..];
 }
 
 fn apply_member_tag(
@@ -906,8 +916,11 @@ fn parse_group_tag(tag: nip01_event.EventTag, group_id: *[]const u8) Nip29Error!
     std.debug.assert(@intFromPtr(group_id) != 0);
     std.debug.assert(tag.items.len <= limits.tag_items_max);
 
-    if (tag.items.len != 2) return error.InvalidGroupTag;
+    if (tag.items.len != 2 and tag.items.len != 3) return error.InvalidGroupTag;
     group_id.* = parse_group_id(tag.items[1]) catch return error.InvalidGroupTag;
+    if (tag.items.len == 3 and tag.items[2].len != 0) {
+        _ = parse_url(tag.items[2]) catch return error.InvalidGroupTag;
+    }
 }
 
 fn parse_user_tag(
@@ -1188,6 +1201,32 @@ test "group admins extract preserves ordered raw roles" {
     try std.testing.expectEqualStrings("gardener", info.admins[0].roles[1]);
 }
 
+test "group admins extract ignores empty compatibility label before permissions" {
+    const tags = [_]nip01_event.EventTag{
+        .{ .items = &.{ "d", "pizza-lovers" } },
+        .{ .items = &.{
+            "p",
+            "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+            "",
+            "put-user",
+            "delete-event",
+        } },
+    };
+    var admins: [1]GroupAdmin = undefined;
+    var roles: [2][]const u8 = undefined;
+
+    const info = try group_admins_extract(
+        &test_event(group_admins_kind, tags[0..]),
+        admins[0..],
+        roles[0..],
+    );
+
+    try std.testing.expectEqual(@as(usize, 1), info.admins.len);
+    try std.testing.expectEqual(@as(usize, 2), info.admins[0].roles.len);
+    try std.testing.expectEqualStrings("put-user", info.admins[0].roles[0]);
+    try std.testing.expectEqualStrings("delete-event", info.admins[0].roles[1]);
+}
+
 test "group members extract accepts optional compatibility labels" {
     const tags = [_]nip01_event.EventTag{
         .{ .items = &.{ "d", "pizza-lovers" } },
@@ -1308,16 +1347,16 @@ test "group roles extract and moderation builders are bounded" {
 
 test "group join leave and user moderation extraction stays bounded" {
     const join_tags = [_]nip01_event.EventTag{
-        .{ .items = &.{ "h", "pizza-lovers" } },
+        .{ .items = &.{ "h", "pizza-lovers", "wss://groups.example" } },
         .{ .items = &.{ "code", "invite-123" } },
         .{ .items = &.{ "previous", "deadbeef" } },
     };
     const leave_tags = [_]nip01_event.EventTag{
-        .{ .items = &.{ "h", "pizza-lovers" } },
+        .{ .items = &.{ "h", "pizza-lovers", "wss://groups.example" } },
         .{ .items = &.{ "previous", "feedbead" } },
     };
     const put_tags = [_]nip01_event.EventTag{
-        .{ .items = &.{ "h", "pizza-lovers" } },
+        .{ .items = &.{ "h", "pizza-lovers", "wss://groups.example" } },
         .{ .items = &.{
             "p",
             "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
@@ -1327,7 +1366,7 @@ test "group join leave and user moderation extraction stays bounded" {
         .{ .items = &.{ "previous", "deadbeef" } },
     };
     const remove_tags = [_]nip01_event.EventTag{
-        .{ .items = &.{ "h", "pizza-lovers" } },
+        .{ .items = &.{ "h", "pizza-lovers", "wss://groups.example" } },
         .{ .items = &.{
             "p",
             "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
@@ -1366,4 +1405,19 @@ test "group join leave and user moderation extraction stays bounded" {
     try std.testing.expectEqual(@as(usize, 2), put_user.roles.len);
     try std.testing.expectEqualStrings("admin", put_user.roles[0]);
     try std.testing.expectEqual(@as(usize, 1), remove_user.previous_refs.len);
+}
+
+test "group join request rejects invalid relay-hint h tag" {
+    const tags = [_]nip01_event.EventTag{
+        .{ .items = &.{ "h", "pizza-lovers", "bad relay" } },
+    };
+    var previous: [1][]const u8 = undefined;
+
+    try std.testing.expectError(
+        error.InvalidGroupTag,
+        group_join_request_extract(
+            &test_event_with_content(group_join_request_kind, tags[0..], ""),
+            previous[0..],
+        ),
+    );
 }

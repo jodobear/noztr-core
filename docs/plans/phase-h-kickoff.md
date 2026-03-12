@@ -394,8 +394,9 @@ the validated maintenance baseline.
     `i`-tag item tolerance remain the accepted kernel posture
   - live provider fetch verification remains out of current kernel scope
 - `NIP-29` robustness outcome:
-  - no inbound extraction widening was required after real-world review
-  - outbound builders now reject empty admin role lists and empty optional member labels so the
+  - inbound extraction now accepts deployed three-slot `h` tags with optional relay hints and
+    ignores the empty admin compatibility label slot emitted by `nostr-tools`
+  - outbound builders still reject empty admin role lists and empty optional member labels so the
     kernel no longer emits invalid compatibility tags
   - bounded relay-generated metadata/admin/member/role extraction plus raw group references,
     user-event extraction, and raw `previous` tags remain the accepted kernel posture

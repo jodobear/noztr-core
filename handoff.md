@@ -171,8 +171,10 @@ Current project context for the Phase H kickoff baseline.
     `39001`, `39002`, and `39003`, raw group-reference parse/build helpers, bounded join/leave
     and put/remove-user extraction, and raw `previous` tag plumbing
   - deferred backlog `NIP-29` robustness review is complete:
-    - inbound extraction stayed unchanged
-    - outbound builders now reject empty admin role lists and empty optional member labels
+    - inbound extraction now accepts deployed three-slot `h` tags with optional relay hints
+    - group-admin extraction now ignores the empty compatibility label slot emitted by
+      `nostr-tools` instead of rejecting the whole tag
+    - outbound builders still reject empty admin role lists and empty optional member labels
   - accepted bounded kernel posture: relay fetch/subscription, derived membership state, and
     broader moderation orchestration remain out of current scope
   - Wave 1, the implemented-NIP audit, Wave 2 / `NIP-46`, Wave 3 / `NIP-06`, post-wave expansion

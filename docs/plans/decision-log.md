@@ -1352,3 +1352,26 @@ Immutable record of accepted planning decisions.
   readiness deferred-by-operator and outside closure scope).
 - Decision-Needed Count (High Impact): 0
 - Owner: active phase owner
+
+## D-067: Accept bounded deployed NIP-29 compatibility shapes for group `h` and admin `p` tags
+
+- Date: 2026-03-12
+- Status: accepted
+- Decision: widen the NIP-29 kernel just enough to accept two deployed compatibility shapes during
+  extraction:
+  - user and moderation `h` tags may carry an optional third-slot relay hint when it is URL-shaped
+  - group-admin `p` tags may carry an empty third-slot compatibility label before permissions, and
+    that empty slot is ignored instead of poisoning the parse path
+  Keep canonical builders unchanged: emitted `h` tags remain two-item tags, emitted admin `p` tags
+  remain raw pubkey-plus-roles tags with no label slot. Do not add broader admin-label modeling in
+  the kernel at this stage.
+- Why: deployed ecosystem helpers, especially `nostr-tools` and applesauce, use these shapes, and
+  the old parser was stricter than necessary in ways that created avoidable compatibility friction
+  without improving safety or determinism.
+- Tradeoff: slightly broader accepted inbound shape versus a small increase in parser surface; this
+  remains bounded because the third `h` slot must still be URL-shaped and only the empty admin
+  compatibility label is ignored.
+- Related Tradeoff: T-H-ANIP-011.
+- Reversal Trigger: the deployed ecosystem converges on a narrower canonical group-tag/admin-tag
+  shape or these compatibility slots begin causing ambiguous or unsafe behavior in practice.
+- Supersedes: none
