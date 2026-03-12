@@ -1102,6 +1102,25 @@ Immutable record of accepted planning decisions.
   interoperability evidence shows the bounded kind-`14`/`10050` split is insufficient.
 - Supersedes: none
 
+## D-061: Keep Phase H NIP-39 bounded to claim parsing plus deterministic proof material
+
+- Date: 2026-03-12
+- Status: accepted
+- Decision: complete `no-g5j` by implementing `src/nip39_external_identities.zig` as a bounded
+  helper surface for kind-`10011` identity-claim extraction, canonical `i` tag building,
+  provider-specific proof-URL derivation, and expected proof-text generation. Do not perform
+  provider network fetch verification inside the kernel.
+- Why: this captures the deterministic protocol value of NIP-39 while keeping network fetches,
+  provider trust policy, and external API behavior out of the core library. It also keeps the
+  boundary compatible with the current KISS posture instead of embedding partial web clients into
+  the kernel.
+- Tradeoff: immediate typed claim/proof-material helpers versus leaving live provider verification
+  for an opt-in adapter layer.
+- Related Tradeoff: T-H-ANIP-001, T-H-ANIP-003, T-0-001, T-0-003.
+- Reversal Trigger: provider verification becomes required for current scope and a bounded
+  non-kernel adapter model is insufficient.
+- Supersedes: none
+
 ## Phase Closure Evidence
 
 ### P0-E-001: Phase 0 closure record

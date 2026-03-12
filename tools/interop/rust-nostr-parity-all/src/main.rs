@@ -16,6 +16,7 @@ use nostr::nips::nip17;
 use nostr::nips::nip19::{FromBech32, ToBech32};
 use nostr::nips::nip21::{Nip21, ToNostrUri};
 use nostr::nips::nip22::{self, CommentTarget as Nip22CommentTarget};
+use nostr::nips::nip39;
 use nostr::nips::nip42;
 use nostr::nips::nip44::v2::{decrypt_to_bytes, encrypt_to_bytes_with_rng, ConversationKey};
 use nostr::nips::nip46::{NostrConnectMessage, NostrConnectMethod, NostrConnectURI};
@@ -986,6 +987,35 @@ fn check_nip17() -> Result<(), String> {
         .collect();
     if extracted != vec![relay_one.as_str().to_string(), relay_two.as_str().to_string()] {
         return Err("nip17 relay extraction mismatch".to_string());
+    }
+
+    Ok(())
+}
+
+fn check_nip39() -> Result<(), String> {
+    let github = nip39::Identity::new("github:semisol", "9721ce4ee4fceb91c9711ca2a6c9a5ab")
+        .map_err(|e| format!("nip39 github identity parse: {e}"))?;
+    if github.platform != nip39::ExternalIdentity::GitHub {
+        return Err("nip39 github provider mismatch".to_string());
+    }
+    if github.ident != "semisol" {
+        return Err("nip39 github identity mismatch".to_string());
+    }
+
+    let mastodon = nip39::Identity::new(
+        "mastodon:bitcoinhackers.org/@semisol",
+        "109775066355589974",
+    )
+    .map_err(|e| format!("nip39 mastodon identity parse: {e}"))?;
+    if mastodon.platform != nip39::ExternalIdentity::Mastodon {
+        return Err("nip39 mastodon provider mismatch".to_string());
+    }
+    if mastodon.ident != "bitcoinhackers.org/@semisol" {
+        return Err("nip39 mastodon identity mismatch".to_string());
+    }
+
+    if nip39::Identity::new("unknown:semisol", "proof").is_ok() {
+        return Err("nip39 unsupported provider was accepted".to_string());
     }
 
     Ok(())
@@ -2050,6 +2080,7 @@ async fn main() {
     push_harness_covered(&mut results, "NIP-23", Depth::Baseline, check_nip23());
     push_harness_covered(&mut results, "NIP-24", Depth::Baseline, check_nip24());
     push_harness_covered(&mut results, "NIP-17", Depth::Baseline, check_nip17());
+    push_harness_covered(&mut results, "NIP-39", Depth::Baseline, check_nip39());
     push_harness_covered(&mut results, "NIP-27", Depth::Deep, check_nip27());
     push_harness_covered(&mut results, "NIP-25", Depth::Deep, check_nip25());
     push_harness_covered(&mut results, "NIP-51", Depth::Deep, check_nip51());

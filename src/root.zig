@@ -84,6 +84,9 @@ pub const nip03_opentimestamps = @import("nip03_opentimestamps.zig");
 /// Phase H deferred-backlog concrete export for the NIP-17 private direct-message module.
 pub const nip17_private_messages = @import("nip17_private_messages.zig");
 
+/// Phase H deferred-backlog concrete export for the NIP-39 external-identity module.
+pub const nip39_external_identities = @import("nip39_external_identities.zig");
+
 /// Phase I5 concrete export for the NIP-44 encrypted direct-message module.
 pub const nip44 = @import("nip44.zig");
 
@@ -159,6 +162,7 @@ test "root exports limits and error namespaces" {
     try std.testing.expect(@TypeOf(nip03_opentimestamps.OpenTimestampsError) == type);
     try std.testing.expect(@TypeOf(nip17_private_messages.Nip17Error) == type);
     try std.testing.expect(@TypeOf(nip17_private_messages.Nip17RelayListError) == type);
+    try std.testing.expect(@TypeOf(nip39_external_identities.Nip39Error) == type);
     try std.testing.expect(@TypeOf(nip44.Nip44Error) == type);
     try std.testing.expect(@TypeOf(nip59_wrap.WrapError) == type);
     try std.testing.expectEqual(i6_extensions_enabled, @hasDecl(nip45_count, "CountError"));
@@ -197,6 +201,9 @@ test "root exports limits and error namespaces" {
     try std.testing.expect(@TypeOf(nip17_private_messages.DmReplyRef) == type);
     try std.testing.expect(@TypeOf(nip17_private_messages.DmMessageInfo) == type);
     try std.testing.expect(@TypeOf(nip17_private_messages.BuiltTag) == type);
+    try std.testing.expect(@TypeOf(nip39_external_identities.IdentityProvider) == type);
+    try std.testing.expect(@TypeOf(nip39_external_identities.IdentityClaim) == type);
+    try std.testing.expect(@TypeOf(nip39_external_identities.BuiltTag) == type);
     try std.testing.expect(
         @TypeOf(nip06_mnemonic.mnemonic_validate) ==
             fn ([]const u8) nip06_mnemonic.Nip06Error!void,
@@ -272,6 +279,27 @@ test "root exports limits and error namespaces" {
                 *const nip01_event.Event,
                 [][]const u8,
             ) nip17_private_messages.Nip17RelayListError!u16,
+    );
+    try std.testing.expect(
+        @TypeOf(nip39_external_identities.identity_claims_extract) ==
+            fn (
+                *const nip01_event.Event,
+                []nip39_external_identities.IdentityClaim,
+            ) nip39_external_identities.Nip39Error!u16,
+    );
+    try std.testing.expect(
+        @TypeOf(nip39_external_identities.identity_claim_build_tag) ==
+            fn (
+                *nip39_external_identities.BuiltTag,
+                *const nip39_external_identities.IdentityClaim,
+            ) nip39_external_identities.Nip39Error!nip01_event.EventTag,
+    );
+    try std.testing.expect(
+        @TypeOf(nip39_external_identities.identity_claim_build_proof_url) ==
+            fn (
+                []u8,
+                *const nip39_external_identities.IdentityClaim,
+            ) nip39_external_identities.Nip39Error![]const u8,
     );
     try std.testing.expect(
         @TypeOf(nip24_extra_metadata.common_tags_extract) ==

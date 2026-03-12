@@ -20,6 +20,7 @@ import * as nip46 from "nostr-tools/nip46";
 import * as nip10 from "nostr-tools/nip10";
 import * as nip06 from "nostr-tools/nip06";
 import * as nip17 from "nostr-tools/nip17";
+import * as nip39 from "nostr-tools/nip39";
 import { parse as parseNostrUri } from "nostr-tools/nip21";
 import * as nip27 from "nostr-tools/nip27";
 import * as kinds from "nostr-tools/kinds";
@@ -884,6 +885,38 @@ function check_nip17(): void {
     ensure(relay_tags[1][1] === "wss://relay.two", "NIP-17 second relay mismatch");
 }
 
+async function check_nip39(): Promise<void> {
+    const pubkey =
+        "b889ff5b1513b641e2a139f661a661364979c5beee91842f8f0ef42ab558e9d4";
+    const npub = npubEncode(pubkey);
+    let requested_url = "";
+
+    nip39.useFetchImplementation(async (url: string) => {
+        requested_url = url;
+        return {
+            text: async () =>
+                `Verifying that I control the following Nostr public key: ${npub}`,
+        };
+    });
+    const github_ok = await nip39.validateGithub(
+        npub,
+        "semisol",
+        "9721ce4ee4fceb91c9711ca2a6c9a5ab",
+    );
+    ensure(github_ok, "NIP-39 github validation returned false");
+    ensure(
+        requested_url ===
+            "https://gist.github.com/semisol/9721ce4ee4fceb91c9711ca2a6c9a5ab/raw",
+        "NIP-39 github proof URL mismatch",
+    );
+
+    nip39.useFetchImplementation(async () => {
+        return { text: async () => "bad proof text" };
+    });
+    const github_bad = await nip39.validateGithub(npub, "semisol", "bad-proof");
+    ensure(!github_bad, "NIP-39 github validation accepted wrong proof text");
+}
+
 async function check_nip46(): Promise<void> {
     const pubkey =
         "b889ff5b1513b641e2a139f661a661364979c5beee91842f8f0ef42ab558e9d4";
@@ -1287,6 +1320,7 @@ async function main(): Promise<void> {
     await push_harness_covered(results, "NIP-23", "BASELINE", check_nip23);
     await push_harness_covered(results, "NIP-24", "BASELINE", check_nip24);
     await push_harness_covered(results, "NIP-17", "BASELINE", check_nip17);
+    await push_harness_covered(results, "NIP-39", "BASELINE", check_nip39);
     await push_harness_covered(results, "NIP-42", "EDGE", check_nip42);
     await push_harness_covered(results, "NIP-44", "DEEP", check_nip44);
     await push_harness_covered(results, "NIP-51", "BASELINE", check_nip51);
