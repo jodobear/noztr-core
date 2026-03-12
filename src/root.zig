@@ -81,6 +81,9 @@ pub const nip24_extra_metadata = @import("nip24_extra_metadata.zig");
 /// Phase H deferred-backlog concrete export for the NIP-03 OpenTimestamps module.
 pub const nip03_opentimestamps = @import("nip03_opentimestamps.zig");
 
+/// Phase H deferred-backlog concrete export for the NIP-17 private direct-message module.
+pub const nip17_private_messages = @import("nip17_private_messages.zig");
+
 /// Phase I5 concrete export for the NIP-44 encrypted direct-message module.
 pub const nip44 = @import("nip44.zig");
 
@@ -154,6 +157,8 @@ test "root exports limits and error namespaces" {
     try std.testing.expect(@TypeOf(nip23_long_form.LongFormError) == type);
     try std.testing.expect(@TypeOf(nip24_extra_metadata.Nip24Error) == type);
     try std.testing.expect(@TypeOf(nip03_opentimestamps.OpenTimestampsError) == type);
+    try std.testing.expect(@TypeOf(nip17_private_messages.Nip17Error) == type);
+    try std.testing.expect(@TypeOf(nip17_private_messages.Nip17RelayListError) == type);
     try std.testing.expect(@TypeOf(nip44.Nip44Error) == type);
     try std.testing.expect(@TypeOf(nip59_wrap.WrapError) == type);
     try std.testing.expectEqual(i6_extensions_enabled, @hasDecl(nip45_count, "CountError"));
@@ -188,6 +193,10 @@ test "root exports limits and error namespaces" {
     try std.testing.expect(@TypeOf(nip24_extra_metadata.BuiltTag) == type);
     try std.testing.expect(@TypeOf(nip03_opentimestamps.OpenTimestampsAttestation) == type);
     try std.testing.expect(@TypeOf(nip03_opentimestamps.BuiltTag) == type);
+    try std.testing.expect(@TypeOf(nip17_private_messages.DmRecipient) == type);
+    try std.testing.expect(@TypeOf(nip17_private_messages.DmReplyRef) == type);
+    try std.testing.expect(@TypeOf(nip17_private_messages.DmMessageInfo) == type);
+    try std.testing.expect(@TypeOf(nip17_private_messages.BuiltTag) == type);
     try std.testing.expect(
         @TypeOf(nip06_mnemonic.mnemonic_validate) ==
             fn ([]const u8) nip06_mnemonic.Nip06Error!void,
@@ -239,6 +248,30 @@ test "root exports limits and error namespaces" {
                 []const u8,
                 ?[]const u8,
             ) nip03_opentimestamps.OpenTimestampsError!nip01_event.EventTag,
+    );
+    try std.testing.expect(
+        @TypeOf(nip17_private_messages.nip17_message_parse) ==
+            fn (
+                *const nip01_event.Event,
+                []nip17_private_messages.DmRecipient,
+            ) nip17_private_messages.Nip17Error!nip17_private_messages.DmMessageInfo,
+    );
+    try std.testing.expect(
+        @TypeOf(nip17_private_messages.nip17_unwrap_message) ==
+            fn (
+                *nip01_event.Event,
+                *const [32]u8,
+                *const nip01_event.Event,
+                []nip17_private_messages.DmRecipient,
+                std.mem.Allocator,
+            ) nip17_private_messages.Nip17Error!nip17_private_messages.DmMessageInfo,
+    );
+    try std.testing.expect(
+        @TypeOf(nip17_private_messages.nip17_relay_list_extract) ==
+            fn (
+                *const nip01_event.Event,
+                [][]const u8,
+            ) nip17_private_messages.Nip17RelayListError!u16,
     );
     try std.testing.expect(
         @TypeOf(nip24_extra_metadata.common_tags_extract) ==

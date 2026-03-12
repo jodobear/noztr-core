@@ -296,6 +296,23 @@ the validated maintenance baseline.
     - TypeScript audit overlap is now `HARNESS_COVERED`, `BASELINE`, `PASS`
   - review outcome:
     - no accepted behavior change was required after the implementation pass
+- Deferred backlog / `NIP-17` is complete in `no-0jq`
+  - bounded `src/nip17_private_messages.zig` surface is implemented
+  - current implemented scope:
+    - kind-`14` message parsing with ordered recipient extraction, optional `subject`, and optional
+      reply reference handling
+    - `NIP-59` unwrap plus inner kind-`14` parse as a direct helper on top of the existing
+      `NIP-44`/`NIP-59` trust boundary
+    - kind-`10050` relay-list extraction with ordered `relay` tags
+    - direct `p` and `relay` tag builders
+    - tolerant handling of unrelated unknown tags
+  - accepted bounded deferral:
+    - kind-`15` file-message handling remains deferred in `no-nv9`
+  - parity/evidence status:
+    - rust parity overlap is now `HARNESS_COVERED`, `BASELINE`, `PASS`
+    - TypeScript audit overlap is now `HARNESS_COVERED`, `BASELINE`, `PASS`
+  - review outcome:
+    - no accepted behavior change was required after the implementation pass
 
 ## Immediate Work Tracks
 
@@ -306,11 +323,12 @@ the validated maintenance baseline.
 - Current robustness progress:
   - completed: `NIP-46`, `NIP-06`, `NIP-51` private lists, `NIP-44`, `NIP-59`
   - recommended next surfaces: `NIP-24`, `NIP-23`, `NIP-46`, `NIP-06`, `NIP-51` private lists
-- Phase H planned expansion is now complete through `NIP-03`; current protocol work remains the
-  remaining deferred backlog sequence (`17`, `39`, `29`) before the next robustness batch.
+- Phase H planned expansion is now complete through deferred backlog item `NIP-17`; current
+  protocol work remains the final deferred backlog sequence (`39`, `29`) before the next
+  robustness batch.
 - Deferred backlog is now reprioritized:
-  - next implementation candidate: `NIP-17` (`no-0jq`)
-  - ordered follow-ons: `NIP-39` (`no-g5j`), `NIP-29` (`no-j2g`)
+  - next implementation candidate: `NIP-39` (`no-g5j`)
+  - ordered follow-on: `NIP-29` (`no-j2g`)
   - recommended sequence: implement the remaining deferred backlog items serially, then run the
     next robustness batch
 - `NIP-44` robustness outcome:

@@ -12,6 +12,7 @@ use nostr::nips::nip06::FromMnemonic;
 use nostr::nips::nip09::EventDeletionRequest;
 use nostr::nips::nip10::Marker as Nip10Marker;
 use nostr::nips::nip11::RelayInformationDocument;
+use nostr::nips::nip17;
 use nostr::nips::nip19::{FromBech32, ToBech32};
 use nostr::nips::nip21::{Nip21, ToNostrUri};
 use nostr::nips::nip22::{self, CommentTarget as Nip22CommentTarget};
@@ -933,6 +934,58 @@ fn check_nip24() -> Result<(), String> {
     }
     if !event_has_exact_tag(&event, hashtag) {
         return Err("nip24 event missing hashtag".to_string());
+    }
+
+    Ok(())
+}
+
+fn check_nip17() -> Result<(), String> {
+    let keys = parse_keys()?;
+    let receiver = parse_alt_keys()?.public_key();
+    let reply_tag = Tag::parse(vec![
+        "e",
+        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "wss://relay.example",
+        "reply",
+    ])
+    .map_err(|e| format!("nip17 reply tag parse: {e}"))?;
+    let subject_tag =
+        Tag::parse(vec!["subject", "Topic"]).map_err(|e| format!("nip17 subject tag parse: {e}"))?;
+    let rumor = EventBuilder::private_msg_rumor(receiver, "hello")
+        .tags([reply_tag.clone(), subject_tag.clone()])
+        .sign_with_keys(&keys)
+        .map_err(|e| format!("sign nip17 rumor: {e}"))?;
+
+    if rumor.kind != Kind::PrivateDirectMessage {
+        return Err("nip17 rumor kind mismatch".to_string());
+    }
+    if !event_has_public_key(&rumor, receiver) {
+        return Err("nip17 rumor missing recipient".to_string());
+    }
+    if !event_has_exact_tag(&rumor, reply_tag) {
+        return Err("nip17 rumor missing reply tag".to_string());
+    }
+    if !event_has_exact_tag(&rumor, subject_tag) {
+        return Err("nip17 rumor missing subject tag".to_string());
+    }
+
+    let relay_one =
+        RelayUrl::parse("wss://relay.one").map_err(|e| format!("nip17 relay one parse: {e}"))?;
+    let relay_two =
+        RelayUrl::parse("wss://relay.two").map_err(|e| format!("nip17 relay two parse: {e}"))?;
+    let relay_event = EventBuilder::new(Kind::InboxRelays, "")
+        .tags([Tag::relay(relay_one.clone()), Tag::relay(relay_two.clone())])
+        .sign_with_keys(&keys)
+        .map_err(|e| format!("sign nip17 relay list: {e}"))?;
+    if relay_event.kind != Kind::InboxRelays {
+        return Err("nip17 relay list kind mismatch".to_string());
+    }
+
+    let extracted: Vec<String> = nip17::extract_relay_list(&relay_event)
+        .map(|url| url.as_str().to_string())
+        .collect();
+    if extracted != vec![relay_one.as_str().to_string(), relay_two.as_str().to_string()] {
+        return Err("nip17 relay extraction mismatch".to_string());
     }
 
     Ok(())
@@ -1996,6 +2049,7 @@ async fn main() {
     push_harness_covered(&mut results, "NIP-22", Depth::Deep, check_nip22());
     push_harness_covered(&mut results, "NIP-23", Depth::Baseline, check_nip23());
     push_harness_covered(&mut results, "NIP-24", Depth::Baseline, check_nip24());
+    push_harness_covered(&mut results, "NIP-17", Depth::Baseline, check_nip17());
     push_harness_covered(&mut results, "NIP-27", Depth::Deep, check_nip27());
     push_harness_covered(&mut results, "NIP-25", Depth::Deep, check_nip25());
     push_harness_covered(&mut results, "NIP-51", Depth::Deep, check_nip51());

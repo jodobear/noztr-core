@@ -200,6 +200,7 @@ Cross-cutting review lenses for every implemented NIP:
 | 10 | Preserve deterministic thread extraction and malformed-marker rejection while keeping reviewed compatibility for legacy `mention` tags and four-slot pubkey fallback; review any future narrowing against both ecosystem pressure and whether the extra accepted data actually improves trust-boundary behavior. |
 | 11 | Preserve typed known-field validation with unknown-field tolerance; review whether known-field typing or pubkey strictness rejects inputs the NIP intentionally leaves open. |
 | 13 | Preserve checked PoW truthfulness and bounded nonce handling; review nonce-tag shape rules only where real producers emit broader but still unambiguous forms. |
+| 17 | Preserve bounded kind-`14` message parsing, wrap-to-rumor trust-boundary reuse, and kind-`10050` relay-list extraction; review recipient/reply/subject tag exactness against real producer output without widening the kernel into chat orchestration or kind-`15` file-transfer policy. |
 | 18 | Preserve repost target consistency and embedded-event verification; review whether addressable repost/helper shapes accepted in the ecosystem remain deterministic enough for Layer 1. |
 | 19 | Preserve exact codec correctness and forbidden-secret handling; review only if bech32 casing or TLV acceptance is broader in practice while still standards-valid. |
 | 21 | Preserve deterministic `nostr:` URI parsing; review whether any lowercase-only or boundary-token rule is stricter than the URI/NIP actually requires. |

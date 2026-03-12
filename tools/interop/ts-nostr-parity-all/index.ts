@@ -19,6 +19,7 @@ import { decrypt, encrypt, getConversationKey } from "nostr-tools/nip44";
 import * as nip46 from "nostr-tools/nip46";
 import * as nip10 from "nostr-tools/nip10";
 import * as nip06 from "nostr-tools/nip06";
+import * as nip17 from "nostr-tools/nip17";
 import { parse as parseNostrUri } from "nostr-tools/nip21";
 import * as nip27 from "nostr-tools/nip27";
 import * as kinds from "nostr-tools/kinds";
@@ -814,6 +815,75 @@ function check_nip24(): void {
     ensure(event.tags.some((tag) => tag[0] === "t" && tag[1] === "nostr"), "NIP-24 event missing hashtag");
 }
 
+function check_nip17(): void {
+    const sender_secret = to_bytes_32(FIXED_SECRET_KEY_HEX);
+    const recipient_secret = to_bytes_32(
+        "7a350bc1469e1a5b1244625fdbec8b23dc4af192e11cdb296cf9d567a90d3812",
+    );
+    const recipient_public_key = getPublicKey(recipient_secret);
+    const wrap = nip17.wrapEvent(
+        sender_secret,
+        { publicKey: recipient_public_key, relayUrl: "wss://relay.example" },
+        "hello",
+        "Topic",
+        {
+            eventId:
+                "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            relayUrl: "wss://relay.example",
+        },
+    );
+    ensure(wrap.kind === kinds.GiftWrap, "NIP-17 wrap kind mismatch");
+    ensure(verifyEvent(wrap), "NIP-17 wrap signature verification failed");
+
+    const rumor = nip17.unwrapEvent(wrap, recipient_secret);
+    ensure(rumor.kind === kinds.PrivateDirectMessage, "NIP-17 rumor kind mismatch");
+    ensure(rumor.content === "hello", "NIP-17 rumor content mismatch");
+    ensure(
+        rumor.tags.some((tag) => tag[0] === "p" && tag[1] === recipient_public_key),
+        "NIP-17 rumor missing recipient",
+    );
+    ensure(
+        rumor.tags.some((tag) => tag[0] === "subject" && tag[1] === "Topic"),
+        "NIP-17 rumor missing subject",
+    );
+    ensure(
+        rumor.tags.some(
+            (tag) =>
+                tag[0] === "e" &&
+                tag[1] ===
+                    "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" &&
+                tag[tag.length - 1] === "reply",
+        ),
+        "NIP-17 rumor missing reply tag",
+    );
+
+    const relay_event = finalizeEvent(
+        {
+            kind: kinds.DirectMessageRelaysList,
+            created_at: 1_708_000_059,
+            tags: [
+                ["relay", "wss://relay.one"],
+                ["name", "ignored"],
+                ["relay", "wss://relay.two"],
+            ],
+            content: "",
+        },
+        sender_secret,
+    );
+    ensure(
+        relay_event.kind === kinds.DirectMessageRelaysList,
+        "NIP-17 relay-list kind mismatch",
+    );
+    ensure(
+        verifyEvent(relay_event),
+        "NIP-17 relay-list signature verification failed",
+    );
+    const relay_tags = relay_event.tags.filter((tag) => tag[0] === "relay");
+    ensure(relay_tags.length === 2, "NIP-17 relay-list count mismatch");
+    ensure(relay_tags[0][1] === "wss://relay.one", "NIP-17 first relay mismatch");
+    ensure(relay_tags[1][1] === "wss://relay.two", "NIP-17 second relay mismatch");
+}
+
 async function check_nip46(): Promise<void> {
     const pubkey =
         "b889ff5b1513b641e2a139f661a661364979c5beee91842f8f0ef42ab558e9d4";
@@ -1216,6 +1286,7 @@ async function main(): Promise<void> {
     await push_harness_covered(results, "NIP-21", "EDGE", check_nip21);
     await push_harness_covered(results, "NIP-23", "BASELINE", check_nip23);
     await push_harness_covered(results, "NIP-24", "BASELINE", check_nip24);
+    await push_harness_covered(results, "NIP-17", "BASELINE", check_nip17);
     await push_harness_covered(results, "NIP-42", "EDGE", check_nip42);
     await push_harness_covered(results, "NIP-44", "DEEP", check_nip44);
     await push_harness_covered(results, "NIP-51", "BASELINE", check_nip51);

@@ -39,7 +39,7 @@ frozen defaults or the current deterministic-and-compatible Layer 1 kernel postu
 | 06 | h0-complete | Phase H0 is now complete: the `libwally-core` pin target, one-module boundary, typed error posture, and vector corpus floor are frozen for later implementation. |
 | 07 | rejected | Browser `window.nostr` capability is runtime/platform integration, outside protocol-kernel scope. |
 | 10 | wave-1-complete | Strict kind-1 thread/reply helpers are now implemented with marked-tag parsing, positional fallback, typed malformed-tag failures, legacy `mention` compatibility handling, and accepted four-slot pubkey fallback. |
-| 17 | defer | Private DM conventions add orchestration and policy complexity beyond current NIP-44/NIP-59 kernel baseline. |
+| 17 | expansion-complete | Bounded private-message helpers are now implemented for kind-14 message parsing, wrap-to-rumor reuse of the existing NIP-59/NIP-44 trust boundary, kind-10050 relay-list extraction, and direct `p`/`relay` builders; kind-15 file-message handling remains deferred in `no-nv9`. |
 | 18 | wave-1-complete | Strict repost parsing/helpers are now implemented with deterministic embedded-event consistency checks across `e`, `p`, `k`, and `a` data. |
 | 22 | wave-1-complete | Strict comment root/parent linkage helpers are now implemented with mandatory `K/k`, author linkage, and NIP-73-consistent external validation. |
 | 23 | expansion-complete | Bounded long-form metadata helpers are implemented with required `d`, optional title/image/summary/published_at extraction, ordered hashtag extraction, and builder coverage for both `30023` and `30024`. |
@@ -59,21 +59,18 @@ frozen defaults or the current deterministic-and-compatible Layer 1 kernel postu
 - Wave 2 (higher-complexity expansion): `46`.
 - Wave 3 (security-sensitive expansion after checkpoint): `06`.
 - Post-Wave expansion completion: `23`.
-- Post-wave deferred backlog completion: `24`, `03`.
-- Deferred backlog (no implementation start in this plan): `17`, `29`, `39`.
+- Post-wave deferred backlog completion: `24`, `03`, `17`.
+- Deferred backlog (no implementation start in this plan): `29`, `39`.
 - Rejected hold: `07`.
 
 ## Deferred Backlog Priority Order
 
-Reprioritized after post-wave completion of `NIP-03`:
+Reprioritized after deferred-backlog completion of `NIP-17`:
 
-1. `17` (`no-0jq`)
-   Reason: now more feasible because `NIP-44` and `NIP-59` are in place, but it still carries more
-   orchestration and trust-surface ambiguity than `24` or `03`.
-2. `39` (`no-g5j`)
+1. `39` (`no-g5j`)
    Reason: explicit trust-policy surface makes it lower priority until the less policy-heavy items
    are done.
-3. `29` (`no-j2g`)
+2. `29` (`no-j2g`)
    Reason: highest state/policy complexity and the weakest fit for the current protocol-kernel
    scope.
 

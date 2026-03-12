@@ -1084,6 +1084,24 @@ Immutable record of accepted planning decisions.
   ecosystem evidence shows the current attestation boundary is too shallow for practical use.
 - Supersedes: none
 
+## D-060: Keep Phase H NIP-17 bounded to kind-14 message helpers plus kind-10050 relay lists
+
+- Date: 2026-03-12
+- Status: accepted
+- Decision: complete `no-0jq` by implementing `src/nip17_private_messages.zig` only as a bounded
+  helper layer for kind-`14` rumor/message parsing, gift-wrap unwrap plus inner kind-`14` parse,
+  kind-`10050` relay-list extraction, and direct `p`/`relay` tag builders. Defer kind-`15`
+  file-message handling to follow-up issue `no-nv9`.
+- Why: this captures the low-ambiguity, production-useful part of NIP-17 while reusing the already
+  accepted `NIP-44` and `NIP-59` trust boundaries. It avoids turning the kernel into a chat SDK or
+  file-transfer orchestration layer.
+- Tradeoff: immediate deterministic private-message and inbox-relay helpers versus leaving
+  file-message support for a later bounded pass.
+- Related Tradeoff: T-H-ANIP-001, T-H-ANIP-003, T-0-001, T-0-003.
+- Reversal Trigger: kind-`15` becomes necessary for current scope or current `NIP-17`
+  interoperability evidence shows the bounded kind-`14`/`10050` split is insufficient.
+- Supersedes: none
+
 ## Phase Closure Evidence
 
 ### P0-E-001: Phase 0 closure record
