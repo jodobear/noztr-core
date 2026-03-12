@@ -200,7 +200,8 @@ Current project context for the Phase H kickoff baseline.
    changes and record outcomes in Phase H kickoff and handoff docs.
 3. Run the implemented-surface robustness / real-world validation pass before any new NIP
    expansion.
-   Recommended first surfaces: `46`, `06`, `51` private lists, `44`, `59`.
+   Completed first surface: `46`.
+   Recommended next surfaces: `06`, `51` private lists, `44`, `59`.
 4. Keep the implemented-NIP audit report current if future code changes reopen compatibility or
    strictness questions.
 5. Wave 2 / `NIP-46` is complete.
@@ -220,12 +221,15 @@ Current project context for the Phase H kickoff baseline.
      extract bounded NIP-89 kind-`31990` remote-signer metadata.
    - signer `nostr.json` discovery accepts both the current `nip46.relays` shape and the older
      deployed pubkey-keyed relay map used by `nostr-tools`.
+   - client-URI parsing now also accepts the older `metadata={...}` query shape emitted by
+     `rust-nostr` and maps it into the current typed `name` / `url` / `image` fields while keeping
+     split-query output as the canonical emitted form.
    Completed evidence:
    - rust overlap parity is now `HARNESS_COVERED`, `BASELINE`, `PASS`
    - TypeScript overlap evidence is now `HARNESS_COVERED`, `BASELINE`, `PASS`
-   - pinned `rust-nostr` still uses the older `metadata=` client-URI shape and omits
-     `switch_relays`; `noztr` keeps the current-spec split-query URI and method surface that
-     matches `nostr-tools`
+   - pinned `rust-nostr` still omits `switch_relays`; `noztr` keeps the current-spec split-query
+     URI output and method surface that matches `nostr-tools`, but now also accepts the older rust
+     `metadata=` input shape as compatibility parse-only behavior
    Accepted out-of-scope:
    - `nostrconnect_url` placeholder expansion or redirect/template rendering remains app-flow
      logic and is intentionally outside the protocol-kernel helper surface (`D-053`)

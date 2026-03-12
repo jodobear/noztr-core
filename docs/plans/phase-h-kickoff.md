@@ -198,9 +198,15 @@ the validated maintenance baseline.
       kind-`31990` NIP-89 remote-signer events
     - signer `nostr.json` discovery accepts both the current `nip46.relays` shape and the older
       deployed pubkey-keyed relay map used by `nostr-tools`
+    - client-URI parsing now also accepts the older `metadata={...}` query shape emitted by
+      `rust-nostr` and maps it into the current typed `name`/`url`/`image` fields without changing
+      current split-query serialization
   - parity/evidence status:
     - rust parity overlap is now `HARNESS_COVERED`, `BASELINE`, `PASS`
     - TypeScript audit overlap is now `HARNESS_COVERED`, `BASELINE`, `PASS`
+  - robustness pass outcome:
+    - accepted legacy `metadata={...}` client-URI parsing as a bounded compatibility input while
+      keeping split-query output as the canonical emitted form (`D-057`)
     - current intentional divergence: pinned `rust-nostr` still uses the older
       `metadata=` client-URI shape and lacks `switch_relays`, while `noztr` and
       `nostr-tools` follow the current split-query URI and method surface

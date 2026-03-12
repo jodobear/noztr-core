@@ -1026,6 +1026,25 @@ Immutable record of accepted planning decisions.
   still common enough to justify a bounded adapter in the kernel.
 - Supersedes: none
 
+## D-057: Accept legacy NIP-46 `metadata=` client URIs as parse-only compatibility input
+
+- Date: 2026-03-12
+- Status: accepted
+- Decision: during the NIP-46 robustness pass, accept the older `nostrconnect://...?...&metadata={}`
+  client-URI shape emitted by `rust-nostr` as an input-only compatibility path. Parse `name`,
+  `url`, and first `icons[]` entry out of legacy metadata JSON, but keep `noztr` serialization on
+  the current split-query form (`name`, `url`, `image`, `perms`) and let explicit split fields win
+  when both shapes are present.
+- Why: the current spec and `nostr-tools` use split query parameters, but a strong deployed Rust
+  reference still emits `metadata={...}`. Accepting that older input improves real-world
+  interoperability without weakening trust boundaries or reintroducing app-flow policy into the
+  kernel.
+- Tradeoff: one bounded compatibility parse path versus slightly more URI parsing complexity.
+- Related Tradeoff: T-H-ANIP-001, T-0-001, T-0-003.
+- Reversal Trigger: the broader ecosystem fully converges on the current split-query shape and the
+  compatibility path no longer provides practical value.
+- Supersedes: none
+
 ## Phase Closure Evidence
 
 ### P0-E-001: Phase 0 closure record

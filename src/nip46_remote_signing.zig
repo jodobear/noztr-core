@@ -1464,6 +1464,10 @@ fn apply_query_pair(
         metadata.?.permissions = try parse_permissions_csv(value, scratch);
         return;
     }
+    if (std.mem.eql(u8, key, "metadata")) {
+        try parse_legacy_metadata_json(metadata.?, value, scratch);
+        return;
+    }
     if (std.mem.eql(u8, key, "name")) {
         try validate_name(value);
         metadata.?.name = value;
@@ -1478,6 +1482,103 @@ fn apply_query_pair(
         _ = parse_url(value) catch return error.InvalidImage;
         metadata.?.image = value;
     }
+}
+
+fn parse_legacy_metadata_json(
+    metadata: *ClientMetadata,
+    input: []const u8,
+    scratch: std.mem.Allocator,
+) Nip46Error!void {
+    std.debug.assert(@intFromPtr(metadata) != 0);
+    std.debug.assert(@intFromPtr(scratch.ptr) != 0);
+
+    var parse_arena = std.heap.ArenaAllocator.init(scratch);
+    defer parse_arena.deinit();
+
+    const root = std.json.parseFromSliceLeaky(
+        std.json.Value,
+        parse_arena.allocator(),
+        input,
+        .{},
+    ) catch return error.InvalidUri;
+    if (root != .object) {
+        return error.InvalidUri;
+    }
+    try parse_legacy_metadata_name(metadata, root.object, scratch);
+    try parse_legacy_metadata_url(metadata, root.object, scratch);
+    try parse_legacy_metadata_icons(metadata, root.object, scratch);
+}
+
+fn parse_legacy_metadata_name(
+    metadata: *ClientMetadata,
+    object: std.json.ObjectMap,
+    scratch: std.mem.Allocator,
+) Nip46Error!void {
+    std.debug.assert(@intFromPtr(metadata) != 0);
+    std.debug.assert(@intFromPtr(scratch.ptr) != 0);
+
+    if (metadata.name != null) {
+        return;
+    }
+    const value = object.get("name") orelse return;
+    const name = try parse_required_string_value(
+        value,
+        limits.tag_item_bytes_max,
+        scratch,
+        error.InvalidName,
+    );
+    try validate_name(name);
+    metadata.name = name;
+}
+
+fn parse_legacy_metadata_url(
+    metadata: *ClientMetadata,
+    object: std.json.ObjectMap,
+    scratch: std.mem.Allocator,
+) Nip46Error!void {
+    std.debug.assert(@intFromPtr(metadata) != 0);
+    std.debug.assert(@intFromPtr(scratch.ptr) != 0);
+
+    if (metadata.url != null) {
+        return;
+    }
+    const value = object.get("url") orelse return;
+    const url = try parse_required_string_value(
+        value,
+        limits.tag_item_bytes_max,
+        scratch,
+        error.InvalidUrl,
+    );
+    _ = parse_url(url) catch return error.InvalidUrl;
+    metadata.url = url;
+}
+
+fn parse_legacy_metadata_icons(
+    metadata: *ClientMetadata,
+    object: std.json.ObjectMap,
+    scratch: std.mem.Allocator,
+) Nip46Error!void {
+    std.debug.assert(@intFromPtr(metadata) != 0);
+    std.debug.assert(@intFromPtr(scratch.ptr) != 0);
+
+    if (metadata.image != null) {
+        return;
+    }
+    const value = object.get("icons") orelse return;
+    if (value != .array) {
+        return error.InvalidUri;
+    }
+    if (value.array.items.len == 0) {
+        return;
+    }
+    const first = try parse_required_string_value(
+        value.array.items[0],
+        limits.tag_item_bytes_max,
+        scratch,
+        error.InvalidImage,
+    );
+    _ = parse_url(first) catch return error.InvalidImage;
+    metadata.image = first;
 }
 
 fn append_query_relay(
@@ -2383,6 +2484,46 @@ test "uri parse and serialize follow current bunker and nostrconnect forms" {
     try std.testing.expectEqual(@as(usize, 2), client.client.permissions.len);
 }
 
+test "uri parse accepts legacy rust metadata client shape" {
+    var arena = std.heap.ArenaAllocator.init(std.testing.allocator);
+    defer arena.deinit();
+
+    const client_text =
+        "nostrconnect://0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef" ++
+        "?metadata=%7B%22name%22%3A%22Example%22%2C%22url%22%3A%22https%3A%2F%2Fclient.example%22" ++
+        "%2C%22icons%22%3A%5B%22https%3A%2F%2Fclient.example%2Ficon.png%22%5D%7D" ++
+        "&relay=wss%3A%2F%2Frelay.one&secret=s3cr3t";
+    const client = try uri_parse(client_text, arena.allocator());
+
+    try std.testing.expect(client == .client);
+    try std.testing.expectEqualStrings("Example", client.client.name.?);
+    try std.testing.expectEqualStrings("https://client.example", client.client.url.?);
+    try std.testing.expectEqualStrings(
+        "https://client.example/icon.png",
+        client.client.image.?,
+    );
+    try std.testing.expectEqual(@as(usize, 1), client.client.relays.len);
+    try std.testing.expectEqualStrings("s3cr3t", client.client.secret);
+}
+
+test "uri parse lets explicit split metadata override legacy metadata json" {
+    var arena = std.heap.ArenaAllocator.init(std.testing.allocator);
+    defer arena.deinit();
+
+    const client_text =
+        "nostrconnect://0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef" ++
+        "?metadata=%7B%22name%22%3A%22Legacy%22%2C%22url%22%3A%22https%3A%2F%2Fold.example%22%2C" ++
+        "%22icons%22%3A%5B%22https%3A%2F%2Fold.example%2Ficon.png%22%5D%7D" ++
+        "&relay=wss%3A%2F%2Frelay.one&secret=s3cr3t&name=Current&url=https%3A%2F%2Fclient.example" ++
+        "&image=https%3A%2F%2Fclient.example%2Fapp.png";
+    const client = try uri_parse(client_text, arena.allocator());
+
+    try std.testing.expect(client == .client);
+    try std.testing.expectEqualStrings("Current", client.client.name.?);
+    try std.testing.expectEqualStrings("https://client.example", client.client.url.?);
+    try std.testing.expectEqualStrings("https://client.example/app.png", client.client.image.?);
+}
+
 test "uri parsing rejects missing required relay and secret" {
     var arena = std.heap.ArenaAllocator.init(std.testing.allocator);
     defer arena.deinit();
@@ -2399,6 +2540,14 @@ test "uri parsing rejects missing required relay and secret" {
         uri_parse(
             "nostrconnect://0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef" ++
                 "?relay=wss%3A%2F%2Frelay.one",
+            arena.allocator(),
+        ),
+    );
+    try std.testing.expectError(
+        error.InvalidUri,
+        uri_parse(
+            "nostrconnect://0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef" ++
+                "?metadata=%7Bbad-json%7D&relay=wss%3A%2F%2Frelay.one&secret=s3cr3t",
             arena.allocator(),
         ),
     );
