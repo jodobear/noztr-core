@@ -78,6 +78,9 @@ pub const nip23_long_form = @import("nip23_long_form.zig");
 /// Phase H concrete export for the NIP-24 extra metadata module.
 pub const nip24_extra_metadata = @import("nip24_extra_metadata.zig");
 
+/// Phase H deferred-backlog concrete export for the NIP-03 OpenTimestamps module.
+pub const nip03_opentimestamps = @import("nip03_opentimestamps.zig");
+
 /// Phase I5 concrete export for the NIP-44 encrypted direct-message module.
 pub const nip44 = @import("nip44.zig");
 
@@ -150,6 +153,7 @@ test "root exports limits and error namespaces" {
     try std.testing.expect(@TypeOf(nip06_mnemonic.Nip06Error) == type);
     try std.testing.expect(@TypeOf(nip23_long_form.LongFormError) == type);
     try std.testing.expect(@TypeOf(nip24_extra_metadata.Nip24Error) == type);
+    try std.testing.expect(@TypeOf(nip03_opentimestamps.OpenTimestampsError) == type);
     try std.testing.expect(@TypeOf(nip44.Nip44Error) == type);
     try std.testing.expect(@TypeOf(nip59_wrap.WrapError) == type);
     try std.testing.expectEqual(i6_extensions_enabled, @hasDecl(nip45_count, "CountError"));
@@ -182,6 +186,8 @@ test "root exports limits and error namespaces" {
     try std.testing.expect(@TypeOf(nip24_extra_metadata.MetadataExtras) == type);
     try std.testing.expect(@TypeOf(nip24_extra_metadata.CommonTagInfo) == type);
     try std.testing.expect(@TypeOf(nip24_extra_metadata.BuiltTag) == type);
+    try std.testing.expect(@TypeOf(nip03_opentimestamps.OpenTimestampsAttestation) == type);
+    try std.testing.expect(@TypeOf(nip03_opentimestamps.BuiltTag) == type);
     try std.testing.expect(
         @TypeOf(nip06_mnemonic.mnemonic_validate) ==
             fn ([]const u8) nip06_mnemonic.Nip06Error!void,
@@ -218,6 +224,21 @@ test "root exports limits and error namespaces" {
                 []const u8,
                 std.mem.Allocator,
             ) nip24_extra_metadata.Nip24Error!nip24_extra_metadata.MetadataExtras,
+    );
+    try std.testing.expect(
+        @TypeOf(nip03_opentimestamps.opentimestamps_extract) ==
+            fn (
+                []u8,
+                *const nip01_event.Event,
+            ) nip03_opentimestamps.OpenTimestampsError!nip03_opentimestamps.OpenTimestampsAttestation,
+    );
+    try std.testing.expect(
+        @TypeOf(nip03_opentimestamps.opentimestamps_build_event_tag) ==
+            fn (
+                *nip03_opentimestamps.BuiltTag,
+                []const u8,
+                ?[]const u8,
+            ) nip03_opentimestamps.OpenTimestampsError!nip01_event.EventTag,
     );
     try std.testing.expect(
         @TypeOf(nip24_extra_metadata.common_tags_extract) ==

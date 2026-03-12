@@ -280,6 +280,22 @@ the validated maintenance baseline.
     - TypeScript audit overlap is now `HARNESS_COVERED`, `BASELINE`, `PASS`
   - review outcome:
     - no accepted behavior change was required after the implementation pass
+- Deferred backlog / `NIP-03` is complete in `no-wo7`
+  - bounded `src/nip03_opentimestamps.zig` surface is implemented
+  - current implemented scope:
+    - strict kind-`1040` attestation extraction with exact single `e` and `k` target tags
+    - caller-buffer base64 proof decoding with typed failures on malformed or oversized content
+    - target-reference validation against a supplied event id and kind
+    - direct builders for canonical `e` and `k` tags
+    - tolerant handling of unrelated unknown tags
+  - accepted bounded deferral:
+    - full OpenTimestamps / Bitcoin attestation verification remains outside the current kernel
+      scope
+  - parity/evidence status:
+    - rust parity overlap is now `HARNESS_COVERED`, `BASELINE`, `PASS`
+    - TypeScript audit overlap is now `HARNESS_COVERED`, `BASELINE`, `PASS`
+  - review outcome:
+    - no accepted behavior change was required after the implementation pass
 
 ## Immediate Work Tracks
 
@@ -290,13 +306,13 @@ the validated maintenance baseline.
 - Current robustness progress:
   - completed: `NIP-46`, `NIP-06`, `NIP-51` private lists, `NIP-44`, `NIP-59`
   - recommended next surfaces: `NIP-24`, `NIP-23`, `NIP-46`, `NIP-06`, `NIP-51` private lists
-- Phase H planned expansion is now complete through `NIP-24`; next protocol work requires either:
-  - a second robustness batch on completed surfaces, or
-  - explicit reprioritization of one deferred backlog item (`03`, `17`, `29`, `39`)
+- Phase H planned expansion is now complete through `NIP-03`; current protocol work remains the
+  remaining deferred backlog sequence (`17`, `39`, `29`) before the next robustness batch.
 - Deferred backlog is now reprioritized:
-  - next implementation candidate: `NIP-03` (`no-wo7`)
-  - ordered follow-ons: `NIP-17` (`no-0jq`), `NIP-39` (`no-g5j`), `NIP-29` (`no-j2g`)
-  - recommended sequence: run the next robustness batch first, then open `NIP-03`
+  - next implementation candidate: `NIP-17` (`no-0jq`)
+  - ordered follow-ons: `NIP-39` (`no-g5j`), `NIP-29` (`no-j2g`)
+  - recommended sequence: implement the remaining deferred backlog items serially, then run the
+    next robustness batch
 - `NIP-44` robustness outcome:
   - no Layer 1 behavior change was required after real-world review
   - the current v2-only surface, staged failure ordering, typed conversation-key boundary, and

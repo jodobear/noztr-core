@@ -177,6 +177,31 @@ async function check_nip40(): Promise<void> {
     );
 }
 
+function check_nip03(): void {
+    const secret_key = to_bytes_32(FIXED_SECRET_KEY_HEX);
+    const event = finalizeEvent(
+        {
+            kind: kinds.OpenTimestamps,
+            created_at: 1_708_000_040,
+            tags: [
+                [
+                    "e",
+                    "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+                    "wss://relay.example",
+                ],
+                ["k", "1"],
+            ],
+            content: "AQIDBA==",
+        },
+        secret_key,
+    );
+    ensure(event.kind === kinds.OpenTimestamps, "NIP-03 event kind mismatch");
+    ensure(verifyEvent(event), "NIP-03 signature verification failed");
+    ensure(event.content === "AQIDBA==", "NIP-03 proof content mismatch");
+    ensure(event.tags.some((tag) => tag[0] === "e" && tag[2] === "wss://relay.example"), "NIP-03 event missing target event tag");
+    ensure(event.tags.some((tag) => tag[0] === "k" && tag[1] === "1"), "NIP-03 event missing target kind tag");
+}
+
 class MockCountWebSocket {
     static OPEN = 1;
     static CLOSED = 3;
@@ -1179,6 +1204,7 @@ async function main(): Promise<void> {
 
     await push_harness_covered(results, "NIP-01", "EDGE", check_nip01);
     await push_harness_covered(results, "NIP-02", "BASELINE", check_nip02);
+    await push_harness_covered(results, "NIP-03", "BASELINE", check_nip03);
     await push_harness_covered(results, "NIP-09", "BASELINE", check_nip09);
     await push_harness_covered(results, "NIP-10", "EDGE", check_nip10);
     await push_harness_covered(results, "NIP-11", "EDGE", check_nip11);

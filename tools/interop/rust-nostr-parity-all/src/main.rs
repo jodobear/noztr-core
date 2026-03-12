@@ -856,6 +856,37 @@ fn check_nip23() -> Result<(), String> {
     Ok(())
 }
 
+fn check_nip03() -> Result<(), String> {
+    let keys = parse_keys()?;
+    let event_tag = Tag::parse(vec![
+        "e",
+        "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+        "wss://relay.example",
+    ])
+    .map_err(|e| format!("nip03 e tag parse: {e}"))?;
+    let kind_tag =
+        Tag::parse(vec!["k", "1"]).map_err(|e| format!("nip03 k tag parse: {e}"))?;
+    let event = EventBuilder::new(Kind::OpenTimestamps, "AQIDBA==")
+        .tags([event_tag.clone(), kind_tag.clone()])
+        .sign_with_keys(&keys)
+        .map_err(|e| format!("sign nip03 attestation: {e}"))?;
+
+    if event.kind != Kind::OpenTimestamps {
+        return Err("nip03 event kind mismatch".to_string());
+    }
+    if event.content != "AQIDBA==" {
+        return Err("nip03 proof content mismatch".to_string());
+    }
+    if !event_has_exact_tag(&event, event_tag) {
+        return Err("nip03 event missing target event tag".to_string());
+    }
+    if !event_has_exact_tag(&event, kind_tag) {
+        return Err("nip03 event missing target kind tag".to_string());
+    }
+
+    Ok(())
+}
+
 fn check_nip24() -> Result<(), String> {
     let keys = parse_keys()?;
     let website = Url::parse("https://example.com").map_err(|e| format!("nip24 website: {e}"))?;
@@ -1954,6 +1985,7 @@ async fn main() {
 
     push_harness_covered(&mut results, "NIP-01", Depth::Deep, check_nip01());
     push_harness_covered(&mut results, "NIP-02", Depth::Deep, check_nip02());
+    push_harness_covered(&mut results, "NIP-03", Depth::Baseline, check_nip03());
     push_harness_covered(&mut results, "NIP-10", Depth::Deep, check_nip10());
     push_harness_covered(&mut results, "NIP-18", Depth::Deep, check_nip18());
     push_harness_covered(&mut results, "NIP-09", Depth::Deep, check_nip09());

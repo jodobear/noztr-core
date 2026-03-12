@@ -1065,6 +1065,25 @@ Immutable record of accepted planning decisions.
   `i` tag must be handled sooner with a bounded shared parser.
 - Supersedes: none
 
+## D-059: Keep Phase H NIP-03 at a bounded attestation-event boundary
+
+- Date: 2026-03-12
+- Status: accepted
+- Decision: complete `no-wo7` by implementing `src/nip03_opentimestamps.zig` as a strict
+  kind-`1040` attestation boundary with exact `e`/`k` target tags, caller-buffer base64 proof
+  decoding, and target-reference validation against a supplied event. Do not claim full
+  OpenTimestamps / Bitcoin attestation verification in the current kernel.
+- Why: `rust-nostr` only gives local builder-level evidence for NIP-03 and relies on a dedicated
+  `nostr-ots` dependency for deeper proof generation. Bringing a full OpenTimestamps verifier into
+  `noztr` now would widen dependency and format-parser scope well beyond the narrow helper posture
+  of the remaining deferred Phase H items.
+- Tradeoff: immediate deterministic attestation event handling and proof-shape validation versus
+  leaving deeper OTS attestation semantics as future work.
+- Related Tradeoff: T-H-ANIP-001, T-H-ANIP-003, T-0-001, T-0-003.
+- Reversal Trigger: a bounded OpenTimestamps parser/verification subsystem is accepted into scope or
+  ecosystem evidence shows the current attestation boundary is too shallow for practical use.
+- Supersedes: none
+
 ## Phase Closure Evidence
 
 ### P0-E-001: Phase 0 closure record
