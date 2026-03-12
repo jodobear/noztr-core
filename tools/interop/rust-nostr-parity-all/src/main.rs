@@ -1126,6 +1126,30 @@ fn check_nip51() -> Result<(), String> {
         return Err("emoji set deep parity mismatch".to_string());
     }
 
+    let private_json = r#"[["t","nostr"],["url","https://example.com/post"]]"#;
+    let conversation_key = ConversationKey::derive(keys.secret_key(), &keys.public_key())
+        .map_err(|e| format!("derive private-list conversation key: {e}"))?;
+    let mut nonce = [0_u8; 32];
+    nonce[31] = 7;
+    let mut rng = FixedNonceRng::new(nonce);
+    let private_payload =
+        encrypt_to_bytes_with_rng(&mut rng, &conversation_key, private_json.as_bytes())
+            .map_err(|e| format!("encrypt private-list json: {e}"))?;
+    let private_plaintext = decrypt_to_bytes(&conversation_key, &private_payload)
+        .map_err(|e| format!("decrypt private-list json: {e}"))?;
+    if private_plaintext != private_json.as_bytes() {
+        return Err("private-list nip44 json roundtrip mismatch".to_string());
+    }
+    let private_value: serde_json::Value = serde_json::from_slice(&private_plaintext)
+        .map_err(|e| format!("parse private-list json: {e}"))?;
+    if private_value
+        .as_array()
+        .map(|items| items.len() == 2)
+        != Some(true)
+    {
+        return Err("private-list json array shape mismatch".to_string());
+    }
+
     Ok(())
 }
 

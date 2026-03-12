@@ -1848,6 +1848,28 @@ test "private list json extract parses supported items and ignores unknown tags"
     try std.testing.expectEqualStrings("spam phrase", items[1].word);
 }
 
+test "private bookmark json extract accepts bounded hashtag and url items" {
+    const json =
+        "[[\"t\",\"nostr\"],[\"url\",\"https://example.com/post\"],[\"title\",\"ignored\"]]";
+    var items: [2]ListItem = undefined;
+    var arena = std.heap.ArenaAllocator.init(std.testing.allocator);
+    defer arena.deinit();
+
+    const parsed = try list_private_extract_json(
+        10003,
+        json,
+        items[0..],
+        arena.allocator(),
+    );
+
+    try std.testing.expectEqual(ListKind.bookmarks, parsed.kind);
+    try std.testing.expectEqual(@as(u16, 2), parsed.item_count);
+    try std.testing.expect(items[0] == .hashtag);
+    try std.testing.expect(items[1] == .url);
+    try std.testing.expectEqualStrings("nostr", items[0].hashtag);
+    try std.testing.expectEqualStrings("https://example.com/post", items[1].url);
+}
+
 test "private list nip44 extract roundtrips mute list content" {
     const private_key = try parse_hex_32_test(
         "0000000000000000000000000000000000000000000000000000000000000001",

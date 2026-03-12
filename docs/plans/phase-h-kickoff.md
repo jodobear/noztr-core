@@ -109,6 +109,16 @@ the validated maintenance baseline.
   - parity harness now covers all supported rust-backed public-list builders at `DEEP` depth
   - audit outcome: widened bookmark extraction to remove unnecessary incompatibility with broader
     rust producer output while keeping malformed supported-tag rejection and coordinate-kind checks
+  - private-list robustness outcome:
+    - no Layer 1 behavior change was required after real-world review
+    - private bookmark JSON extraction now explicitly pins bounded hashtag and URL item handling
+    - rust evidence now includes generic NIP-44 JSON-array roundtrip coverage for private-list
+      payloads on top of the existing `NIP-51` builder coverage
+    - TypeScript audit evidence now includes generic NIP-44 JSON-array roundtrip coverage for the
+      accepted private-list wire shape even though `nostr-tools` exposes no dedicated NIP-51
+      private-list helper
+    - the current NIP-44-first private JSON-array wire and explicit legacy NIP-04 rejection remain
+      the accepted kernel posture
 - Wave 1 status: complete.
 - Active next execution focus: implemented-surface robustness / real-world validation before any
   further protocol expansion.
@@ -254,8 +264,8 @@ the validated maintenance baseline.
   - `NIP-44`
   - `NIP-59`
 - Current robustness progress:
-  - completed: `NIP-46`, `NIP-06`
-  - recommended next surfaces: `NIP-51` private lists, `NIP-44`, `NIP-59`
+  - completed: `NIP-46`, `NIP-06`, `NIP-51` private lists
+  - recommended next surfaces: `NIP-44`, `NIP-59`
 - Keep the implemented-NIP audit report current if future code changes reopen compatibility
   questions.
 - `no-4iw` is resolved by the NIP-10 audit and no longer blocks interpretation of NIP-10 quality.

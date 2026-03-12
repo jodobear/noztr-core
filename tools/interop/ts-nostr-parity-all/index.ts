@@ -15,7 +15,7 @@ import { decode, naddrEncode, noteEncode, nsecEncode, npubEncode } from "nostr-t
 import * as nip25 from "nostr-tools/nip25";
 import * as nip30 from "nostr-tools/nip30";
 import { makeAuthEvent } from "nostr-tools/nip42";
-import { decrypt, encrypt } from "nostr-tools/nip44";
+import { decrypt, encrypt, getConversationKey } from "nostr-tools/nip44";
 import * as nip46 from "nostr-tools/nip46";
 import * as nip10 from "nostr-tools/nip10";
 import * as nip06 from "nostr-tools/nip06";
@@ -675,6 +675,35 @@ function check_nip44(): void {
     }
 }
 
+function check_nip51(): void {
+    const author_private_key = to_bytes_32(FIXED_SECRET_KEY_HEX);
+    const author_pubkey = getPublicKey(author_private_key);
+    const conversation_key = getConversationKey(author_private_key, author_pubkey);
+    const nonce = new Uint8Array(32);
+    nonce[31] = 7;
+    const private_tags = [
+        ["t", "nostr"],
+        ["url", "https://example.com/post"],
+    ];
+    const plaintext = JSON.stringify(private_tags);
+    const payload = encrypt(plaintext, conversation_key, nonce);
+    const decrypted = decrypt(payload, conversation_key);
+
+    ensure(decrypted === plaintext, "NIP-51 private-list nip44 json roundtrip mismatch");
+    const parsed = JSON.parse(decrypted) as unknown;
+    ensure(Array.isArray(parsed), "NIP-51 private-list decrypted payload is not an array");
+    ensure(parsed.length === 2, "NIP-51 private-list decrypted tag count mismatch");
+    ensure(
+        Array.isArray(parsed[0]) && parsed[0][0] === "t" && parsed[0][1] === "nostr",
+        "NIP-51 private-list hashtag tag mismatch",
+    );
+    ensure(
+        Array.isArray(parsed[1]) && parsed[1][0] === "url" &&
+            parsed[1][1] === "https://example.com/post",
+        "NIP-51 private-list url tag mismatch",
+    );
+}
+
 async function check_nip46(): Promise<void> {
     const pubkey =
         "b889ff5b1513b641e2a139f661a661364979c5beee91842f8f0ef42ab558e9d4";
@@ -1076,6 +1105,7 @@ async function main(): Promise<void> {
     await push_harness_covered(results, "NIP-21", "EDGE", check_nip21);
     await push_harness_covered(results, "NIP-42", "EDGE", check_nip42);
     await push_harness_covered(results, "NIP-44", "DEEP", check_nip44);
+    await push_harness_covered(results, "NIP-51", "BASELINE", check_nip51);
     await push_harness_covered(results, "NIP-46", "BASELINE", check_nip46);
     await push_harness_covered(results, "NIP-59", "EDGE", check_nip59);
     await push_harness_covered(results, "NIP-65", "BASELINE", check_nip65);

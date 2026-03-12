@@ -150,7 +150,7 @@ Current project context for the Phase H kickoff baseline.
 
 - Active lane: rust only (`tools/interop/rust-nostr-parity-all`).
 - Current rust status: `24/24 HARNESS_COVERED`, mixed `BASELINE/EDGE/DEEP`, `PASS`.
-- Current TS audit status: `22/22 HARNESS_COVERED`, mixed `BASELINE/EDGE/DEEP`, `PASS`
+- Current TS audit status: `23/23 HARNESS_COVERED`, mixed `BASELINE/EDGE/DEEP`, `PASS`
   (`tools/interop/ts-nostr-parity-all`; non-gating audit evidence lane).
 - Baseline cadence run (2026-03-09): rust parity harness passed
   (`SUMMARY pass=16 fail=0 harness_covered=16 total=16`).
@@ -166,9 +166,9 @@ Current project context for the Phase H kickoff baseline.
 - Latest cadence run (2026-03-12): rust parity harness passed
   (`SUMMARY pass=24 fail=0 harness_covered=24 total=24`).
 - Latest cadence run (2026-03-12): TS audit harness passed
-  (`SUMMARY pass=22 fail=0 harness_covered=22 total=22`).
+  (`SUMMARY pass=23 fail=0 harness_covered=23 total=23`).
 - Latest cadence run (2026-03-12): `zig build test --summary all` passed
-  (`Build Summary: 9/9 steps succeeded; 656/656 tests passed`).
+  (`Build Summary: 9/9 steps succeeded; 658/658 tests passed`).
 - Latest cadence run (2026-03-12): `zig build` passed.
 - Active cadence commands:
   - `cargo run --manifest-path tools/interop/rust-nostr-parity-all/Cargo.toml`
@@ -207,8 +207,8 @@ Current project context for the Phase H kickoff baseline.
    changes and record outcomes in Phase H kickoff and handoff docs.
 3. Run the implemented-surface robustness / real-world validation pass before any new NIP
    expansion.
-   Completed surfaces: `46`, `06`.
-   Recommended next surfaces: `51` private lists, `44`, `59`.
+   Completed surfaces: `46`, `06`, `51` private lists.
+   Recommended next surfaces: `44`, `59`.
 4. Keep the implemented-NIP audit report current if future code changes reopen compatibility or
    strictness questions.
 5. Wave 2 / `NIP-46` is complete.
@@ -266,6 +266,14 @@ Current project context for the Phase H kickoff baseline.
      public extraction.
    - it now decrypts NIP-44 private list `event.content` directly and rejects legacy `?iv=` NIP-04
      payloads with typed `UnsupportedPrivateEncoding`.
+   Robustness pass outcome:
+   - no Layer 1 behavior change was required after real-world review.
+   - private bookmark JSON extraction now explicitly covers bounded hashtag and URL item handling.
+   - rust evidence now includes generic NIP-44 JSON-array roundtrip coverage for private-list
+     payloads on top of the existing public-list `NIP-51` builder coverage.
+   - TypeScript audit evidence now includes generic NIP-44 JSON-array roundtrip coverage for the
+     accepted private-list wire shape even though `nostr-tools` exposes no dedicated private-list
+     helper.
    Explicit follow-up:
    - `no-urr` tracks any future deprecated NIP-04 compatibility adapter for private lists.
 8. Keep `no-3uj` visible as deferred-by-operator until remote setup returns to active execution focus.
