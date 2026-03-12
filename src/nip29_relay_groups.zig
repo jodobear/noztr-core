@@ -226,6 +226,7 @@ pub fn group_build_admin_tag(
     std.debug.assert(roles.len + 2 <= limits.tag_items_max);
 
     _ = parse_lower_hex_32(pubkey_hex) catch return error.InvalidAdminTag;
+    if (roles.len == 0) return error.InvalidAdminTag;
     output.items[0] = "p";
     output.items[1] = pubkey_hex;
     output.item_count = 2;
@@ -250,6 +251,7 @@ pub fn group_build_member_tag(
     output.items[1] = pubkey_hex;
     output.item_count = 2;
     if (label) |value| {
+        if (value.len == 0) return error.InvalidMemberTag;
         output.items[2] = parse_member_label(value) catch return error.InvalidMemberTag;
         output.item_count = 3;
     }
@@ -665,4 +667,26 @@ test "group builders emit canonical metadata admin and member tags" {
     try std.testing.expectEqualStrings("ceo", admin.items[2]);
     try std.testing.expectEqualStrings("gardener", admin.items[3]);
     try std.testing.expectEqualStrings("vip", member.items[2]);
+}
+
+test "group builders reject empty optional role and label output" {
+    var admin_tag: BuiltTag = .{};
+    var member_tag: BuiltTag = .{};
+
+    try std.testing.expectError(
+        error.InvalidAdminTag,
+        group_build_admin_tag(
+            &admin_tag,
+            "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+            &.{},
+        ),
+    );
+    try std.testing.expectError(
+        error.InvalidMemberTag,
+        group_build_member_tag(
+            &member_tag,
+            "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "",
+        ),
+    );
 }
