@@ -378,7 +378,7 @@ the validated maintenance baseline.
     marker / pubkey suffix shape used by generic event-tag tooling
   - exact target-kind requirement, bounded base64 proof decoding, and caller-buffer proof output
     remain unchanged
-  - deeper OpenTimestamps / Bitcoin attestation verification remains deferred in `no-y0i`
+  - deeper OpenTimestamps / Bitcoin attestation verification remains out of current kernel scope
 - `NIP-17` robustness outcome:
   - direct-message parsing now accepts standard long-form reply `e` tags with optional public-key
     suffixes instead of rejecting those deployed generic event-tag shapes
@@ -388,7 +388,7 @@ the validated maintenance baseline.
   - no Layer 1 behavior change was required after real-world review
   - current claim parsing, proof-URL derivation, expected-proof-text generation, and future-extra
     `i`-tag item tolerance remain the accepted kernel posture
-  - live provider fetch verification remains deferred in `no-t9x`
+  - live provider fetch verification remains out of current kernel scope
 - `NIP-29` robustness outcome:
   - no inbound extraction widening was required after real-world review
   - outbound builders now reject empty admin role lists and empty optional member labels so the

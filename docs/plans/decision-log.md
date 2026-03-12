@@ -1170,6 +1170,42 @@ Immutable record of accepted planning decisions.
   current scope.
 - Supersedes: D-060
 
+## D-064: Keep deeper NIP-03 OpenTimestamps and Bitcoin verification out of the kernel
+
+- Date: 2026-03-12
+- Status: accepted
+- Decision: close `no-y0i` by keeping deeper OpenTimestamps proof verification and Bitcoin
+  attestation verification out of the current kernel scope. `src/nip03_opentimestamps.zig` remains
+  the bounded event-layer helper for kind-`1040`, exact target tags, and caller-buffer proof
+  decoding only.
+- Why: this preserves the accepted bounded attestation-event posture from `D-059` and avoids
+  pulling a larger proof-parser / chain-verification subsystem into Layer 1 without strong
+  cross-reference evidence that it belongs there.
+- Tradeoff: explicit event-boundary handling without end-to-end attestation verification versus
+  leaving deeper proof verification to a higher layer or future scoped work.
+- Related Tradeoff: T-H-ANIP-001, T-H-ANIP-003, T-0-001, T-0-003.
+- Reversal Trigger: operator scope changes or ecosystem evidence show that bounded deeper proof
+  verification is required inside the kernel and can be added without violating the current
+  posture.
+- Supersedes: D-059
+
+## D-065: Keep live NIP-39 provider verification outside the kernel
+
+- Date: 2026-03-12
+- Status: accepted
+- Decision: close `no-t9x` by keeping live provider fetch verification for NIP-39 outside the
+  kernel. `src/nip39_external_identities.zig` remains limited to claim extraction, canonical tag
+  building, deterministic proof-URL derivation, and expected-proof-text generation.
+- Why: network fetches, provider trust policy, and remote availability handling are not core
+  protocol-kernel concerns. The accepted value of the current NIP-39 surface is deterministic proof
+  material, not embedded web verification clients.
+- Tradeoff: simpler deterministic kernel boundary versus leaving provider verification to an opt-in
+  higher layer.
+- Related Tradeoff: T-H-ANIP-001, T-H-ANIP-003, T-0-001, T-0-003.
+- Reversal Trigger: current scope explicitly requires in-library provider verification and a
+  bounded non-kernel adapter model is shown to be insufficient.
+- Supersedes: D-061
+
 ## Phase Closure Evidence
 
 ### P0-E-001: Phase 0 closure record

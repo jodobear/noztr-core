@@ -165,7 +165,7 @@ Current project context for the Phase H kickoff baseline.
     kind-`10011` claim extraction, canonical `i`-tag building, provider-specific proof-URL
     derivation, and expected proof-text generation
   - deferred backlog `NIP-39` robustness review is complete with no Layer 1 behavior change
-  - accepted bounded deferral: live provider fetch verification remains deferred in `no-t9x`
+  - accepted kernel posture: live provider fetch verification remains out of current kernel scope
   - deferred backlog `NIP-29` is now complete in `src/nip29_relay_groups.zig` with bounded
     relay-generated group metadata/admin/member extraction and builders for kinds `39000`,
     `39001`, and `39002`
@@ -291,8 +291,8 @@ Current project context for the Phase H kickoff baseline.
    changes and record outcomes in Phase H kickoff and handoff docs.
 3. Phase H planned expansion is complete through deferred backlog item `NIP-29`.
    Recommended next step:
-   - address deferred follow-up items (`no-y0i`, `no-nv9`, `no-t9x`, `no-ebj`) or other
-     operator-directed hardening work before any new protocol expansion
+   - address the remaining bounded deferred follow-up item `no-ebj` or other operator-directed
+     hardening work before any new protocol expansion
 4. Keep the implemented-NIP audit report current if future code changes reopen compatibility or
    strictness questions.
 5. Wave 2 / `NIP-46` is complete.
