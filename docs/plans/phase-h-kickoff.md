@@ -334,15 +334,19 @@ the validated maintenance baseline.
     - kind-`39000` metadata extraction/building
     - kind-`39001` admin extraction/building with ordered raw role labels
     - kind-`39002` member extraction/building with bounded optional compatibility labels
+    - kind-`39003` role extraction/building
+    - raw `<host>'<group-id>` group-reference parse/build helpers
+    - bounded join/leave request extraction for kinds `9021` and `9022`
+    - bounded put/remove-user extraction for kinds `9000` and `9001`
+    - raw `previous` tag parse/build helpers
     - compatibility parsing for deployed `nostr-tools` `public` / `open` metadata aliases
     - tolerant handling of unrelated unknown tags
-  - accepted bounded deferral:
-    - group references, user/moderation event surfaces, and relay orchestration remain deferred in
-      `no-ebj`
   - parity/evidence status:
     - rust parity overlap remains source-review-only because `rust-nostr` has no dedicated NIP-29
-      helper surface
-    - TypeScript audit overlap is now `HARNESS_COVERED`, `BASELINE`, `PASS`
+      helper surface beyond generic event tagging
+    - TypeScript audit overlap is `HARNESS_COVERED`, `BASELINE`, `PASS` for relay-generated events
+      and raw group-reference codecs; broader user/moderation helpers are source-review-backed
+      against applesauce
   - review outcome:
     - no accepted behavior change was required after the implementation pass
 
@@ -393,8 +397,8 @@ the validated maintenance baseline.
   - no inbound extraction widening was required after real-world review
   - outbound builders now reject empty admin role lists and empty optional member labels so the
     kernel no longer emits invalid compatibility tags
-  - bounded relay-generated metadata/admin/member extraction remains the accepted kernel posture,
-    while broader group surfaces remain deferred in `no-ebj`
+  - bounded relay-generated metadata/admin/member/role extraction plus raw group references,
+    user-event extraction, and raw `previous` tags remain the accepted kernel posture
 - Keep the implemented-NIP audit report current if future code changes reopen compatibility
   questions.
 - `no-4iw` is resolved by the NIP-10 audit and no longer blocks interpretation of NIP-10 quality.

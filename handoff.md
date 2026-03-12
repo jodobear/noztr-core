@@ -167,13 +167,14 @@ Current project context for the Phase H kickoff baseline.
   - deferred backlog `NIP-39` robustness review is complete with no Layer 1 behavior change
   - accepted kernel posture: live provider fetch verification remains out of current kernel scope
   - deferred backlog `NIP-29` is now complete in `src/nip29_relay_groups.zig` with bounded
-    relay-generated group metadata/admin/member extraction and builders for kinds `39000`,
-    `39001`, and `39002`
+    relay-generated group metadata/admin/member/role extraction and builders for kinds `39000`,
+    `39001`, `39002`, and `39003`, raw group-reference parse/build helpers, bounded join/leave
+    and put/remove-user extraction, and raw `previous` tag plumbing
   - deferred backlog `NIP-29` robustness review is complete:
     - inbound extraction stayed unchanged
     - outbound builders now reject empty admin role lists and empty optional member labels
-  - accepted bounded deferral: group references, user/moderation event helpers, and relay
-    orchestration remain deferred in `no-ebj`
+  - accepted bounded kernel posture: relay fetch/subscription, derived membership state, and
+    broader moderation orchestration remain out of current scope
   - Wave 1, the implemented-NIP audit, Wave 2 / `NIP-46`, Wave 3 / `NIP-06`, post-wave expansion
     `NIP-23`, and deferred backlog items `NIP-24`, `NIP-03`, `NIP-17`, `NIP-39`, and `NIP-29`
     are complete

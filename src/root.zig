@@ -214,9 +214,16 @@ test "root exports limits and error namespaces" {
     try std.testing.expect(@TypeOf(nip29_relay_groups.GroupMetadataFlag) == type);
     try std.testing.expect(@TypeOf(nip29_relay_groups.GroupMetadata) == type);
     try std.testing.expect(@TypeOf(nip29_relay_groups.GroupAdmin) == type);
+    try std.testing.expect(@TypeOf(nip29_relay_groups.GroupReference) == type);
     try std.testing.expect(@TypeOf(nip29_relay_groups.GroupMember) == type);
+    try std.testing.expect(@TypeOf(nip29_relay_groups.GroupRole) == type);
     try std.testing.expect(@TypeOf(nip29_relay_groups.GroupAdminsInfo) == type);
     try std.testing.expect(@TypeOf(nip29_relay_groups.GroupMembersInfo) == type);
+    try std.testing.expect(@TypeOf(nip29_relay_groups.GroupRolesInfo) == type);
+    try std.testing.expect(@TypeOf(nip29_relay_groups.GroupJoinRequestInfo) == type);
+    try std.testing.expect(@TypeOf(nip29_relay_groups.GroupLeaveRequestInfo) == type);
+    try std.testing.expect(@TypeOf(nip29_relay_groups.GroupPutUserInfo) == type);
+    try std.testing.expect(@TypeOf(nip29_relay_groups.GroupRemoveUserInfo) == type);
     try std.testing.expect(@TypeOf(nip29_relay_groups.BuiltTag) == type);
     try std.testing.expect(
         @TypeOf(nip06_mnemonic.mnemonic_validate) ==
@@ -282,6 +289,17 @@ test "root exports limits and error namespaces" {
                 [][]const u8,
                 std.mem.Allocator,
             ) nip17_private_messages.Nip17Error!nip17_private_messages.FileMessageInfo,
+    );
+    try std.testing.expect(
+        @TypeOf(nip29_relay_groups.group_reference_parse) ==
+            fn ([]const u8) nip29_relay_groups.Nip29Error!nip29_relay_groups.GroupReference,
+    );
+    try std.testing.expect(
+        @TypeOf(nip29_relay_groups.group_roles_extract) ==
+            fn (
+                *const nip01_event.Event,
+                []nip29_relay_groups.GroupRole,
+            ) nip29_relay_groups.Nip29Error!nip29_relay_groups.GroupRolesInfo,
     );
     try std.testing.expect(
         @TypeOf(nip03_opentimestamps.opentimestamps_build_event_tag) ==

@@ -1206,6 +1206,29 @@ Immutable record of accepted planning decisions.
   bounded non-kernel adapter model is shown to be insufficient.
 - Supersedes: D-061
 
+## D-066: Extend Phase H NIP-29 to bounded references, roles, and user-event helpers
+
+- Date: 2026-03-12
+- Status: accepted
+- Decision: close `no-ebj` by extending `src/nip29_relay_groups.zig` with the smallest coherent
+  kernel-safe expansion beyond relay-generated metadata/admin/member events:
+  - raw `<host>'<group-id>` group-reference parse/build
+  - kind-`39003` role extraction/building
+  - kind-`9021` and kind-`9022` bounded join/leave extraction
+  - kind-`9000` and kind-`9001` bounded put/remove-user extraction
+  - raw `previous` tag parse/build helpers
+  Do not add relay fetch/subscription logic, derived membership-state helpers, random previous-tag
+  selection policy, or broader moderation orchestration.
+- Why: this captures the deterministic event-local value that local reference implementations
+  actually support without turning `noztr` into a relay client or group-state engine. It also keeps
+  the surface aligned with the KISS posture by treating `previous` as raw tag plumbing only.
+- Tradeoff: useful bounded group-reference and user-event helpers versus leaving higher-level group
+  workflows and stateful policy outside the kernel.
+- Related Tradeoff: T-H-ANIP-001, T-H-ANIP-003, T-0-001, T-0-003.
+- Reversal Trigger: operator scope expands to require stateful group orchestration or ecosystem
+  evidence shows the current bounded surface is insufficient for interoperable group tooling.
+- Supersedes: D-062
+
 ## Phase Closure Evidence
 
 ### P0-E-001: Phase 0 closure record

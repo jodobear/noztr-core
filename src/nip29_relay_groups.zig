@@ -5,9 +5,29 @@ const nip01_event = @import("nip01_event.zig");
 pub const group_metadata_kind: u32 = 39000;
 pub const group_admins_kind: u32 = 39001;
 pub const group_members_kind: u32 = 39002;
+pub const group_roles_kind: u32 = 39003;
+pub const group_put_user_kind: u32 = 9000;
+pub const group_remove_user_kind: u32 = 9001;
+pub const group_join_request_kind: u32 = 9021;
+pub const group_leave_request_kind: u32 = 9022;
 
 pub const Nip29Error = error{
     InvalidGroupKind,
+    InvalidGroupReference,
+    InvalidGroupHost,
+    InvalidGroupTag,
+    DuplicateGroupTag,
+    MissingGroupTag,
+    InvalidRoleTag,
+    InvalidCodeTag,
+    DuplicateCodeTag,
+    InvalidPreviousTag,
+    InvalidPutUserTag,
+    DuplicatePutUserTag,
+    MissingPutUserTag,
+    InvalidRemoveUserTag,
+    DuplicateRemoveUserTag,
+    MissingRemoveUserTag,
     InvalidIdentifierTag,
     DuplicateIdentifierTag,
     MissingIdentifierTag,
@@ -60,9 +80,19 @@ pub const GroupAdmin = struct {
     roles: []const []const u8,
 };
 
+pub const GroupReference = struct {
+    host: []const u8,
+    id: []const u8,
+};
+
 pub const GroupMember = struct {
     pubkey: [32]u8,
     label: ?[]const u8 = null,
+};
+
+pub const GroupRole = struct {
+    name: []const u8,
+    description: ?[]const u8 = null,
 };
 
 pub const GroupAdminsInfo = struct {
@@ -73,6 +103,39 @@ pub const GroupAdminsInfo = struct {
 pub const GroupMembersInfo = struct {
     group_id: []const u8,
     members: []const GroupMember,
+};
+
+pub const GroupRolesInfo = struct {
+    group_id: []const u8,
+    roles: []const GroupRole,
+};
+
+pub const GroupJoinRequestInfo = struct {
+    group_id: []const u8,
+    invite_code: ?[]const u8 = null,
+    reason: ?[]const u8 = null,
+    previous_refs: []const []const u8,
+};
+
+pub const GroupLeaveRequestInfo = struct {
+    group_id: []const u8,
+    reason: ?[]const u8 = null,
+    previous_refs: []const []const u8,
+};
+
+pub const GroupPutUserInfo = struct {
+    group_id: []const u8,
+    pubkey: [32]u8,
+    roles: []const []const u8,
+    reason: ?[]const u8 = null,
+    previous_refs: []const []const u8,
+};
+
+pub const GroupRemoveUserInfo = struct {
+    group_id: []const u8,
+    pubkey: [32]u8,
+    reason: ?[]const u8 = null,
+    previous_refs: []const []const u8,
 };
 
 pub const BuiltTag = struct {
@@ -150,6 +213,109 @@ pub fn group_members_extract(
     };
 }
 
+/// Parse a raw `<host>'<group-id>` group reference. Host-only input defaults `id` to `_`.
+pub fn group_reference_parse(text: []const u8) Nip29Error!GroupReference {
+    std.debug.assert(text.len <= limits.tag_item_bytes_max);
+    std.debug.assert(limits.tag_item_bytes_max <= limits.content_bytes_max);
+
+    const separator = std.mem.indexOfScalar(u8, text, '\'');
+    if (separator == null) {
+        return .{
+            .host = parse_group_host(text) catch return error.InvalidGroupReference,
+            .id = "_",
+        };
+    }
+    const split = separator.?;
+    if (split == 0 or split + 1 >= text.len) return error.InvalidGroupReference;
+    return .{
+        .host = parse_group_host(text[0..split]) catch return error.InvalidGroupReference,
+        .id = parse_group_id(text[split + 1 ..]) catch return error.InvalidGroupReference,
+    };
+}
+
+/// Build a raw `<host>'<group-id>` group reference.
+pub fn group_reference_build(output: []u8, reference: *const GroupReference) Nip29Error![]const u8 {
+    std.debug.assert(output.len <= limits.content_bytes_max);
+    std.debug.assert(@intFromPtr(reference) != 0);
+
+    const host = parse_group_host(reference.host) catch return error.InvalidGroupReference;
+    const group_id = parse_group_id(reference.id) catch return error.InvalidGroupReference;
+    return std.fmt.bufPrint(output, "{s}'{s}", .{ host, group_id }) catch {
+        return error.BufferTooSmall;
+    };
+}
+
+/// Extract bounded NIP-29 group-role entries from a kind-39003 event.
+pub fn group_roles_extract(
+    event: *const nip01_event.Event,
+    out_roles: []GroupRole,
+) Nip29Error!GroupRolesInfo {
+    std.debug.assert(@intFromPtr(event) != 0);
+    std.debug.assert(out_roles.len <= limits.tags_max);
+
+    if (event.kind != group_roles_kind) return error.InvalidGroupKind;
+
+    var group_id: []const u8 = "";
+    var role_count: u16 = 0;
+    for (event.tags) |tag| {
+        try apply_role_tag(tag, &group_id, out_roles, &role_count);
+    }
+    if (group_id.len == 0) return error.MissingIdentifierTag;
+    return .{
+        .group_id = group_id,
+        .roles = out_roles[0..role_count],
+    };
+}
+
+/// Extract a bounded NIP-29 join request from a kind-9021 event.
+pub fn group_join_request_extract(
+    event: *const nip01_event.Event,
+    previous_out: [][]const u8,
+) Nip29Error!GroupJoinRequestInfo {
+    std.debug.assert(@intFromPtr(event) != 0);
+    std.debug.assert(previous_out.len <= limits.tags_max);
+
+    if (event.kind != group_join_request_kind) return error.InvalidGroupKind;
+    return extract_join_request(event, previous_out);
+}
+
+/// Extract a bounded NIP-29 leave request from a kind-9022 event.
+pub fn group_leave_request_extract(
+    event: *const nip01_event.Event,
+    previous_out: [][]const u8,
+) Nip29Error!GroupLeaveRequestInfo {
+    std.debug.assert(@intFromPtr(event) != 0);
+    std.debug.assert(previous_out.len <= limits.tags_max);
+
+    if (event.kind != group_leave_request_kind) return error.InvalidGroupKind;
+    return extract_leave_request(event, previous_out);
+}
+
+/// Extract a bounded NIP-29 put-user moderation event from a kind-9000 event.
+pub fn group_put_user_extract(
+    event: *const nip01_event.Event,
+    out_roles: [][]const u8,
+    out_previous: [][]const u8,
+) Nip29Error!GroupPutUserInfo {
+    std.debug.assert(@intFromPtr(event) != 0);
+    std.debug.assert(out_roles.len <= limits.tags_max);
+
+    if (event.kind != group_put_user_kind) return error.InvalidGroupKind;
+    return extract_put_user(event, out_roles, out_previous);
+}
+
+/// Extract a bounded NIP-29 remove-user moderation event from a kind-9001 event.
+pub fn group_remove_user_extract(
+    event: *const nip01_event.Event,
+    out_previous: [][]const u8,
+) Nip29Error!GroupRemoveUserInfo {
+    std.debug.assert(@intFromPtr(event) != 0);
+    std.debug.assert(out_previous.len <= limits.tags_max);
+
+    if (event.kind != group_remove_user_kind) return error.InvalidGroupKind;
+    return extract_remove_user(event, out_previous);
+}
+
 /// Builds a canonical NIP-29 `d` tag.
 pub fn group_build_identifier_tag(
     output: *BuiltTag,
@@ -213,6 +379,81 @@ pub fn group_build_flag_tag(
 
     output.items[0] = flag.as_text();
     output.item_count = 1;
+    return output.as_event_tag();
+}
+
+/// Builds a canonical NIP-29 `h` tag for user or moderation events.
+pub fn group_build_group_tag(output: *BuiltTag, group_id: []const u8) Nip29Error!nip01_event.EventTag {
+    std.debug.assert(@intFromPtr(output) != 0);
+    std.debug.assert(group_id.len <= limits.tag_item_bytes_max);
+
+    output.items[0] = "h";
+    output.items[1] = parse_group_id(group_id) catch return error.InvalidGroupTag;
+    output.item_count = 2;
+    return output.as_event_tag();
+}
+
+/// Builds a canonical NIP-29 `role` tag for kind-39003 events.
+pub fn group_build_role_tag(
+    output: *BuiltTag,
+    role_name: []const u8,
+    description: ?[]const u8,
+) Nip29Error!nip01_event.EventTag {
+    std.debug.assert(@intFromPtr(output) != 0);
+    std.debug.assert(role_name.len <= limits.tag_item_bytes_max);
+
+    output.items[0] = "role";
+    output.items[1] = parse_role(role_name) catch return error.InvalidRoleTag;
+    output.item_count = 2;
+    if (description) |value| {
+        output.items[2] = parse_nonempty_utf8(value) catch return error.InvalidRoleTag;
+        output.item_count = 3;
+    }
+    return output.as_event_tag();
+}
+
+/// Builds a canonical NIP-29 `code` tag for join requests.
+pub fn group_build_code_tag(output: *BuiltTag, code: []const u8) Nip29Error!nip01_event.EventTag {
+    std.debug.assert(@intFromPtr(output) != 0);
+    std.debug.assert(code.len <= limits.tag_item_bytes_max);
+
+    output.items[0] = "code";
+    output.items[1] = parse_nonempty_utf8(code) catch return error.InvalidCodeTag;
+    output.item_count = 2;
+    return output.as_event_tag();
+}
+
+/// Builds a canonical NIP-29 `previous` tag.
+pub fn group_build_previous_tag(
+    output: *BuiltTag,
+    previous_ref: []const u8,
+) Nip29Error!nip01_event.EventTag {
+    std.debug.assert(@intFromPtr(output) != 0);
+    std.debug.assert(previous_ref.len <= limits.tag_item_bytes_max);
+
+    output.items[0] = "previous";
+    output.items[1] = parse_previous_ref(previous_ref) catch return error.InvalidPreviousTag;
+    output.item_count = 2;
+    return output.as_event_tag();
+}
+
+/// Builds a canonical NIP-29 `p` tag for put/remove user moderation events.
+pub fn group_build_user_tag(
+    output: *BuiltTag,
+    pubkey_hex: []const u8,
+    roles: []const []const u8,
+) Nip29Error!nip01_event.EventTag {
+    std.debug.assert(@intFromPtr(output) != 0);
+    std.debug.assert(roles.len + 2 <= limits.tag_items_max);
+
+    _ = parse_lower_hex_32(pubkey_hex) catch return error.InvalidPutUserTag;
+    output.items[0] = "p";
+    output.items[1] = pubkey_hex;
+    output.item_count = 2;
+    for (roles, 0..) |role, index| {
+        output.items[index + 2] = parse_role(role) catch return error.InvalidPutUserTag;
+        output.item_count += 1;
+    }
     return output.as_event_tag();
 }
 
@@ -429,6 +670,279 @@ fn apply_member_tag(
     try parse_member_tag(tag, out_members, member_count);
 }
 
+fn apply_role_tag(
+    tag: nip01_event.EventTag,
+    group_id: *[]const u8,
+    out_roles: []GroupRole,
+    role_count: *u16,
+) Nip29Error!void {
+    std.debug.assert(@intFromPtr(group_id) != 0);
+    std.debug.assert(@intFromPtr(role_count) != 0);
+
+    if (tag.items.len == 0) return;
+    if (std.mem.eql(u8, tag.items[0], "d")) return parse_identifier_tag(tag, group_id);
+    if (!std.mem.eql(u8, tag.items[0], "role")) return;
+    try parse_role_tag(tag, out_roles, role_count);
+}
+
+fn parse_role_tag(
+    tag: nip01_event.EventTag,
+    out_roles: []GroupRole,
+    role_count: *u16,
+) Nip29Error!void {
+    std.debug.assert(@intFromPtr(role_count) != 0);
+    std.debug.assert(out_roles.len <= limits.tags_max);
+
+    if (tag.items.len != 2 and tag.items.len != 3) return error.InvalidRoleTag;
+    if (role_count.* == out_roles.len) return error.BufferTooSmall;
+    out_roles[role_count.*] = .{
+        .name = parse_role(tag.items[1]) catch return error.InvalidRoleTag,
+        .description = null,
+    };
+    if (tag.items.len == 3) {
+        out_roles[role_count.*].description =
+            parse_nonempty_utf8(tag.items[2]) catch return error.InvalidRoleTag;
+    }
+    role_count.* += 1;
+}
+
+fn extract_join_request(
+    event: *const nip01_event.Event,
+    previous_out: [][]const u8,
+) Nip29Error!GroupJoinRequestInfo {
+    std.debug.assert(@intFromPtr(event) != 0);
+    std.debug.assert(previous_out.len <= limits.tags_max);
+
+    var info = GroupJoinRequestInfo{
+        .group_id = "",
+        .reason = parse_optional_reason(event.content) catch return error.InvalidGroupTag,
+        .previous_refs = previous_out[0..0],
+    };
+    var previous_count: u16 = 0;
+    var saw_code = false;
+    for (event.tags) |tag| {
+        try apply_join_request_tag(tag, &info, previous_out, &previous_count, &saw_code);
+    }
+    if (info.group_id.len == 0) return error.MissingGroupTag;
+    info.previous_refs = previous_out[0..previous_count];
+    return info;
+}
+
+fn apply_join_request_tag(
+    tag: nip01_event.EventTag,
+    info: *GroupJoinRequestInfo,
+    previous_out: [][]const u8,
+    previous_count: *u16,
+    saw_code: *bool,
+) Nip29Error!void {
+    std.debug.assert(@intFromPtr(info) != 0);
+    std.debug.assert(@intFromPtr(previous_count) != 0);
+
+    if (tag.items.len == 0) return;
+    if (std.mem.eql(u8, tag.items[0], "h")) return parse_group_tag(tag, &info.group_id);
+    if (std.mem.eql(u8, tag.items[0], "previous")) {
+        return parse_previous_tag(tag, previous_out, previous_count);
+    }
+    if (!std.mem.eql(u8, tag.items[0], "code")) return;
+    if (saw_code.*) return error.DuplicateCodeTag;
+    if (tag.items.len != 2) return error.InvalidCodeTag;
+    info.invite_code = parse_nonempty_utf8(tag.items[1]) catch return error.InvalidCodeTag;
+    saw_code.* = true;
+}
+
+fn extract_leave_request(
+    event: *const nip01_event.Event,
+    previous_out: [][]const u8,
+) Nip29Error!GroupLeaveRequestInfo {
+    std.debug.assert(@intFromPtr(event) != 0);
+    std.debug.assert(previous_out.len <= limits.tags_max);
+
+    var info = GroupLeaveRequestInfo{
+        .group_id = "",
+        .reason = parse_optional_reason(event.content) catch return error.InvalidGroupTag,
+        .previous_refs = previous_out[0..0],
+    };
+    var previous_count: u16 = 0;
+    for (event.tags) |tag| {
+        if (tag.items.len == 0) continue;
+        if (std.mem.eql(u8, tag.items[0], "h")) {
+            try parse_group_tag(tag, &info.group_id);
+            continue;
+        }
+        if (std.mem.eql(u8, tag.items[0], "previous")) {
+            try parse_previous_tag(tag, previous_out, &previous_count);
+        }
+    }
+    if (info.group_id.len == 0) return error.MissingGroupTag;
+    info.previous_refs = previous_out[0..previous_count];
+    return info;
+}
+
+fn extract_put_user(
+    event: *const nip01_event.Event,
+    out_roles: [][]const u8,
+    out_previous: [][]const u8,
+) Nip29Error!GroupPutUserInfo {
+    std.debug.assert(@intFromPtr(event) != 0);
+    std.debug.assert(out_roles.len <= limits.tags_max);
+
+    var info = GroupPutUserInfo{
+        .group_id = "",
+        .pubkey = undefined,
+        .roles = out_roles[0..0],
+        .reason = parse_optional_reason(event.content) catch return error.InvalidGroupTag,
+        .previous_refs = out_previous[0..0],
+    };
+    var state = UserEventState{};
+    for (event.tags) |tag| {
+        try apply_put_user_tag(tag, &info, out_roles, out_previous, &state);
+    }
+    return finalize_put_user_info(&info, &state);
+}
+
+const UserEventState = struct {
+    saw_group: bool = false,
+    saw_target: bool = false,
+    role_count: u16 = 0,
+    previous_count: u16 = 0,
+};
+
+fn apply_put_user_tag(
+    tag: nip01_event.EventTag,
+    info: *GroupPutUserInfo,
+    out_roles: [][]const u8,
+    out_previous: [][]const u8,
+    state: *UserEventState,
+) Nip29Error!void {
+    std.debug.assert(@intFromPtr(info) != 0);
+    std.debug.assert(@intFromPtr(state) != 0);
+
+    if (tag.items.len == 0) return;
+    if (std.mem.eql(u8, tag.items[0], "h")) {
+        if (state.saw_group) return error.DuplicateGroupTag;
+        try parse_group_tag(tag, &info.group_id);
+        state.saw_group = true;
+        return;
+    }
+    if (std.mem.eql(u8, tag.items[0], "previous")) {
+        return parse_previous_tag(tag, out_previous, &state.previous_count);
+    }
+    if (!std.mem.eql(u8, tag.items[0], "p")) return;
+    if (state.saw_target) return error.DuplicatePutUserTag;
+    try parse_user_tag(tag, &info.pubkey, out_roles, &state.role_count);
+    state.saw_target = true;
+}
+
+fn finalize_put_user_info(
+    info: *GroupPutUserInfo,
+    state: *const UserEventState,
+) Nip29Error!GroupPutUserInfo {
+    std.debug.assert(@intFromPtr(info) != 0);
+    std.debug.assert(@intFromPtr(state) != 0);
+
+    if (!state.saw_group) return error.MissingGroupTag;
+    if (!state.saw_target) return error.MissingPutUserTag;
+    info.roles = info.roles.ptr[0..state.role_count];
+    info.previous_refs = info.previous_refs.ptr[0..state.previous_count];
+    return info.*;
+}
+
+fn extract_remove_user(
+    event: *const nip01_event.Event,
+    out_previous: [][]const u8,
+) Nip29Error!GroupRemoveUserInfo {
+    std.debug.assert(@intFromPtr(event) != 0);
+    std.debug.assert(out_previous.len <= limits.tags_max);
+
+    var info = GroupRemoveUserInfo{
+        .group_id = "",
+        .pubkey = undefined,
+        .reason = parse_optional_reason(event.content) catch return error.InvalidGroupTag,
+        .previous_refs = out_previous[0..0],
+    };
+    var state = RemoveUserState{};
+    for (event.tags) |tag| {
+        try apply_remove_user_tag(tag, &info, out_previous, &state);
+    }
+    if (!state.saw_group) return error.MissingGroupTag;
+    if (!state.saw_target) return error.MissingRemoveUserTag;
+    info.previous_refs = out_previous[0..state.previous_count];
+    return info;
+}
+
+const RemoveUserState = struct {
+    saw_group: bool = false,
+    saw_target: bool = false,
+    previous_count: u16 = 0,
+};
+
+fn apply_remove_user_tag(
+    tag: nip01_event.EventTag,
+    info: *GroupRemoveUserInfo,
+    out_previous: [][]const u8,
+    state: *RemoveUserState,
+) Nip29Error!void {
+    std.debug.assert(@intFromPtr(info) != 0);
+    std.debug.assert(@intFromPtr(state) != 0);
+
+    if (tag.items.len == 0) return;
+    if (std.mem.eql(u8, tag.items[0], "h")) {
+        if (state.saw_group) return error.DuplicateGroupTag;
+        try parse_group_tag(tag, &info.group_id);
+        state.saw_group = true;
+        return;
+    }
+    if (std.mem.eql(u8, tag.items[0], "previous")) {
+        return parse_previous_tag(tag, out_previous, &state.previous_count);
+    }
+    if (!std.mem.eql(u8, tag.items[0], "p")) return;
+    if (state.saw_target) return error.DuplicateRemoveUserTag;
+    if (tag.items.len != 2) return error.InvalidRemoveUserTag;
+    info.pubkey = parse_lower_hex_32(tag.items[1]) catch return error.InvalidRemoveUserTag;
+    state.saw_target = true;
+}
+
+fn parse_group_tag(tag: nip01_event.EventTag, group_id: *[]const u8) Nip29Error!void {
+    std.debug.assert(@intFromPtr(group_id) != 0);
+    std.debug.assert(tag.items.len <= limits.tag_items_max);
+
+    if (tag.items.len != 2) return error.InvalidGroupTag;
+    group_id.* = parse_group_id(tag.items[1]) catch return error.InvalidGroupTag;
+}
+
+fn parse_user_tag(
+    tag: nip01_event.EventTag,
+    pubkey: *[32]u8,
+    out_roles: [][]const u8,
+    role_count: *u16,
+) Nip29Error!void {
+    std.debug.assert(@intFromPtr(pubkey) != 0);
+    std.debug.assert(@intFromPtr(role_count) != 0);
+
+    if (tag.items.len < 2) return error.InvalidPutUserTag;
+    pubkey.* = parse_lower_hex_32(tag.items[1]) catch return error.InvalidPutUserTag;
+    for (tag.items[2..]) |role| {
+        if (role_count.* == out_roles.len) return error.BufferTooSmall;
+        out_roles[role_count.*] = parse_role(role) catch return error.InvalidPutUserTag;
+        role_count.* += 1;
+    }
+}
+
+fn parse_previous_tag(
+    tag: nip01_event.EventTag,
+    out_previous: [][]const u8,
+    previous_count: *u16,
+) Nip29Error!void {
+    std.debug.assert(@intFromPtr(previous_count) != 0);
+    std.debug.assert(out_previous.len <= limits.tags_max);
+
+    if (tag.items.len != 2) return error.InvalidPreviousTag;
+    if (previous_count.* == out_previous.len) return error.BufferTooSmall;
+    out_previous[previous_count.*] =
+        parse_previous_ref(tag.items[1]) catch return error.InvalidPreviousTag;
+    previous_count.* += 1;
+}
+
 fn parse_member_tag(
     tag: nip01_event.EventTag,
     out_members: []GroupMember,
@@ -450,6 +964,19 @@ fn parse_member_tag(
     member_count.* += 1;
 }
 
+fn parse_group_host(text: []const u8) error{InvalidHost}![]const u8 {
+    std.debug.assert(text.len <= limits.tag_item_bytes_max);
+    std.debug.assert(limits.tag_item_bytes_max <= limits.content_bytes_max);
+
+    if (text.len == 0) return error.InvalidHost;
+    if (!std.unicode.utf8ValidateSlice(text)) return error.InvalidHost;
+    for (text) |byte| {
+        if (std.ascii.isWhitespace(byte)) return error.InvalidHost;
+        if (byte == '\'' or byte == '/' or byte == '?' or byte == '#') return error.InvalidHost;
+    }
+    return text;
+}
+
 fn parse_group_id(text: []const u8) error{InvalidGroupId}![]const u8 {
     std.debug.assert(text.len <= limits.tag_item_bytes_max);
     std.debug.assert(limits.tag_item_bytes_max <= limits.content_bytes_max);
@@ -464,6 +991,19 @@ fn parse_group_id(text: []const u8) error{InvalidGroupId}![]const u8 {
     return text;
 }
 
+fn parse_previous_ref(text: []const u8) error{InvalidPrevious}![]const u8 {
+    std.debug.assert(text.len <= limits.tag_item_bytes_max);
+    std.debug.assert(limits.tag_item_bytes_max <= limits.content_bytes_max);
+
+    if (text.len != 8) return error.InvalidPrevious;
+    for (text) |byte| {
+        if (byte >= '0' and byte <= '9') continue;
+        if (byte >= 'a' and byte <= 'f') continue;
+        return error.InvalidPrevious;
+    }
+    return text;
+}
+
 fn parse_nonempty_utf8(text: []const u8) error{InvalidText}![]const u8 {
     std.debug.assert(text.len <= limits.content_bytes_max);
     std.debug.assert(limits.content_bytes_max > 0);
@@ -471,6 +1011,14 @@ fn parse_nonempty_utf8(text: []const u8) error{InvalidText}![]const u8 {
     if (text.len == 0) return error.InvalidText;
     if (!std.unicode.utf8ValidateSlice(text)) return error.InvalidText;
     return text;
+}
+
+fn parse_optional_reason(text: []const u8) error{InvalidReason}!?[]const u8 {
+    std.debug.assert(text.len <= limits.content_bytes_max);
+    std.debug.assert(limits.content_bytes_max > 0);
+
+    if (text.len == 0) return null;
+    return parse_nonempty_utf8(text) catch return error.InvalidReason;
 }
 
 fn parse_url(text: []const u8) error{InvalidUrl}![]const u8 {
@@ -550,6 +1098,26 @@ fn test_event(kind: u32, tags: []const nip01_event.EventTag) nip01_event.Event {
         .tags = tags,
         .content = "",
         .sig = [_]u8{0} ** 64,
+    };
+}
+
+fn test_event_with_content(
+    kind: u32,
+    tags: []const nip01_event.EventTag,
+    content: []const u8,
+) nip01_event.Event {
+    std.debug.assert(kind <= std.math.maxInt(u32));
+    std.debug.assert(content.len <= limits.content_bytes_max);
+
+    const event = test_event(kind, tags);
+    return .{
+        .id = event.id,
+        .pubkey = event.pubkey,
+        .created_at = event.created_at,
+        .kind = event.kind,
+        .tags = event.tags,
+        .content = content,
+        .sig = event.sig,
     };
 }
 
@@ -689,4 +1257,113 @@ test "group builders reject empty optional role and label output" {
             "",
         ),
     );
+}
+
+test "group reference parse and build keep host and id" {
+    var output: [64]u8 = undefined;
+
+    const parsed = try group_reference_parse("groups.example'pizza-lovers");
+    const root = try group_reference_parse("groups.example");
+    const built = try group_reference_build(output[0..], &parsed);
+
+    try std.testing.expectEqualStrings("groups.example", parsed.host);
+    try std.testing.expectEqualStrings("pizza-lovers", parsed.id);
+    try std.testing.expectEqualStrings("_", root.id);
+    try std.testing.expectEqualStrings("groups.example'pizza-lovers", built);
+}
+
+test "group roles extract and moderation builders are bounded" {
+    const role_tags = [_]nip01_event.EventTag{
+        .{ .items = &.{ "d", "pizza-lovers" } },
+        .{ .items = &.{ "role", "admin", "full access" } },
+        .{ .items = &.{ "role", "moderator" } },
+    };
+    var roles: [2]GroupRole = undefined;
+    var role_tag: BuiltTag = .{};
+    var group_tag: BuiltTag = .{};
+    var previous_tag: BuiltTag = .{};
+    var user_tag: BuiltTag = .{};
+    var code_tag: BuiltTag = .{};
+
+    const parsed = try group_roles_extract(&test_event(group_roles_kind, role_tags[0..]), roles[0..]);
+    const built_role = try group_build_role_tag(&role_tag, "admin", "full access");
+    const built_group = try group_build_group_tag(&group_tag, "pizza-lovers");
+    const built_previous = try group_build_previous_tag(&previous_tag, "deadbeef");
+    const built_user = try group_build_user_tag(
+        &user_tag,
+        "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+        &.{ "admin", "moderator" },
+    );
+    const built_code = try group_build_code_tag(&code_tag, "invite-123");
+
+    try std.testing.expectEqualStrings("pizza-lovers", parsed.group_id);
+    try std.testing.expectEqual(@as(usize, 2), parsed.roles.len);
+    try std.testing.expectEqualStrings("admin", parsed.roles[0].name);
+    try std.testing.expectEqualStrings("role", built_role.items[0]);
+    try std.testing.expectEqualStrings("h", built_group.items[0]);
+    try std.testing.expectEqualStrings("previous", built_previous.items[0]);
+    try std.testing.expectEqualStrings("p", built_user.items[0]);
+    try std.testing.expectEqualStrings("code", built_code.items[0]);
+}
+
+test "group join leave and user moderation extraction stays bounded" {
+    const join_tags = [_]nip01_event.EventTag{
+        .{ .items = &.{ "h", "pizza-lovers" } },
+        .{ .items = &.{ "code", "invite-123" } },
+        .{ .items = &.{ "previous", "deadbeef" } },
+    };
+    const leave_tags = [_]nip01_event.EventTag{
+        .{ .items = &.{ "h", "pizza-lovers" } },
+        .{ .items = &.{ "previous", "feedbead" } },
+    };
+    const put_tags = [_]nip01_event.EventTag{
+        .{ .items = &.{ "h", "pizza-lovers" } },
+        .{ .items = &.{
+            "p",
+            "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+            "admin",
+            "moderator",
+        } },
+        .{ .items = &.{ "previous", "deadbeef" } },
+    };
+    const remove_tags = [_]nip01_event.EventTag{
+        .{ .items = &.{ "h", "pizza-lovers" } },
+        .{ .items = &.{
+            "p",
+            "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+        } },
+        .{ .items = &.{ "previous", "feedbead" } },
+    };
+    var join_previous: [1][]const u8 = undefined;
+    var leave_previous: [1][]const u8 = undefined;
+    var put_roles: [2][]const u8 = undefined;
+    var put_previous: [1][]const u8 = undefined;
+    var remove_previous: [1][]const u8 = undefined;
+
+    const join = try group_join_request_extract(
+        &test_event_with_content(group_join_request_kind, join_tags[0..], "please let me in"),
+        join_previous[0..],
+    );
+    const leave = try group_leave_request_extract(
+        &test_event_with_content(group_leave_request_kind, leave_tags[0..], "bye"),
+        leave_previous[0..],
+    );
+    const put_user = try group_put_user_extract(
+        &test_event_with_content(group_put_user_kind, put_tags[0..], "adding moderator"),
+        put_roles[0..],
+        put_previous[0..],
+    );
+    const remove_user = try group_remove_user_extract(
+        &test_event_with_content(group_remove_user_kind, remove_tags[0..], "removing spammer"),
+        remove_previous[0..],
+    );
+
+    try std.testing.expectEqualStrings("pizza-lovers", join.group_id);
+    try std.testing.expectEqualStrings("invite-123", join.invite_code.?);
+    try std.testing.expectEqual(@as(usize, 1), join.previous_refs.len);
+    try std.testing.expectEqualStrings("pizza-lovers", leave.group_id);
+    try std.testing.expectEqual(@as(usize, 1), leave.previous_refs.len);
+    try std.testing.expectEqual(@as(usize, 2), put_user.roles.len);
+    try std.testing.expectEqualStrings("admin", put_user.roles[0]);
+    try std.testing.expectEqual(@as(usize, 1), remove_user.previous_refs.len);
 }
