@@ -1375,3 +1375,99 @@ Immutable record of accepted planning decisions.
 - Reversal Trigger: the deployed ecosystem converges on a narrower canonical group-tag/admin-tag
   shape or these compatibility slots begin causing ambiguous or unsafe behavior in practice.
 - Supersedes: none
+
+## D-068: Refine the NIP-46 kernel boundary to allow deterministic template substitution
+
+- Date: 2026-03-12
+- Status: accepted
+- Decision: keep NIP-46 relay/session orchestration, redirect handling, and end-user connection
+  flow outside the kernel, but allow deterministic `nostrconnect_url` template substitution inside
+  the kernel. `src/nip46_remote_signing.zig` may expose a bounded helper that replaces the exact
+  `<nostrconnect>` placeholder with a validated `nostrconnect://...` URI string, while leaving
+  launching, redirects, and relay/session control to higher layers.
+- Why: the NIP-46 appendix explicitly defines this placeholder replacement as protocol-facing data
+  published by signers. Treating the substitution itself as app-flow was too absolute; the actual
+  app-flow boundary is what happens after the URL is constructed.
+- Tradeoff: a slightly wider deterministic helper surface versus clearer spec completeness and less
+  duplicated template handling in downstream callers.
+- Related Tradeoff: T-H-ANIP-011.
+- Reversal Trigger: template substitution proves to require environment-specific redirect policy or
+  other non-deterministic behavior after all.
+- Supersedes: D-053
+
+## D-069: Keep NIP-24 generic `i` tags owned by NIP-73 and prioritize NIP-73 support
+
+- Date: 2026-03-12
+- Status: accepted
+- Decision: keep the decision that generic `i` tag grammar should not be reimplemented ad hoc
+  inside `src/nip24_extra_metadata.zig`, but tighten the rationale: this is not a broad
+  out-of-scope exclusion, it is a dependency/ownership decision. If we want fuller rust-nostr-like
+  functionality for NIP-24/NIP-39 adjacent external identifiers, the right change is to implement a
+  bounded NIP-73 helper and then wire NIP-24 generic `i` handling through it.
+- Why: `24.md` explicitly points `i` tags at NIP-73, and rust-nostr also centralizes external-id
+  handling there. The gap is missing NIP-73 support, not that the kernel should permanently ignore
+  generic `i` tags.
+- Tradeoff: a delayed but cleaner generic `i` implementation versus a faster ad hoc parser in the
+  wrong module.
+- Related Tradeoff: T-H-ANIP-011.
+- Reversal Trigger: current scope explicitly rejects NIP-73 but still requires generic `i` support
+  in `NIP-24`, forcing a local fallback grammar.
+- Supersedes: D-058
+
+## D-070: Refine NIP-03 scope to include bounded local proof verification but not networked chain verification
+
+- Date: 2026-03-12
+- Status: accepted
+- Decision: reopen the NIP-03 boundary partially. Keep networked Bitcoin/esplora verification and
+  full external proof-engine orchestration outside the kernel, but allow a bounded local
+  verification floor inside `src/nip03_opentimestamps.zig`:
+  - parse the decoded proof structure far enough to verify that it commits to the referenced event
+    id digest
+  - verify the presence of at least one Bitcoin attestation in the proof
+  - keep deterministic caller-buffer operation and typed failures
+  Do not turn the kernel into a networked attestation verifier.
+- Why: the old boundary only validated tags and base64 shape, which is too thin for a NIP whose
+  core claim is that the proof attests to an event in Bitcoin. A bounded local verification floor
+  improves correctness materially without requiring network clients in Layer 1.
+- Tradeoff: more parser complexity versus a more functionally complete NIP-03 helper that still
+  avoids network-coupled behavior.
+- Related Tradeoff: T-H-ANIP-011.
+- Reversal Trigger: bounded local proof verification proves too large or too unstable to keep KISS
+  and static-bound requirements.
+- Supersedes: D-064
+
+## D-071: Keep live NIP-39 provider verification outside the kernel
+
+- Date: 2026-03-12
+- Status: accepted
+- Decision: keep live provider fetch verification for NIP-39 outside the kernel. The accepted
+  kernel surface remains claim extraction, canonical tag building, deterministic proof-URL
+  derivation, and expected-proof-text generation.
+- Why: provider fetches, remote availability, content parsing, trust policy, and rate limiting are
+  adapter/client concerns rather than deterministic protocol-kernel behavior, and rust-nostr does
+  not provide a stronger in-kernel reference surface here either.
+- Tradeoff: simpler deterministic kernel boundary versus leaving live verification to an opt-in
+  higher layer.
+- Related Tradeoff: T-H-ANIP-011.
+- Reversal Trigger: current scope explicitly requires in-library provider verification and a
+  bounded adapter model is shown to be insufficient.
+- Supersedes: D-065
+
+## D-072: Refine NIP-29 scope to allow pure fixed-capacity state reduction but not relay orchestration
+
+- Date: 2026-03-12
+- Status: accepted
+- Decision: reopen the NIP-29 boundary partially. Keep relay fetch/subscription logic, relay
+  authority checks, random `previous` selection policy, and broader moderation/orchestration
+  outside the kernel, but allow a pure fixed-capacity reducer over caller-supplied NIP-29 events if
+  we need fuller functional parity later. That reducer may reconstruct bounded group state from a
+  supplied canonical sequence without performing any network or storage orchestration.
+- Why: `29.md` explicitly says group state should be reconstructable from the canonical event
+  sequence. Treating all state reconstruction as out of scope was too absolute. The real boundary is
+  networked relay/client orchestration, not pure event reduction.
+- Tradeoff: more protocol logic inside the kernel versus a more functionally complete and still
+  deterministic group helper surface.
+- Related Tradeoff: T-H-ANIP-011.
+- Reversal Trigger: a fixed-capacity reducer proves too coupled to relay policy or too complex to
+  preserve KISS and boundedness.
+- Supersedes: D-066

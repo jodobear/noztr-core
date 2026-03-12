@@ -144,15 +144,18 @@ Current project context for the Phase H kickoff baseline.
     `birthday`, deprecated `displayName` fallback, ordered generic `r`/`title`/`t` extraction,
     and direct generic tag builders
   - accepted bounded deferral: generic `i` tags remain deferred to `no-fah` because their grammar
-    belongs to NIP-73 rather than the NIP-24 module
+    belongs to NIP-73 rather than the NIP-24 module; this is now treated as a missing dependency,
+    not a permanent exclusion
   - deferred backlog `NIP-03` is now complete in `src/nip03_opentimestamps.zig` with strict
     kind-`1040` extraction, exact `e`/`k` target tags, caller-buffer base64 proof decoding, target
     reference validation, and direct `e`/`k` tag builders
   - deferred backlog `NIP-03` robustness review is complete:
     - standard long-form `e` tags with empty-relay / marker / pubkey suffixes are now accepted
     - bounded proof decoding and exact target-reference validation remain unchanged
-  - accepted bounded deferral: full OpenTimestamps / Bitcoin attestation verification remains out
-    of current kernel scope
+  - accepted bounded deferral:
+    - networked OpenTimestamps / Bitcoin attestation verification remains out of current kernel
+      scope
+    - bounded local proof verification is now accepted future kernel work (`D-070`)
   - deferred backlog `NIP-17` is now complete in `src/nip17_private_messages.zig` with bounded
     kind-`14` message parsing, kind-`15` file-message parsing, direct `NIP-59`
     unwrap-to-rumor reuse for both message kinds, kind-`10050` relay-list extraction, and direct
@@ -166,6 +169,7 @@ Current project context for the Phase H kickoff baseline.
     derivation, and expected proof-text generation
   - deferred backlog `NIP-39` robustness review is complete with no Layer 1 behavior change
   - accepted kernel posture: live provider fetch verification remains out of current kernel scope
+    (`D-071`)
   - deferred backlog `NIP-29` is now complete in `src/nip29_relay_groups.zig` with bounded
     relay-generated group metadata/admin/member/role extraction and builders for kinds `39000`,
     `39001`, `39002`, and `39003`, raw group-reference parse/build helpers, bounded join/leave
@@ -175,8 +179,9 @@ Current project context for the Phase H kickoff baseline.
     - group-admin extraction now ignores the empty compatibility label slot emitted by
       `nostr-tools` instead of rejecting the whole tag
     - outbound builders still reject empty admin role lists and empty optional member labels
-  - accepted bounded kernel posture: relay fetch/subscription, derived membership state, and
-    broader moderation orchestration remain out of current scope
+  - accepted bounded kernel posture:
+    - pure fixed-capacity state reduction is now accepted future kernel work (`D-072`)
+    - relay fetch/subscription and broader moderation orchestration remain out of current scope
   - Wave 1, the implemented-NIP audit, Wave 2 / `NIP-46`, Wave 3 / `NIP-06`, post-wave expansion
     `NIP-23`, and deferred backlog items `NIP-24`, `NIP-03`, `NIP-17`, `NIP-39`, and `NIP-29`
     are complete
@@ -325,8 +330,10 @@ Current project context for the Phase H kickoff baseline.
      URI output and method surface that matches `nostr-tools`, but now also accepts the older rust
      `metadata=` input shape as compatibility parse-only behavior
    Accepted out-of-scope:
-   - `nostrconnect_url` placeholder expansion or redirect/template rendering remains app-flow
-     logic and is intentionally outside the protocol-kernel helper surface (`D-053`)
+   - relay/session orchestration, redirects, and end-user connection flow remain outside the
+     protocol-kernel helper surface
+   - deterministic `nostrconnect_url` placeholder substitution is now accepted future kernel work
+     (`D-068`)
 6. Wave 3 / `NIP-06` is implemented, green, and closed.
    Current status:
    - `src/nip06_mnemonic.zig` implements the frozen narrow libwally boundary with strict

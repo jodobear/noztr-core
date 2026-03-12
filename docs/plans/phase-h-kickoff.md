@@ -221,8 +221,10 @@ the validated maintenance baseline.
       `metadata=` client-URI shape and lacks `switch_relays`, while `noztr` and
       `nostr-tools` follow the current split-query URI and method surface
   - accepted out-of-scope:
-    - `nostrconnect_url` placeholder expansion or redirect/template rendering remains app-flow
-      logic and is intentionally outside the protocol-kernel helper surface (`D-053`)
+    - relay/session orchestration, redirects, and end-user connection flow remain app-flow logic
+      outside the protocol-kernel helper surface
+    - deterministic `nostrconnect_url` placeholder substitution is now considered kernel-safe and
+      may be added later without reopening NIP-46 scope (`D-068`)
 - Wave 3 / `NIP-06` is implemented and closed in `no-7lv`
   - `src/nip06_mnemonic.zig` now implements the frozen narrow boundary:
     - English mnemonic validation
@@ -274,7 +276,8 @@ the validated maintenance baseline.
     - direct generic tag builders for `r`, `title`, and lowercase canonical `t`
     - tolerant handling of unrelated unknown fields and tags
   - accepted bounded deferral:
-    - generic `i` tags remain deferred to `no-fah` because their value grammar belongs to NIP-73
+    - generic `i` tags remain deferred to `no-fah` because their value grammar belongs to NIP-73;
+      the gap is missing NIP-73 support, not a permanent NIP-24 exclusion (`D-069`)
   - parity/evidence status:
     - rust parity overlap is now `HARNESS_COVERED`, `BASELINE`, `PASS`
     - TypeScript audit overlap is now `HARNESS_COVERED`, `BASELINE`, `PASS`
@@ -289,8 +292,8 @@ the validated maintenance baseline.
     - direct builders for canonical `e` and `k` tags
     - tolerant handling of unrelated unknown tags
   - accepted bounded deferral:
-    - full OpenTimestamps / Bitcoin attestation verification remains outside the current kernel
-      scope
+    - networked Bitcoin/OpenTimestamps verification remains outside the current kernel scope
+    - bounded local proof verification is now accepted future kernel work (`D-070`)
   - parity/evidence status:
     - rust parity overlap is now `HARNESS_COVERED`, `BASELINE`, `PASS`
     - TypeScript audit overlap is now `HARNESS_COVERED`, `BASELINE`, `PASS`
@@ -322,12 +325,15 @@ the validated maintenance baseline.
     - deterministic expected proof-text generation from a public key
     - tolerant handling of unrelated unknown tags
   - accepted bounded deferral:
-    - live provider fetch verification remains deferred in `no-t9x`
+    - live provider fetch verification remains deferred in `no-t9x` and remains outside the kernel
+      (`D-071`)
   - parity/evidence status:
     - rust parity overlap is now `HARNESS_COVERED`, `BASELINE`, `PASS`
     - TypeScript audit overlap is now `HARNESS_COVERED`, `BASELINE`, `PASS`
   - review outcome:
     - no accepted behavior change was required after the implementation pass
+    - pure fixed-capacity state reduction is now considered valid future kernel work, while relay
+      fetch/subscription and broader orchestration remain out of scope (`D-072`)
 - Deferred backlog / `NIP-29` is complete in `no-j2g`
   - bounded `src/nip29_relay_groups.zig` surface is implemented
   - current implemented scope:
