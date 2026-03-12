@@ -137,8 +137,10 @@ Implementation status snapshot (post-I7 closure):
     `src/nip27_references.zig`.
   - `NIP-51` strict public-list helpers and bounded bookmark/emoji tag builders are implemented in
     `src/nip51_lists.zig`.
-  - Wave 1 is complete; next execution focus is the implemented-NIP audit.
-  - Next expansion phase-order item remains Wave 2 / `NIP-46` after the audit.
+  - Wave 1, the implemented-NIP audit, Wave 2 / `NIP-46`, Wave 3 / `NIP-06`, and the post-Wave
+    `NIP-51` private-list follow-up are complete.
+  - Next execution focus is implemented-surface robustness / real-world validation before any
+    further protocol expansion.
 
 Phase G closure and Phase H transition from current baseline:
 - keep TypeScript references archive-only and prevent active-cadence wording regressions.
@@ -272,6 +274,54 @@ Consolidated audit artifact:
 - `docs/plans/implemented-nip-audit-report.md` is the canonical summary for audit findings,
   decisions, accepted risks, and follow-up links after the autonomous audit completes.
 - beads issues hold per-NIP raw evidence; the report holds the systematic review-ready synthesis.
+
+### Implemented Surface Robustness / Real-World Validation Execution
+
+Use this when the goal is to harden already-implemented surfaces before adding more NIPs. This is
+not a separate governance model. It reuses the implemented-NIP audit standards above and extends
+them with stronger integration and interoperability evidence.
+
+Run the robustness pass serially, one implemented surface at a time.
+
+Per-surface robustness steps:
+1. Create or claim one beads issue for the target hardening pass and freeze the exact scope.
+   Examples: `NIP-46`, `NIP-06`, `NIP-51` private lists, `NIP-44`, `NIP-59`.
+2. Reuse the same review axes, temperament rule, and cross-cutting lenses from the implemented-NIP
+   audit.
+3. Gather stronger execution evidence than a normal parity review where practical:
+   - current `noztr` code/tests
+   - NIP text
+   - `rust-nostr`
+   - `nostr-tools`
+   - protocol-shaped integration samples, replay inputs, or real-world message/event examples
+4. Prefer findings in these classes:
+   - latent bug under realistic composition
+   - unnecessary interoperability friction under real producer/consumer behavior
+   - trust-boundary weakness that only appears in end-to-end or composed flows
+   - unnecessary complexity that makes maintenance or safe usage harder than needed
+5. Keep the fix posture narrow:
+   - do not broaden acceptance casually
+   - do not add orchestration or app-flow logic into Layer 1
+   - prefer adapters only when broader compatibility would otherwise blur the kernel contract
+6. Run the same two review-cycle discipline used by the implementation loop:
+   - Review Cycle A: correctness, edge cases, parity/ecosystem, overengineering, usability
+   - Review Cycle B: challenge the fixes and remove any regression or unnecessary complexity
+7. Run fresh gates after the final candidate:
+   - focused surface tests first
+   - `zig build test --summary all`
+   - `zig build`
+   - focused parity/interop commands where applicable
+8. Update canonical docs only where accepted behavior, active risks, or current state changed.
+   Keep the consolidated outcome in `docs/plans/implemented-nip-audit-report.md` if the pass
+   changes accepted conclusions or opens new follow-ups.
+9. Land one local git commit scoped to the completed robustness item before moving to the next one.
+
+Robustness pass quality rules:
+- Reuse existing procedure; do not create a new ad hoc review process per surface.
+- Treat real-world/interoperability evidence as a strengthening layer on top of the audit, not as a
+  replacement for the audit standards.
+- Prefer hardening the highest-value, most integration-sensitive surfaces first before resuming new
+  protocol expansion.
 
 ## Phase F hard-gate closure status (epic `no-dr3`)
 

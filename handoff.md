@@ -198,8 +198,9 @@ Current project context for the Phase H kickoff baseline.
 1. Keep TypeScript references archive-only in docs and prevent active-cadence wording regressions.
 2. Continue maintenance cadence reruns (rust parity + aggregate Zig gates) on dependency or toolchain
    changes and record outcomes in Phase H kickoff and handoff docs.
-3. Continue Phase H expansion sequencing from `docs/plans/phase-h-additional-nips-plan.md`.
-   Wave 1 is complete: `25`, `10`, `18`, `22`, `27`, `51`.
+3. Run the implemented-surface robustness / real-world validation pass before any new NIP
+   expansion.
+   Recommended first surfaces: `46`, `06`, `51` private lists, `44`, `59`.
 4. Keep the implemented-NIP audit report current if future code changes reopen compatibility or
    strictness questions.
 5. Wave 2 / `NIP-46` is complete.

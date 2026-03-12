@@ -110,8 +110,8 @@ the validated maintenance baseline.
   - audit outcome: widened bookmark extraction to remove unnecessary incompatibility with broader
     rust producer output while keeping malformed supported-tag rejection and coordinate-kind checks
 - Wave 1 status: complete.
-- Active next execution focus: post-Wave follow-up prioritization after `no-e7b`, `no-09f`, and
-  `no-7lv` closure.
+- Active next execution focus: implemented-surface robustness / real-world validation before any
+  further protocol expansion.
 - Implemented-NIP audit status:
   - `NIP-01`, `NIP-02`, `NIP-09`, `NIP-10`, `NIP-11`, `NIP-13`, `NIP-18`, `NIP-19`, `NIP-21`,
     `NIP-22`, `NIP-25`, `NIP-27`, `NIP-40`, `NIP-42`, `NIP-44`, `NIP-51`, `NIP-59`, and `NIP-65`
@@ -230,9 +230,16 @@ the validated maintenance baseline.
 
 ## Immediate Work Tracks
 
-- Maintain rust-active parity cadence and aggregate Zig quality gates on dependency/toolchain changes.
-- Keep Wave 1 closure evidence current and retain the serial loop doc as the canonical execution
-  model.
+- Maintain rust-active parity cadence and aggregate Zig quality gates on dependency/toolchain
+  changes.
+- Use the implemented-surface robustness / real-world validation execution in
+  `docs/plans/build-plan.md` as the next execution model before any new NIP expansion.
+- Start that robustness pass with the most integration-sensitive completed surfaces:
+  - `NIP-46`
+  - `NIP-06`
+  - `NIP-51` private lists
+  - `NIP-44`
+  - `NIP-59`
 - Keep the implemented-NIP audit report current if future code changes reopen compatibility
   questions.
 - `no-4iw` is resolved by the NIP-10 audit and no longer blocks interpretation of NIP-10 quality.
