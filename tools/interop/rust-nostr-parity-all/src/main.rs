@@ -8,6 +8,7 @@ use base64::Engine;
 use nostr::filter::MatchEventOptions;
 use nostr::nips::nip01::Coordinate;
 use nostr::nips::nip02::Contact;
+use nostr::nips::nip05::{verify_from_raw_json, Nip05Address, Nip05Profile};
 use nostr::nips::nip06::FromMnemonic;
 use nostr::nips::nip09::EventDeletionRequest;
 use nostr::nips::nip10::Marker as Nip10Marker;
@@ -1083,6 +1084,55 @@ fn check_nip56() -> Result<(), String> {
         )
     }) {
         return Err("NIP-56 event report tag mismatch".to_string());
+    }
+
+    Ok(())
+}
+
+fn check_nip05() -> Result<(), String> {
+    let pubkey_hex = "68d81165918100b7da43fc28f7d1fc12554466e1115886b9e7bb326f65ec4272";
+    let pubkey =
+        PublicKey::from_hex(pubkey_hex).map_err(|e| format!("NIP-05 pubkey parse: {e}"))?;
+    let json = format!(
+        r#"{{"names":{{"_":"{0}","bob":"{0}"}},"relays":{{"{0}":["wss://relay.example.com"]}},
+        "nip46":{{"{0}":["wss://bunker.example.com"]}}}}"#,
+        pubkey_hex
+    );
+
+    let root =
+        Nip05Address::parse("example.com").map_err(|e| format!("NIP-05 bare parse: {e}"))?;
+    if root.name() != "_" {
+        return Err("NIP-05 bare address did not canonicalize to _".to_string());
+    }
+    if root.url().as_str() != "https://example.com/.well-known/nostr.json?name=_" {
+        return Err("NIP-05 bare address URL mismatch".to_string());
+    }
+    if !verify_from_raw_json(&pubkey, &root, &json)
+        .map_err(|e| format!("NIP-05 verify: {e}"))?
+    {
+        return Err("NIP-05 verify returned false".to_string());
+    }
+
+    let profile = Nip05Profile::from_raw_json(&root, &json)
+        .map_err(|e| format!("NIP-05 profile parse: {e}"))?;
+    if profile.public_key != pubkey {
+        return Err("NIP-05 profile public key mismatch".to_string());
+    }
+    if profile.relays.len() != 1 ||
+        !profile.relays[0].as_str().starts_with("wss://relay.example.com")
+    {
+        return Err("NIP-05 relay list mismatch".to_string());
+    }
+    if profile.nip46.len() != 1 ||
+        !profile.nip46[0].as_str().starts_with("wss://bunker.example.com")
+    {
+        return Err("NIP-05 nip46 relay list mismatch".to_string());
+    }
+
+    let named =
+        Nip05Address::parse("bob@example.com").map_err(|e| format!("NIP-05 named parse: {e}"))?;
+    if named.url().as_str() != "https://example.com/.well-known/nostr.json?name=bob" {
+        return Err("NIP-05 named address URL mismatch".to_string());
     }
 
     Ok(())
@@ -2313,6 +2363,7 @@ async fn main() {
     push_harness_covered(&mut results, "NIP-32", Depth::Baseline, check_nip32());
     push_harness_covered(&mut results, "NIP-36", Depth::Baseline, check_nip36());
     push_harness_covered(&mut results, "NIP-56", Depth::Baseline, check_nip56());
+    push_harness_covered(&mut results, "NIP-05", Depth::Baseline, check_nip05());
     push_harness_covered(&mut results, "NIP-17", Depth::Baseline, check_nip17().await);
     push_harness_covered(&mut results, "NIP-39", Depth::Baseline, check_nip39());
     push_harness_covered(&mut results, "NIP-27", Depth::Deep, check_nip27());

@@ -85,6 +85,11 @@ Release-facing note for behavior differences that are intentional in `noztr` Lay
   `rust-nostr` lane still exposes the older `metadata=` client-URI shape and does not yet expose
   `switch_relays` in its method enum. `noztr` keeps the current-spec surface instead of narrowing
   itself to the stale Rust overlap.
+- **NIP-05 local-part grammar stays spec-shaped instead of following `nostr-tools`' broader regex:**
+  `noztr` enforces the NIP-05 local-part character set `a-z0-9-_.` and rejects broader forms such
+  as `+` that `nostr-tools` still accepts in `NIP05_REGEX`. `noztr` keeps bare-domain
+  canonicalization to `_@domain` and shared `relays` / `nip46` extraction, but does not widen the
+  identifier grammar beyond the NIP text just to match the JS helper regex.
 
 ## Interoperability impact and migration guidance
 

@@ -1566,3 +1566,20 @@ Immutable record of accepted planning decisions.
 - Reversal Trigger: protocol evidence or product scope changes show that one of the SDK-first items
   needs a smaller bounded kernel slice earlier than planned.
 - Supersedes: none
+
+## D-078: Implement bounded NIP-05 identity helpers in the kernel
+
+- Date: 2026-03-13
+- Status: accepted
+- Decision: implement `src/nip05_identity.zig` as the bounded kernel surface for NIP-05 address
+  parsing, canonical well-known URL composition, raw `nostr.json` verification, and bounded
+  optional `relays` / `nip46` extraction keyed by the matched public key. Keep HTTP fetch, redirect
+  handling, caching, and higher-level trust UX in the future SDK.
+- Why: this is deterministic protocol glue that many SDK surfaces will reuse, and it materially
+  improves kernel completeness for both relay and client work without pulling in network workflow.
+- Tradeoff: a slightly broader kernel helper surface versus cleaner SDK layering and less repeated
+  NIP-05 parser/verification logic.
+- Related Tradeoff: T-H-ANIP-011.
+- Reversal Trigger: the helper proves to require network/policy assumptions that cannot stay pure
+  and bounded.
+- Supersedes: none

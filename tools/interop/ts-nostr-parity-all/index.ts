@@ -18,6 +18,7 @@ import { makeAuthEvent } from "nostr-tools/nip42";
 import { decrypt, encrypt, getConversationKey } from "nostr-tools/nip44";
 import * as nip46 from "nostr-tools/nip46";
 import * as nip10 from "nostr-tools/nip10";
+import * as nip05 from "nostr-tools/nip05";
 import * as nip06 from "nostr-tools/nip06";
 import * as nip17 from "nostr-tools/nip17";
 import * as nip29 from "nostr-tools/nip29";
@@ -931,6 +932,38 @@ function check_nip56(): void {
     );
 }
 
+async function check_nip05(): Promise<void> {
+    const pubkey = "68d81165918100b7da43fc28f7d1fc12554466e1115886b9e7bb326f65ec4272";
+    let seen_url = "";
+    nip05.useFetchImplementation(async (input, init) => {
+        seen_url = String(input);
+        ensure(init?.redirect === "manual", "NIP-05 redirect policy mismatch");
+        return new Response(
+            JSON.stringify({
+                names: { _: pubkey, bob: pubkey },
+                relays: { [pubkey]: ["wss://relay.example.com"] },
+                nip46: { [pubkey]: ["wss://bunker.example.com"] },
+            }),
+            { status: 200, headers: { "content-type": "application/json" } },
+        );
+    });
+
+    const root = await nip05.queryProfile("example.com");
+    ensure(root !== null, "NIP-05 bare-domain query returned null");
+    ensure(root.pubkey === pubkey, "NIP-05 bare-domain pubkey mismatch");
+    ensure(root.relays?.[0] === "wss://relay.example.com", "NIP-05 relay mismatch");
+    ensure(
+        seen_url === "https://example.com/.well-known/nostr.json?name=_",
+        "NIP-05 bare-domain URL mismatch",
+    );
+
+    const named = await nip05.queryProfile("bob@example.com");
+    ensure(named !== null, "NIP-05 named query returned null");
+    ensure(named.pubkey === pubkey, "NIP-05 named pubkey mismatch");
+    ensure(await nip05.isValid(pubkey, "bob@example.com"), "NIP-05 isValid mismatch");
+    ensure(nip05.NIP05_REGEX.test("alice+test@example.com"), "NIP-05 regex breadth changed");
+}
+
 function check_nip17(): void {
     const sender_secret = to_bytes_32(FIXED_SECRET_KEY_HEX);
     const recipient_secret = to_bytes_32(
@@ -1546,6 +1579,7 @@ async function main(): Promise<void> {
     await push_harness_covered(results, "NIP-32", "BASELINE", check_nip32);
     await push_harness_covered(results, "NIP-36", "BASELINE", check_nip36);
     await push_harness_covered(results, "NIP-56", "BASELINE", check_nip56);
+    await push_harness_covered(results, "NIP-05", "BASELINE", check_nip05);
     await push_harness_covered(results, "NIP-17", "BASELINE", check_nip17);
     await push_harness_covered(results, "NIP-29", "BASELINE", check_nip29);
     await push_harness_covered(results, "NIP-39", "BASELINE", check_nip39);

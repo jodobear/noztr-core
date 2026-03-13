@@ -102,6 +102,9 @@ pub const nip36_content_warning = @import("nip36_content_warning.zig");
 /// Post-Phase-H concrete export for the NIP-56 reporting module.
 pub const nip56_reporting = @import("nip56_reporting.zig");
 
+/// Post-Phase-H concrete export for the NIP-05 identity module.
+pub const nip05_identity = @import("nip05_identity.zig");
+
 /// Phase I5 concrete export for the NIP-44 encrypted direct-message module.
 pub const nip44 = @import("nip44.zig");
 
@@ -183,6 +186,7 @@ test "root exports limits and error namespaces" {
     try std.testing.expect(@TypeOf(nip32_labeling.Nip32Error) == type);
     try std.testing.expect(@TypeOf(nip36_content_warning.Nip36Error) == type);
     try std.testing.expect(@TypeOf(nip56_reporting.Nip56Error) == type);
+    try std.testing.expect(@TypeOf(nip05_identity.Nip05Error) == type);
     try std.testing.expect(@TypeOf(nip44.Nip44Error) == type);
     try std.testing.expect(@TypeOf(nip59_wrap.WrapError) == type);
     try std.testing.expectEqual(i6_extensions_enabled, @hasDecl(nip45_count, "CountError"));
@@ -244,6 +248,8 @@ test "root exports limits and error namespaces" {
     try std.testing.expect(@TypeOf(nip56_reporting.ReportType) == type);
     try std.testing.expect(@TypeOf(nip56_reporting.ReportInfo) == type);
     try std.testing.expect(@TypeOf(nip56_reporting.BuiltTag) == type);
+    try std.testing.expect(@TypeOf(nip05_identity.Address) == type);
+    try std.testing.expect(@TypeOf(nip05_identity.Profile) == type);
     try std.testing.expect(@TypeOf(nip29_relay_groups.GroupMetadata) == type);
     try std.testing.expect(@TypeOf(nip29_relay_groups.GroupAdmin) == type);
     try std.testing.expect(@TypeOf(nip29_relay_groups.GroupReference) == type);
@@ -575,6 +581,35 @@ test "root exports limits and error namespaces" {
                 *nip51_lists.BuiltTag,
                 *const nip51_lists.ListEmoji,
             ) nip51_lists.ListError!nip01_event.EventTag,
+    );
+    try std.testing.expect(
+        @TypeOf(nip05_identity.address_parse) ==
+            fn ([]const u8, std.mem.Allocator) nip05_identity.Nip05Error!nip05_identity.Address,
+    );
+    try std.testing.expect(
+        @TypeOf(nip05_identity.address_format) ==
+            fn ([]u8, *const nip05_identity.Address) nip05_identity.Nip05Error![]const u8,
+    );
+    try std.testing.expect(
+        @TypeOf(nip05_identity.address_compose_well_known_url) ==
+            fn ([]u8, *const nip05_identity.Address) nip05_identity.Nip05Error![]const u8,
+    );
+    try std.testing.expect(
+        @TypeOf(nip05_identity.profile_parse_json) ==
+            fn (
+                *const nip05_identity.Address,
+                []const u8,
+                std.mem.Allocator,
+            ) nip05_identity.Nip05Error!nip05_identity.Profile,
+    );
+    try std.testing.expect(
+        @TypeOf(nip05_identity.profile_verify_json) ==
+            fn (
+                *const [32]u8,
+                *const nip05_identity.Address,
+                []const u8,
+                std.mem.Allocator,
+            ) nip05_identity.Nip05Error!bool,
     );
     try std.testing.expect(
         @TypeOf(nip46_remote_signing.message_parse_json) ==
