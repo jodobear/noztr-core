@@ -940,6 +940,68 @@ fn check_nip24() -> Result<(), String> {
     Ok(())
 }
 
+fn check_nip32() -> Result<(), String> {
+    let keys = parse_keys()?;
+    let label_event = EventBuilder::new(Kind::Label, "NIP-32 label")
+        .tags([
+            Tag::parse(vec!["L", "#t"]).map_err(|e| format!("NIP-32 namespace parse: {e}"))?,
+            Tag::parse(vec!["l", "nostr", "#t", "en", "extra"])
+                .map_err(|e| format!("NIP-32 label parse: {e}"))?,
+            Tag::parse(vec![
+                "p",
+                "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+                "wss://relay.example",
+                "petname-ignored",
+            ])
+            .map_err(|e| format!("NIP-32 target parse: {e}"))?,
+            Tag::parse(vec!["title", "ignored"])
+                .map_err(|e| format!("NIP-32 unrelated tag parse: {e}"))?,
+        ])
+        .sign_with_keys(&keys)
+        .map_err(|e| format!("NIP-32 label event build failed: {e}"))?;
+    if label_event.kind != Kind::Label {
+        return Err("NIP-32 label event kind mismatch".to_string());
+    }
+    label_event
+        .verify()
+        .map_err(|e| format!("NIP-32 label event signature verification failed: {e}"))?;
+    if !label_event.tags.iter().any(|tag| {
+        matches!(
+            tag.as_standardized(),
+            Some(TagStandard::LabelNamespace(namespace)) if namespace == "#t"
+        )
+    }) {
+        return Err("NIP-32 missing label namespace tag".to_string());
+    }
+    if !label_event.tags.iter().any(|tag| {
+        matches!(
+            tag.as_standardized(),
+            Some(TagStandard::Label { value, namespace })
+                if value == "nostr" && namespace.as_deref() == Some("#t")
+        )
+    }) {
+        return Err("NIP-32 missing label tag".to_string());
+    }
+
+    let self_labeled = EventBuilder::text_note("self-labeled")
+        .tags([
+            Tag::parse(vec!["L", "ISO-639-1"])
+                .map_err(|e| format!("NIP-32 self namespace parse: {e}"))?,
+            Tag::parse(vec!["l", "en", "ISO-639-1"])
+                .map_err(|e| format!("NIP-32 self label parse: {e}"))?,
+        ])
+        .sign_with_keys(&keys)
+        .map_err(|e| format!("NIP-32 self-label event build failed: {e}"))?;
+    if self_labeled.kind != Kind::TextNote {
+        return Err("NIP-32 self-label event kind mismatch".to_string());
+    }
+    self_labeled
+        .verify()
+        .map_err(|e| format!("NIP-32 self-label signature verification failed: {e}"))?;
+
+    Ok(())
+}
+
 async fn check_nip17() -> Result<(), String> {
     let keys = parse_keys()?;
     let receiver_keys = parse_alt_keys()?;
@@ -2162,6 +2224,7 @@ async fn main() {
     push_harness_covered(&mut results, "NIP-22", Depth::Deep, check_nip22());
     push_harness_covered(&mut results, "NIP-23", Depth::Baseline, check_nip23());
     push_harness_covered(&mut results, "NIP-24", Depth::Baseline, check_nip24());
+    push_harness_covered(&mut results, "NIP-32", Depth::Baseline, check_nip32());
     push_harness_covered(&mut results, "NIP-17", Depth::Baseline, check_nip17().await);
     push_harness_covered(&mut results, "NIP-39", Depth::Baseline, check_nip39());
     push_harness_covered(&mut results, "NIP-27", Depth::Deep, check_nip27());

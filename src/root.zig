@@ -93,6 +93,9 @@ pub const nip29_relay_groups = @import("nip29_relay_groups.zig");
 /// Post-Phase-H concrete export for the NIP-73 external-id module.
 pub const nip73_external_ids = @import("nip73_external_ids.zig");
 
+/// Post-Phase-H concrete export for the NIP-32 labeling module.
+pub const nip32_labeling = @import("nip32_labeling.zig");
+
 /// Phase I5 concrete export for the NIP-44 encrypted direct-message module.
 pub const nip44 = @import("nip44.zig");
 
@@ -171,6 +174,7 @@ test "root exports limits and error namespaces" {
     try std.testing.expect(@TypeOf(nip39_external_identities.Nip39Error) == type);
     try std.testing.expect(@TypeOf(nip29_relay_groups.Nip29Error) == type);
     try std.testing.expect(@TypeOf(nip73_external_ids.Nip73Error) == type);
+    try std.testing.expect(@TypeOf(nip32_labeling.Nip32Error) == type);
     try std.testing.expect(@TypeOf(nip44.Nip44Error) == type);
     try std.testing.expect(@TypeOf(nip59_wrap.WrapError) == type);
     try std.testing.expectEqual(i6_extensions_enabled, @hasDecl(nip45_count, "CountError"));
@@ -221,6 +225,12 @@ test "root exports limits and error namespaces" {
     try std.testing.expect(@TypeOf(nip73_external_ids.ExternalIdKind) == type);
     try std.testing.expect(@TypeOf(nip73_external_ids.ExternalId) == type);
     try std.testing.expect(@TypeOf(nip73_external_ids.BuiltTag) == type);
+    try std.testing.expect(@TypeOf(nip32_labeling.LabelNamespace) == type);
+    try std.testing.expect(@TypeOf(nip32_labeling.Label) == type);
+    try std.testing.expect(@TypeOf(nip32_labeling.LabelTarget) == type);
+    try std.testing.expect(@TypeOf(nip32_labeling.LabelEventInfo) == type);
+    try std.testing.expect(@TypeOf(nip32_labeling.SelfLabelInfo) == type);
+    try std.testing.expect(@TypeOf(nip32_labeling.BuiltTag) == type);
     try std.testing.expect(@TypeOf(nip29_relay_groups.GroupMetadata) == type);
     try std.testing.expect(@TypeOf(nip29_relay_groups.GroupAdmin) == type);
     try std.testing.expect(@TypeOf(nip29_relay_groups.GroupReference) == type);

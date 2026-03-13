@@ -47,6 +47,7 @@ frozen defaults or the current deterministic-and-compatible Layer 1 kernel postu
 | 25 | wave-1-complete | Native kind-7 reaction parsing/helpers are now implemented with strict last-target semantics, typed malformed-tag failures, and strict custom-emoji validation; kind-17 external reactions remain separate follow-up work. |
 | 27 | wave-1-complete | Strict inline `nostr:` reference extraction is now implemented with stable spans, decoded NIP-21 entities, and malformed-fragment fallback. |
 | 29 | expansion-complete | Bounded relay-group helpers are now implemented for relay-generated kinds `39000`, `39001`, `39002`, and `39003`, raw group-reference parse/build, bounded join/leave and put/remove-user event extraction, and raw `previous` tag plumbing; relay fetch/subscription, derived membership state, and broader moderation orchestration remain out of scope. |
+| 32 | expansion-complete | Bounded labeling helpers are now implemented for kind-`1985` label events, non-`1985` self-label extraction, deterministic `e`/`p`/`a`/`r`/`t` target handling, exact target-tag matching, tolerant unrelated-tag ignoring, and direct `L`/`l`/target builders. |
 | 39 | expansion-complete | Bounded external-identity helpers are now implemented for kind-10011 claim extraction, canonical `i`-tag building, provider-specific proof-URL derivation, and expected proof-text generation; live provider fetch verification remains deferred in `no-t9x`. |
 | 46 | expansion-complete | Bounded Nostr Connect helpers are implemented with request/result parsing and building, envelope validation, URI/discovery handling, and exact deterministic `nostrconnect_url` template substitution. |
 | 51 | wave-1-complete | Strict public-list extraction for the common rust-backed NIP-51 kinds is implemented with explicit set metadata handling, coordinate-kind validation, bounded broader bookmark/emoji emission helpers, and bounded NIP-44 private-list helpers; deprecated NIP-04 private-list compatibility is deferred in `no-urr`. |
@@ -61,6 +62,7 @@ frozen defaults or the current deterministic-and-compatible Layer 1 kernel postu
 - Wave 3 (security-sensitive expansion after checkpoint): `06`.
 - Post-Wave expansion completion: `23`.
 - Post-wave deferred backlog completion: `24`, `03`, `17`, `39`, `29`.
+- Active kernel-first sequence: `32`, `36`, `56`, `05`, `26`, `37`, `58`, `84`.
 - Deferred backlog (no implementation start in this plan): none.
 - Rejected hold: `07`.
 

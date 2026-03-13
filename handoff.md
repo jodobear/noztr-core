@@ -315,14 +315,14 @@ Current project context for the Phase H kickoff baseline.
 1. Keep TypeScript references archive-only in docs and prevent active-cadence wording regressions.
 2. Continue maintenance cadence reruns (rust parity + aggregate Zig gates) on dependency or toolchain
    changes and record outcomes in Phase H kickoff and handoff docs.
-3. Phase H planned expansion plus the bounded NIP-73 ownership follow-up are complete.
-   Recommended next step:
-   - use operator-directed robustness or SDK-boundary / `nzdk` preparation work before any new
-     protocol expansion
-   - accepted next-NIP boundary map now lives in
+3. Kernel-first expansion is active.
+   Current state:
+   - `NIP-32` is complete in `src/nip32_labeling.zig`
+   - accepted next-NIP boundary map lives in
      `docs/plans/noztr-sdk-ownership-matrix.md` for `05`, `07`, `26`, `32`, `36`, `37`, `56`,
      `57`, `58`, `60`, `61`, `84`, `86`, and `B7`
-   - current recommended kernel-first sequence is `32`, `36`, `56`, `05`, `26`, `37`, `58`, `84`
+   - current serial kernel-first sequence is `32`, `36`, `56`, `05`, `26`, `37`, `58`, `84`
+   - next serial item is `NIP-36`
 4. Keep the implemented-NIP audit report current if future code changes reopen compatibility or
    strictness questions.
    - use `docs/plans/noztr-sdk-ownership-matrix.md` when the question is whether a helper belongs

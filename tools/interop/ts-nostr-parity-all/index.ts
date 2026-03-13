@@ -817,6 +817,54 @@ function check_nip24(): void {
     ensure(event.tags.some((tag) => tag[0] === "t" && tag[1] === "nostr"), "NIP-24 event missing hashtag");
 }
 
+function check_nip32(): void {
+    const secret_key = to_bytes_32(FIXED_SECRET_KEY_HEX);
+    const pubkey = getPublicKey(secret_key);
+    const label_event = finalizeEvent(
+        {
+            kind: kinds.Label,
+            created_at: 1_708_000_058,
+            tags: [
+                ["L", "#t"],
+                ["l", "nostr", "#t", "en", "extra"],
+                ["p", pubkey, "wss://relay.example", "petname-ignored"],
+                ["title", "ignored"],
+            ],
+            content: "NIP-32 label",
+        },
+        secret_key,
+    );
+    ensure(label_event.kind === kinds.Label, "NIP-32 label kind mismatch");
+    ensure(verifyEvent(label_event), "NIP-32 label signature verification failed");
+    ensure(
+        label_event.tags.some((tag) => tag[0] === "L" && tag[1] === "#t"),
+        "NIP-32 missing namespace tag",
+    );
+    ensure(
+        label_event.tags.some((tag) => tag[0] === "l" && tag[1] === "nostr" && tag[2] === "#t"),
+        "NIP-32 missing label tag",
+    );
+    ensure(
+        label_event.tags.some((tag) => tag[0] === "p" && tag[1] === pubkey),
+        "NIP-32 missing pubkey target",
+    );
+
+    const self_label = finalizeEvent(
+        {
+            kind: kinds.ShortTextNote,
+            created_at: 1_708_000_059,
+            tags: [
+                ["L", "ISO-639-1"],
+                ["l", "en", "ISO-639-1"],
+            ],
+            content: "self-labeled",
+        },
+        secret_key,
+    );
+    ensure(self_label.kind === kinds.ShortTextNote, "NIP-32 self-label kind mismatch");
+    ensure(verifyEvent(self_label), "NIP-32 self-label signature verification failed");
+}
+
 function check_nip17(): void {
     const sender_secret = to_bytes_32(FIXED_SECRET_KEY_HEX);
     const recipient_secret = to_bytes_32(
@@ -1429,6 +1477,7 @@ async function main(): Promise<void> {
     await push_harness_covered(results, "NIP-21", "EDGE", check_nip21);
     await push_harness_covered(results, "NIP-23", "BASELINE", check_nip23);
     await push_harness_covered(results, "NIP-24", "BASELINE", check_nip24);
+    await push_harness_covered(results, "NIP-32", "BASELINE", check_nip32);
     await push_harness_covered(results, "NIP-17", "BASELINE", check_nip17);
     await push_harness_covered(results, "NIP-29", "BASELINE", check_nip29);
     await push_harness_covered(results, "NIP-39", "BASELINE", check_nip39);

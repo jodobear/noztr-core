@@ -120,8 +120,8 @@ the validated maintenance baseline.
     - the current NIP-44-first private JSON-array wire and explicit legacy NIP-04 rejection remain
       the accepted kernel posture
 - Wave 1 status: complete.
-- Active next execution focus: Phase H planned expansion is complete; next work should be either a
-  second robustness batch or an explicit reprioritization of deferred backlog items.
+- Active next execution focus: the kernel-first expansion sequence is active.
+- `NIP-32` is complete; `NIP-36` is the next serial implementation item.
 - Implemented-NIP audit status:
   - `NIP-01`, `NIP-02`, `NIP-09`, `NIP-10`, `NIP-11`, `NIP-13`, `NIP-18`, `NIP-19`, `NIP-21`,
     `NIP-22`, `NIP-25`, `NIP-27`, `NIP-40`, `NIP-42`, `NIP-44`, `NIP-51`, `NIP-59`, and `NIP-65`
@@ -383,10 +383,11 @@ the validated maintenance baseline.
   - completed: `NIP-46`, `NIP-06`, `NIP-51` private lists, `NIP-44`, `NIP-59`, `NIP-03`,
     `NIP-17`, `NIP-39`, `NIP-29`
   - latest completed batch: `NIP-03`, `NIP-17`, `NIP-39`, `NIP-29`
-- Phase H planned expansion plus the bounded NIP-73 ownership follow-up are now complete.
-- Deferred backlog is now complete.
-- Recommended next sequence: address deferred follow-up items or operator-directed robustness work
-  before any new protocol expansion.
+- Phase H planned expansion plus the bounded NIP-73 ownership follow-up are complete.
+- Deferred backlog is complete, and the next execution lane is the accepted kernel-first sequence.
+- Kernel-first expansion progress:
+  - completed: `NIP-32`
+  - next serial item: `NIP-36`
 - `NIP-44` robustness outcome:
   - no Layer 1 behavior change was required after real-world review
   - the current v2-only surface, staged failure ordering, typed conversation-key boundary, and
