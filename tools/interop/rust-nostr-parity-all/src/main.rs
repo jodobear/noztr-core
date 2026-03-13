@@ -21,6 +21,7 @@ use nostr::nips::nip42;
 use nostr::nips::nip44::v2::{decrypt_to_bytes, encrypt_to_bytes_with_rng, ConversationKey};
 use nostr::nips::nip46::{NostrConnectMessage, NostrConnectMethod, NostrConnectURI};
 use nostr::nips::nip51::{ArticlesCuration, Bookmarks, Emojis, Interests, MuteList};
+use nostr::nips::nip56::Report;
 use nostr::nips::nip59::{self, UnwrappedGift};
 use nostr::nips::nip65::{self, RelayMetadata};
 use nostr::nips::nip73::ExternalContentId;
@@ -1035,6 +1036,53 @@ fn check_nip36() -> Result<(), String> {
         )
     }) {
         return Err("NIP-36 content-warning namespace tag mismatch".to_string());
+    }
+
+    Ok(())
+}
+
+fn check_nip56() -> Result<(), String> {
+    let keys = parse_keys()?;
+    let pubkey = PublicKey::from_hex(
+        "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    )
+    .map_err(|e| format!("NIP-56 pubkey parse: {e}"))?;
+    let event_id = EventId::from_hex(
+        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    )
+    .map_err(|e| format!("NIP-56 event id parse: {e}"))?;
+    let report = EventBuilder::report(
+        [
+            Tag::public_key_report(pubkey, Report::Spam),
+            Tag::event_report(event_id, Report::Illegal),
+        ],
+        "NIP-56 report",
+    )
+    .sign_with_keys(&keys)
+    .map_err(|e| format!("NIP-56 report build failed: {e}"))?;
+    if report.kind != Kind::Reporting {
+        return Err("NIP-56 report kind mismatch".to_string());
+    }
+    report
+        .verify()
+        .map_err(|e| format!("NIP-56 signature verification failed: {e}"))?;
+    if !report.tags.iter().any(|tag| {
+        matches!(
+            tag.as_standardized(),
+            Some(TagStandard::PublicKeyReport(found, report_type))
+                if *found == pubkey && *report_type == Report::Spam
+        )
+    }) {
+        return Err("NIP-56 pubkey report tag mismatch".to_string());
+    }
+    if !report.tags.iter().any(|tag| {
+        matches!(
+            tag.as_standardized(),
+            Some(TagStandard::EventReport(found, report_type))
+                if *found == event_id && *report_type == Report::Illegal
+        )
+    }) {
+        return Err("NIP-56 event report tag mismatch".to_string());
     }
 
     Ok(())
@@ -2264,6 +2312,7 @@ async fn main() {
     push_harness_covered(&mut results, "NIP-24", Depth::Baseline, check_nip24());
     push_harness_covered(&mut results, "NIP-32", Depth::Baseline, check_nip32());
     push_harness_covered(&mut results, "NIP-36", Depth::Baseline, check_nip36());
+    push_harness_covered(&mut results, "NIP-56", Depth::Baseline, check_nip56());
     push_harness_covered(&mut results, "NIP-17", Depth::Baseline, check_nip17().await);
     push_harness_covered(&mut results, "NIP-39", Depth::Baseline, check_nip39());
     push_harness_covered(&mut results, "NIP-27", Depth::Deep, check_nip27());

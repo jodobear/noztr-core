@@ -99,6 +99,9 @@ pub const nip32_labeling = @import("nip32_labeling.zig");
 /// Post-Phase-H concrete export for the NIP-36 content-warning module.
 pub const nip36_content_warning = @import("nip36_content_warning.zig");
 
+/// Post-Phase-H concrete export for the NIP-56 reporting module.
+pub const nip56_reporting = @import("nip56_reporting.zig");
+
 /// Phase I5 concrete export for the NIP-44 encrypted direct-message module.
 pub const nip44 = @import("nip44.zig");
 
@@ -179,6 +182,7 @@ test "root exports limits and error namespaces" {
     try std.testing.expect(@TypeOf(nip73_external_ids.Nip73Error) == type);
     try std.testing.expect(@TypeOf(nip32_labeling.Nip32Error) == type);
     try std.testing.expect(@TypeOf(nip36_content_warning.Nip36Error) == type);
+    try std.testing.expect(@TypeOf(nip56_reporting.Nip56Error) == type);
     try std.testing.expect(@TypeOf(nip44.Nip44Error) == type);
     try std.testing.expect(@TypeOf(nip59_wrap.WrapError) == type);
     try std.testing.expectEqual(i6_extensions_enabled, @hasDecl(nip45_count, "CountError"));
@@ -237,6 +241,9 @@ test "root exports limits and error namespaces" {
     try std.testing.expect(@TypeOf(nip32_labeling.BuiltTag) == type);
     try std.testing.expect(@TypeOf(nip36_content_warning.ContentWarningInfo) == type);
     try std.testing.expect(@TypeOf(nip36_content_warning.BuiltTag) == type);
+    try std.testing.expect(@TypeOf(nip56_reporting.ReportType) == type);
+    try std.testing.expect(@TypeOf(nip56_reporting.ReportInfo) == type);
+    try std.testing.expect(@TypeOf(nip56_reporting.BuiltTag) == type);
     try std.testing.expect(@TypeOf(nip29_relay_groups.GroupMetadata) == type);
     try std.testing.expect(@TypeOf(nip29_relay_groups.GroupAdmin) == type);
     try std.testing.expect(@TypeOf(nip29_relay_groups.GroupReference) == type);

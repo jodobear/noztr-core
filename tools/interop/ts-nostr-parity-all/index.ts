@@ -896,6 +896,41 @@ function check_nip36(): void {
     );
 }
 
+function check_nip56(): void {
+    const secret_key = to_bytes_32(FIXED_SECRET_KEY_HEX);
+    const event = finalizeEvent(
+        {
+            kind: kinds.Reporting,
+            created_at: 1_708_000_061,
+            tags: [
+                [
+                    "p",
+                    "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+                    "spam",
+                ],
+                [
+                    "e",
+                    "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                    "illegal",
+                ],
+                ["server", "https://blob.example/file"],
+            ],
+            content: "NIP-56 report",
+        },
+        secret_key,
+    );
+    ensure(event.kind === kinds.Reporting, "NIP-56 event kind mismatch");
+    ensure(verifyEvent(event), "NIP-56 signature verification failed");
+    ensure(
+        event.tags.some((tag) => tag[0] === "p" && tag[2] === "spam"),
+        "NIP-56 pubkey report tag mismatch",
+    );
+    ensure(
+        event.tags.some((tag) => tag[0] === "e" && tag[2] === "illegal"),
+        "NIP-56 event report tag mismatch",
+    );
+}
+
 function check_nip17(): void {
     const sender_secret = to_bytes_32(FIXED_SECRET_KEY_HEX);
     const recipient_secret = to_bytes_32(
@@ -1510,6 +1545,7 @@ async function main(): Promise<void> {
     await push_harness_covered(results, "NIP-24", "BASELINE", check_nip24);
     await push_harness_covered(results, "NIP-32", "BASELINE", check_nip32);
     await push_harness_covered(results, "NIP-36", "BASELINE", check_nip36);
+    await push_harness_covered(results, "NIP-56", "BASELINE", check_nip56);
     await push_harness_covered(results, "NIP-17", "BASELINE", check_nip17);
     await push_harness_covered(results, "NIP-29", "BASELINE", check_nip29);
     await push_harness_covered(results, "NIP-39", "BASELINE", check_nip39);
