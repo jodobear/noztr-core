@@ -392,6 +392,11 @@ the validated maintenance baseline.
 - Kernel-first expansion progress:
   - completed: `NIP-32`, `NIP-36`, `NIP-56`, `NIP-05`, `NIP-26`, `NIP-37`, `NIP-58`, `NIP-84`
   - next focus: targeted robustness and compatibility review over the completed kernel-first set
+  - latest audit result:
+    - `NIP-05` now accepts uppercase local-parts and canonicalizes them to lowercase for
+      lookup/output while keeping the exact supported character set unchanged
+    - `NIP-26`, `NIP-36`, and `NIP-56` were reviewed in the same pass and required no Layer 1
+      behavior change
 - `NIP-44` robustness outcome:
   - no Layer 1 behavior change was required after real-world review
   - the current v2-only surface, staged failure ordering, typed conversation-key boundary, and

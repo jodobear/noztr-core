@@ -1686,3 +1686,22 @@ Immutable record of accepted planning decisions.
   still insufficient, or the tightened draft/profile-badge validation floor creates unjustified
   ecosystem incompatibility.
 - Supersedes: none
+
+## D-084: Canonicalize uppercase NIP-05 local-parts without widening the identifier grammar
+
+- Date: 2026-03-13
+- Status: accepted
+- Decision: widen `src/nip05_identity.zig` so NIP-05 address parsing accepts uppercase ASCII in the
+  local-part, canonicalizes it to lowercase for storage/lookup/output, and leaves the rest of the
+  identifier grammar unchanged. `+`, whitespace, percent-encoding, and other unsupported local-part
+  characters remain rejected.
+- Why: the NIP constrains the allowed local-part characters but does not justify rejecting
+  uppercase-only variants as a compatibility boundary. Deployed library behavior is broader on
+  casing, and accepting then canonicalizing uppercase improves interoperability without making the
+  grammar fuzzy or undermining deterministic well-known URL composition.
+- Tradeoff: slightly broader input acceptance versus a narrower literal interpretation of the
+  `a-z0-9-_.` character set.
+- Related Tradeoff: T-H-ANIP-011.
+- Reversal Trigger: strong standards-backed evidence shows uppercase local-parts must remain
+  rejected for interoperability or security reasons.
+- Supersedes: none

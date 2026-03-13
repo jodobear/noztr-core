@@ -56,7 +56,9 @@ pub fn address_format(output: []u8, address: *const Address) Nip05Error![]const 
 
     try validate_local_part(address.name);
     try validate_domain(address.domain);
-    return std.fmt.bufPrint(output, "{s}@{s}", .{ address.name, address.domain }) catch {
+    var canonical_name_storage: [limits.nip05_identifier_bytes_max]u8 = undefined;
+    const canonical_name = lowercase_ascii_copy(address.name, canonical_name_storage[0..]);
+    return std.fmt.bufPrint(output, "{s}@{s}", .{ canonical_name, address.domain }) catch {
         return error.BufferTooSmall;
     };
 }
@@ -71,10 +73,12 @@ pub fn address_compose_well_known_url(
 
     try validate_local_part(address.name);
     try validate_domain(address.domain);
+    var canonical_name_storage: [limits.nip05_identifier_bytes_max]u8 = undefined;
+    const canonical_name = lowercase_ascii_copy(address.name, canonical_name_storage[0..]);
     const rendered = std.fmt.bufPrint(
         output,
         "https://{s}/.well-known/nostr.json?name={s}",
-        .{ address.domain, address.name },
+        .{ address.domain, canonical_name },
     ) catch return error.BufferTooSmall;
     try validate_lookup_url(rendered);
     return rendered;
@@ -166,7 +170,10 @@ fn duplicate_name(name: []const u8, scratch: std.mem.Allocator) Nip05Error![]con
     std.debug.assert(@intFromPtr(scratch.ptr) != 0);
 
     if (std.mem.eql(u8, name, "_")) return "_";
-    return scratch.dupe(u8, name) catch return error.OutOfMemory;
+    const owned = scratch.alloc(u8, name.len) catch return error.OutOfMemory;
+    @memcpy(owned, name);
+    lowercase_ascii_in_place(owned);
+    return owned;
 }
 
 fn parse_root_object(
@@ -194,7 +201,9 @@ fn parse_names_pubkey(object: std.json.ObjectMap, name: []const u8) Nip05Error![
 
     const names = object.get("names") orelse return error.MissingName;
     if (names != .object) return error.InvalidNames;
-    const value = names.object.get(name) orelse return error.MissingName;
+    var canonical_name_storage: [limits.nip05_identifier_bytes_max]u8 = undefined;
+    const canonical_name = lowercase_ascii_copy(name, canonical_name_storage[0..]);
+    const value = names.object.get(canonical_name) orelse return error.MissingName;
     if (value != .string) return error.InvalidNames;
     return parse_lower_hex_32(value.string) catch return error.InvalidPubkey;
 }
@@ -252,10 +261,30 @@ fn validate_local_part(name: []const u8) Nip05Error!void {
     if (name.len == 0) return error.InvalidLocalPart;
     for (name) |byte| {
         if (byte >= 'a' and byte <= 'z') continue;
+        if (byte >= 'A' and byte <= 'Z') continue;
         if (byte >= '0' and byte <= '9') continue;
         if (byte == '-' or byte == '_' or byte == '.') continue;
         return error.InvalidLocalPart;
     }
+}
+
+fn lowercase_ascii_in_place(text: []u8) void {
+    std.debug.assert(text.len <= limits.nip05_identifier_bytes_max);
+    std.debug.assert(limits.nip05_identifier_bytes_max > 0);
+
+    for (text) |*byte| {
+        byte.* = std.ascii.toLower(byte.*);
+    }
+}
+
+fn lowercase_ascii_copy(text: []const u8, output: []u8) []const u8 {
+    std.debug.assert(text.len <= limits.nip05_identifier_bytes_max);
+    std.debug.assert(output.len >= text.len);
+
+    for (text, 0..) |byte, index| {
+        output[index] = std.ascii.toLower(byte);
+    }
+    return output[0..text.len];
 }
 
 fn validate_domain(domain: []const u8) Nip05Error!void {
@@ -348,6 +377,10 @@ test "address parse supports canonical and bare-domain forms" {
     const root = try address_parse("_@example.com", arena.allocator());
     try std.testing.expectEqualStrings("_", root.name);
     try std.testing.expectEqualStrings("example.com", root.domain);
+
+    const upper = try address_parse("Bob@Example.com", arena.allocator());
+    try std.testing.expectEqualStrings("bob", upper.name);
+    try std.testing.expectEqualStrings("Example.com", upper.domain);
 }
 
 test "address parse rejects malformed local part and domain" {
@@ -382,6 +415,35 @@ test "address formatting and well-known URL stay canonical" {
     try std.testing.expectEqualStrings(
         "https://example.com/.well-known/nostr.json?name=_",
         url,
+    );
+
+    const manual = Address{ .name = "Bob", .domain = "Example.com" };
+    try std.testing.expectEqualStrings(
+        "bob@Example.com",
+        try address_format(address_buffer[0..], &manual),
+    );
+    try std.testing.expectEqualStrings(
+        "https://Example.com/.well-known/nostr.json?name=bob",
+        try address_compose_well_known_url(url_buffer[0..], &manual),
+    );
+}
+
+test "profile parse and verify canonicalize uppercase local parts" {
+    var arena = std.heap.ArenaAllocator.init(std.testing.allocator);
+    defer arena.deinit();
+
+    const json =
+        \\{"names":{"bob":"68d81165918100b7da43fc28f7d1fc12554466e1115886b9e7bb326f65ec4272"}}
+    ;
+    const address = try address_parse("Bob@example.com", arena.allocator());
+    const expected = parse_lower_hex_32(
+        "68d81165918100b7da43fc28f7d1fc12554466e1115886b9e7bb326f65ec4272",
+    ) catch unreachable;
+
+    const profile = try profile_parse_json(&address, json, arena.allocator());
+    try std.testing.expectEqualSlices(u8, expected[0..], profile.public_key[0..]);
+    try std.testing.expect(
+        try profile_verify_json(&expected, &address, json, arena.allocator()),
     );
 }
 
