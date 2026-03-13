@@ -8,7 +8,7 @@ frozen defaults or the current deterministic-and-compatible Layer 1 kernel postu
 ## Decisions
 
 - `H-ANIP-001`: this plan covers only NIPs `03`, `06`, `07`, `10`, `17`, `18`, `22`, `23`, `24`,
-  `25`, `27`, `29`, `39`, `46`, `51`.
+  `25`, `27`, `29`, `39`, `46`, `51`, `73`.
 - `H-ANIP-002`: frozen defaults remain unchanged; `D-036` deterministic-and-compatible Layer 1
   posture remains canonical.
 - `H-ANIP-003`: expansion work is limited to bounded protocol-kernel additions and explicit
@@ -43,13 +43,14 @@ frozen defaults or the current deterministic-and-compatible Layer 1 kernel postu
 | 18 | wave-1-complete | Strict repost parsing/helpers are now implemented with deterministic embedded-event consistency checks across `e`, `p`, `k`, and `a` data. |
 | 22 | wave-1-complete | Strict comment root/parent linkage helpers are now implemented with mandatory `K/k`, author linkage, and NIP-73-consistent external validation. |
 | 23 | expansion-complete | Bounded long-form metadata helpers are implemented with required `d`, optional title/image/summary/published_at extraction, ordered hashtag extraction, and builder coverage for both `30023` and `30024`. |
-| 24 | defer | Extra metadata/tag conventions are lower priority and can follow higher-interoperability items. |
-| 25 | wave-1-complete | Native kind-7 reaction parsing/helpers are now implemented with strict last-target semantics, typed malformed-tag failures, and strict custom-emoji validation; kind-17 external reactions remain deferred with NIP-73. |
+| 24 | expansion-complete | Bounded extra metadata/tag helpers are implemented; generic `i` handling now arrives through the shared NIP-73 external-id helper instead of an ad hoc parser. |
+| 25 | wave-1-complete | Native kind-7 reaction parsing/helpers are now implemented with strict last-target semantics, typed malformed-tag failures, and strict custom-emoji validation; kind-17 external reactions remain separate follow-up work. |
 | 27 | wave-1-complete | Strict inline `nostr:` reference extraction is now implemented with stable spans, decoded NIP-21 entities, and malformed-fragment fallback. |
 | 29 | expansion-complete | Bounded relay-group helpers are now implemented for relay-generated kinds `39000`, `39001`, `39002`, and `39003`, raw group-reference parse/build, bounded join/leave and put/remove-user event extraction, and raw `previous` tag plumbing; relay fetch/subscription, derived membership state, and broader moderation orchestration remain out of scope. |
 | 39 | expansion-complete | Bounded external-identity helpers are now implemented for kind-10011 claim extraction, canonical `i`-tag building, provider-specific proof-URL derivation, and expected proof-text generation; live provider fetch verification remains deferred in `no-t9x`. |
-| 46 | expansion-candidate | Nostr Connect is strategically important and can be modeled via explicit message/verification boundaries. |
+| 46 | expansion-complete | Bounded Nostr Connect helpers are implemented with request/result parsing and building, envelope validation, URI/discovery handling, and exact deterministic `nostrconnect_url` template substitution. |
 | 51 | wave-1-complete | Strict public-list extraction for the common rust-backed NIP-51 kinds is implemented with explicit set metadata handling, coordinate-kind validation, bounded broader bookmark/emoji emission helpers, and bounded NIP-44 private-list helpers; deprecated NIP-04 private-list compatibility is deferred in `no-urr`. |
+| 73 | expansion-complete | Bounded external-id parse/build/match helpers are now implemented and reused by NIP-24 generic `i` extraction and NIP-22 external-kind consistency checks. |
 
 ## Proposed Implementation Waves
 
@@ -184,7 +185,7 @@ Reprioritized after deferred-backlog completion of `NIP-29`:
       - empty optional relay-hint fields normalize to absent
     - accepted quality judgment: this strict custom-emoji validation is retained as a material
       trust-boundary improvement rather than a parity deviation to roll back
-    - deferred scope: kind-17 external reactions pending NIP-73 support
+    - deferred scope: kind-17 external reactions remain separate follow-up work
 - Wave 1 status:
   - Wave 1 is complete.
   - Wave 2 / `46` is complete.

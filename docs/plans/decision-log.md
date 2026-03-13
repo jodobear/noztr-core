@@ -1489,3 +1489,20 @@ Immutable record of accepted planning decisions.
 - Reversal Trigger: the matrix becomes redundant with a future SDK repo's own canonical boundary
   docs or proves too stale to maintain.
 - Supersedes: none
+
+## D-074: Implement bounded NIP-73 external-id helpers and wire NIP-24 through them
+
+- Date: 2026-03-12
+- Status: accepted
+- Decision: implement `src/nip73_external_ids.zig` as the reusable external-id boundary for
+  protocol-facing `i`/`k` external content handling, and wire `src/nip24_extra_metadata.zig`
+  generic `i` extraction through it instead of keeping that support deferred. Reuse the same
+  matcher for NIP-22 external target consistency checks.
+- Why: `D-069` already established that generic `i` support should arrive through a proper NIP-73
+  helper rather than an ad hoc local parser. Landing the shared module now improves completeness and
+  keeps external-id logic in one bounded place.
+- Tradeoff: a slightly broader kernel surface versus cleaner ownership, less duplicated parser
+  logic, and less drift across NIP-22 / NIP-24 / later external-id surfaces.
+- Related Tradeoff: T-H-ANIP-011.
+- Reversal Trigger: the bounded helper proves insufficient and forces per-NIP grammars anyway.
+- Supersedes: none

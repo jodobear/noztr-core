@@ -220,6 +220,7 @@ Cross-cutting review lenses for every implemented NIP:
 | 59 | Preserve staged unwrap integrity, sender continuity, and bounded scratch usage; review only if interoperability pressure appears on wrapper/seal/rumor envelope shapes that remain unambiguous and safe. |
 | 65 | Preserve relay URL validation, marker typing, and bounded extraction; review normalization and accepted marker breadth so we reject malformed relays rather than merely non-preferred formatting. |
 | 70 | Preserve deny-by-default protected-event semantics and exact tag meaning; review whether any tag-shape exactness exceeds what NIP-70 needs for deterministic behavior. |
+| 73 | Preserve bounded external-id parse/build/match behavior and shared ownership of generic `i` grammar; review kind/value strictness so we reject malformed external IDs without fragmenting the grammar across per-NIP helper reimplementations. |
 | 77 | Preserve bounded negentropy state transitions and strict session parsing; review message-shape rejection only where broader but still well-defined peer behavior exists. |
 
 Review execution rule:

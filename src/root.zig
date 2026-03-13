@@ -90,6 +90,9 @@ pub const nip39_external_identities = @import("nip39_external_identities.zig");
 /// Phase H deferred-backlog concrete export for the NIP-29 relay-group module.
 pub const nip29_relay_groups = @import("nip29_relay_groups.zig");
 
+/// Post-Phase-H concrete export for the NIP-73 external-id module.
+pub const nip73_external_ids = @import("nip73_external_ids.zig");
+
 /// Phase I5 concrete export for the NIP-44 encrypted direct-message module.
 pub const nip44 = @import("nip44.zig");
 
@@ -167,6 +170,7 @@ test "root exports limits and error namespaces" {
     try std.testing.expect(@TypeOf(nip17_private_messages.Nip17RelayListError) == type);
     try std.testing.expect(@TypeOf(nip39_external_identities.Nip39Error) == type);
     try std.testing.expect(@TypeOf(nip29_relay_groups.Nip29Error) == type);
+    try std.testing.expect(@TypeOf(nip73_external_ids.Nip73Error) == type);
     try std.testing.expect(@TypeOf(nip44.Nip44Error) == type);
     try std.testing.expect(@TypeOf(nip59_wrap.WrapError) == type);
     try std.testing.expectEqual(i6_extensions_enabled, @hasDecl(nip45_count, "CountError"));
@@ -212,6 +216,9 @@ test "root exports limits and error namespaces" {
     try std.testing.expect(@TypeOf(nip39_external_identities.IdentityClaim) == type);
     try std.testing.expect(@TypeOf(nip39_external_identities.BuiltTag) == type);
     try std.testing.expect(@TypeOf(nip29_relay_groups.GroupMetadataFlag) == type);
+    try std.testing.expect(@TypeOf(nip73_external_ids.ExternalIdKind) == type);
+    try std.testing.expect(@TypeOf(nip73_external_ids.ExternalId) == type);
+    try std.testing.expect(@TypeOf(nip73_external_ids.BuiltTag) == type);
     try std.testing.expect(@TypeOf(nip29_relay_groups.GroupMetadata) == type);
     try std.testing.expect(@TypeOf(nip29_relay_groups.GroupAdmin) == type);
     try std.testing.expect(@TypeOf(nip29_relay_groups.GroupReference) == type);
@@ -380,6 +387,29 @@ test "root exports limits and error namespaces" {
                 [][]const u8,
                 [][]const u8,
             ) nip24_extra_metadata.Nip24Error!nip24_extra_metadata.CommonTagInfo,
+    );
+    try std.testing.expect(
+        @TypeOf(nip24_extra_metadata.common_tags_extract_with_external_ids) ==
+            fn (
+                []const nip01_event.EventTag,
+                [][]const u8,
+                []nip73_external_ids.ExternalId,
+                [][]const u8,
+            ) nip24_extra_metadata.Nip24Error!nip24_extra_metadata.CommonTagInfo,
+    );
+    try std.testing.expect(
+        @TypeOf(nip73_external_ids.external_id_parse) ==
+            fn (
+                []const u8,
+                ?[]const u8,
+            ) nip73_external_ids.Nip73Error!nip73_external_ids.ExternalId,
+    );
+    try std.testing.expect(
+        @TypeOf(nip73_external_ids.external_id_build_i_tag) ==
+            fn (
+                *nip73_external_ids.BuiltTag,
+                *const nip73_external_ids.ExternalId,
+            ) nip73_external_ids.Nip73Error!nip01_event.EventTag,
     );
     try std.testing.expect(@TypeOf(nip46_remote_signing.Message) == type);
     try std.testing.expect(@TypeOf(nip46_remote_signing.ConnectionUri) == type);

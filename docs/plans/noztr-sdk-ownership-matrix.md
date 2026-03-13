@@ -37,8 +37,8 @@ Put behavior in the SDK when it involves any of:
 | Surface | `noztr` owns | SDK owns | Current posture |
 | --- | --- | --- | --- |
 | `NIP-46` remote signing | method/permission parsing, request/result parsing/building, envelope validation, URI parsing, signer discovery parsing, exact `<nostrconnect>` template substitution | relay pool control, signer session lifecycle, auth handling flow, URL launching, redirect policy, connection orchestration | deterministic helper glue belongs in `noztr`; client flow belongs in SDK |
-| `NIP-24` extra metadata | bounded metadata extras, generic `r` / `title` / `t` tags | UX helpers and richer app-level metadata handling | keep current scope; add `i` support through `NIP-73` |
-| `NIP-73` external ids | external-id parse/build/validate if accepted later | provider presets and higher-level workflows | missing dependency for fuller `NIP-24` / `NIP-39` support |
+| `NIP-24` extra metadata | bounded metadata extras, generic `r` / `i` / `title` / `t` tags | UX helpers and richer app-level metadata handling | current split is correct with shared `NIP-73` reuse |
+| `NIP-73` external ids | bounded external-id parse/build/validate/match helpers | provider presets and higher-level workflows | implemented and reused by `NIP-24` and `NIP-22` |
 | `NIP-03` OpenTimestamps | attestation event parsing, bounded proof decode, bounded local proof verification floor | networked Bitcoin/esplora verification, remote proof-engine orchestration, caching/retry policy | bounded local verification may belong in `noztr`; networked verification does not |
 | `NIP-39` external identities | claim extraction, canonical tag building, proof URL derivation, expected proof text | live provider fetch verification, trust policy, retries, provider adapters | live verification belongs in SDK |
 | `NIP-29` relay groups | relay-generated event helpers, raw references, bounded user-event helpers, pure fixed-capacity state reduction | relay subscriptions, authority policy, sync/storage, moderation workflows, group client engine | pure reducers may belong in `noztr`; orchestration does not |
@@ -61,7 +61,7 @@ If the answer to `5` is yes, the behavior probably belongs in the SDK.
 ## Current Priority Implications
 
 - `NIP-46`: add exact `<nostrconnect>` template substitution in `noztr` when useful.
-- `NIP-73`: strongest missing protocol helper if we want fuller external-id support.
+- `NIP-73`: implemented shared external-id helper for fuller external-id support.
 - `NIP-03`: bounded local proof verification is a valid future `noztr` improvement.
 - `NIP-29`: pure fixed-capacity state reduction is a valid future `noztr` improvement.
 - `NIP-39`: live verification should remain SDK work unless the project deliberately changes the

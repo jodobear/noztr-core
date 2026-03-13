@@ -1982,6 +1982,43 @@ fn check_nip70() -> Result<(), String> {
     Ok(())
 }
 
+fn check_nip73() -> Result<(), String> {
+    let url = ExternalContentId::from_str("https://example.com/articles/1")
+        .map_err(|e| format!("NIP-73 url parse: {e}"))?;
+    if url.kind().to_string() != "web" {
+        return Err("NIP-73 url kind mismatch".to_string());
+    }
+    if url.to_string() != "https://example.com/articles/1" {
+        return Err("NIP-73 url roundtrip mismatch".to_string());
+    }
+
+    let podcast = ExternalContentId::from_str(
+        "podcast:item:guid:d98d189b-dc7b-45b1-8720-d4b98690f31f",
+    )
+    .map_err(|e| format!("NIP-73 podcast parse: {e}"))?;
+    if podcast.kind().to_string() != "podcast:item:guid" {
+        return Err("NIP-73 podcast kind mismatch".to_string());
+    }
+
+    let blockchain_tx = ExternalContentId::from_str(
+        "ethereum:1:tx:0x98f7812be496f97f80e2e98d66358d1fc733cf34176a8356d171ea7fbbe97ccd",
+    )
+    .map_err(|e| format!("NIP-73 blockchain parse: {e}"))?;
+    if blockchain_tx.kind().to_string() != "ethereum:tx" {
+        return Err("NIP-73 blockchain kind mismatch".to_string());
+    }
+    if blockchain_tx.to_string()
+        != "ethereum:1:tx:0x98f7812be496f97f80e2e98d66358d1fc733cf34176a8356d171ea7fbbe97ccd"
+    {
+        return Err("NIP-73 blockchain roundtrip mismatch".to_string());
+    }
+    if ExternalContentId::from_str("bad-external-id").is_ok() {
+        return Err("NIP-73 malformed content accepted".to_string());
+    }
+
+    Ok(())
+}
+
 fn check_nip77() -> Result<(), String> {
     let message = ClientMessage::from_json(r#"["NEG-OPEN","sub-b",{},"00"]"#)
         .map_err(|e| format!("NEG-OPEN parse failed unexpectedly: {e}"))?;
@@ -2141,6 +2178,7 @@ async fn main() {
     push_harness_covered(&mut results, "NIP-45", Depth::Deep, check_nip45());
     push_harness_covered(&mut results, "NIP-50", Depth::Deep, check_nip50());
     push_harness_covered(&mut results, "NIP-70", Depth::Deep, check_nip70());
+    push_harness_covered(&mut results, "NIP-73", Depth::Baseline, check_nip73());
     push_harness_covered(&mut results, "NIP-77", Depth::Deep, check_nip77());
 
     let mut pass_count = 0usize;

@@ -272,17 +272,25 @@ the validated maintenance baseline.
     - kind-`0` metadata extras parse/serialize for `display_name`, `website`, `banner`, `bot`, and
       `birthday`
     - compatibility fallback for deprecated `displayName` when canonical `display_name` is absent
-    - ordered generic tag extraction for `r`, `title`, and `t`
+    - ordered generic tag extraction for `r`, `i`, `title`, and `t`
     - direct generic tag builders for `r`, `title`, and lowercase canonical `t`
     - tolerant handling of unrelated unknown fields and tags
-  - accepted bounded deferral:
-    - generic `i` tags remain deferred to `no-fah` because their value grammar belongs to NIP-73;
-      the gap is missing NIP-73 support, not a permanent NIP-24 exclusion (`D-069`)
   - parity/evidence status:
     - rust parity overlap is now `HARNESS_COVERED`, `BASELINE`, `PASS`
     - TypeScript audit overlap is now `HARNESS_COVERED`, `BASELINE`, `PASS`
   - review outcome:
-    - no accepted behavior change was required after the implementation pass
+    - generic `i` extraction now reuses the bounded NIP-73 helper
+- Ownership follow-up / `NIP-73` is complete
+  - bounded `src/nip73_external_ids.zig` surface is implemented
+  - current implemented scope:
+    - external-id value parsing and kind detection for web, hashtag, geo, iso3166, isbn, isan, doi,
+      podcast feed/item/publisher, and blockchain tx/address forms
+    - optional hint validation plus reusable `i` and `k` tag builders
+    - reusable kind/value consistency matching now shared by `NIP-22` and `NIP-24`
+  - evidence status:
+    - `rust-nostr`: `HARNESS_COVERED`, `BASELINE`, `PASS`
+    - `nostr-tools`: no dedicated external-id helper surface; generic tag carriage remains
+      compatible
 - Deferred backlog / `NIP-03` is complete in `no-wo7`
   - bounded `src/nip03_opentimestamps.zig` surface is implemented
   - current implemented scope:
@@ -366,7 +374,7 @@ the validated maintenance baseline.
   - completed: `NIP-46`, `NIP-06`, `NIP-51` private lists, `NIP-44`, `NIP-59`, `NIP-03`,
     `NIP-17`, `NIP-39`, `NIP-29`
   - latest completed batch: `NIP-03`, `NIP-17`, `NIP-39`, `NIP-29`
-- Phase H planned expansion is now complete through deferred backlog item `NIP-29`.
+- Phase H planned expansion plus the bounded NIP-73 ownership follow-up are now complete.
 - Deferred backlog is now complete.
 - Recommended next sequence: address deferred follow-up items or operator-directed robustness work
   before any new protocol expansion.

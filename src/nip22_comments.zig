@@ -1,6 +1,7 @@
 const std = @import("std");
 const limits = @import("limits.zig");
 const nip01_event = @import("nip01_event.zig");
+const nip73_external_ids = @import("nip73_external_ids.zig");
 
 pub const comment_event_kind: u32 = 1111;
 
@@ -611,65 +612,7 @@ fn external_kind_matches_value(kind_token: []const u8, value: []const u8) bool {
     std.debug.assert(kind_token.len > 0);
     std.debug.assert(std.unicode.utf8ValidateSlice(kind_token));
 
-    if (std.mem.eql(u8, kind_token, "web")) {
-        return is_url_shaped(value);
-    }
-    if (std.mem.eql(u8, kind_token, "#")) {
-        return std.mem.startsWith(u8, value, "#") and value.len > 1;
-    }
-    if (std.mem.eql(u8, kind_token, "geo")) {
-        return std.mem.startsWith(u8, value, "geo:") and value.len > 4;
-    }
-    if (std.mem.eql(u8, kind_token, "isbn")) {
-        return std.mem.startsWith(u8, value, "isbn:") and value.len > 5;
-    }
-    if (std.mem.eql(u8, kind_token, "podcast:guid")) {
-        return std.mem.startsWith(u8, value, "podcast:guid:") and value.len > 13;
-    }
-    if (std.mem.eql(u8, kind_token, "podcast:item:guid")) {
-        return std.mem.startsWith(u8, value, "podcast:item:guid:") and value.len > 18;
-    }
-    if (std.mem.eql(u8, kind_token, "podcast:publisher:guid")) {
-        return std.mem.startsWith(u8, value, "podcast:publisher:guid:") and value.len > 23;
-    }
-    if (std.mem.eql(u8, kind_token, "isan")) {
-        return std.mem.startsWith(u8, value, "isan:") and value.len > 5;
-    }
-    if (std.mem.eql(u8, kind_token, "doi")) {
-        return std.mem.startsWith(u8, value, "doi:") and value.len > 4;
-    }
-    if (std.mem.endsWith(u8, kind_token, ":tx")) {
-        return external_blockchain_matches(kind_token, value, ":tx:");
-    }
-    if (std.mem.endsWith(u8, kind_token, ":address")) {
-        return external_blockchain_matches(kind_token, value, ":address:");
-    }
-    return false;
-}
-
-fn external_blockchain_matches(kind_token: []const u8, value: []const u8, separator: []const u8) bool {
-    std.debug.assert(separator.len > 0);
-    std.debug.assert(kind_token.len > separator.len);
-
-    const chain = kind_token[0 .. kind_token.len - (separator.len - 1)];
-    if (!std.mem.startsWith(u8, value, chain)) {
-        return false;
-    }
-    const separator_index = std.mem.indexOf(u8, value, separator) orelse return false;
-    if (separator_index < chain.len) {
-        return false;
-    }
-    return value.len > separator_index + separator.len;
-}
-
-fn is_url_shaped(text: []const u8) bool {
-    std.debug.assert(text.len <= limits.tag_item_bytes_max);
-    std.debug.assert(text.len >= 0);
-
-    _ = std.Uri.parse(text) catch {
-        return false;
-    };
-    return true;
+    return nip73_external_ids.external_id_matches_kind(kind_token, value);
 }
 
 fn parse_nostr_kind(text: []const u8) error{InvalidKind}!u32 {

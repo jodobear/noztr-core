@@ -1,6 +1,7 @@
 const std = @import("std");
 const limits = @import("limits.zig");
 const nip01_event = @import("nip01_event.zig");
+const nip73_external_ids = @import("nip73_external_ids.zig");
 
 pub const Nip24Error = error{
     OutOfMemory,
@@ -13,6 +14,7 @@ pub const Nip24Error = error{
     InvalidTitleTag,
     DuplicateTitleTag,
     InvalidReferenceTag,
+    InvalidExternalIdTag,
     InvalidHashtagTag,
     BufferTooSmall,
 };
@@ -34,6 +36,7 @@ pub const MetadataExtras = struct {
 pub const CommonTagInfo = struct {
     title: ?[]const u8 = null,
     reference_count: u16 = 0,
+    external_id_count: u16 = 0,
     hashtag_count: u16 = 0,
 };
 
@@ -121,7 +124,24 @@ pub fn common_tags_extract(
 
     var info = CommonTagInfo{};
     for (tags) |tag| {
-        try apply_common_tag(tag, &info, out_reference_urls, out_hashtags);
+        try apply_common_tag(tag, &info, out_reference_urls, &.{}, out_hashtags);
+    }
+    return info;
+}
+
+/// Extracts generic NIP-24 tag meanings including NIP-73 external ids.
+pub fn common_tags_extract_with_external_ids(
+    tags: []const nip01_event.EventTag,
+    out_reference_urls: [][]const u8,
+    out_external_ids: []nip73_external_ids.ExternalId,
+    out_hashtags: [][]const u8,
+) Nip24Error!CommonTagInfo {
+    std.debug.assert(out_reference_urls.len <= std.math.maxInt(u16));
+    std.debug.assert(out_external_ids.len <= std.math.maxInt(u16));
+
+    var info = CommonTagInfo{};
+    for (tags) |tag| {
+        try apply_common_tag(tag, &info, out_reference_urls, out_external_ids, out_hashtags);
     }
     return info;
 }
@@ -388,6 +408,7 @@ fn apply_common_tag(
     tag: nip01_event.EventTag,
     info: *CommonTagInfo,
     out_reference_urls: [][]const u8,
+    out_external_ids: []nip73_external_ids.ExternalId,
     out_hashtags: [][]const u8,
 ) Nip24Error!void {
     std.debug.assert(@intFromPtr(info) != 0);
@@ -397,6 +418,7 @@ fn apply_common_tag(
     const name = tag.items[0];
     if (std.mem.eql(u8, name, "title")) return apply_title_tag(tag, info);
     if (std.mem.eql(u8, name, "r")) return apply_reference_tag(tag, info, out_reference_urls);
+    if (std.mem.eql(u8, name, "i")) return apply_external_id_tag(tag, info, out_external_ids);
     if (std.mem.eql(u8, name, "t")) return apply_hashtag_tag(tag, info, out_hashtags);
 }
 
@@ -436,6 +458,20 @@ fn apply_hashtag_tag(
     info.hashtag_count += 1;
 }
 
+fn apply_external_id_tag(
+    tag: nip01_event.EventTag,
+    info: *CommonTagInfo,
+    out_external_ids: []nip73_external_ids.ExternalId,
+) Nip24Error!void {
+    std.debug.assert(@intFromPtr(info) != 0);
+    std.debug.assert(out_external_ids.len <= std.math.maxInt(u16));
+
+    const external_id = parse_external_id_tag(tag) catch return error.InvalidExternalIdTag;
+    if (info.external_id_count == out_external_ids.len) return error.BufferTooSmall;
+    out_external_ids[info.external_id_count] = external_id;
+    info.external_id_count += 1;
+}
+
 fn parse_single_utf8_value(tag: nip01_event.EventTag) error{InvalidTag}![]const u8 {
     std.debug.assert(tag.items.len <= limits.tag_items_max);
     std.debug.assert(limits.tag_items_max >= 2);
@@ -458,6 +494,19 @@ fn parse_hashtag_tag(tag: nip01_event.EventTag) error{InvalidTag}![]const u8 {
 
     if (tag.items.len != 2) return error.InvalidTag;
     return parse_hashtag_value(tag.items[1]) catch return error.InvalidTag;
+}
+
+fn parse_external_id_tag(
+    tag: nip01_event.EventTag,
+) error{InvalidTag}!nip73_external_ids.ExternalId {
+    std.debug.assert(tag.items.len <= limits.tag_items_max);
+    std.debug.assert(limits.tag_items_max >= 2);
+
+    if (tag.items.len < 2) return error.InvalidTag;
+    if (tag.items.len > 3) return error.InvalidTag;
+
+    const hint = if (tag.items.len == 3) tag.items[2] else null;
+    return nip73_external_ids.external_id_parse(tag.items[1], hint) catch return error.InvalidTag;
 }
 
 fn parse_hashtag_value(text: []const u8) error{InvalidTag}![]const u8 {
@@ -635,14 +684,40 @@ test "common tags extract parses title references and hashtags" {
     try std.testing.expectEqualStrings("Nostr", hashtags[0]);
 }
 
+test "common tags extract with external ids parses generic i tags" {
+    const tags = [_]nip01_event.EventTag{
+        .{ .items = &.{ "title", "Article title" } },
+        .{ .items = &.{ "i", "podcast:guid:feed-guid", "https://fountain.fm/show/1" } },
+        .{ .items = &.{ "r", "https://example.com/post" } },
+        .{ .items = &.{ "t", "nostr" } },
+    };
+    var references: [1][]const u8 = undefined;
+    var external_ids: [1]nip73_external_ids.ExternalId = undefined;
+    var hashtags: [1][]const u8 = undefined;
+
+    const parsed = try common_tags_extract_with_external_ids(
+        tags[0..],
+        references[0..],
+        external_ids[0..],
+        hashtags[0..],
+    );
+
+    try std.testing.expectEqual(@as(u16, 1), parsed.external_id_count);
+    try std.testing.expect(external_ids[0].kind == .podcast_feed);
+    try std.testing.expectEqualStrings("podcast:guid:feed-guid", external_ids[0].value);
+    try std.testing.expectEqualStrings("https://fountain.fm/show/1", external_ids[0].hint.?);
+}
+
 test "common tags extract rejects malformed supported tags and duplicate titles" {
     const duplicate_title = [_]nip01_event.EventTag{
         .{ .items = &.{ "title", "A" } },
         .{ .items = &.{ "title", "B" } },
     };
     const bad_reference = [_]nip01_event.EventTag{.{ .items = &.{ "r", "not-a-url" } }};
+    const bad_external_id = [_]nip01_event.EventTag{.{ .items = &.{ "i", "bad-external-id" } }};
     const bad_hashtag = [_]nip01_event.EventTag{.{ .items = &.{ "t", "bad tag" } }};
     var references: [1][]const u8 = undefined;
+    var external_ids: [1]nip73_external_ids.ExternalId = undefined;
     var hashtags: [1][]const u8 = undefined;
 
     try std.testing.expectError(
@@ -652,6 +727,15 @@ test "common tags extract rejects malformed supported tags and duplicate titles"
     try std.testing.expectError(
         error.InvalidReferenceTag,
         common_tags_extract(bad_reference[0..], references[0..], hashtags[0..]),
+    );
+    try std.testing.expectError(
+        error.InvalidExternalIdTag,
+        common_tags_extract_with_external_ids(
+            bad_external_id[0..],
+            references[0..],
+            external_ids[0..],
+            hashtags[0..],
+        ),
     );
     try std.testing.expectError(
         error.InvalidHashtagTag,

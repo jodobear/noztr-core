@@ -141,11 +141,11 @@ Current project context for the Phase H kickoff baseline.
     unrelated unknown tags
   - deferred backlog `NIP-24` is now complete in `src/nip24_extra_metadata.zig` with bounded
     kind-`0` metadata extras parse/serialize for `display_name`/`website`/`banner`/`bot`/
-    `birthday`, deprecated `displayName` fallback, ordered generic `r`/`title`/`t` extraction,
-    and direct generic tag builders
-  - accepted bounded deferral: generic `i` tags remain deferred to `no-fah` because their grammar
-    belongs to NIP-73 rather than the NIP-24 module; this is now treated as a missing dependency,
-    not a permanent exclusion
+    `birthday`, deprecated `displayName` fallback, ordered generic `r`/`i`/`title`/`t`
+    extraction, and direct generic tag builders for `r`/`title`/`t`
+  - ownership follow-up `NIP-73` is now complete in `src/nip73_external_ids.zig` with bounded
+    external-id parse/build/match helpers reused by `NIP-24` generic `i` extraction and
+    `NIP-22` external-kind consistency
   - deferred backlog `NIP-03` is now complete in `src/nip03_opentimestamps.zig` with strict
     kind-`1040` extraction, exact `e`/`k` target tags, caller-buffer base64 proof decoding, target
     reference validation, and direct `e`/`k` tag builders
@@ -198,7 +198,7 @@ Current project context for the Phase H kickoff baseline.
 ## Active Parity Gate
 
 - Active lane: rust only (`tools/interop/rust-nostr-parity-all`).
-- Current rust status: `29 HARNESS_COVERED`, mixed `BASELINE/EDGE/DEEP`, `PASS`; `NIP-29` remains
+- Current rust status: `30 HARNESS_COVERED`, mixed `BASELINE/EDGE/DEEP`, `PASS`; `NIP-29` remains
   source-review-only because `rust-nostr` has no dedicated helper surface there.
 - Current TS audit status: `29/29 HARNESS_COVERED`, mixed `BASELINE/EDGE/DEEP`, `PASS`
   (`tools/interop/ts-nostr-parity-all`; non-gating audit evidence lane).
@@ -262,6 +262,13 @@ Current project context for the Phase H kickoff baseline.
 - Latest cadence run (2026-03-12): `zig build test --summary all` passed
   (`Build Summary: 9/9 steps succeeded; 720/720 tests passed`).
 - Latest cadence run (2026-03-12): `zig build` passed.
+- Latest cadence run (2026-03-12): rust parity harness passed
+  (`SUMMARY pass=30 fail=0 harness_covered=30 total=30`).
+- Latest cadence run (2026-03-12): TS audit harness passed
+  (`SUMMARY pass=29 fail=0 harness_covered=29 total=29`).
+- Latest cadence run (2026-03-12): `zig build test --summary all` passed
+  (`Build Summary: 9/9 steps succeeded; 750/750 tests passed`).
+- Latest cadence run (2026-03-12): `zig build` passed.
 - Active cadence commands:
   - `cargo run --manifest-path tools/interop/rust-nostr-parity-all/Cargo.toml`
   - `zig build test --summary all && zig build`
@@ -297,10 +304,10 @@ Current project context for the Phase H kickoff baseline.
 1. Keep TypeScript references archive-only in docs and prevent active-cadence wording regressions.
 2. Continue maintenance cadence reruns (rust parity + aggregate Zig gates) on dependency or toolchain
    changes and record outcomes in Phase H kickoff and handoff docs.
-3. Phase H planned expansion is complete through deferred backlog item `NIP-29`.
+3. Phase H planned expansion plus the bounded NIP-73 ownership follow-up are complete.
    Recommended next step:
-   - address the remaining bounded deferred follow-up item `no-ebj` or other operator-directed
-     hardening work before any new protocol expansion
+   - implement the bounded NIP-03 local proof-verification floor or the pure NIP-29 reducer before
+     any new protocol expansion
 4. Keep the implemented-NIP audit report current if future code changes reopen compatibility or
    strictness questions.
    - use `docs/plans/noztr-sdk-ownership-matrix.md` when the question is whether a helper belongs
@@ -336,7 +343,22 @@ Current project context for the Phase H kickoff baseline.
      protocol-kernel helper surface
    - deterministic `nostrconnect_url` placeholder substitution is now implemented as a bounded
      kernel helper (`D-068`)
-6. Wave 3 / `NIP-06` is implemented, green, and closed.
+6. Ownership follow-up / `NIP-73` is implemented.
+   Current status:
+   - `src/nip73_external_ids.zig` now provides bounded external-id parse/build/match helpers for
+     NIP-73 content ids.
+   - `src/nip24_extra_metadata.zig` now extracts generic `i` tags through the shared NIP-73 module.
+   - `src/nip22_comments.zig` now reuses the same kind/value matcher for external target
+     consistency.
+   Evidence:
+   - `zig build test --summary all`: `750/750` passed
+   - `zig build`: passed
+   - rust parity lane: `30/30 HARNESS_COVERED`, `PASS`; `NIP-73` is now `HARNESS_COVERED`,
+     `BASELINE`
+   - TypeScript parity lane: `29/29 HARNESS_COVERED`, `PASS`
+   - `nostr-tools` has no dedicated NIP-73 helper surface; generic tag carriage remains
+     compatible
+7. Wave 3 / `NIP-06` is implemented, green, and closed.
    Current status:
    - `src/nip06_mnemonic.zig` implements the frozen narrow libwally boundary with strict
      zeroization and typed errors.
