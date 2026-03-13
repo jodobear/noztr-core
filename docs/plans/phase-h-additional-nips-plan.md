@@ -444,8 +444,6 @@ Reprioritized after deferred-backlog completion of `NIP-29`:
   lands.
 - `OQ-H-ANIP-002` (NIP-17, medium): which subset (decode/verify-only vs broader workflow helpers)
   can be added without introducing orchestration semantics into Layer 1.
-- `OQ-H-ANIP-003` (NIP-29, high): what fixed-capacity state model is acceptable for relay-group
-  semantics without unbounded or policy-coupled behavior.
 - `OQ-H-ANIP-004` (NIP-39, high): what trust model and verification policy are acceptable for
   external identity claims under current Layer 1 defaults.
 - `OQ-H-ANIP-005` (NIP-03, medium): what bounded proof-shape and verification-depth floor is required

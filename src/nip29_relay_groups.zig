@@ -15,6 +15,7 @@ pub const Nip29Error = error{
     InvalidGroupKind,
     InvalidGroupReference,
     InvalidGroupHost,
+    GroupStateMismatch,
     InvalidGroupTag,
     DuplicateGroupTag,
     MissingGroupTag,
@@ -85,6 +86,8 @@ pub const GroupReference = struct {
     id: []const u8,
 };
 
+pub const group_state_user_roles_max: u16 = limits.tag_items_max - 2;
+
 pub const GroupMember = struct {
     pubkey: [32]u8,
     label: ?[]const u8 = null,
@@ -136,6 +139,48 @@ pub const GroupRemoveUserInfo = struct {
     pubkey: [32]u8,
     reason: ?[]const u8 = null,
     previous_refs: []const []const u8,
+};
+
+pub const GroupStateUser = struct {
+    pubkey: [32]u8,
+    label: ?[]const u8 = null,
+    roles: []const []const u8 = &.{},
+    is_member: bool = false,
+};
+
+pub const GroupState = struct {
+    metadata: GroupMetadata = .{ .group_id = "" },
+    users: []GroupStateUser = &.{},
+    supported_roles: []GroupRole = &.{},
+    user_storage: []GroupStateUser,
+    supported_role_storage: []GroupRole,
+    user_role_storage: [][]const u8,
+
+    pub fn init(
+        user_storage: []GroupStateUser,
+        supported_role_storage: []GroupRole,
+        user_role_storage: [][]const u8,
+    ) GroupState {
+        std.debug.assert(user_storage.len <= limits.tags_max);
+        std.debug.assert(
+            user_role_storage.len >= user_storage.len * group_state_user_roles_max,
+        );
+
+        return .{
+            .user_storage = user_storage,
+            .supported_role_storage = supported_role_storage,
+            .user_role_storage = user_role_storage,
+        };
+    }
+
+    pub fn reset(self: *GroupState) void {
+        std.debug.assert(@intFromPtr(self) != 0);
+        std.debug.assert(self.user_storage.len <= limits.tags_max);
+
+        self.metadata = .{ .group_id = "" };
+        self.users = self.user_storage[0..0];
+        self.supported_roles = self.supported_role_storage[0..0];
+    }
 };
 
 pub const BuiltTag = struct {
@@ -265,6 +310,39 @@ pub fn group_roles_extract(
         .group_id = group_id,
         .roles = out_roles[0..role_count],
     };
+}
+
+/// Applies one caller-supplied NIP-29 event to fixed-capacity group state.
+pub fn group_state_apply_event(
+    state: *GroupState,
+    event: *const nip01_event.Event,
+) Nip29Error!void {
+    std.debug.assert(@intFromPtr(state) != 0);
+    std.debug.assert(@intFromPtr(event) != 0);
+
+    switch (event.kind) {
+        group_metadata_kind => try reduce_metadata_event(state, event),
+        group_admins_kind => try reduce_admins_event(state, event),
+        group_members_kind => try reduce_members_event(state, event),
+        group_roles_kind => try reduce_supported_roles_event(state, event),
+        group_put_user_kind => try reduce_put_user_event(state, event),
+        group_remove_user_kind => try reduce_remove_user_event(state, event),
+        else => {},
+    }
+}
+
+/// Applies a caller-supplied canonical sequence of NIP-29 events to fixed-capacity group state.
+pub fn group_state_apply_events(
+    state: *GroupState,
+    events: []const nip01_event.Event,
+) Nip29Error!void {
+    std.debug.assert(@intFromPtr(state) != 0);
+    std.debug.assert(state.users.len <= state.user_storage.len);
+    std.debug.assert(state.supported_roles.len <= state.supported_role_storage.len);
+
+    for (events) |*event| {
+        try group_state_apply_event(state, event);
+    }
 }
 
 /// Extract a bounded NIP-29 join request from a kind-9021 event.
@@ -923,6 +1001,278 @@ fn parse_group_tag(tag: nip01_event.EventTag, group_id: *[]const u8) Nip29Error!
     }
 }
 
+fn reduce_metadata_event(
+    state: *GroupState,
+    event: *const nip01_event.Event,
+) Nip29Error!void {
+    std.debug.assert(@intFromPtr(state) != 0);
+    std.debug.assert(event.kind == group_metadata_kind);
+
+    const metadata = try group_metadata_extract(event);
+    try ensure_state_group_id(state, metadata.group_id);
+    state.metadata = metadata;
+}
+
+fn reduce_supported_roles_event(
+    state: *GroupState,
+    event: *const nip01_event.Event,
+) Nip29Error!void {
+    std.debug.assert(@intFromPtr(state) != 0);
+    std.debug.assert(event.kind == group_roles_kind);
+
+    const info = try group_roles_extract(event, state.supported_role_storage);
+    try ensure_state_group_id(state, info.group_id);
+    state.supported_roles = state.supported_role_storage[0..info.roles.len];
+}
+
+fn reduce_admins_event(
+    state: *GroupState,
+    event: *const nip01_event.Event,
+) Nip29Error!void {
+    std.debug.assert(@intFromPtr(state) != 0);
+    std.debug.assert(event.kind == group_admins_kind);
+
+    var group_id: []const u8 = "";
+    clear_admin_snapshot(state);
+    for (event.tags) |tag| {
+        try reduce_admin_snapshot_tag(state, tag, &group_id);
+    }
+    if (group_id.len == 0) return error.MissingIdentifierTag;
+    try ensure_state_group_id(state, group_id);
+    compact_inactive_users(state);
+}
+
+fn reduce_admin_snapshot_tag(
+    state: *GroupState,
+    tag: nip01_event.EventTag,
+    group_id: *[]const u8,
+) Nip29Error!void {
+    std.debug.assert(@intFromPtr(state) != 0);
+    std.debug.assert(@intFromPtr(group_id) != 0);
+
+    if (tag.items.len == 0) return;
+    if (std.mem.eql(u8, tag.items[0], "d")) return parse_identifier_tag(tag, group_id);
+    if (!std.mem.eql(u8, tag.items[0], "p")) return;
+    try apply_admin_snapshot_user(state, tag);
+}
+
+fn apply_admin_snapshot_user(state: *GroupState, tag: nip01_event.EventTag) Nip29Error!void {
+    std.debug.assert(@intFromPtr(state) != 0);
+    std.debug.assert(tag.items.len <= limits.tag_items_max);
+
+    if (tag.items.len < 2) return error.InvalidAdminTag;
+    const pubkey = parse_lower_hex_32(tag.items[1]) catch return error.InvalidAdminTag;
+    const user_index = try ensure_user_slot(state, &pubkey);
+    try set_user_roles(state, user_index, admin_role_items(tag), error.InvalidAdminTag);
+}
+
+fn reduce_members_event(
+    state: *GroupState,
+    event: *const nip01_event.Event,
+) Nip29Error!void {
+    std.debug.assert(@intFromPtr(state) != 0);
+    std.debug.assert(event.kind == group_members_kind);
+
+    var group_id: []const u8 = "";
+    clear_member_snapshot(state);
+    for (event.tags) |tag| {
+        try reduce_member_snapshot_tag(state, tag, &group_id);
+    }
+    if (group_id.len == 0) return error.MissingIdentifierTag;
+    try ensure_state_group_id(state, group_id);
+    compact_inactive_users(state);
+}
+
+fn reduce_member_snapshot_tag(
+    state: *GroupState,
+    tag: nip01_event.EventTag,
+    group_id: *[]const u8,
+) Nip29Error!void {
+    std.debug.assert(@intFromPtr(state) != 0);
+    std.debug.assert(@intFromPtr(group_id) != 0);
+
+    if (tag.items.len == 0) return;
+    if (std.mem.eql(u8, tag.items[0], "d")) return parse_identifier_tag(tag, group_id);
+    if (!std.mem.eql(u8, tag.items[0], "p")) return;
+    try apply_member_snapshot_user(state, tag);
+}
+
+fn apply_member_snapshot_user(state: *GroupState, tag: nip01_event.EventTag) Nip29Error!void {
+    std.debug.assert(@intFromPtr(state) != 0);
+    std.debug.assert(tag.items.len <= limits.tag_items_max);
+
+    if (tag.items.len != 2 and tag.items.len != 3) return error.InvalidMemberTag;
+    var user = GroupMember{
+        .pubkey = parse_lower_hex_32(tag.items[1]) catch return error.InvalidMemberTag,
+        .label = null,
+    };
+    if (tag.items.len == 3 and tag.items[2].len != 0) {
+        user.label = parse_member_label(tag.items[2]) catch return error.InvalidMemberTag;
+    }
+    const user_index = try ensure_user_slot(state, &user.pubkey);
+    state.user_storage[user_index].label = user.label;
+    state.user_storage[user_index].is_member = true;
+}
+
+fn reduce_put_user_event(
+    state: *GroupState,
+    event: *const nip01_event.Event,
+) Nip29Error!void {
+    std.debug.assert(@intFromPtr(state) != 0);
+    std.debug.assert(event.kind == group_put_user_kind);
+
+    var roles: [group_state_user_roles_max][]const u8 = undefined;
+    var previous: [0][]const u8 = .{};
+    const info = try group_put_user_extract(event, roles[0..], previous[0..]);
+    const user_index = try ensure_user_slot(state, &info.pubkey);
+    try ensure_state_group_id(state, info.group_id);
+    try set_user_roles(state, user_index, info.roles, error.InvalidPutUserTag);
+    state.user_storage[user_index].is_member = true;
+}
+
+fn reduce_remove_user_event(
+    state: *GroupState,
+    event: *const nip01_event.Event,
+) Nip29Error!void {
+    std.debug.assert(@intFromPtr(state) != 0);
+    std.debug.assert(event.kind == group_remove_user_kind);
+
+    var previous: [0][]const u8 = .{};
+    const info = try group_remove_user_extract(event, previous[0..]);
+    try ensure_state_group_id(state, info.group_id);
+    const user_index = find_user_index(state, &info.pubkey) orelse return;
+    clear_user(state, user_index);
+    compact_inactive_users(state);
+}
+
+fn ensure_state_group_id(state: *GroupState, group_id: []const u8) Nip29Error!void {
+    std.debug.assert(@intFromPtr(state) != 0);
+    std.debug.assert(group_id.len <= limits.tag_item_bytes_max);
+
+    if (state.metadata.group_id.len == 0) {
+        state.metadata.group_id = group_id;
+        return;
+    }
+    if (!std.mem.eql(u8, state.metadata.group_id, group_id)) {
+        return error.GroupStateMismatch;
+    }
+}
+
+fn clear_admin_snapshot(state: *GroupState) void {
+    std.debug.assert(@intFromPtr(state) != 0);
+    std.debug.assert(state.users.len <= state.user_storage.len);
+
+    for (state.users) |*user| {
+        user.roles = &.{};
+    }
+}
+
+fn clear_member_snapshot(state: *GroupState) void {
+    std.debug.assert(@intFromPtr(state) != 0);
+    std.debug.assert(state.users.len <= state.user_storage.len);
+
+    for (state.users) |*user| {
+        user.is_member = false;
+        user.label = null;
+    }
+}
+
+fn ensure_user_slot(state: *GroupState, pubkey: *const [32]u8) Nip29Error!u16 {
+    std.debug.assert(@intFromPtr(state) != 0);
+    std.debug.assert(@intFromPtr(pubkey) != 0);
+
+    if (find_user_index(state, pubkey)) |index| return index;
+    if (state.users.len == state.user_storage.len) return error.BufferTooSmall;
+    const index: u16 = @intCast(state.users.len);
+    state.user_storage[index] = .{ .pubkey = pubkey.* };
+    state.users = state.user_storage[0 .. state.users.len + 1];
+    return index;
+}
+
+fn find_user_index(state: *const GroupState, pubkey: *const [32]u8) ?u16 {
+    std.debug.assert(@intFromPtr(state) != 0);
+    std.debug.assert(@intFromPtr(pubkey) != 0);
+
+    for (state.users, 0..) |user, index| {
+        if (std.mem.eql(u8, user.pubkey[0..], pubkey[0..])) return @intCast(index);
+    }
+    return null;
+}
+
+fn set_user_roles(
+    state: *GroupState,
+    user_index: u16,
+    role_items: []const []const u8,
+    invalid_error: Nip29Error,
+) Nip29Error!void {
+    std.debug.assert(@intFromPtr(state) != 0);
+    std.debug.assert(user_index < state.user_storage.len);
+
+    if (role_items.len > group_state_user_roles_max) return error.BufferTooSmall;
+    const slot = user_role_slot(state, user_index);
+    for (role_items, 0..) |role, index| {
+        slot[index] = parse_role(role) catch return invalid_error;
+    }
+    state.user_storage[user_index].roles = slot[0..role_items.len];
+}
+
+fn user_role_slot(state: *GroupState, user_index: u16) [][]const u8 {
+    std.debug.assert(@intFromPtr(state) != 0);
+    std.debug.assert(user_index < state.user_storage.len);
+
+    const start: usize = @intCast(user_index * group_state_user_roles_max);
+    const end: usize = start + group_state_user_roles_max;
+    return state.user_role_storage[start..end];
+}
+
+fn clear_user(state: *GroupState, user_index: u16) void {
+    std.debug.assert(@intFromPtr(state) != 0);
+    std.debug.assert(user_index < state.user_storage.len);
+
+    state.user_storage[user_index].roles = &.{};
+    state.user_storage[user_index].label = null;
+    state.user_storage[user_index].is_member = false;
+}
+
+fn compact_inactive_users(state: *GroupState) void {
+    std.debug.assert(@intFromPtr(state) != 0);
+    std.debug.assert(state.users.len <= state.user_storage.len);
+
+    var index: u16 = 0;
+    while (index < state.users.len) {
+        if (user_is_active(&state.user_storage[index])) {
+            index += 1;
+            continue;
+        }
+        remove_user_at(state, index);
+    }
+}
+
+fn user_is_active(user: *const GroupStateUser) bool {
+    std.debug.assert(@intFromPtr(user) != 0);
+    std.debug.assert(user.roles.len <= group_state_user_roles_max);
+
+    return user.is_member or user.roles.len != 0;
+}
+
+fn remove_user_at(state: *GroupState, user_index: u16) void {
+    std.debug.assert(@intFromPtr(state) != 0);
+    std.debug.assert(user_index < state.user_storage.len);
+
+    const last_index: u16 = @intCast(state.users.len - 1);
+    if (user_index != last_index) {
+        state.user_storage[user_index] = state.user_storage[last_index];
+        const dst = user_role_slot(state, user_index);
+        const src = user_role_slot(state, last_index);
+        for (src, 0..) |role, index| {
+            dst[index] = role;
+        }
+        state.user_storage[user_index].roles =
+            dst[0..state.user_storage[user_index].roles.len];
+    }
+    state.users = state.user_storage[0..last_index];
+}
+
 fn parse_user_tag(
     tag: nip01_event.EventTag,
     pubkey: *[32]u8,
@@ -1419,5 +1769,124 @@ test "group join request rejects invalid relay-hint h tag" {
             &test_event_with_content(group_join_request_kind, tags[0..], ""),
             previous[0..],
         ),
+    );
+}
+
+test "group state reducer applies snapshots and moderation updates" {
+    const metadata_tags = [_]nip01_event.EventTag{
+        .{ .items = &.{ "d", "pizza-lovers" } },
+        .{ .items = &.{ "name", "Pizza Lovers" } },
+        .{ .items = &.{"public"} },
+    };
+    const role_tags = [_]nip01_event.EventTag{
+        .{ .items = &.{ "d", "pizza-lovers" } },
+        .{ .items = &.{ "role", "moderator", "can delete spam" } },
+    };
+    const admin_tags = [_]nip01_event.EventTag{
+        .{ .items = &.{ "d", "pizza-lovers" } },
+        .{ .items = &.{
+            "p",
+            "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "moderator",
+        } },
+    };
+    const member_tags = [_]nip01_event.EventTag{
+        .{ .items = &.{ "d", "pizza-lovers" } },
+        .{ .items = &.{
+            "p",
+            "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "vip",
+        } },
+        .{ .items = &.{
+            "p",
+            "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        } },
+    };
+    const put_tags = [_]nip01_event.EventTag{
+        .{ .items = &.{ "h", "pizza-lovers" } },
+        .{ .items = &.{
+            "p",
+            "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "moderator",
+        } },
+    };
+    const remove_tags = [_]nip01_event.EventTag{
+        .{ .items = &.{ "h", "pizza-lovers" } },
+        .{ .items = &.{
+            "p",
+            "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        } },
+    };
+    const ignored_tags = [_]nip01_event.EventTag{
+        .{ .items = &.{ "h", "pizza-lovers" } },
+    };
+    const events = [_]nip01_event.Event{
+        test_event(group_metadata_kind, metadata_tags[0..]),
+        test_event(group_roles_kind, role_tags[0..]),
+        test_event(group_admins_kind, admin_tags[0..]),
+        test_event(group_members_kind, member_tags[0..]),
+        test_event_with_content(group_put_user_kind, put_tags[0..], "promote"),
+        test_event_with_content(group_remove_user_kind, remove_tags[0..], "remove"),
+        test_event_with_content(group_join_request_kind, ignored_tags[0..], "ignored"),
+    };
+    var users: [2]GroupStateUser = undefined;
+    var roles: [1]GroupRole = undefined;
+    var user_roles: [2 * group_state_user_roles_max][]const u8 = undefined;
+    var state = GroupState.init(users[0..], roles[0..], user_roles[0..]);
+
+    state.reset();
+    try group_state_apply_events(&state, events[0..]);
+
+    try std.testing.expectEqualStrings("pizza-lovers", state.metadata.group_id);
+    try std.testing.expectEqualStrings("Pizza Lovers", state.metadata.name.?);
+    try std.testing.expectEqual(@as(usize, 1), state.supported_roles.len);
+    try std.testing.expectEqualStrings("moderator", state.supported_roles[0].name);
+    try std.testing.expectEqual(@as(usize, 1), state.users.len);
+    try std.testing.expect(state.users[0].is_member);
+    try std.testing.expectEqualStrings("vip", state.users[0].label.?);
+    try std.testing.expectEqual(@as(usize, 1), state.users[0].roles.len);
+    try std.testing.expectEqualStrings("moderator", state.users[0].roles[0]);
+}
+
+test "group state reducer replaces snapshots and rejects mixed groups" {
+    const first_admins = [_]nip01_event.EventTag{
+        .{ .items = &.{ "d", "pizza-lovers" } },
+        .{ .items = &.{
+            "p",
+            "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "ceo",
+        } },
+        .{ .items = &.{
+            "p",
+            "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "moderator",
+        } },
+    };
+    const second_admins = [_]nip01_event.EventTag{
+        .{ .items = &.{ "d", "pizza-lovers" } },
+        .{ .items = &.{
+            "p",
+            "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "gardener",
+        } },
+    };
+    const other_metadata = [_]nip01_event.EventTag{
+        .{ .items = &.{ "d", "other-group" } },
+    };
+    var users: [2]GroupStateUser = undefined;
+    var roles: [1]GroupRole = undefined;
+    var user_roles: [2 * group_state_user_roles_max][]const u8 = undefined;
+    var state = GroupState.init(users[0..], roles[0..], user_roles[0..]);
+
+    state.reset();
+    try group_state_apply_event(&state, &test_event(group_admins_kind, first_admins[0..]));
+    try group_state_apply_event(&state, &test_event(group_admins_kind, second_admins[0..]));
+
+    try std.testing.expectEqual(@as(usize, 1), state.users.len);
+    try std.testing.expectEqualStrings("pizza-lovers", state.metadata.group_id);
+    try std.testing.expectEqualStrings("gardener", state.users[0].roles[0]);
+    try std.testing.expectError(
+        error.GroupStateMismatch,
+        group_state_apply_event(&state, &test_event(group_metadata_kind, other_metadata[0..])),
     );
 }

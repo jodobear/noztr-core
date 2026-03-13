@@ -216,6 +216,8 @@ test "root exports limits and error namespaces" {
     try std.testing.expect(@TypeOf(nip39_external_identities.IdentityClaim) == type);
     try std.testing.expect(@TypeOf(nip39_external_identities.BuiltTag) == type);
     try std.testing.expect(@TypeOf(nip29_relay_groups.GroupMetadataFlag) == type);
+    try std.testing.expect(@TypeOf(nip29_relay_groups.GroupStateUser) == type);
+    try std.testing.expect(@TypeOf(nip29_relay_groups.GroupState) == type);
     try std.testing.expect(@TypeOf(nip73_external_ids.ExternalIdKind) == type);
     try std.testing.expect(@TypeOf(nip73_external_ids.ExternalId) == type);
     try std.testing.expect(@TypeOf(nip73_external_ids.BuiltTag) == type);
@@ -372,6 +374,20 @@ test "root exports limits and error namespaces" {
                 []nip29_relay_groups.GroupAdmin,
                 [][]const u8,
             ) nip29_relay_groups.Nip29Error!nip29_relay_groups.GroupAdminsInfo,
+    );
+    try std.testing.expect(
+        @TypeOf(nip29_relay_groups.group_state_apply_event) ==
+            fn (
+                *nip29_relay_groups.GroupState,
+                *const nip01_event.Event,
+            ) nip29_relay_groups.Nip29Error!void,
+    );
+    try std.testing.expect(
+        @TypeOf(nip29_relay_groups.group_state_apply_events) ==
+            fn (
+                *nip29_relay_groups.GroupState,
+                []const nip01_event.Event,
+            ) nip29_relay_groups.Nip29Error!void,
     );
     try std.testing.expect(
         @TypeOf(nip29_relay_groups.group_members_extract) ==

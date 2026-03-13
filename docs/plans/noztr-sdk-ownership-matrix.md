@@ -41,7 +41,7 @@ Put behavior in the SDK when it involves any of:
 | `NIP-73` external ids | bounded external-id parse/build/validate/match helpers | provider presets and higher-level workflows | implemented and reused by `NIP-24` and `NIP-22` |
 | `NIP-03` OpenTimestamps | attestation event parsing, bounded proof decode, bounded local proof verification floor | networked Bitcoin/esplora verification, remote proof-engine orchestration, caching/retry policy | bounded local verification may belong in `noztr`; networked verification does not |
 | `NIP-39` external identities | claim extraction, canonical tag building, proof URL derivation, expected proof text | live provider fetch verification, trust policy, retries, provider adapters | live verification belongs in SDK |
-| `NIP-29` relay groups | relay-generated event helpers, raw references, bounded user-event helpers, pure fixed-capacity state reduction | relay subscriptions, authority policy, sync/storage, moderation workflows, group client engine | pure reducers may belong in `noztr`; orchestration does not |
+| `NIP-29` relay groups | relay-generated event helpers, raw references, bounded user-event helpers, pure fixed-capacity state reduction | relay subscriptions, authority policy, sync/storage, moderation workflows, group client engine | pure reducer is implemented in `noztr`; orchestration stays in the SDK |
 | `NIP-17` private messages | kind `14` / `15` parse, unwrap reuse, bounded relay-list helpers | attachment transfer workflow, mailbox policy, message sync/orchestration | current split is correct |
 | `NIP-06` mnemonic and derivation | mnemonic validation, seed derivation, canonical key derivation, zeroization, typed errors | wallet UX, account management flow, secret storage policy | current split is correct |
 | `NIP-44` / `NIP-59` crypto messaging | cryptographic framing, wrap/seal/rumor boundaries, checked decrypt/verify helpers | session management, key storage, mailbox workflow | current split is correct |
@@ -63,6 +63,6 @@ If the answer to `5` is yes, the behavior probably belongs in the SDK.
 - `NIP-46`: add exact `<nostrconnect>` template substitution in `noztr` when useful.
 - `NIP-73`: implemented shared external-id helper for fuller external-id support.
 - `NIP-03`: bounded local proof verification is a valid future `noztr` improvement.
-- `NIP-29`: pure fixed-capacity state reduction is a valid future `noztr` improvement.
+- `NIP-29`: pure fixed-capacity state reduction is implemented; relay orchestration remains SDK work.
 - `NIP-39`: live verification should remain SDK work unless the project deliberately changes the
   kernel boundary.

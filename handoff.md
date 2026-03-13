@@ -173,14 +173,15 @@ Current project context for the Phase H kickoff baseline.
   - deferred backlog `NIP-29` is now complete in `src/nip29_relay_groups.zig` with bounded
     relay-generated group metadata/admin/member/role extraction and builders for kinds `39000`,
     `39001`, `39002`, and `39003`, raw group-reference parse/build helpers, bounded join/leave
-    and put/remove-user extraction, and raw `previous` tag plumbing
+    and put/remove-user extraction, raw `previous` tag plumbing, and pure fixed-capacity state
+    reduction over caller-supplied `39000` / `39001` / `39002` / `39003` / `9000` / `9001` events
   - deferred backlog `NIP-29` robustness review is complete:
     - inbound extraction now accepts deployed three-slot `h` tags with optional relay hints
     - group-admin extraction now ignores the empty compatibility label slot emitted by
       `nostr-tools` instead of rejecting the whole tag
     - outbound builders still reject empty admin role lists and empty optional member labels
   - accepted bounded kernel posture:
-    - pure fixed-capacity state reduction is now accepted future kernel work (`D-072`)
+    - pure fixed-capacity state reduction is now implemented under the accepted `D-072` boundary
     - relay fetch/subscription and broader moderation orchestration remain out of current scope
   - Wave 1, the implemented-NIP audit, Wave 2 / `NIP-46`, Wave 3 / `NIP-06`, post-wave expansion
     `NIP-23`, and deferred backlog items `NIP-24`, `NIP-03`, `NIP-17`, `NIP-39`, and `NIP-29`
@@ -198,8 +199,9 @@ Current project context for the Phase H kickoff baseline.
 ## Active Parity Gate
 
 - Active lane: rust only (`tools/interop/rust-nostr-parity-all`).
-- Current rust status: `30 HARNESS_COVERED`, mixed `BASELINE/EDGE/DEEP`, `PASS`; `NIP-29` remains
-  source-review-only because `rust-nostr` has no dedicated helper surface there.
+- Current rust status: `30 HARNESS_COVERED`, mixed `BASELINE/EDGE/DEEP`, `PASS`; `NIP-29`
+  extraction parity remains source-review-only because `rust-nostr` has no dedicated helper
+  surface or reducer there.
 - Current TS audit status: `29/29 HARNESS_COVERED`, mixed `BASELINE/EDGE/DEEP`, `PASS`
   (`tools/interop/ts-nostr-parity-all`; non-gating audit evidence lane).
 - Baseline cadence run (2026-03-09): rust parity harness passed
@@ -269,6 +271,13 @@ Current project context for the Phase H kickoff baseline.
 - Latest cadence run (2026-03-12): `zig build test --summary all` passed
   (`Build Summary: 9/9 steps succeeded; 750/750 tests passed`).
 - Latest cadence run (2026-03-12): `zig build` passed.
+- Latest cadence run (2026-03-13): rust parity harness passed
+  (`SUMMARY pass=30 fail=0 harness_covered=30 total=30`).
+- Latest cadence run (2026-03-13): TS audit harness passed
+  (`SUMMARY pass=29 fail=0 harness_covered=29 total=29`).
+- Latest cadence run (2026-03-13): `zig build test --summary all` passed
+  (`Build Summary: 9/9 steps succeeded; 754/754 tests passed`).
+- Latest cadence run (2026-03-13): `zig build` passed.
 - Active cadence commands:
   - `cargo run --manifest-path tools/interop/rust-nostr-parity-all/Cargo.toml`
   - `zig build test --summary all && zig build`
@@ -306,8 +315,7 @@ Current project context for the Phase H kickoff baseline.
    changes and record outcomes in Phase H kickoff and handoff docs.
 3. Phase H planned expansion plus the bounded NIP-73 ownership follow-up are complete.
    Recommended next step:
-   - implement the bounded NIP-03 local proof-verification floor or the pure NIP-29 reducer before
-     any new protocol expansion
+   - implement the bounded NIP-03 local proof-verification floor before any new protocol expansion
 4. Keep the implemented-NIP audit report current if future code changes reopen compatibility or
    strictness questions.
    - use `docs/plans/noztr-sdk-ownership-matrix.md` when the question is whether a helper belongs

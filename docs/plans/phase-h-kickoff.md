@@ -340,7 +340,7 @@ the validated maintenance baseline.
     - TypeScript audit overlap is now `HARNESS_COVERED`, `BASELINE`, `PASS`
   - review outcome:
     - no accepted behavior change was required after the implementation pass
-    - pure fixed-capacity state reduction is now considered valid future kernel work, while relay
+    - pure fixed-capacity state reduction is now implemented in the kernel, while relay
       fetch/subscription and broader orchestration remain out of scope (`D-072`)
 - Deferred backlog / `NIP-29` is complete in `no-j2g`
   - bounded `src/nip29_relay_groups.zig` surface is implemented
@@ -353,14 +353,16 @@ the validated maintenance baseline.
     - bounded join/leave request extraction for kinds `9021` and `9022`
     - bounded put/remove-user extraction for kinds `9000` and `9001`
     - raw `previous` tag parse/build helpers
+    - pure fixed-capacity group-state reduction over caller-supplied `39000` / `39001` / `39002` /
+      `39003` / `9000` / `9001` events
     - compatibility parsing for deployed `nostr-tools` `public` / `open` metadata aliases
     - tolerant handling of unrelated unknown tags
   - parity/evidence status:
     - rust parity overlap remains source-review-only because `rust-nostr` has no dedicated NIP-29
-      helper surface beyond generic event tagging
+      helper surface or reducer beyond generic event tagging
     - TypeScript audit overlap is `HARNESS_COVERED`, `BASELINE`, `PASS` for relay-generated events
-      and raw group-reference codecs; broader user/moderation helpers are source-review-backed
-      against applesauce
+      and raw group-reference codecs; reducer behavior is local-source- and NIP-backed because the
+      TS lane has no equivalent reducer helper
   - review outcome:
     - no accepted behavior change was required after the implementation pass
 
@@ -412,8 +414,8 @@ the validated maintenance baseline.
     ignores the empty admin compatibility label slot emitted by `nostr-tools`
   - outbound builders still reject empty admin role lists and empty optional member labels so the
     kernel no longer emits invalid compatibility tags
-  - bounded relay-generated metadata/admin/member/role extraction plus raw group references,
-    user-event extraction, and raw `previous` tags remain the accepted kernel posture
+  - bounded relay-generated metadata/admin/member/role extraction, pure state reduction, raw group
+    references, user-event extraction, and raw `previous` tags remain the accepted kernel posture
 - Keep the implemented-NIP audit report current if future code changes reopen compatibility
   questions.
 - `no-4iw` is resolved by the NIP-10 audit and no longer blocks interpretation of NIP-10 quality.
