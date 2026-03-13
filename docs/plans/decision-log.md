@@ -1603,3 +1603,23 @@ Immutable record of accepted planning decisions.
   materially too narrow for interoperability, or the module proves to require orchestration logic to
   remain useful.
 - Supersedes: none
+
+## D-080: Implement bounded NIP-37 draft-wrap and private relay-list helpers
+
+- Date: 2026-03-13
+- Status: accepted
+- Decision: implement `src/nip37_drafts.zig` as the bounded kernel surface for kind-`31234`
+  draft-wrap metadata parsing, validated draft JSON NIP-44 encrypt/decrypt helpers, direct
+  `d`/`k`/`expiration` tag builders, kind-`10013` private relay-tag builders, private relay-list
+  JSON serialization/extraction, and NIP-44 private relay-list extraction. Keep draft sync, editor
+  workflow, local storage, publish/delete workflow, and relay-selection policy in the future SDK.
+- Why: both NIP-37 surfaces are deterministic protocol glue built on top of already-implemented
+  NIP-44 helpers, and multiple future SDK/client flows will need the same strict metadata and
+  private relay-list handling without wanting to re-implement the encrypted-content boundary.
+- Tradeoff: a broader private-content helper surface in the kernel versus cleaner SDK layering and
+  less repeated draft/private-relay parsing logic later.
+- Related Tradeoff: T-H-ANIP-011.
+- Reversal Trigger: real-world draft or private-relay payload evidence shows that the accepted exact
+  `d`/`k`/relay-tag rules are materially too narrow, or the module proves to require stateful draft
+  workflow to stay useful.
+- Supersedes: none

@@ -108,6 +108,9 @@ pub const nip05_identity = @import("nip05_identity.zig");
 /// Post-Phase-H concrete export for the NIP-26 delegation module.
 pub const nip26_delegation = @import("nip26_delegation.zig");
 
+/// Post-Phase-H concrete export for the NIP-37 drafts module.
+pub const nip37_drafts = @import("nip37_drafts.zig");
+
 /// Phase I5 concrete export for the NIP-44 encrypted direct-message module.
 pub const nip44 = @import("nip44.zig");
 
@@ -258,6 +261,10 @@ test "root exports limits and error namespaces" {
     try std.testing.expect(@TypeOf(nip26_delegation.DelegationCondition) == type);
     try std.testing.expect(@TypeOf(nip26_delegation.DelegationConditions) == type);
     try std.testing.expect(@TypeOf(nip26_delegation.BuiltTag) == type);
+    try std.testing.expect(@TypeOf(nip37_drafts.DraftWrapInfo) == type);
+    try std.testing.expect(@TypeOf(nip37_drafts.DraftWrapPlaintextInfo) == type);
+    try std.testing.expect(@TypeOf(nip37_drafts.PrivateRelayListInfo) == type);
+    try std.testing.expect(@TypeOf(nip37_drafts.BuiltTag) == type);
     try std.testing.expect(@TypeOf(nip29_relay_groups.GroupMetadata) == type);
     try std.testing.expect(@TypeOf(nip29_relay_groups.GroupAdmin) == type);
     try std.testing.expect(@TypeOf(nip29_relay_groups.GroupReference) == type);
@@ -682,6 +689,55 @@ test "root exports limits and error namespaces" {
     try std.testing.expect(
         @TypeOf(nip46_remote_signing.message_parse_json) ==
             fn ([]const u8, std.mem.Allocator) nip46_remote_signing.Nip46Error!nip46_remote_signing.Message,
+    );
+    try std.testing.expect(
+        @TypeOf(nip37_drafts.draft_wrap_parse) ==
+            fn (*const nip01_event.Event) nip37_drafts.Nip37Error!nip37_drafts.DraftWrapInfo,
+    );
+    try std.testing.expect(
+        @TypeOf(nip37_drafts.draft_wrap_decrypt_json) ==
+            fn (
+                []u8,
+                *const nip01_event.Event,
+                *const [32]u8,
+                std.mem.Allocator,
+            ) nip37_drafts.Nip37Error!nip37_drafts.DraftWrapPlaintextInfo,
+    );
+    try std.testing.expect(
+        @TypeOf(nip37_drafts.draft_wrap_encrypt_json) ==
+            fn (
+                []u8,
+                *const [32]u8,
+                *const [32]u8,
+                []const u8,
+                std.mem.Allocator,
+            ) nip37_drafts.Nip37Error![]const u8,
+    );
+    try std.testing.expect(
+        @TypeOf(nip37_drafts.private_relay_build_tag) ==
+            fn (*nip37_drafts.BuiltTag, []const u8) nip37_drafts.Nip37Error!nip01_event.EventTag,
+    );
+    try std.testing.expect(
+        @TypeOf(nip37_drafts.private_relay_list_serialize_json) ==
+            fn ([]u8, []const nip01_event.EventTag) nip37_drafts.Nip37Error![]const u8,
+    );
+    try std.testing.expect(
+        @TypeOf(nip37_drafts.private_relay_list_extract_json) ==
+            fn (
+                []const u8,
+                [][]const u8,
+                std.mem.Allocator,
+            ) nip37_drafts.Nip37Error!nip37_drafts.PrivateRelayListInfo,
+    );
+    try std.testing.expect(
+        @TypeOf(nip37_drafts.private_relay_list_extract_nip44) ==
+            fn (
+                []u8,
+                *const nip01_event.Event,
+                *const [32]u8,
+                [][]const u8,
+                std.mem.Allocator,
+            ) nip37_drafts.Nip37Error!nip37_drafts.PrivateRelayListInfo,
     );
     try std.testing.expect(
         @TypeOf(nip46_remote_signing.message_serialize_json) ==
