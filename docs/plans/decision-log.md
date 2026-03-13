@@ -1705,3 +1705,21 @@ Immutable record of accepted planning decisions.
 - Reversal Trigger: strong standards-backed evidence shows uppercase local-parts must remain
   rejected for interoperability or security reasons.
 - Supersedes: none
+
+## D-085: Enforce lowercase hashtag semantics across the kernel-first metadata helpers
+
+- Date: 2026-03-13
+- Status: accepted
+- Decision: tighten `src/nip23_long_form.zig`, `src/nip24_extra_metadata.zig`, and
+  `src/nip32_labeling.zig` so their `t`-tag helpers reject uppercase hashtags during extraction and
+  building. The accepted surface remains lowercase-only for long-form topics, generic NIP-24
+  hashtags, and NIP-32 hashtag targets.
+- Why: the broader tag contract already treats hashtags as lowercase canonical data, the Rust
+  reference lowers or rejects uppercase hashtags, and the audit found local inconsistencies where
+  some builders rejected uppercase while their paired parsers still accepted it.
+- Tradeoff: slightly stricter parse behavior on malformed uppercase hashtag tags versus a clearer,
+  more deterministic canonical `t`-tag contract across adjacent modules.
+- Related Tradeoff: T-H-ANIP-011.
+- Reversal Trigger: strong ecosystem evidence shows uppercase hashtag tags are materially common
+  and rejecting them causes more interoperability harm than contract clarity provides.
+- Supersedes: none

@@ -518,6 +518,9 @@ fn parse_hashtag(text: []const u8) error{InvalidHashtag}![]const u8 {
 
     const parsed = parse_nonempty_utf8(text) catch return error.InvalidHashtag;
     if (std.mem.indexOfScalar(u8, parsed, ' ') != null) return error.InvalidHashtag;
+    for (parsed) |byte| {
+        if (std.ascii.isUpper(byte)) return error.InvalidHashtag;
+    }
     return parsed;
 }
 
@@ -683,6 +686,30 @@ test "label event builders emit canonical tags" {
     try std.testing.expectEqualStrings(
         "t",
         (try label_build_hashtag_target_tag(&hashtag_tag, "topic")).items[0],
+    );
+    try std.testing.expectError(
+        error.InvalidHashtagTargetTag,
+        label_build_hashtag_target_tag(&hashtag_tag, "Topic"),
+    );
+}
+
+test "label event extract rejects uppercase hashtag targets" {
+    const tags = [_]nip01_event.EventTag{
+        .{ .items = &.{ "l", "topic", "ugc" } },
+        .{ .items = &.{ "t", "Topic" } },
+    };
+    var namespaces: [1]LabelNamespace = undefined;
+    var labels: [1]Label = undefined;
+    var targets: [1]LabelTarget = undefined;
+
+    try std.testing.expectError(
+        error.InvalidHashtagTargetTag,
+        label_event_extract(
+            &test_event(label_event_kind, "", tags[0..]),
+            namespaces[0..],
+            labels[0..],
+            targets[0..],
+        ),
     );
 }
 

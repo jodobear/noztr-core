@@ -296,6 +296,13 @@ Current project context for the Phase H kickoff baseline.
 - Latest cadence run (2026-03-13): `zig build test --summary all` passed
   (`Build Summary: 9/9 steps succeeded; 852/852 tests passed`).
 - Latest cadence run (2026-03-13): `zig build` passed.
+- Latest cadence run (2026-03-13): rust parity harness passed
+  (`SUMMARY pass=35 fail=0 harness_covered=35 lib_unsupported=3 total=38`).
+- Latest cadence run (2026-03-13): TS audit harness passed
+  (`SUMMARY pass=33 fail=0 harness_covered=33 lib_unsupported=4 total=37`).
+- Latest cadence run (2026-03-13): `zig build test --summary all` passed
+  (`Build Summary: 9/9 steps succeeded; 856/856 tests passed`).
+- Latest cadence run (2026-03-13): `zig build` passed.
 - Active cadence commands:
   - `cargo run --manifest-path tools/interop/rust-nostr-parity-all/Cargo.toml`
   - `zig build test --summary all && zig build`
@@ -353,6 +360,10 @@ Current project context for the Phase H kickoff baseline.
        lookup/output while keeping the exact supported character set unchanged
      - `NIP-26`, `NIP-36`, and `NIP-56` were reviewed in the same pass and required no Layer 1
        behavior change
+     - `NIP-23`, `NIP-24`, and `NIP-32` now enforce lowercase hashtag semantics consistently
+       across both build and extract paths
+     - `NIP-73` was reviewed in the same pass and kept intentionally broader pending stronger
+       ecosystem evidence for stricter normalization
 4. Keep the implemented-NIP audit report current if future code changes reopen compatibility or
    strictness questions.
    - use `docs/plans/noztr-sdk-ownership-matrix.md` when the question is whether a helper belongs

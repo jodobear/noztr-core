@@ -187,7 +187,7 @@ pub fn long_form_build_hashtag_tag(
     std.debug.assert(hashtag.len <= limits.tag_item_bytes_max);
 
     output.items[0] = "t";
-    output.items[1] = parse_nonempty_utf8(hashtag) catch return error.InvalidHashtagTag;
+    output.items[1] = parse_hashtag_value(hashtag) catch return error.InvalidHashtagTag;
     output.item_count = 2;
     return output.as_event_tag();
 }
@@ -273,12 +273,18 @@ fn apply_hashtag_tag(
     std.debug.assert(tag.items.len <= limits.tag_items_max);
     std.debug.assert(@intFromPtr(metadata) != 0);
 
-    const hashtag = parse_single_value(tag, error.InvalidHashtagTag) catch {
-        return error.InvalidHashtagTag;
-    };
+    const hashtag = parse_hashtag_tag(tag) catch return error.InvalidHashtagTag;
     if (metadata.hashtag_count == out_hashtags.len) return error.BufferTooSmall;
     out_hashtags[metadata.hashtag_count] = hashtag;
     metadata.hashtag_count += 1;
+}
+
+fn parse_hashtag_tag(tag: nip01_event.EventTag) error{InvalidHashtagTag}![]const u8 {
+    std.debug.assert(tag.items.len <= limits.tag_items_max);
+    std.debug.assert(limits.tag_items_max >= 2);
+
+    if (tag.items.len != 2) return error.InvalidHashtagTag;
+    return parse_hashtag_value(tag.items[1]) catch return error.InvalidHashtagTag;
 }
 
 fn validate_content(content: []const u8) LongFormError!void {
@@ -333,6 +339,18 @@ fn parse_nonempty_utf8(text: []const u8) error{InvalidUtf8}![]const u8 {
     if (text.len == 0) return error.InvalidUtf8;
     if (!std.unicode.utf8ValidateSlice(text)) return error.InvalidUtf8;
     return text;
+}
+
+fn parse_hashtag_value(text: []const u8) error{InvalidHashtag}![]const u8 {
+    std.debug.assert(text.len <= limits.tag_item_bytes_max);
+    std.debug.assert(text.len <= limits.content_bytes_max);
+
+    const parsed = parse_nonempty_utf8(text) catch return error.InvalidHashtag;
+    for (parsed) |byte| {
+        if (std.ascii.isWhitespace(byte)) return error.InvalidHashtag;
+        if (std.ascii.isUpper(byte)) return error.InvalidHashtag;
+    }
+    return parsed;
 }
 
 fn parse_url(text: []const u8) error{InvalidUrl}![]const u8 {
@@ -527,5 +545,33 @@ test "long form builders emit bounded metadata tags" {
     try std.testing.expectEqualStrings(
         "t",
         (try long_form_build_hashtag_tag(&hashtag_tag, "nostr")).items[0],
+    );
+    try std.testing.expectError(
+        error.InvalidHashtagTag,
+        long_form_build_hashtag_tag(&hashtag_tag, "Nostr"),
+    );
+}
+
+test "long form extract rejects uppercase hashtags" {
+    const tags = [_]nip01_event.EventTag{
+        .{ .items = &.{ "d", "article" } },
+        .{ .items = &.{ "t", "Nostr" } },
+    };
+    var hashtags: [1][]const u8 = undefined;
+
+    try std.testing.expectError(
+        error.InvalidHashtagTag,
+        long_form_extract(
+            &.{
+                .id = [_]u8{0} ** 32,
+                .pubkey = [_]u8{0} ** 32,
+                .sig = [_]u8{0} ** 64,
+                .kind = 30023,
+                .created_at = 0,
+                .content = "body",
+                .tags = tags[0..],
+            },
+            hashtags[0..],
+        ),
     );
 }

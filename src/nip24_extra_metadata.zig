@@ -182,11 +182,8 @@ pub fn build_hashtag_tag(
     std.debug.assert(@intFromPtr(output) != 0);
     std.debug.assert(hashtag.len <= limits.tag_item_bytes_max);
 
-    const parsed = parse_hashtag_value(hashtag) catch return error.InvalidHashtagTag;
-    if (has_ascii_uppercase(parsed)) return error.InvalidHashtagTag;
-
     output.items[0] = "t";
-    output.items[1] = parsed;
+    output.items[1] = parse_hashtag_value(hashtag) catch return error.InvalidHashtagTag;
     output.item_count = 2;
     return output.as_event_tag();
 }
@@ -515,6 +512,7 @@ fn parse_hashtag_value(text: []const u8) error{InvalidTag}![]const u8 {
 
     const parsed = parse_nonempty_utf8(text) catch return error.InvalidTag;
     if (has_ascii_whitespace(parsed)) return error.InvalidTag;
+    if (has_ascii_uppercase(parsed)) return error.InvalidTag;
     return parsed;
 }
 
@@ -669,7 +667,7 @@ test "common tags extract parses title references and hashtags" {
     const tags = [_]nip01_event.EventTag{
         .{ .items = &.{ "title", "Article title" } },
         .{ .items = &.{ "r", "https://example.com/post" } },
-        .{ .items = &.{ "t", "Nostr" } },
+        .{ .items = &.{ "t", "nostr" } },
         .{ .items = &.{ "p", "ignored" } },
     };
     var references: [1][]const u8 = undefined;
@@ -681,7 +679,7 @@ test "common tags extract parses title references and hashtags" {
     try std.testing.expectEqual(@as(u16, 1), parsed.reference_count);
     try std.testing.expectEqual(@as(u16, 1), parsed.hashtag_count);
     try std.testing.expectEqualStrings("https://example.com/post", references[0]);
-    try std.testing.expectEqualStrings("Nostr", hashtags[0]);
+    try std.testing.expectEqualStrings("nostr", hashtags[0]);
 }
 
 test "common tags extract with external ids parses generic i tags" {
@@ -716,6 +714,7 @@ test "common tags extract rejects malformed supported tags and duplicate titles"
     const bad_reference = [_]nip01_event.EventTag{.{ .items = &.{ "r", "not-a-url" } }};
     const bad_external_id = [_]nip01_event.EventTag{.{ .items = &.{ "i", "bad-external-id" } }};
     const bad_hashtag = [_]nip01_event.EventTag{.{ .items = &.{ "t", "bad tag" } }};
+    const uppercase_hashtag = [_]nip01_event.EventTag{.{ .items = &.{ "t", "Nostr" } }};
     var references: [1][]const u8 = undefined;
     var external_ids: [1]nip73_external_ids.ExternalId = undefined;
     var hashtags: [1][]const u8 = undefined;
@@ -740,6 +739,10 @@ test "common tags extract rejects malformed supported tags and duplicate titles"
     try std.testing.expectError(
         error.InvalidHashtagTag,
         common_tags_extract(bad_hashtag[0..], references[0..], hashtags[0..]),
+    );
+    try std.testing.expectError(
+        error.InvalidHashtagTag,
+        common_tags_extract(uppercase_hashtag[0..], references[0..], hashtags[0..]),
     );
 }
 

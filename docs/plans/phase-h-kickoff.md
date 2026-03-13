@@ -397,6 +397,10 @@ the validated maintenance baseline.
       lookup/output while keeping the exact supported character set unchanged
     - `NIP-26`, `NIP-36`, and `NIP-56` were reviewed in the same pass and required no Layer 1
       behavior change
+    - `NIP-23`, `NIP-24`, and `NIP-32` now enforce lowercase hashtag semantics consistently across
+      both build and extract paths
+    - `NIP-73` was reviewed in the same pass and kept intentionally broader pending stronger
+      ecosystem evidence for stricter normalization
 - `NIP-44` robustness outcome:
   - no Layer 1 behavior change was required after real-world review
   - the current v2-only surface, staged failure ordering, typed conversation-key boundary, and
