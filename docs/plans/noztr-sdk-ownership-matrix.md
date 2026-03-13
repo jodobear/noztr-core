@@ -32,20 +32,41 @@ Put behavior in the SDK when it involves any of:
 - local stores, caches, or sync policy
 - app-flow convenience that is not protocol-kernel reuse
 
-## Default Ownership Matrix
+## Implemented NIP Ownership Matrix
 
-| Surface | `noztr` owns | SDK owns | Current posture |
-| --- | --- | --- | --- |
-| `NIP-46` remote signing | method/permission parsing, request/result parsing/building, envelope validation, URI parsing, signer discovery parsing, exact `<nostrconnect>` template substitution | relay pool control, signer session lifecycle, auth handling flow, URL launching, redirect policy, connection orchestration | deterministic helper glue belongs in `noztr`; client flow belongs in SDK |
-| `NIP-24` extra metadata | bounded metadata extras, generic `r` / `i` / `title` / `t` tags | UX helpers and richer app-level metadata handling | current split is correct with shared `NIP-73` reuse |
-| `NIP-73` external ids | bounded external-id parse/build/validate/match helpers | provider presets and higher-level workflows | implemented and reused by `NIP-24` and `NIP-22` |
-| `NIP-03` OpenTimestamps | attestation event parsing, bounded proof decode, bounded local proof verification floor | networked Bitcoin/esplora verification, remote proof-engine orchestration, caching/retry policy | bounded local proof floor is implemented; networked verification does not belong in the kernel |
-| `NIP-39` external identities | claim extraction, canonical tag building, proof URL derivation, expected proof text | live provider fetch verification, trust policy, retries, provider adapters | live verification belongs in SDK |
-| `NIP-29` relay groups | relay-generated event helpers, raw references, bounded user-event helpers, pure fixed-capacity state reduction | relay subscriptions, authority policy, sync/storage, moderation workflows, group client engine | pure reducer is implemented in `noztr`; orchestration stays in the SDK |
-| `NIP-17` private messages | kind `14` / `15` parse, unwrap reuse, bounded relay-list helpers | attachment transfer workflow, mailbox policy, message sync/orchestration | current split is correct |
-| `NIP-06` mnemonic and derivation | mnemonic validation, seed derivation, canonical key derivation, zeroization, typed errors | wallet UX, account management flow, secret storage policy | current split is correct |
-| `NIP-44` / `NIP-59` crypto messaging | cryptographic framing, wrap/seal/rumor boundaries, checked decrypt/verify helpers | session management, key storage, mailbox workflow | current split is correct |
-| `NIP-51` lists | bounded public/private list parse/build helpers | app list-management UX, sync/store policy, merge conflict policy | current split is correct |
+| NIP | `noztr` owns | SDK owns | SDK starter point | Current posture |
+| --- | --- | --- | --- | --- |
+| `01` events / filters / messages | strict event, filter, and client/relay message parse/validate/serialize helpers | publish / subscribe workflows, relay connection state, stream orchestration | high-level event builder presets plus REQ/COUNT/EOSE subscription helpers | kernel scope is correct |
+| `02` contacts | bounded contact-tag extraction and contact builders | contact sync, graph views, follow recommendations, petname UX | contact-list sync plus social-graph cache | kernel scope is correct |
+| `03` OpenTimestamps | event parsing, bounded proof decode, bounded local proof verification floor | networked OTS/Bitcoin verification, caching, remote proof retrieval | opt-in verifier adapters over caller-supplied HTTP / Bitcoin clients | local proof floor belongs in `noztr`; networked verification belongs in SDK |
+| `06` mnemonic / derivation | mnemonic validate, seed derivation, canonical key derivation, zeroization, typed errors | wallet UX, account selection, secret storage, import/export flows | wallet/account manager over kernel derivation helpers | current split is correct; full NFKD remains a future kernel follow-up |
+| `09` deletions | delete-target extraction and checked wrappers | delete publish flows, local tombstone policy, UI confirmation | deletion compose / publish helpers and tombstone cache policy | kernel scope is correct |
+| `10` threads | bounded root / reply / mention extraction | thread assembly, timeline stitching, reply composition UX | thread graph builder over extracted references | kernel scope is correct |
+| `11` relay info | bounded relay-info subset parsing | relay fetch, cache, policy scoring, capability negotiation | relay-info fetch/cache layer with refresh policy | current split is correct |
+| `13` PoW | checked difficulty helpers and verified-id wrapper | mining loops, publish retry policy, target selection UX | cancellable mining job wrapper using kernel checks | kernel scope is correct |
+| `17` private messages | bounded kind-`14` / `15` parse, relay-list helpers, gift-wrap unwrap reuse | mailbox sync, attachment transfer flow, inbox policy, send orchestration | private-message session and mailbox pipeline | current split is correct |
+| `18` reposts | bounded repost target extraction / builders | repost compose UX and publish flow | repost composer over event / coordinate pickers | kernel scope is correct |
+| `19` bech32 | encode / decode helpers for Nostr entities | clipboard/share helpers, resolver UX | human-facing encode / decode helpers for apps and CLIs | kernel scope is correct |
+| `21` URIs | strict `nostr:` URI parse / compose | deep-link routing, launch handling, app dispatch | URI router that resolves actions from parsed entities | kernel scope is correct |
+| `22` comments | bounded comment target / linkage extraction | comment tree assembly, fetch strategy, compose workflows | comment-thread builder over extracted comment info | strict kernel scope remains intentional |
+| `23` long-form | bounded metadata extraction / builders for article events | draft UX, publish workflow, editor integration | article draft/publish helper using kernel metadata tags | kernel scope is correct |
+| `24` extra metadata | bounded profile metadata extras and generic tag helpers | profile editing UX, richer app-specific metadata handling | profile editor / profile sync layer using kernel metadata helpers | `i` support is correctly routed through `NIP-73` |
+| `25` reactions | bounded reaction target extraction / builders | reaction compose/send UX, emoji registry / picker policy | reaction send helper using target resolution from SDK context | kernel scope is correct |
+| `27` references | inline `nostr:` reference extraction with spans | rich-text rendering, editor highlighting, click/open policy | rich-text tokenizer / renderer bridge | kernel scope is correct |
+| `29` relay groups | relay-generated event helpers, raw references, user-event helpers, pure fixed-capacity state reduction | relay subscriptions, sync/store, authority policy, moderation workflows, full group client engine | group-sync and state-store layer over kernel reducer and parsers | pure reducer belongs in `noztr`; orchestration belongs in SDK |
+| `39` external identities | claim extraction, canonical tag building, proof URL derivation, expected proof text | live provider verification, trust policy, retries, provider adapters | provider verifier adapters and identity-sync flows | live verification belongs in SDK |
+| `40` expiration | expiration extraction and checked expiration helpers | scheduler / retention policy, client-side expiry filtering | event-retention policy layer using kernel expiration checks | kernel scope is correct |
+| `42` auth | auth challenge parsing / compose helpers and boundary checks | relay-auth handshake state machine, retry / session policy | auth handshake manager over relay connections | kernel scope is correct |
+| `44` crypto | conversation-key derivation, payload encrypt/decrypt, checked cryptographic boundaries | secret/session storage, conversation caches, key-distribution workflows | conversation crypto service using kernel v2 primitives | current split is correct |
+| `45` count | bounded COUNT response parsing and HLL helpers | COUNT request orchestration, relay fanout, result aggregation | count-query orchestration layer | kernel scope is correct |
+| `46` remote signing | method / permission / request / result helpers, URI handling, discovery parsing, exact template substitution, envelope validation | relay pool control, signer session lifecycle, auth flows, launching / redirect policy, connection orchestration | remote-signer client/session manager | deterministic protocol glue belongs in `noztr`; client flow belongs in SDK |
+| `50` search | bounded search parse / extension extraction | query-building UX, search flow, result handling | search-query builder and relay search orchestration | kernel scope is correct |
+| `51` lists | bounded public/private list parse/build helpers | list-management UX, sync/store, merge conflict policy, higher-level list semantics | list manager with sync / storage / merge policy | current split is correct |
+| `59` gift wrap | wrap / seal / rumor boundaries and checked unwrap helpers | mailbox workflow, delivery orchestration, session handling | mailbox pipeline over kernel wrap / unwrap helpers | current split is correct |
+| `65` relay metadata | bounded relay-list extraction and builders | relay preference store, routing policy, failover heuristics | relay-preference manager and router hints | kernel scope is correct |
+| `70` protected events | exact protected-tag semantics and checked helpers | publish policy and protected-event UX | protected-event publish helper with policy toggles | kernel scope is correct |
+| `73` external ids | bounded external-id parse/build/validate/match helpers | provider presets, richer external-id workflows, UX affordances | shared provider preset / resolver layer for external IDs | implemented and reused by `NIP-24` and `NIP-22` |
+| `77` negentropy | bounded NEG-OPEN / MSG / CLOSE / ERR parsing and session helpers | full sync engine, transport scheduling, retry/session policy | negentropy sync driver over kernel message/state helpers | kernel scope is correct |
 
 ## Review Questions
 
@@ -58,11 +79,13 @@ When a scope question comes up, answer these in order:
 
 If the answer to `5` is yes, the behavior probably belongs in the SDK.
 
-## Current Priority Implications
+## NZDK Starter Priorities
 
-- `NIP-46`: add exact `<nostrconnect>` template substitution in `noztr` when useful.
-- `NIP-73`: implemented shared external-id helper for fuller external-id support.
-- `NIP-03`: bounded local proof verification floor is implemented; networked verification remains SDK or adapter work.
-- `NIP-29`: pure fixed-capacity state reduction is implemented; relay orchestration remains SDK work.
-- `NIP-39`: live verification should remain SDK work unless the project deliberately changes the
-  kernel boundary.
+- Start the SDK with the orchestration-heavy surfaces already intentionally left out of `noztr`:
+  `NIP-46`, `NIP-39`, `NIP-29`, `NIP-17`, `NIP-03`, `NIP-11`, and `NIP-65`.
+- Treat `NIP-44`, `NIP-59`, and `NIP-06` as foundational SDK dependencies rather than as the first
+  UX-facing modules.
+- Reuse `NIP-73` as the shared starter for any SDK support involving external identifiers or
+  provider-specific presets.
+- Keep SDK starter work honest: if a proposed helper stays pure, deterministic, bounded, and widely
+  reusable, reconsider whether it should live in `noztr` instead.

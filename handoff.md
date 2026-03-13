@@ -177,8 +177,10 @@ Current project context for the Phase H kickoff baseline.
     reduction over caller-supplied `39000` / `39001` / `39002` / `39003` / `9000` / `9001` events
   - deferred backlog `NIP-29` robustness review is complete:
     - inbound extraction now accepts deployed three-slot `h` tags with optional relay hints
-    - group-admin extraction now ignores the empty compatibility label slot emitted by
-      `nostr-tools` instead of rejecting the whole tag
+    - group-admin extraction now accepts optional compatibility labels emitted by `nostr-tools`
+      without misreading those labels as permissions
+    - the pure reducer ignores compatibility labels for role state, and outbound builders may emit
+      the broader labeled admin shape only when a caller explicitly supplies one
     - outbound builders still reject empty admin role lists and empty optional member labels
   - accepted bounded kernel posture:
     - pure fixed-capacity state reduction is now implemented under the accepted `D-072` boundary
@@ -315,7 +317,8 @@ Current project context for the Phase H kickoff baseline.
    changes and record outcomes in Phase H kickoff and handoff docs.
 3. Phase H planned expansion plus the bounded NIP-73 ownership follow-up are complete.
    Recommended next step:
-   - use operator-directed robustness or SDK-boundary work before any new protocol expansion
+   - use operator-directed robustness or SDK-boundary / `nzdk` preparation work before any new
+     protocol expansion
 4. Keep the implemented-NIP audit report current if future code changes reopen compatibility or
    strictness questions.
    - use `docs/plans/noztr-sdk-ownership-matrix.md` when the question is whether a helper belongs
