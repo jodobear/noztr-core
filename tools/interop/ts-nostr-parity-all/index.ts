@@ -733,6 +733,57 @@ function check_nip51(): void {
     );
 }
 
+function check_nip22(): void {
+    const secret_key = to_bytes_32(FIXED_SECRET_KEY_HEX);
+    const target_secret_key = to_bytes_32(
+        "7a350bc1469e1a5b1244625fdbec8b23dc4af192e11cdb296cf9d567a90d3812",
+    );
+    const target = finalizeEvent(
+        {
+            kind: kinds.FileMetadata,
+            created_at: 1_708_000_025,
+            tags: [],
+            content: "file target",
+        },
+        target_secret_key,
+    );
+
+    const comment = finalizeEvent(
+        {
+            kind: kinds.Comment,
+            created_at: 1_708_000_026,
+            tags: [
+                ["e", target.id, "", "root", target.pubkey],
+                ["e", target.id, "", "reply", target.pubkey],
+                ["k", `${target.kind}`],
+                ["K", `${target.kind}`],
+                ["p", target.pubkey],
+                ["P", target.pubkey],
+            ],
+            content: "nice file",
+        },
+        secret_key,
+    );
+
+    ensure(verifyEvent(comment), "NIP-22 signature verification failed");
+    ensure(
+        comment.tags.some((tag) => tag[0] === "e" && tag[3] === "root" && tag[4] === target.pubkey),
+        "NIP-22 root event tag mismatch",
+    );
+    ensure(
+        comment.tags.some((tag) => tag[0] === "e" && tag[3] === "reply" && tag[4] === target.pubkey),
+        "NIP-22 reply event tag mismatch",
+    );
+    ensure(
+        comment.tags.some((tag) => tag[0] === "K" && tag[1] === `${target.kind}`),
+        "NIP-22 uppercase K tag mismatch",
+    );
+    ensure(
+        comment.tags.some((tag) => tag[0] === "P" && tag[1] === target.pubkey),
+        "NIP-22 uppercase P tag mismatch",
+    );
+}
+
 function check_nip23(): void {
     const secret_key = to_bytes_32(FIXED_SECRET_KEY_HEX);
     const article = finalizeEvent(
@@ -1377,6 +1428,33 @@ function check_nip18(): void {
     );
 }
 
+function check_nip73(): void {
+    const web = "https://example.com/articles/1";
+    ensure(web.includes("://"), "NIP-73 web id lost scheme");
+
+    const podcast = "podcast:item:guid:d98d189b-dc7b-45b1-8720-d4b98690f31f";
+    const podcast_parts = podcast.split(":");
+    ensure(
+        podcast_parts.length === 4 &&
+            podcast_parts[0] === "podcast" &&
+            podcast_parts[1] === "item" &&
+            podcast_parts[2] === "guid",
+        "NIP-73 podcast id structure mismatch",
+    );
+
+    const blockchain =
+        "ethereum:1:tx:0x98f7812be496f97f80e2e98d66358d1fc733cf34176a8356d171ea7fbbe97ccd";
+    const blockchain_parts = blockchain.split(":");
+    ensure(
+        blockchain_parts.length === 4 &&
+            blockchain_parts[0] === "ethereum" &&
+            blockchain_parts[1] === "1" &&
+            blockchain_parts[2] === "tx" &&
+            blockchain_parts[3].startsWith("0x"),
+        "NIP-73 blockchain id structure mismatch",
+    );
+}
+
 function check_nip25(): void {
     const secret_key = to_bytes_32(FIXED_SECRET_KEY_HEX);
     const target_private = to_bytes_32(
@@ -1574,6 +1652,7 @@ async function main(): Promise<void> {
     await push_harness_covered(results, "NIP-25", "EDGE", check_nip25);
     await push_harness_covered(results, "NIP-27", "EDGE", check_nip27);
     await push_harness_covered(results, "NIP-21", "EDGE", check_nip21);
+    await push_harness_covered(results, "NIP-22", "BASELINE", check_nip22);
     await push_harness_covered(results, "NIP-23", "BASELINE", check_nip23);
     await push_harness_covered(results, "NIP-24", "BASELINE", check_nip24);
     await push_harness_covered(results, "NIP-32", "BASELINE", check_nip32);
@@ -1623,6 +1702,7 @@ async function main(): Promise<void> {
     await push_harness_covered(results, "NIP-45", "EDGE", check_nip45);
     await push_harness_covered(results, "NIP-50", "EDGE", check_nip50);
     await push_harness_covered(results, "NIP-70", "EDGE", check_nip70);
+    await push_harness_covered(results, "NIP-73", "BASELINE", check_nip73);
 
     let pass_count = 0;
     let fail_count = 0;

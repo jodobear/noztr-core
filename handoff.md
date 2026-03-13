@@ -207,13 +207,14 @@ Current project context for the Phase H kickoff baseline.
 ## Active Parity Gate
 
 - Active lane: rust only (`tools/interop/rust-nostr-parity-all`).
-- Current rust status: `35 HARNESS_COVERED`, `3 LIB_UNSUPPORTED`, mixed `BASELINE/EDGE/DEEP`,
-  `PASS`; `NIP-26` and `NIP-37` remain source-review-only because the active Rust lane exposes no
-  dedicated helper surfaces for them, `NIP-84` is also source-review-only there, and `NIP-29`
-  extraction parity remains source-review-only because `rust-nostr` has no dedicated helper
-  surface or reducer there.
-- Current TS audit status: `33 HARNESS_COVERED`, `4 LIB_UNSUPPORTED`, mixed `BASELINE/EDGE/DEEP`,
-  `PASS` (`tools/interop/ts-nostr-parity-all`; non-gating audit evidence lane).
+- Current rust status: `35 HARNESS_COVERED`, `4 LIB_UNSUPPORTED`, mixed `BASELINE/EDGE/DEEP`,
+  `PASS`; all `39` implemented NIPs are now explicitly accounted for in the Rust lane, with
+  `NIP-26`, `NIP-29`, `NIP-37`, and `NIP-84` recorded as `LIB_UNSUPPORTED` because the active
+  Rust lane exposes no dedicated helper surfaces for them.
+- Current TS audit status: `35 HARNESS_COVERED`, `4 LIB_UNSUPPORTED`, mixed `BASELINE/EDGE/DEEP`,
+  `PASS` (`tools/interop/ts-nostr-parity-all`; non-gating audit evidence lane); all `39`
+  implemented NIPs are now explicitly accounted for in the TS lane, with `NIP-26`, `NIP-37`,
+  `NIP-58`, and `NIP-84` recorded as `LIB_UNSUPPORTED`.
 - Baseline cadence run (2026-03-09): rust parity harness passed
   (`SUMMARY pass=16 fail=0 harness_covered=16 total=16`).
 - Latest cadence run (2026-03-10): rust parity harness passed
@@ -306,6 +307,13 @@ Current project context for the Phase H kickoff baseline.
   (`SUMMARY pass=35 fail=0 harness_covered=35 lib_unsupported=3 total=38`).
 - Latest cadence run (2026-03-13): TS audit harness passed
   (`SUMMARY pass=33 fail=0 harness_covered=33 lib_unsupported=4 total=37`).
+- Latest cadence run (2026-03-13): `zig build test --summary all` passed
+  (`Build Summary: 9/9 steps succeeded; 856/856 tests passed`).
+- Latest cadence run (2026-03-13): `zig build` passed.
+- Latest cadence run (2026-03-13): rust parity harness passed
+  (`SUMMARY pass=35 fail=0 harness_covered=35 lib_unsupported=4 total=39`).
+- Latest cadence run (2026-03-13): TS audit harness passed
+  (`SUMMARY pass=35 fail=0 harness_covered=35 lib_unsupported=4 total=39`).
 - Latest cadence run (2026-03-13): `zig build test --summary all` passed
   (`Build Summary: 9/9 steps succeeded; 856/856 tests passed`).
 - Latest cadence run (2026-03-13): `zig build` passed.
