@@ -170,6 +170,12 @@ Current project context for the Phase H kickoff baseline.
   - deferred backlog `NIP-39` robustness review is complete with no Layer 1 behavior change
   - accepted kernel posture: live provider fetch verification remains out of current kernel scope
     (`D-071`)
+  - continuing implemented-NIP audit result for `NIP-03`, `NIP-17`, `NIP-39`, and `NIP-46`:
+    - `NIP-03`, `NIP-17`, and `NIP-46` were reviewed with no further Layer 1 behavior change
+      required after the recent expansion and robustness passes
+    - `NIP-39` remains unchanged and is still covered by the accepted `D-076` borderline-helper
+      posture for deterministic proof URL / expected-text glue pending future `nzdk` provider
+      adapters
   - deferred backlog `NIP-29` is now complete in `src/nip29_relay_groups.zig` with bounded
     relay-generated group metadata/admin/member/role extraction and builders for kinds `39000`,
     `39001`, `39002`, and `39003`, raw group-reference parse/build helpers, bounded join/leave

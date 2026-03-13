@@ -35,11 +35,13 @@ completes.
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | 01 | complete | `HARNESS_COVERED DEEP PASS` | `HARNESS_COVERED EDGE PASS` | Accepted uppercase single-letter `#X` filter keys; retained unknown filter-field rejection and prefixed rejection-status enforcement as accepted trust-boundary behavior | none | none | NIP-01 allows `a-zA-Z` tag-filter keys, and both reference lanes support uppercase matching; current unknown-field and status-prefix strictness remains more policyful but still spec-defensible |
 | 02 | complete | `HARNESS_COVERED DEEP PASS` | `HARNESS_COVERED BASELINE PASS` | No Layer 1 change required; valid relay-hint and petname shapes are already accepted | none | none | `rust-nostr` builders emit canonical `p` tags with optional relay and alias, but the available reference extraction surfaces are generic tag iterators rather than a dedicated strict contact-list helper |
+| 03 | complete | `HARNESS_COVERED BASELINE PASS` | `HARNESS_COVERED BASELINE PASS` | No further Layer 1 change required after the bounded local proof-floor work and the deployed long-form `e`-tag compatibility fix | none | none | The current helper now covers exact target extraction, bounded proof decode, bounded local proof verification, and accepted long-form `e` tags; deeper networked Bitcoin / OpenTimestamps verification remains intentionally SDK-side |
 | 05 | complete | `HARNESS_COVERED BASELINE PASS` | `HARNESS_COVERED BASELINE PASS` | Accept and canonicalize uppercase local-parts while keeping the exact NIP character set and bounded `names` / `relays` / `nip46` extraction unchanged | none | none | The NIP constrains the allowed local-part characters, but deployed libraries treat casing more loosely; canonical lowercase lookup/output preserves determinism without widening into unsupported `+`-style identifier grammar |
 | 09 | complete | `HARNESS_COVERED DEEP PASS` | `HARNESS_COVERED BASELINE PASS` | Tightened `a`-target deletion parsing so only valid replaceable/addressable coordinates are accepted | none | none | `rust-nostr` models delete coordinates through the NIP-01 coordinate type; TS coverage remains baseline builder/tag-shape signal only in this pass |
 | 10 | complete | `HARNESS_COVERED DEEP PASS` | `HARNESS_COVERED EDGE PASS` | Removed unnecessary rejection of legacy `mention`; removed unnecessary rejection of four-slot pubkey fallback | none | `no-4iw` closed | `noztr` now preserves four-slot author pubkey; `nostr-tools` accepts the shape but drops author |
 | 11 | complete | `HARNESS_COVERED DEEP PASS` | `HARNESS_COVERED EDGE PASS` | No Layer 1 change required; current bounded partial-document parse remains acceptable and now has an explicit full-spec-shaped compatibility vector | none | none | `noztr` intentionally exposes a typed subset of relay-info fields, but it ignores additional NIP-11 fields without disturbing the supported subset; both reference lanes tolerate the broader document shape |
 | 13 | complete | `HARNESS_COVERED DEEP PASS` | `HARNESS_COVERED EDGE PASS` | No Layer 1 change required; current PoW helper already preserves the full `0..256` difficulty domain and trust-boundary checked-ID entry point | none | none | `rust-nostr` remains the stronger runtime reference for normal PoW checks, but its standalone leading-zero helper is typed as `u8`; `noztr` keeps the full `256`-bit edge, and `nostr-tools` runtime evidence confirms the broader domain |
+| 17 | complete | `HARNESS_COVERED BASELINE PASS` | `HARNESS_COVERED BASELINE PASS` | No further Layer 1 change required after accepting long-form reply `e` tags and adding the bounded kind-15 file-message surface | none | none | The current helper remains protocol-kernel glue: bounded parse/build/unwrap reuse and relay-list extraction, with mailbox sync and delivery workflow still left to the SDK |
 | 18 | complete | `HARNESS_COVERED DEEP PASS` | `HARNESS_COVERED EDGE PASS` | Reject contradictory repost target metadata without embedded-event proof; retained existing embedded-event consistency checks and kind-6 relay-hint requirement | none | none | `rust-nostr` builders already emit coherent repost metadata and add `a` only for coordinate-capable targets; `nostr-tools` runtime coverage now confirms kind-6/kind-16 builder behavior and protected-event empty-content handling |
 | 19 | complete | `HARNESS_COVERED DEEP PASS` | `HARNESS_COVERED EDGE PASS` | Accepted empty-identifier `naddr` encode/decode for normal replaceable coordinates | none | none | NIP-19 explicitly allows empty `d` for replaceable coordinates; both reference lanes roundtrip that shape, so the prior rejection was unnecessary incompatibility |
 | 21 | complete | `HARNESS_COVERED DEEP PASS` | `HARNESS_COVERED EDGE PASS` | No separate Layer 1 change required; explicit replaceable-`naddr` URI coverage now pins the inherited NIP-19 compatibility fix | none | none | Current strict scheme/entity rejection remains justified; the audit mainly needed to confirm that valid empty-identifier `naddr` URIs now roundtrip cleanly through the URI layer |
@@ -53,10 +55,12 @@ completes.
 | 32 | complete | `HARNESS_COVERED BASELINE PASS` | `HARNESS_COVERED BASELINE PASS` | Enforce lowercase hashtag targets on NIP-32 `t` labels; other namespace/label/target handling remains unchanged | none | none | The active references already treat lowercase hashtags as canonical standardized `t` tags; tightening the label helper here removes needless drift without changing namespace or target scope |
 | 36 | complete | `HARNESS_COVERED BASELINE PASS` | `HARNESS_COVERED BASELINE PASS` | No Layer 1 change required; current first-tag extraction, empty-reason normalization, and exact NIP-32 namespace/label bridge remain acceptable | none | none | Both reference lanes expose generic tag behavior rather than a dedicated strict helper; the current bounded surface matches the NIP’s simple optional-reason shape without adding unnecessary policy |
 | 37 | complete | `LIB_UNSUPPORTED BASELINE PASS` | `LIB_UNSUPPORTED BASELINE PASS` | Strengthened the minimum draft-event validation floor so encrypted/decrypted draft JSON must now include at least `kind`, `tags`, and `content` in addition to the existing object/kind checks | none | none | No dedicated helper exists in the active reference lanes; this remains a spec-first kernel helper, but the prior “any object” floor was too weak for a module that claims to handle unsigned draft events |
+| 39 | complete | `HARNESS_COVERED BASELINE PASS` | `HARNESS_COVERED BASELINE PASS` | No Layer 1 change required; claim parsing, canonical `i` tags, proof URL derivation, and expected proof text remain accepted deterministic helper glue | none | none | `identity_claim_build_proof_url(...)` and `identity_claim_build_expected_text(...)` remain the clearest borderline kernel helpers, but they stay accepted under `D-076` until `nzdk` grows provider adapters that make them redundant |
 | 40 | complete | `HARNESS_COVERED DEEP PASS` | `HARNESS_COVERED EDGE PASS` | Malformed expiration metadata no longer hard-fails the helper path; the first valid expiration tag now wins deterministically | none | none | `rust-nostr` and `nostr-tools` both treat malformed expiration data as non-expiring rather than exceptional; the previous typed-error path created unnecessary compatibility friction for advisory metadata |
 | 42 | complete | `HARNESS_COVERED DEEP PASS` | `HARNESS_COVERED EDGE PASS` | Widened NIP-42 challenge bound from `64` to `255`; retained path-bound websocket origin matching, duplicate-tag rejection, and unbracketed IPv6 rejection | none | none | `rust-nostr` and `nostr-tools` both accept long challenges; current remaining strictness is judged trust-boundary-positive rather than ecosystem-hostile |
 | 44 | complete | `HARNESS_COVERED DEEP PASS` | `HARNESS_COVERED DEEP PASS` | No Layer 1 change required; current NIP-44 v2 surface remains aligned on vectors, staged failure order, and checked cryptographic boundaries | none | none | The audit found no unjustified strictness: unsupported `#` encoding, version-before-MAC ordering, MAC-before-padding ordering, and invalid-UTF8-as-invalid-padding all remain bounded and compatible |
 | 45 | complete | `HARNESS_COVERED DEEP PASS` | `HARNESS_COVERED EDGE PASS` | Uppercase HLL hex now validates and unknown COUNT metadata keys are ignored instead of rejecting the whole response | none | none | NIP-45 says `hll` is hex-encoded and leaves room for optional relay metadata; both reference lanes tolerate forward-compatible COUNT metadata better than the old strict parser |
+| 46 | complete | `HARNESS_COVERED BASELINE PASS` | `HARNESS_COVERED BASELINE PASS` | No Layer 1 change required; current message/URI/envelope/discovery surface remains compatible, and deterministic `<nostrconnect>` template substitution stays accepted under the refined kernel boundary | none | none | The current helper stays on the protocol-data side of the boundary: parse/validate/build/discovery/template substitution in `noztr`, while relay/session/auth/orchestration remains SDK work |
 | 50 | complete | `HARNESS_COVERED DEEP PASS` | `HARNESS_COVERED EDGE PASS` | Malformed extension-like search tokens no longer invalidate the helper path; supported tokens are now extracted best-effort from bounded UTF-8 search text | none | none | NIP-50 frames `search` as a human-readable string and says unsupported extensions should be ignored; both reference lanes treat malformed extension-like text as ordinary searchable text rather than invalid input |
 | 51 | complete | `HARNESS_COVERED DEEP PASS` | `SOURCE_REVIEW_ONLY no dedicated NIP-51 helper beyond kind constants` | Widened bookmark extraction to accept bounded hashtag/URL items and changed unrelated unknown tags from fatal to ignored; kept typed failures for malformed supported tags and coordinate-kind enforcement | none | none | `rust-nostr` bookmark builders were broader than the old parser; `nostr-tools` provides kind-level signal only in this pass |
 | 56 | complete | `HARNESS_COVERED BASELINE PASS` | `HARNESS_COVERED BASELINE PASS` | No Layer 1 change required; current required `p` target, bounded `e` / `x` / `server` extraction, and optional `p` report-type handling remain acceptable for the kernel helper surface | none | none | The active reference lanes mainly provide builder/tag-shape signal here; the current helper stays intentionally bounded around one parsed pubkey target plus optional event/blob/server context rather than becoming a moderation-policy layer |
@@ -76,6 +80,9 @@ completes.
 - NIP-02: no Layer 1 change required; current contact extraction already accepts the valid relay
   hint and petname shapes called for by the NIP, and current stricter whole-tag validation remains
   acceptable on the evidence gathered in this pass.
+- NIP-03: no further Layer 1 change required; keep the current bounded attestation-event surface,
+  long-form `e`-tag compatibility, and local proof-verification floor, while leaving networked
+  OpenTimestamps / Bitcoin verification to the SDK.
 - NIP-05: accept and canonicalize uppercase local-parts for lookup/output while keeping the exact
   NIP character set and bounded document extraction unchanged.
 - NIP-09: reject syntactically valid but semantically invalid `a` delete targets by enforcing the
@@ -88,6 +95,8 @@ completes.
   preserve compatibility with full spec-shaped documents by ignoring unmodeled fields cleanly.
 - NIP-13: no Layer 1 change required; keep the current checked-ID trust-boundary API and the full
   `0..256` difficulty domain instead of mirroring narrower helper typing from the Rust reference.
+- NIP-17: no further Layer 1 change required; keep the bounded kind-14 / kind-15 parse/build and
+  unwrap-reuse surface in the kernel, with mailbox / delivery orchestration still left to the SDK.
 - NIP-19: accept empty-identifier `naddr` values for normal replaceable coordinates during both
   encode and decode instead of rejecting them as malformed.
 - NIP-21: no separate Layer 1 change required; keep the current strict URI parser while pinning
@@ -106,6 +115,9 @@ completes.
   `key:value` extensions best-effort instead of invalidating the whole search helper path.
 - NIP-45: accept uppercase HLL hex and ignore unknown COUNT metadata keys instead of rejecting the
   whole relay response.
+- NIP-46: no Layer 1 change required; keep the current message/URI/envelope/discovery surface plus
+  deterministic `<nostrconnect>` template substitution in the kernel, while leaving signer session
+  orchestration, auth flow, and relay control to the SDK.
 - NIP-77: accept `NEG-ERR` reason strings with `:` and optional space, and allow bounded session
   reopen on reused negentropy state.
 - NIP-18: reject contradictory repost target metadata when empty-content reposts cannot prove the
@@ -133,6 +145,9 @@ completes.
   namespace/label/target surface unchanged.
 - NIP-36: no Layer 1 change required; keep the current first-tag extraction, empty-reason
   normalization, and exact NIP-32 namespace/label bridge.
+- NIP-39: no Layer 1 change required; keep claim parsing plus deterministic proof-URL /
+  expected-text helpers in the kernel for now under `D-076`, while leaving live provider fetch
+  verification to the SDK.
 - NIP-42: widen the challenge bound to `255` bytes, but keep path-bound websocket origin matching,
   duplicate required-tag rejection, and unbracketed IPv6 rejection as accepted trust-boundary
   behavior.
@@ -146,7 +161,9 @@ completes.
 
 ## Accepted Risks
 
-- none yet
+- `NIP-39` and `NIP-46` each still have one accepted borderline deterministic helper in the kernel
+  under `D-076`; revisit those only when `nzdk` has stable provider adapters or connection-handoff
+  helpers that would make the current kernel helpers redundant.
 
 ## Follow-up Summary
 

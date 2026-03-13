@@ -430,6 +430,12 @@ the validated maintenance baseline.
   - current claim parsing, proof-URL derivation, expected-proof-text generation, and future-extra
     `i`-tag item tolerance remain the accepted kernel posture
   - live provider fetch verification remains out of current kernel scope
+- continuing implemented-NIP audit outcome for `NIP-03`, `NIP-17`, `NIP-39`, and `NIP-46`:
+  - `NIP-03`, `NIP-17`, and `NIP-46` were reviewed with no further Layer 1 behavior change
+    required after the recent expansion/robustness work
+  - `NIP-39` remains unchanged and is still covered by the accepted `D-076` borderline-helper
+    posture for deterministic proof URL / expected-text glue pending future `nzdk` provider
+    adapters
 - `NIP-29` robustness outcome:
   - inbound extraction now accepts deployed three-slot `h` tags with optional relay hints and
     optional admin compatibility labels emitted by deployed TS tooling
