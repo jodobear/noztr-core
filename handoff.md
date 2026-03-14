@@ -369,8 +369,12 @@ Current project context for the Phase H kickoff baseline.
      complete
    - split-later kernel work `57` / `86` is now complete
    - next recommended `noztr` focus is the post-kernel follow-up loop:
-     - SDK-consumer integration / hardening pass
-     - `no-mzd` BIP-85 deterministic child-entropy helpers
+     - SDK-consumer integration / hardening pass is now complete:
+       - `build.zig` now exposes a public `noztr` package module for downstream Zig dependencies
+       - local consumer smoke package lives at `examples/sdk_consumer_smoke`
+       - main `zig build test --summary all` now runs that downstream smoke package
+       - `README.md` now documents local Zig dependency usage for SDK/bootstrap consumers
+     - `no-mzd` BIP-85 deterministic child-entropy helpers are next
      - `no-2gp` full NIP-06 Unicode NFKD only if justified by real SDK/interoperability pressure
      - `no-urr` remains explicit defer-gate work unless real interoperability evidence demands it
    - next recommended cross-repo focus is `nzdk`, not more broad kernel expansion

@@ -34,6 +34,34 @@ zig build test --summary all
 zig build
 ```
 
+## Use as a local Zig dependency
+
+For local SDK/bootstrap work, consume `noztr` as a normal Zig package dependency.
+
+`build.zig.zon`:
+
+```zig
+.{
+    .dependencies = .{
+        .noztr = .{
+            .path = "../noztr",
+        },
+    },
+}
+```
+
+`build.zig`:
+
+```zig
+const noztr_dependency = b.dependency("noztr", .{});
+const noztr_module = noztr_dependency.module("noztr");
+exe.root_module.addImport("noztr", noztr_module);
+```
+
+This repo now carries a downstream smoke package in
+[`examples/sdk_consumer_smoke`](/workspace/projects/noztr/examples/sdk_consumer_smoke) and wires it
+into the main `zig build test --summary all` path so SDK-style local consumption stays checked.
+
 ## Repo layout
 
 - `src/` - protocol modules and root exports

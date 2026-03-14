@@ -30,6 +30,14 @@ pub fn build(builder: *std.Build) void {
         libwally_module,
         false,
     );
+    _ = add_public_root_module(
+        builder,
+        target,
+        optimize,
+        secp256k1_module,
+        libwally_module,
+        enable_i6_extensions,
+    );
 
     const static_library = builder.addLibrary(.{
         .linkage = .static,
@@ -50,6 +58,7 @@ pub fn build(builder: *std.Build) void {
     const test_step = builder.step("test", "Run noztr unit tests");
     test_step.dependOn(&run_unit_tests.step);
     test_step.dependOn(&run_unit_tests_core_only.step);
+    add_sdk_consumer_smoke_step(builder, test_step);
 }
 
 fn create_root_module(
@@ -75,6 +84,47 @@ fn create_root_module(
     root_module.addImport("libwally", libwally_module);
     root_module.addOptions("build_options", build_options);
     return root_module;
+}
+
+fn add_public_root_module(
+    builder: *std.Build,
+    target: std.Build.ResolvedTarget,
+    optimize: std.builtin.OptimizeMode,
+    secp256k1_module: *std.Build.Module,
+    libwally_module: *std.Build.Module,
+    enable_i6_extensions: bool,
+) *std.Build.Module {
+    std.debug.assert(@sizeOf(std.Build.Module) > 0);
+    std.debug.assert(@sizeOf(bool) == 1);
+
+    const build_options = builder.addOptions();
+    build_options.addOption(bool, "enable_i6_extensions", enable_i6_extensions);
+
+    const root_module = builder.addModule("noztr", .{
+        .root_source_file = builder.path("src/root.zig"),
+        .target = target,
+        .optimize = optimize,
+    });
+    root_module.addImport("secp256k1", secp256k1_module);
+    root_module.addImport("libwally", libwally_module);
+    root_module.addOptions("build_options", build_options);
+    return root_module;
+}
+
+fn add_sdk_consumer_smoke_step(builder: *std.Build, test_step: *std.Build.Step) void {
+    std.debug.assert(@sizeOf(std.Build.Step) > 0);
+    std.debug.assert(!@inComptime());
+
+    const consumer_smoke = builder.addSystemCommand(&.{
+        "zig",
+        "build",
+        "test",
+        "--summary",
+        "all",
+    });
+    consumer_smoke.setName("run sdk consumer smoke");
+    consumer_smoke.setCwd(builder.path("examples/sdk_consumer_smoke"));
+    test_step.dependOn(&consumer_smoke.step);
 }
 
 fn create_secp256k1_module(
