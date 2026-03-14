@@ -1776,3 +1776,29 @@ Immutable record of accepted planning decisions.
   contract causes repeated churn, or real relay implementations show the accepted payload floor is
   too narrow.
 - Supersedes: none
+
+## D-088: Implement bounded BIP-85 derivation helpers adjacent to NIP-06
+
+- Date: 2026-03-14
+- Status: accepted
+- Decision: implement `src/bip85_derivation.zig` as a bounded kernel helper module adjacent to
+  `NIP-06`.
+  - accepted kernel floor:
+    - deterministic BIP-85 hex entropy derivation from the existing BIP39 seed boundary
+    - deterministic English BIP39 child entropy derivation
+    - deterministic English BIP39 child mnemonic derivation
+    - direct seed-based helpers plus convenience wrappers from mnemonic + optional passphrase
+    - fixed bounds, typed errors, zeroization, and no wallet/account state in the kernel
+  - explicitly out of current kernel scope:
+    - non-English BIP39 language packs
+    - other BIP-85 applications such as WIF, XPRV, passwords, or dice-style higher-level UX
+    - wallet/account/storage/import-export flow, which remains SDK work
+- Why: `nzdk` wallet work benefits from a deterministic child-entropy/kernel derivation layer, and
+  this can be added cleanly on top of the already accepted `libwally`-backed NIP-06 seed boundary
+  without widening the kernel into wallet orchestration.
+- Tradeoff: a slightly broader derivation surface in the kernel versus less duplicated wallet
+  primitive logic in the SDK.
+- Related Tradeoff: T-H-ANIP-011.
+- Reversal Trigger: real SDK usage shows the accepted English-only hex/BIP39 floor is still too
+  narrow, or the surface starts pulling workflow/state concerns into the kernel.
+- Supersedes: none

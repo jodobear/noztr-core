@@ -374,7 +374,13 @@ Current project context for the Phase H kickoff baseline.
        - local consumer smoke package lives at `examples/sdk_consumer_smoke`
        - main `zig build test --summary all` now runs that downstream smoke package
        - `README.md` now documents local Zig dependency usage for SDK/bootstrap consumers
-     - `no-mzd` BIP-85 deterministic child-entropy helpers are next
+     - `no-mzd` BIP-85 deterministic child-entropy helpers are now complete:
+       - `src/bip85_derivation.zig` now derives bounded BIP-85 hex entropy and English BIP39
+         child entropy/mnemonics from the existing NIP-06 seed boundary
+       - accepted kernel scope is limited to deterministic derivation helpers only; wallet/account
+         UX remains in `nzdk`
+       - the main Zig gates and downstream consumer smoke remain green with the new module
+     - `no-2gp` full NIP-06 Unicode NFKD is the next explicit review gate
      - `no-2gp` full NIP-06 Unicode NFKD only if justified by real SDK/interoperability pressure
      - `no-urr` remains explicit defer-gate work unless real interoperability evidence demands it
    - next recommended cross-repo focus is `nzdk`, not more broad kernel expansion

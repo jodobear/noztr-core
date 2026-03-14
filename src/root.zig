@@ -72,6 +72,9 @@ pub const nip46_remote_signing = @import("nip46_remote_signing.zig");
 /// Phase H concrete export for the NIP-06 mnemonic derivation module.
 pub const nip06_mnemonic = @import("nip06_mnemonic.zig");
 
+/// Post-kernel concrete export for bounded BIP-85 derivation helpers.
+pub const bip85_derivation = @import("bip85_derivation.zig");
+
 /// Phase H concrete export for the NIP-23 long-form metadata module.
 pub const nip23_long_form = @import("nip23_long_form.zig");
 
@@ -193,6 +196,7 @@ test "root exports limits and error namespaces" {
     try std.testing.expect(@TypeOf(nip51_lists.PrivateListError) == type);
     try std.testing.expect(@TypeOf(nip46_remote_signing.Nip46Error) == type);
     try std.testing.expect(@TypeOf(nip06_mnemonic.Nip06Error) == type);
+    try std.testing.expect(@TypeOf(bip85_derivation.Bip85Error) == type);
     try std.testing.expect(@TypeOf(nip23_long_form.LongFormError) == type);
     try std.testing.expect(@TypeOf(nip24_extra_metadata.Nip24Error) == type);
     try std.testing.expect(@TypeOf(nip03_opentimestamps.OpenTimestampsError) == type);
@@ -333,6 +337,16 @@ test "root exports limits and error namespaces" {
     try std.testing.expect(
         @TypeOf(nip06_mnemonic.derive_nostr_secret_key) ==
             fn ([]u8, []const u8, ?[]const u8, u32) nip06_mnemonic.Nip06Error![]const u8,
+    );
+    try std.testing.expect(
+        @TypeOf(bip85_derivation.derive_bip39_mnemonic) ==
+            fn (
+                []u8,
+                []const u8,
+                ?[]const u8,
+                bip85_derivation.Bip39WordCount,
+                u32,
+            ) bip85_derivation.Bip85Error![]const u8,
     );
     try std.testing.expect(
         @TypeOf(nip23_long_form.long_form_extract) ==
