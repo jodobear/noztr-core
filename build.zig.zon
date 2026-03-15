@@ -3,12 +3,12 @@
     .version = "0.15.2",
     .dependencies = .{
         .@"libwally-core" = .{
-            .url = "git+https://github.com/ElementsProject/libwally-core?ref=6439e6e3262c47ce0e51aa95d7b4ff67d9952c52",
+            .url = "git+https://github.com/ElementsProject/libwally-core.git#455ec5b0188e1fc76f38c9b7aad7f4e24b421eb4",
             .hash = "N-V-__8AAAitUgDcU4g8UG0hStyFchfa999eIbWld-EKdpd4",
         },
         .secp256k1 = .{
-            .url = "git+https://github.com/bitcoin-core/secp256k1.git?ref=0cdc758a56360bf58a851fe91085a327ec97685a",
-            .hash = "N-V-__8AAPTEWwDHn7CZ8KKEZ50Y7z3tmVTGa0DigtHsIc2J",
+            .url = "git+https://github.com/bitcoin-core/secp256k1.git#0cdc758a56360bf58a851fe91085a327ec97685a",
+            .hash = "N-V-__8AADJMTgDEfe07_P0Y5osu_kf-DbxYeyW8DVvtN-wv",
         },
     },
     .paths = .{""},
