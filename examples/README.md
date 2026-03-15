@@ -26,6 +26,10 @@ fixtures so SDK and app authors can see what `noztr` rejects and why.
 - mailbox/private-message handoff:
   - `nip17_wrap_recipe.zig`
   - `nip17_example.zig`
+- group-state replay handoff:
+  - `nip29_reducer_recipe.zig`
+  - `nip29_example.zig`
+  - `nip29_adversarial_example.zig`
 - identity lookup and proof flows:
   - `discovery_recipe.zig`
   - `identity_proof_recipe.zig`
@@ -85,6 +89,7 @@ Each implemented kernel NIP now has a direct reference example.
 - `nip26_example.zig`
 - `nip27_example.zig`
 - `nip29_example.zig`
+- `nip29_reducer_recipe.zig`
 - `nip32_example.zig`
 - `nip36_example.zig`
 - `nip37_example.zig`
@@ -132,6 +137,8 @@ The recipe files are slightly higher-level, but still stay inside `noztr` bounda
   - NIP-03 extraction plus bounded local-proof verification
 - `nip17_wrap_recipe.zig`
   - NIP-17 rumor construction, signed seal/wrap transcript building, and unwrap
+- `nip29_reducer_recipe.zig`
+  - NIP-29 pure reducer replay across metadata, snapshot, and moderation events
 - `private_lists_recipe.zig`
   - NIP-51 private-list JSON boundary
 - `relay_admin_recipe.zig`
@@ -153,6 +160,8 @@ These are the first files to open when you need the failure contract for a bound
   - missing `imeta` metadata and non-canonical file MIME values
 - `listings_adversarial_example.zig`
   - invalid NIP-99 listing identifiers on both builder and extractor paths
+- `nip29_adversarial_example.zig`
+  - mixed-group moderation replay rejected by the pure reducer
 
 ## Boundary
 

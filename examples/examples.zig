@@ -27,6 +27,8 @@ comptime {
     _ = @import("nip17_example.zig");
     _ = @import("nip26_example.zig");
     _ = @import("nip29_example.zig");
+    _ = @import("nip29_reducer_recipe.zig");
+    _ = @import("nip29_adversarial_example.zig");
     _ = @import("nip39_example.zig");
     _ = @import("identity_proof_adversarial_example.zig");
     _ = @import("nip37_example.zig");

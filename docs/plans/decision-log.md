@@ -2116,3 +2116,31 @@ Immutable record of accepted planning decisions.
 - Reversal Trigger: future evidence shows the public key/signing helper should move to a dedicated
   lower-level crypto library without weakening the current `noztr` / `nzdk` boundary.
 - Supersedes: none
+
+## D-100: Accept bounded NIP-29 reducer replay compatibility for `previous` tags
+
+- Date: 2026-03-15
+- Status: accepted
+- Decision: widen the pure `NIP-29` reducer replay path just enough to tolerate bounded
+  `previous` references on `put-user` and `remove-user` moderation events.
+  - accepted behavior:
+    - `group_state_apply_event(...)` and `group_state_apply_events(...)` now accept valid
+      moderation events that carry bounded `previous` tags
+    - reducer replay still ignores `previous` semantics for state reconstruction; the tags are
+      accepted, parsed, and then dropped because they do not affect the fixed-capacity state model
+    - canonical downstream examples now include:
+      - `examples/nip29_reducer_recipe.zig`
+      - `examples/nip29_adversarial_example.zig`
+  - accepted evidence posture:
+    - the issue came directly from `nzdk` group-session replay work
+    - the change keeps the reducer deterministic and bounded
+    - green gates passed after the reducer fix and example additions
+- Why: the reducer previously reused the moderation extractors with zero-capacity `previous`
+  scratch, which made otherwise valid replay events fail. SDKs should not have to strip protocol
+  tags or normalize events just to make kernel-owned reducer replay work.
+- Tradeoff: a slightly broader tolerated replay shape versus preserving a too-narrow reducer input
+  contract that rejected valid moderation events.
+- Related Tradeoff: T-0-001, T-0-002.
+- Reversal Trigger: future protocol or ecosystem evidence shows reducer replay should preserve or
+  model `previous` semantics rather than ignoring them.
+- Supersedes: none

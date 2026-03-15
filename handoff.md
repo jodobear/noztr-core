@@ -42,6 +42,12 @@ Current project context for the Phase H kickoff baseline.
       verification recipe
     - added `examples/nip17_wrap_recipe.zig` as the canonical end-to-end wrapped-message recipe
       using only public `noztr` APIs
+  - addressed the next `nzdk` `NIP-29` feedback packet:
+    - `src/nip29_relay_groups.zig` reducer replay now tolerates bounded `previous` tags on
+      `put-user` and `remove-user` moderation events
+    - added `examples/nip29_reducer_recipe.zig` as the canonical group-state replay recipe
+    - added `examples/nip29_adversarial_example.zig` as the canonical mixed-group replay failure
+      example
   - Historical Phase F/G packet:
   - `docs/archive/plans/phase-f-kickoff.md`
   - `docs/archive/plans/phase-f-parity-matrix.md`

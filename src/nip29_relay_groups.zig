@@ -1141,7 +1141,7 @@ fn reduce_put_user_event(
     std.debug.assert(event.kind == group_put_user_kind);
 
     var roles: [group_state_user_roles_max][]const u8 = undefined;
-    var previous: [0][]const u8 = .{};
+    var previous: [limits.tags_max][]const u8 = undefined;
     const info = try group_put_user_extract(event, roles[0..], previous[0..]);
     const user_index = try ensure_user_slot(state, &info.pubkey);
     try ensure_state_group_id(state, info.group_id);
@@ -1156,7 +1156,7 @@ fn reduce_remove_user_event(
     std.debug.assert(@intFromPtr(state) != 0);
     std.debug.assert(event.kind == group_remove_user_kind);
 
-    var previous: [0][]const u8 = .{};
+    var previous: [limits.tags_max][]const u8 = undefined;
     const info = try group_remove_user_extract(event, previous[0..]);
     try ensure_state_group_id(state, info.group_id);
     const user_index = find_user_index(state, &info.pubkey) orelse return;
@@ -1948,4 +1948,48 @@ test "group state reducer ignores admin compatibility label for roles" {
     try std.testing.expectEqual(@as(usize, 2), state.users[0].roles.len);
     try std.testing.expectEqualStrings("put-user", state.users[0].roles[0]);
     try std.testing.expectEqualStrings("delete-event", state.users[0].roles[1]);
+}
+
+test "group state reducer tolerates previous tags on moderation replay" {
+    const metadata_tags = [_]nip01_event.EventTag{
+        .{ .items = &.{ "d", "pizza-lovers" } },
+        .{ .items = &.{ "name", "Pizza Lovers" } },
+    };
+    const put_tags = [_]nip01_event.EventTag{
+        .{ .items = &.{ "h", "pizza-lovers" } },
+        .{ .items = &.{
+            "p",
+            "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "moderator",
+        } },
+        .{ .items = &.{ "previous", "deadbeef" } },
+    };
+    const remove_tags = [_]nip01_event.EventTag{
+        .{ .items = &.{ "h", "pizza-lovers" } },
+        .{ .items = &.{
+            "p",
+            "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        } },
+        .{ .items = &.{ "previous", "feedbead" } },
+    };
+    var users: [2]GroupStateUser = undefined;
+    var roles: [0]GroupRole = .{};
+    var user_roles: [2 * group_state_user_roles_max][]const u8 = undefined;
+    var state = GroupState.init(users[0..], roles[0..], user_roles[0..]);
+
+    state.reset();
+    try group_state_apply_event(&state, &test_event(group_metadata_kind, metadata_tags[0..]));
+    try group_state_apply_event(
+        &state,
+        &test_event_with_content(group_put_user_kind, put_tags[0..], "promote"),
+    );
+
+    try std.testing.expectEqual(@as(usize, 1), state.users.len);
+    try std.testing.expectEqualStrings("moderator", state.users[0].roles[0]);
+
+    try group_state_apply_event(
+        &state,
+        &test_event_with_content(group_remove_user_kind, remove_tags[0..], "remove"),
+    );
+    try std.testing.expectEqual(@as(usize, 0), state.users.len);
 }
