@@ -10,6 +10,8 @@ Current project context for the Phase H kickoff baseline.
 - Latest local checkpoint:
   - `NIP-06` now applies full bounded BIP39-compatible `NFKD` normalization via
     `src/unicode_nfkd.zig`
+    - this is an intentional improvement over the currently covered `rust-nostr` helper path for
+      non-ASCII passphrase equivalence
   - SDK-facing downstream examples now include:
     - `examples/sdk_consumer_smoke`
     - `examples/sdk_surface_recipes`

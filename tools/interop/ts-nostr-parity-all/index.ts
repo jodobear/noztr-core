@@ -1661,6 +1661,48 @@ function check_nip06(): void {
         "NIP-06 null and empty passphrase derivations diverged",
     );
 
+    const composed_accent = Buffer.from(
+        nip06.privateKeyFromSeedWords(
+            "abandon abandon abandon abandon abandon abandon abandon abandon " +
+                "abandon abandon abandon about",
+            "Trézor",
+            0,
+        ),
+    ).toString("hex");
+    const decomposed_accent = Buffer.from(
+        nip06.privateKeyFromSeedWords(
+            "abandon abandon abandon abandon abandon abandon abandon abandon " +
+                "abandon abandon abandon about",
+            "Trézor",
+            0,
+        ),
+    ).toString("hex");
+    ensure(
+        composed_accent === decomposed_accent,
+        "NIP-06 accent passphrase normalization diverged",
+    );
+
+    const composed_japanese = Buffer.from(
+        nip06.privateKeyFromSeedWords(
+            "abandon abandon abandon abandon abandon abandon abandon abandon " +
+                "abandon abandon abandon about",
+            "パスフレーズ",
+            0,
+        ),
+    ).toString("hex");
+    const decomposed_japanese = Buffer.from(
+        nip06.privateKeyFromSeedWords(
+            "abandon abandon abandon abandon abandon abandon abandon abandon " +
+                "abandon abandon abandon about",
+            "パスフレーズ",
+            0,
+        ),
+    ).toString("hex");
+    ensure(
+        composed_japanese === decomposed_japanese,
+        "NIP-06 Japanese passphrase normalization diverged",
+    );
+
     ensure(
         nip06.validateWords(
             "leader monkey parrot ring guide accident before fence cannon height naive bean",

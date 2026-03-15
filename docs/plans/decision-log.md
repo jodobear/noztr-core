@@ -1859,6 +1859,10 @@ Immutable record of accepted planning decisions.
 - Why: `nzdk` and other downstream consumers need `noztr` to be the authoritative Zig Nostr core
   library, and BIP39-compatible wallet flows should not silently diverge on composed vs decomposed
   Unicode input.
+- Compatibility note:
+  - this is intentionally stricter to BIP39 than the currently covered `rust-nostr` helper path
+    for non-ASCII passphrase equivalence
+  - current `nostr-tools` helper behavior matches the accepted `NFKD` result
 - Tradeoff: a moderate increase in static data / code size versus correct BIP39 interoperability and
   a cleaner SDK dependency boundary.
 - Related Tradeoff: T-H-ANIP-011.
