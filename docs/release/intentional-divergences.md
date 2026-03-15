@@ -104,6 +104,6 @@ Release-facing note for behavior differences that are intentional in `noztr` Lay
 
 ## Parity evidence pointers
 
-- Canonical side-by-side parity status: `docs/plans/phase-f-parity-matrix.md`.
-- Canonical parity deltas and model-v1 status: `docs/plans/phase-f-parity-ledger.md`.
-- Incremental parity-depth execution evidence: `docs/plans/phase-f-risk-burndown.md`.
+- Canonical side-by-side parity status: `docs/archive/plans/phase-f-parity-matrix.md`.
+- Canonical parity deltas and model-v1 status: `docs/archive/plans/phase-f-parity-ledger.md`.
+- Incremental parity-depth execution evidence: `docs/archive/plans/phase-f-risk-burndown.md`.

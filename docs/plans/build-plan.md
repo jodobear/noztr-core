@@ -80,9 +80,9 @@ Implementation status snapshot (post-I7 closure):
 - I6 gate note: optional extension modules are implemented, vector floors are met, and extension
   tests pass with I6 enabled and disabled.
 - I7 closure evidence recorded in:
-  `docs/plans/i7-regression-evidence.md`,
-  `docs/plans/i7-api-contract-trace-checklist.md`, and
-  `docs/plans/i7-phase-f-kickoff-handoff.md`.
+  `docs/archive/plans/i7-regression-evidence.md`,
+  `docs/archive/plans/i7-api-contract-trace-checklist.md`, and
+  `docs/archive/plans/i7-phase-f-kickoff-handoff.md`.
 - Phase-state convention: planning prompt phase records remain closed in `decision-log`, while
   implementation execution is on the post-I7 baseline and proceeds through Phase F kickoff actions.
 - Overengineering/correctness mitigation pass is applied on docs/contracts: trust-boundary path wording
@@ -97,15 +97,15 @@ Implementation status snapshot (post-I7 closure):
 - PoW trust-boundary path is explicit: canonical strict callers use
   `pow_meets_difficulty_verified_id`; unchecked helper behavior is internal-only.
 - Phase F execution is active on the post-I7 baseline; kickoff tracking is in
-  `docs/plans/phase-f-kickoff.md`.
+  `docs/archive/plans/phase-f-kickoff.md`.
 - Phase F risk burn-down is active with replay pass evidence in
-  `docs/plans/phase-f-risk-burndown.md` (`UT-E-003`/`UT-E-004`).
+  `docs/archive/plans/phase-f-risk-burndown.md` (`UT-E-003`/`UT-E-004`).
 - Current implementation state remains post-I7 closure baseline; no default-policy changes are
   introduced by kickoff tracking.
 - Active parity cadence runs rust parity-all plus aggregate `zig` gates only.
 - Active rust parity status is `22/22 HARNESS_COVERED`, `DEEP`, `PASS`.
-- TypeScript parity lane is archived historical evidence only; records are preserved in canonical
-  Phase F artifacts.
+- TypeScript parity lane is a re-runnable non-gating audit evidence lane; historical Phase F
+  snapshots are preserved in the archive packet.
 - Comparative evidence path for active NIP-59 deep parity remains:
   `cargo run --manifest-path tools/interop/rust-nostr-parity-all/Cargo.toml` and
   `zig build test --summary all -- --test-filter "nip59"` (`src/nip59_wrap.zig`).
@@ -113,8 +113,8 @@ Implementation status snapshot (post-I7 closure):
   policy/default changes were considered.
 - Rule remains: any future trigger firing requires a decision-log entry before any default changes.
 - Phase F parity model v1 canonical artifacts are active:
-  - `docs/plans/phase-f-parity-matrix.md`
-  - `docs/plans/phase-f-parity-ledger.md`
+  - `docs/archive/plans/phase-f-parity-matrix.md`
+  - `docs/archive/plans/phase-f-parity-ledger.md`
 - Policy note: parity model v1 adoption changes interop reporting shape only; strictness/default
   policy remains unchanged.
 - Policy note: rust-only active parity governance changes operations scope only; strictness/default
@@ -357,7 +357,8 @@ Completed in order:
    - local Zig dependency path is documented
    - downstream example packages are wired into `zig build test --summary all`
 2. Nostr-relevant `BIP-85` follow-up
-   - bounded hex entropy plus English BIP39 child entropy/mnemonic helpers are implemented
+   - bounded lowercase-hex entropy text plus English BIP39 child entropy/mnemonic helpers are
+     implemented
 3. Full `NIP-06` Unicode `NFKD` normalization
    - repo-owned static Unicode tables and bounded runtime normalization are implemented
 4. `NIP-51` deprecated `NIP-04` compatibility adapter
@@ -373,19 +374,20 @@ Current rule:
 
 - `no-21a` Gate 1 (scope freeze first): complete.
   Representative-set freeze is recorded and locked before gate reruns
-  (`docs/plans/phase-f-replay-inputs.md`, `docs/plans/phase-f-parity-matrix.md`).
+  (`docs/archive/plans/phase-f-replay-inputs.md`, `docs/archive/plans/phase-f-parity-matrix.md`).
 - `no-hbo` Gate 2 (three consecutive full-gate runs): complete.
   Full sequence executed three times consecutively from controlled state with stable pass outcomes.
 - `no-fof` Gate 3 (fail-fast on drift): complete.
   No drift detected across the three-run window; all three runs are recorded in
-  `docs/plans/phase-f-risk-burndown.md`.
+  `docs/archive/plans/phase-f-risk-burndown.md`.
 - `no-6jx` Gate 4 (no-new-findings closure rationale): complete.
   Closure rationale based on latest incremental candidates is recorded in
-  `docs/plans/phase-f-risk-burndown.md`.
+  `docs/archive/plans/phase-f-risk-burndown.md`.
 - `no-1jh` Gate 5 (governance/docs closure with open P0/P1 check): complete.
   `br query "status=open AND (priority=0 OR priority=1)" --json --limit 0`
   pre-check: `count=0`, ids: none; post-check: `count=0`, ids: none.
-- Policy note: rust lane remains active and TS lane remains archived historical evidence only.
+- Policy note: rust lane remains active and the TypeScript lane remains a re-runnable non-gating
+  audit evidence lane.
 
 ### Phase G closure note (local-only baseline)
 
@@ -403,8 +405,8 @@ Current rule:
 - Cadence/gates: rust parity cadence plus aggregate `zig` gates are current for kickoff baseline.
 - Policy reaffirmed: `UT-E-003`/`UT-E-004` remain maintenance-mode only, with no burn-down expansion
   unless a new behavior class is discovered.
-- Governance reaffirmed: rust lane is active; TypeScript lane remains archived historical evidence
-  only.
+- Governance reaffirmed: rust lane is active; TypeScript remains a re-runnable non-gating audit
+  evidence lane.
 - Scope note: remote readiness (`no-3uj`) remains deferred-by-operator and outside this
   non-remote checklist pass.
 - Transition note: additional-NIP expansion planning now proceeds in Phase H artifacts.

@@ -106,9 +106,9 @@ Purpose: track active burn-down for `UT-E-003` and `UT-E-004` from the rust-deep
   part of active cadence.
 - Historical step-level records that established this baseline remain in project history and related
   artifacts:
-  - `docs/plans/phase-f-parity-matrix.md`
-  - `docs/plans/phase-f-parity-ledger.md`
-  - `docs/plans/phase-f-ts-nostr-tools-parity.md`
+  - `docs/archive/plans/phase-f-parity-matrix.md`
+  - `docs/archive/plans/phase-f-parity-ledger.md`
+  - `docs/archive/plans/phase-f-ts-nostr-tools-parity.md`
 
 ## Burn-Down Focus
 

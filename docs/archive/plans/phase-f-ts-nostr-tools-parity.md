@@ -14,8 +14,8 @@ Purpose: record one-pass `nostr-tools` overlap validation for all currently impl
 
 ## Canonical References
 
-- Canonical side-by-side parity matrix: `docs/plans/phase-f-parity-matrix.md`.
-- Canonical parity ledger and deltas: `docs/plans/phase-f-parity-ledger.md`.
+- Canonical side-by-side parity matrix: `docs/archive/plans/phase-f-parity-matrix.md`.
+- Canonical parity ledger and deltas: `docs/archive/plans/phase-f-parity-ledger.md`.
 
 ## TypeScript Lane Evidence
 

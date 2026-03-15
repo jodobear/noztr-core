@@ -24,12 +24,12 @@ Current project context for the Phase H kickoff baseline.
   - crypto-boundary evaluation is recorded in `docs/plans/crypto-boundary-evaluation.md`
   - open follow-up research item: `no-980` for a possible standalone Zig secp/bitcoin primitive
     library track
-- Canonical Phase F trackers:
-  - `docs/plans/phase-f-kickoff.md`
-  - `docs/plans/phase-f-parity-matrix.md`
-  - `docs/plans/phase-f-parity-ledger.md`
-  - `docs/plans/phase-f-risk-burndown.md`
-  - `docs/plans/phase-g-kickoff.md`
+- Historical Phase F/G packet:
+  - `docs/archive/plans/phase-f-kickoff.md`
+  - `docs/archive/plans/phase-f-parity-matrix.md`
+  - `docs/archive/plans/phase-f-parity-ledger.md`
+  - `docs/archive/plans/phase-f-risk-burndown.md`
+  - `docs/archive/plans/phase-g-kickoff.md`
 
 ## Phase H Kickoff
 
@@ -349,15 +349,15 @@ Current project context for the Phase H kickoff baseline.
 - TypeScript parity lane (`tools/interop/ts-nostr-parity-all`) is not an active gate lane, but it
   remains a re-runnable secondary audit evidence lane.
 - Historical TS parity context remains preserved in:
-  - `docs/plans/phase-f-parity-matrix.md`
-  - `docs/plans/phase-f-parity-ledger.md`
-  - `docs/plans/phase-f-risk-burndown.md`
-  - `docs/plans/phase-f-ts-nostr-tools-parity.md`
+  - `docs/archive/plans/phase-f-parity-matrix.md`
+  - `docs/archive/plans/phase-f-parity-ledger.md`
+  - `docs/archive/plans/phase-f-risk-burndown.md`
+  - `docs/archive/plans/phase-f-ts-nostr-tools-parity.md`
 
 ## Burn-Down Status
 
 - `UT-E-003` and `UT-E-004` remain maintenance-mode only; no active burn-down expansion.
-- Canonical evidence baseline remains in `docs/plans/phase-f-risk-burndown.md`.
+- Canonical evidence baseline remains in `docs/archive/plans/phase-f-risk-burndown.md`.
 - Trigger-governance status remains unchanged: no `UT-E-001`/`A-D-001` trigger criteria fired.
 
 ## Hard-Gate Snapshot (epic `no-dr3`)
@@ -368,7 +368,8 @@ Current project context for the Phase H kickoff baseline.
   (rust parity `pass=16 fail=0`; zig tests `460/460`; `zig build` pass each run).
 - No-new-findings closure: latest incremental candidates produced no new behavior-class findings.
 - Governance closure: open high-priority check (`P0/P1`) is `0` before and after gate sequence.
-- Policy continuity: rust-active lane maintained; TS remains archived historical evidence.
+- Policy continuity: rust-active lane maintained; TS remains a re-runnable non-gating audit
+  evidence lane.
 
 ## Pending Actions
 
@@ -398,8 +399,8 @@ Current project context for the Phase H kickoff baseline.
        - main `zig build test --summary all` now runs that downstream smoke package
        - `README.md` now documents local Zig dependency usage for SDK/bootstrap consumers
      - `no-mzd` BIP-85 deterministic child-entropy helpers are now complete:
-       - `src/bip85_derivation.zig` now derives bounded BIP-85 hex entropy and English BIP39
-         child entropy/mnemonics from the existing NIP-06 seed boundary
+       - `src/bip85_derivation.zig` now derives bounded BIP-85 lowercase-hex entropy text and
+         English BIP39 child entropy/mnemonics from the existing NIP-06 seed boundary
        - accepted kernel scope is limited to deterministic derivation helpers only; wallet/account
          UX remains in `nzdk`
        - the main Zig gates and downstream consumer smoke remain green with the new module

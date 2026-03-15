@@ -11,9 +11,9 @@ parity gate lane.
 - Carry-forward accepted risks remain: `UT-E-001`, `UT-E-002`, `UT-E-003`, `UT-E-004`, `A-D-001`.
 - Frozen defaults and strictness posture are unchanged (`D-001`..`D-004`).
 - Canonical I7 evidence remains:
-  - `docs/plans/i7-regression-evidence.md`
-  - `docs/plans/i7-api-contract-trace-checklist.md`
-  - `docs/plans/i7-phase-f-kickoff-handoff.md`
+  - `docs/archive/plans/i7-regression-evidence.md`
+  - `docs/archive/plans/i7-api-contract-trace-checklist.md`
+  - `docs/archive/plans/i7-phase-f-kickoff-handoff.md`
 
 ## Parity Gate Status
 
@@ -23,22 +23,22 @@ parity gate lane.
   - `cargo run --manifest-path tools/interop/rust-nostr-parity-all/Cargo.toml`
   - `zig build test --summary all && zig build`
 - Canonical parity artifacts:
-  - `docs/plans/phase-f-parity-matrix.md`
-  - `docs/plans/phase-f-parity-ledger.md`
+  - `docs/archive/plans/phase-f-parity-matrix.md`
+  - `docs/archive/plans/phase-f-parity-ledger.md`
 
 ## Archived TypeScript Evidence
 
 - `tools/interop/ts-nostr-parity-all` is archived historical evidence only (not an active gate lane).
 - Historical TS outcomes remain preserved in:
-  - `docs/plans/phase-f-parity-matrix.md`
-  - `docs/plans/phase-f-parity-ledger.md`
-  - `docs/plans/phase-f-risk-burndown.md`
+  - `docs/archive/plans/phase-f-parity-matrix.md`
+  - `docs/archive/plans/phase-f-parity-ledger.md`
+  - `docs/archive/plans/phase-f-risk-burndown.md`
 
 ## Burn-Down Status
 
 - `UT-E-003` and `UT-E-004` burn-down remains active with recorded pass/no-drift checkpoints.
 - Replay fixtures and persistent cross-language harness evidence remain available for depth expansion.
-- Canonical burn-down tracker: `docs/plans/phase-f-risk-burndown.md`.
+- Canonical burn-down tracker: `docs/archive/plans/phase-f-risk-burndown.md`.
 
 ## Next Actions
 

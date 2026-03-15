@@ -14,9 +14,9 @@ gates, exact file targets, and deterministic verification cadence.
 - I6 gate note: optional modules implemented, vector floors met, and enabled/disabled extension gate
   tests passing.
 - I7 closure evidence is recorded in:
-  `docs/plans/i7-regression-evidence.md`,
-  `docs/plans/i7-api-contract-trace-checklist.md`, and
-  `docs/plans/i7-phase-f-kickoff-handoff.md`.
+  `docs/archive/plans/i7-regression-evidence.md`,
+  `docs/archive/plans/i7-api-contract-trace-checklist.md`, and
+  `docs/archive/plans/i7-phase-f-kickoff-handoff.md`.
 - Contract sync deltas are recorded in active artifacts: NIP-44 padded-length `u32` bounds,
   parser `OutOfMemory` variants where implemented, strict `kind <= 65535` boundaries,
   transcript canonical-vs-compat naming, NIP-77 CLOSE/ERR parse APIs,

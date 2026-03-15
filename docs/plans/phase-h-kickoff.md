@@ -9,8 +9,8 @@ the validated maintenance baseline.
 
 - Phase G local-only release-readiness closure is complete.
 - Phase G historical closure evidence remains in:
-  - `docs/plans/phase-g-kickoff.md`
-  - `docs/plans/phase-f-risk-burndown.md`
+  - `docs/archive/plans/phase-g-kickoff.md`
+  - `docs/archive/plans/phase-f-risk-burndown.md`
 - Active parity cadence and aggregate Zig gates remain the same as the completed local baseline.
 
 ## Operating Mode

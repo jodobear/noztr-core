@@ -8,10 +8,10 @@ Purpose: establish the minimal Phase G execution baseline while preserving final
 
 - Phase F hard-gate closure (`no-dr3`) is complete.
 - Phase F records remain canonical historical evidence:
-  - `docs/plans/phase-f-kickoff.md`
-  - `docs/plans/phase-f-parity-matrix.md`
-  - `docs/plans/phase-f-parity-ledger.md`
-  - `docs/plans/phase-f-risk-burndown.md`
+  - `docs/archive/plans/phase-f-kickoff.md`
+  - `docs/archive/plans/phase-f-parity-matrix.md`
+  - `docs/archive/plans/phase-f-parity-ledger.md`
+  - `docs/archive/plans/phase-f-risk-burndown.md`
 
 ## Operating Mode
 
@@ -44,7 +44,7 @@ Purpose: establish the minimal Phase G execution baseline while preserving final
   behavior-class discovery.
 - [done] rust-active / TS-archived governance wording is aligned in active Phase G docs.
 - [done] Artifact consistency confirmed: `docs/plans/build-plan.md`,
-  `docs/plans/phase-g-kickoff.md`, and `handoff.md` are aligned; `docs/plans/phase-f-risk-burndown.md`
+  `docs/archive/plans/phase-g-kickoff.md`, and `handoff.md` are aligned; `docs/archive/plans/phase-f-risk-burndown.md`
   is retained as historical evidence for this checklist baseline.
 - [done] Complete local-only Phase G closure while remote setup remains deferred and out of scope.
 

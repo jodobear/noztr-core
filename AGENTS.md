@@ -20,6 +20,8 @@ exceptions recorded in the decision log.
 
 - Pre-v1 broad studies are reference-only inputs and do not set policy defaults.
 - v1 artifacts are canonical working outputs for downstream phases.
+- `docs/archive/` is reference-only historical material; do not load it on startup unless the task
+  explicitly needs historical evidence or traceability.
 - `docs/plans/build-plan.md` is a working baseline until Phase E finalization.
 - Precedence on conflict: `docs/plans/nostr-principles.md` and
   `docs/plans/decision-log.md` > v1 artifacts > pre-v1 broad studies.

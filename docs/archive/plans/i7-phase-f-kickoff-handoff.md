@@ -11,9 +11,9 @@ Purpose: record implementation-readiness at I7 closure and define immediate Phas
 - [x] Transcript replay checks pass (`src/nip01_message.zig` transcript suite).
 - [x] Crypto check-order replay checks pass (`src/nip44.zig` staged decrypt order suite).
 - [x] Contract trace checklist completed:
-  `docs/plans/i7-api-contract-trace-checklist.md`.
+  `docs/archive/plans/i7-api-contract-trace-checklist.md`.
 - [x] I7 regression evidence captured:
-  `docs/plans/i7-regression-evidence.md`.
+  `docs/archive/plans/i7-regression-evidence.md`.
 - [x] Contract wording synced to current deltas: NIP-44 padded-length `u32` semantics,
   parser `OutOfMemory` variants where implemented, strict `kind <= 65535` policy,
   transcript canonical-vs-compat wording, NIP-77 CLOSE/ERR parse APIs,

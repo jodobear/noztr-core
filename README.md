@@ -24,8 +24,8 @@ backend exceptions.
   - `NIP-51` (bounded public/private list helpers)
   - `NIP-56`, `NIP-57`, `NIP-58`, `NIP-59`, `NIP-65`, `NIP-70`, `NIP-73`, `NIP-84`, `NIP-86`
   - Optional I6 extension exports (build-flag gated): `NIP-45`, `NIP-50`, `NIP-77`
-  - Non-NIP bounded wallet helpers: Nostr-relevant `BIP-85` subset for hex entropy and English
-    BIP39 child mnemonic/entropy
+  - Non-NIP bounded wallet helpers: Nostr-relevant `BIP-85` subset for lowercase-hex entropy text
+    and English BIP39 child mnemonic/entropy
 - Current prep focus: kernel-side split work is complete; next recommended focus is `nzdk`
   planning/execution (`docs/plans/phase-h-kickoff.md`).
 
@@ -92,7 +92,7 @@ This repo now carries one downstream examples package and wires it into
 ## Planning documents
 
 - Build baseline: `docs/plans/build-plan.md`
-- Phase G closure baseline: `docs/plans/phase-g-kickoff.md`
 - Phase H kickoff baseline: `docs/plans/phase-h-kickoff.md`
 - Additional NIP planning (Phase H): `docs/plans/phase-h-additional-nips-plan.md`
 - Phase H Wave 1 execution loop: `docs/plans/phase-h-wave1-loop.md`
+- Historical phase evidence: `docs/archive/plans/`

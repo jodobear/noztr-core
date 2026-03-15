@@ -10,8 +10,8 @@ actions.
 | Scope | Status | Evidence |
 | --- | --- | --- |
 | Rust lane (`tools/interop/rust-nostr-parity-all`) | Active parity gate lane; `16/16` implemented NIPs are `HARNESS_COVERED`, `DEEP`, `PASS`; `0` `NOT_COVERED_IN_THIS_PASS`; `0` `LIB_UNSUPPORTED` | `cargo run --manifest-path tools/interop/rust-nostr-parity-all/Cargo.toml` |
-| TypeScript lane (`tools/interop/ts-nostr-parity-all`) | Archived historical evidence only; excluded from active pass/fail cadence | Historical evidence retained in this ledger, matrix, and `docs/plans/phase-f-risk-burndown.md` |
-| Full side-by-side matrix | canonical and current | `docs/plans/phase-f-parity-matrix.md` |
+| TypeScript lane (`tools/interop/ts-nostr-parity-all`) | Archived historical evidence only; excluded from active pass/fail cadence | Historical evidence retained in this ledger, matrix, and `docs/archive/plans/phase-f-risk-burndown.md` |
+| Full side-by-side matrix | canonical and current | `docs/archive/plans/phase-f-parity-matrix.md` |
 | Incremental depth raise (current pass) | rust lane deep-pass raised all implemented NIPs (`16/16`) to `DEEP` with additional malformed/negative assertions; defaults unchanged | `tools/interop/rust-nostr-parity-all/src/main.rs` |
 
 ## Deliberate Differences
@@ -37,7 +37,7 @@ actions.
 1. Move any remaining old TS cadence wording into archive-only sections.
 2. Re-run rust parity (`tools/interop/rust-nostr-parity-all`) on dependency/version bumps.
 3. Continue `UT-E-003` and `UT-E-004` depth burn-down work and append results in
-   `docs/plans/phase-f-risk-burndown.md`.
+   `docs/archive/plans/phase-f-risk-burndown.md`.
 4. Keep matrix/ledger authoritative and keep frozen defaults unchanged.
 
 ## NIP-59 Deep Comparison

@@ -314,9 +314,9 @@ Immutable record of accepted planning decisions.
 - Status: accepted
 - Decision: treat the I7 closure evidence pack as complete and canonical for the current
   implementation baseline, with required artifacts:
-  - `docs/plans/i7-regression-evidence.md`
-  - `docs/plans/i7-api-contract-trace-checklist.md`
-  - `docs/plans/i7-phase-f-kickoff-handoff.md`
+  - `docs/archive/plans/i7-regression-evidence.md`
+  - `docs/archive/plans/i7-api-contract-trace-checklist.md`
+  - `docs/archive/plans/i7-phase-f-kickoff-handoff.md`
 - Why: closes I7 with explicit command evidence, replay evidence, and contract-to-implementation
   traceability before Phase F kickoff.
 - Tradeoff: additional documentation maintenance versus lower closure-status drift and higher audit
@@ -350,8 +350,9 @@ Immutable record of accepted planning decisions.
 - Date: 2026-03-08
 - Status: accepted
 - Decision: start active Phase F execution tracking on the post-I7 baseline and anchor kickoff
-  execution guidance in `docs/plans/phase-f-kickoff.md`, including UT-E-003/UT-E-004 burn-down,
-  optional corpus review triggers (`UT-E-001`/`A-D-001`), and dual-run gate reminders.
+  execution guidance in the historical Phase F kickoff packet
+  (`docs/archive/plans/phase-f-kickoff.md`), including UT-E-003/UT-E-004 burn-down, optional
+  corpus review triggers (`UT-E-001`/`A-D-001`), and dual-run gate reminders.
 - Why: keeps execution state explicit after I7 closure while preserving deterministic gate posture.
 - Tradeoff: additional tracking artifact maintenance versus lower phase-state drift.
 - Related Tradeoff: T-0-004, T-E-001.
@@ -366,8 +367,8 @@ Immutable record of accepted planning decisions.
 - Date: 2026-03-08
 - Status: accepted
 - Decision: capture the first concrete Phase F replay/boundary pass for `UT-E-003` and `UT-E-004` in
-  `docs/plans/phase-f-risk-burndown.md`, including baseline snapshot, replay matrix template, command
-  evidence, outcomes, and next owners.
+  `docs/archive/plans/phase-f-risk-burndown.md`, including baseline snapshot, replay matrix
+  template, command evidence, outcomes, and next owners.
 - Why: establish auditable execution evidence for carry-forward risk burn-down without waiting for
   phase closure.
 - Tradeoff: one additional status artifact to maintain versus lower execution-status drift.
@@ -441,8 +442,8 @@ Immutable record of accepted planning decisions.
   - implemented-but-untested NIPs default to `NOT_COVERED_IN_THIS_PASS`.
   - `LIB_UNSUPPORTED` is emitted only when explicitly proven in harness code.
   - canonical parity status lives in:
-    - `docs/plans/phase-f-parity-matrix.md`
-    - `docs/plans/phase-f-parity-ledger.md`
+    - `docs/archive/plans/phase-f-parity-matrix.md`
+    - `docs/archive/plans/phase-f-parity-ledger.md`
 - Why: remove overloaded unsupported wording, stabilize machine/human parse output, and keep one
   canonical parity status source across lanes.
 - Tradeoff: extra taxonomy/depth bookkeeping versus clearer parity semantics and lower status drift.
@@ -970,7 +971,7 @@ Immutable record of accepted planning decisions.
 ## D-054: Use an ASCII-only normalization boundary for Phase H NIP-06
 
 - Date: 2026-03-11
-- Status: accepted
+- Status: superseded by `D-091`
 - Decision: for the current Phase H NIP-06 boundary, accept ASCII-only mnemonic and passphrase
   input after UTF-8 validation and reject non-ASCII input with typed `InvalidNormalization`.
   Full BIP39-compatible NFKD normalization remains follow-up issue `no-09f`; the current boundary
@@ -990,7 +991,7 @@ Immutable record of accepted planning decisions.
 ## D-055: Keep full NIP-06 NFKD normalization out of the current kernel scope
 
 - Date: 2026-03-11
-- Status: accepted
+- Status: superseded by `D-091`
 - Decision: complete the `no-09f` review by keeping `D-054` as the current accepted NIP-06
   boundary and not implementing full in-repo Unicode NFKD normalization now. Track any future
   full BIP39-compatible Unicode normalization work in `no-2gp` instead of expanding the current

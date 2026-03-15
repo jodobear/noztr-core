@@ -19,7 +19,7 @@ Goal: prepare a coding agent to implement the library directly from planning art
 
 ## Required Output
 
-- `docs/plans/implementation-kickoff.md`
+- `docs/archive/plans/implementation-kickoff.md`
   - ordered coding steps for the first implementation phase
   - required tests and vector checks
   - expected files to create/update

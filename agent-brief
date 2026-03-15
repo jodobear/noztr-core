@@ -64,7 +64,6 @@ plan_docs=(
     "docs/plans/decision-log.md"
     "docs/plans/build-plan.md"
     "docs/plans/noztr-sdk-ownership-matrix.md"
-    "docs/plans/phase-g-kickoff.md"
     "docs/plans/phase-h-kickoff.md"
     "docs/plans/phase-h-additional-nips-plan.md"
     "docs/plans/phase-h-wave1-loop.md"
@@ -97,7 +96,6 @@ roadmap_docs=(
     "docs/research/v1-implementation-decisions.md"
     "docs/plans/v1-api-contracts.md"
     "docs/guides/zig-anti-patterns.md"
-    "docs/plans/implementation-kickoff.md"
 )
 
 for rel in "${research_docs[@]}"; do
