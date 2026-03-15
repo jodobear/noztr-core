@@ -1898,3 +1898,29 @@ Immutable record of accepted planning decisions.
 - Reversal Trigger: separate research establishes a stable primitive surface, target consumers, and
   dependency posture for a standalone library.
 - Supersedes: none
+
+## D-093: Freeze the next requested-NIP loop after the current kernel-complete baseline
+
+- Date: 2026-03-15
+- Status: accepted
+- Decision: track the newly requested NIPs in
+  `docs/plans/post-kernel-requested-nips-loop.md` and execute them serially under one enforced
+  meta-loop.
+  - accepted classification:
+    - `NIP-40` is already implemented and enters the loop only as a review checkpoint
+    - `NIP-47`, `NIP-98`, and `NIP-B7` are split surfaces where `noztr` owns only the
+      deterministic protocol/kernel slice
+    - `NIP-49`, `NIP-64`, `NIP-88`, `NIP-92`, `NIP-94`, `NIP-99`, `NIP-B0`, and `NIP-C0` are
+      kernel-first bounded protocol candidates
+  - accepted execution rule:
+    - each NIP must complete research freeze, implementation, Review A, Review B, green gates,
+      docs/examples, and one scoped git commit before the next NIP starts
+- Why: the current kernel baseline is stable enough to resume deliberate expansion, but the next
+  set mixes low-ambiguity metadata NIPs with split wallet/HTTP/media surfaces that can drift into
+  SDK scope without a frozen per-NIP boundary.
+- Tradeoff: slower serial delivery versus lower boundary drift, higher review quality, and more
+  reliable examples/docs per NIP.
+- Related Tradeoff: T-0-001, T-0-002, T-0-004.
+- Reversal Trigger: a future accepted planning change replaces the serial two-review model with a
+  more effective execution lane without lowering review quality or boundary discipline.
+- Supersedes: none

@@ -123,25 +123,20 @@ If the answer to `5` is yes, the behavior probably belongs in the SDK.
 
 ## Requested Next-NIP Mapping
 
-| NIP | Recommended placement | `noztr` slice | `nzdk` slice | Recommended order |
+See `docs/plans/post-kernel-requested-nips-loop.md` for the canonical serial loop and review
+requirements. The ownership split for the newly requested set is:
+
+| NIP | Recommended placement | `noztr` slice | `nzdk` slice | Current call |
 | --- | --- | --- | --- | --- |
-| `05` | split | identifier validation plus `/.well-known/nostr.json` parse/build helpers | HTTP fetch, cache, trust policy, verification UX | medium |
-| `07` | `nzdk` | none | browser / signer adapter over `window.nostr` | sdk-only |
-| `26` | `noztr` | delegation tag parse / build / verify helpers | compose UX and signer workflow | high |
-| `32` | `noztr` | label / content-tag parse / build / validate helpers | higher-level label-management UX | highest |
-| `36` | `noztr` | content-warning tag/event helpers on top of NIP-32 | moderation / rendering policy | highest |
-| `37` | `noztr` | draft event parse / build / encrypt / decrypt helpers | draft sync, storage, editor workflow | high |
-| `56` | `noztr` | report event parse / build / validate helpers | reporting UX, relay submission workflow | highest |
-| `57` | split | zap request / receipt parse / build / validate helpers | LNURL fetch, invoice/payment flow, wallet orchestration | medium |
-| `58` | `noztr` | badge definition / award / profile-badge parse / build helpers | badge UX, profile presentation, sync | medium |
-| `60` | `nzdk` first | optional later offline validation helpers only | wallet state, mint interaction, spend / redeem workflow | sdk-first |
-| `61` | `nzdk` first | optional later offline validation helpers only | Nutzap wallet / payment workflow | sdk-first |
-| `84` | `noztr` | highlight event/tag parse / build helpers | article-reader UX and highlight workflows | medium |
-| `86` | split | relay-management RPC parse / build / validate helpers | admin auth, request orchestration, relay operator client flow | medium |
-| `B7` | `nzdk` first | at most later bounded event/tag helpers if needed | Blossom upload/download/service integration | sdk-first |
-
-## Recommended Next Sequence
-
-- Kernel-first: `32`, `36`, `56`, `05`, `26`, `37`, `58`, `84`
-- Split later: `57`, `86`
-- SDK-first: `07`, `60`, `61`, `B7`
+| `40` | already in `noztr` | existing expiration parse/check helpers | retention policy and client filtering | review-only checkpoint |
+| `47` | split | deterministic NWC protocol contracts | wallet service workflow and relay orchestration | stop at kernel slice |
+| `49` | `noztr` | bounded private-key encryption/decryption helpers | password UX and secret storage | kernel-first |
+| `64` | `noztr` | PGN note parse/build/validate helpers | board/playback UX | kernel-first |
+| `88` | `noztr` | poll/response parse/build plus pure tally logic | poll UX and relay fetch workflow | kernel-first |
+| `92` | `noztr` | `imeta` parse/build/validate helpers | media fetch/upload/preview workflow | kernel-first |
+| `94` | `noztr` | file-metadata event parse/build/validate helpers | upload/download and hosting-service workflow | kernel-first |
+| `98` | split | deterministic HTTP-auth event and header helpers | HTTP middleware and request execution | stop at kernel slice |
+| `99` | `noztr` | classified-listing metadata parse/build/validate helpers | commerce/search/inventory workflow | kernel-first |
+| `B0` | `noztr` | web-bookmark event parse/build helpers | bookmark sync and preview/browser workflow | kernel-first |
+| `B7` | split | Blossom server-list and fallback URL helpers | BUD/media service workflow | stop at kernel slice |
+| `C0` | `noztr` | code-snippet event parse/build helpers | syntax highlighting/editor/run workflow | kernel-first |

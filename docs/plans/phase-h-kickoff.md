@@ -124,8 +124,9 @@ the validated maintenance baseline.
 - `NIP-32`, `NIP-36`, `NIP-56`, `NIP-05`, `NIP-26`, `NIP-37`, `NIP-58`, and `NIP-84` are
   complete.
 - Active next execution focus: `NIP-57` and `NIP-86` split-later kernel slices are now complete.
-- Recommended next execution focus: stop kernel expansion here and begin `nzdk` planning when
-  directed; do not reopen kernel-only work unless new evidence or follow-up scope appears.
+- Recommended next execution focus: use the frozen post-kernel requested-NIP lane in
+  `docs/plans/post-kernel-requested-nips-loop.md`; keep it serial, research-first, and stop split
+  NIPs at the deterministic kernel boundary.
 - Implemented-NIP audit status:
   - `NIP-01`, `NIP-02`, `NIP-09`, `NIP-10`, `NIP-11`, `NIP-13`, `NIP-18`, `NIP-19`, `NIP-21`,
     `NIP-22`, `NIP-25`, `NIP-27`, `NIP-40`, `NIP-42`, `NIP-44`, `NIP-51`, `NIP-59`, and `NIP-65`

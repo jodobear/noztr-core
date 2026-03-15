@@ -370,6 +370,22 @@ Current rule:
 - prefer further `noztr` work only when it clearly improves SDK consumption, deterministic kernel
   reuse, or proven interoperability
 
+## Post-Kernel Requested NIP Execution
+
+The next requested-NIP lane after the current kernel-complete baseline is tracked in
+`docs/plans/post-kernel-requested-nips-loop.md`.
+
+Required execution policy:
+- run the requested NIPs serially, one at a time
+- freeze the exact kernel slice before implementation starts
+- require two explicit reviews per NIP:
+  - Review A: correctness / parity / trust boundary
+  - Review B: boundary / usability / overengineering
+- require at least one scoped git commit per NIP before the next NIP starts
+- require examples and active-doc updates as part of each NIP closure
+- for split NIPs, stop at the deterministic protocol-kernel boundary and record the remaining SDK
+  surface explicitly
+
 ## Phase F hard-gate closure status (epic `no-dr3`)
 
 - `no-21a` Gate 1 (scope freeze first): complete.

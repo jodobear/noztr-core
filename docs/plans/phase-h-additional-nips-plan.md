@@ -482,3 +482,17 @@ Reprioritized after deferred-backlog completion of `NIP-29`:
     - legacy `?iv=` private-list payloads are rejected as unsupported deprecated encoding
   - deferred scope:
     - deprecated NIP-04 compatibility adapter is tracked in `no-urr`
+
+## Post-Kernel Requested-NIP Follow-Up
+
+The next requested-NIP lane after the current kernel-complete baseline is tracked in
+`docs/plans/post-kernel-requested-nips-loop.md`.
+
+Accepted framing:
+- `NIP-40` is already complete and enters the loop only as a review checkpoint.
+- `NIP-47`, `NIP-98`, and `NIP-B7` are split surfaces and must stop at the deterministic kernel
+  contract in `noztr`.
+- `NIP-49`, `NIP-64`, `NIP-88`, `NIP-92`, `NIP-94`, `NIP-99`, `NIP-B0`, and `NIP-C0` are treated
+  as bounded protocol-kernel candidates.
+- every NIP in that lane must complete research freeze, implementation, Review A, Review B, green
+  gates, docs, examples, and one scoped git commit before the next NIP starts.

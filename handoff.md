@@ -22,8 +22,8 @@ Current project context for the Phase H kickoff baseline.
     - the `hex` helper contract now returns lowercase hex text rather than raw entropy bytes
   - deprecated `NIP-04` private-list compatibility remains deferred
   - crypto-boundary evaluation is recorded in `docs/plans/crypto-boundary-evaluation.md`
-  - open follow-up research item: `no-980` for a possible standalone Zig secp/bitcoin primitive
-    library track
+  - standalone Zig secp/bitcoin primitive-library research has moved out to the dedicated
+    `zsats-crypto` repo and is no longer tracked as active `noztr` work
 - Historical Phase F/G packet:
   - `docs/archive/plans/phase-f-kickoff.md`
   - `docs/archive/plans/phase-f-parity-matrix.md`
@@ -534,6 +534,12 @@ Current project context for the Phase H kickoff baseline.
    - existing Rust and TypeScript wrap/unwrap parity coverage plus source review of the deployed
      helper surfaces were sufficient to keep the API unchanged.
 10. Keep `no-3uj` visible as deferred-by-operator until remote setup returns to active execution focus.
+11. The current next-NIP planning lane is `docs/plans/post-kernel-requested-nips-loop.md`.
+    Current call:
+    - `NIP-40` is already implemented and should only be re-reviewed in that loop.
+    - `NIP-47`, `NIP-98`, and `NIP-B7` are split and must stop at the deterministic kernel slice.
+    - `NIP-49`, `NIP-64`, `NIP-88`, `NIP-92`, `NIP-94`, `NIP-99`, `NIP-B0`, and `NIP-C0` are the
+      kernel-first implementation set.
 
 ## Repo Boundary Note
 
