@@ -39,6 +39,8 @@ Instead:
   - lane- or slice-specific execution context
 - `audit`
   - posture-specific findings with stable IDs
+- `log`
+  - ongoing issue or feedback tracking that is useful but not startup-critical
 - `reference`
   - accepted background and stable guidance
 - `archive`
@@ -156,6 +158,20 @@ When refining an existing slice or the process itself:
 4. rerun the relevant checks
 5. update the audit doc explicitly
 
+## Closeout Consistency Rule
+
+Closing a slice or process-refinement pass means restoring the docs surface to steady state, not
+just landing the main content change.
+
+Required closeout consistency steps:
+1. update the targeted audit findings immediately
+2. update examples or discovery catalogs if the public teaching surface changed
+3. remove temporary packet or startup emphasis if the slice is no longer active
+4. make handoff point at the new next work instead of the slice that just closed
+
+The goal is to prevent technically correct work from leaving stale routing or bloated startup docs
+behind.
+
 ## Archive Rule
 
 If a doc no longer controls current work, move it out of the startup path.
@@ -164,6 +180,7 @@ Good candidates for archive or de-emphasis:
 - completed execution loops
 - superseded handoff-style narratives
 - bootstrap planning packets whose decisions are already accepted
+- temporary closeout packets once their deltas are absorbed into the steady-state control docs
 
 ## Minimal Standard
 
@@ -174,4 +191,5 @@ Any future process tightening should preserve these properties:
 - one docs index
 - one decision index
 - posture-specific audits instead of generic quality prose
+- explicit closeout-consistency rules that restore steady-state routing after a slice closes
 - no active doc should have to carry history just to remain understandable

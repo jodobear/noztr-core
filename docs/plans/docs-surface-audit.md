@@ -135,6 +135,18 @@ Measured on 2026-03-15 before the current refinement pass:
   add `docs/plans/decision-index.md` as the startup route into policy areas and move
   `docs/plans/decision-log.md` to on-demand reference status.
 
+### DOC-CLOSEOUT-001
+
+- Status: fixed in this pass
+- Problem:
+  closeout consistency was implied by good hygiene, but not stated as an explicit control rule.
+- Why it hurt:
+  slices could land technically correct code and still leave startup routing, examples catalogs, or
+  handoff emphasis in a stale state, which recreates doc bloat and process drift quietly.
+- Fix:
+  add an explicit closeout-consistency rule in `docs/guides/PROCESS_CONTROL.md` that requires
+  audit updates, discovery-surface updates, and steady-state routing restoration as part of done.
+
 ## Adoption Notes
 
 This pass takes the minimal adoption path:
@@ -144,7 +156,8 @@ This pass takes the minimal adoption path:
 3. add one repo-specific process-control guide
 4. define one shared frontmatter schema for active docs
 5. add one decision index so the full decision log becomes on-demand reference
-6. keep a stable-ID audit for docs/process findings
-7. shorten handoff to current state
+6. make closeout-consistency explicit so finished slices restore steady-state routing
+7. keep a stable-ID audit for docs/process findings
+8. shorten handoff to current state
 
 That is enough to reduce startup load immediately without a risky full doc reorg.

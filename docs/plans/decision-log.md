@@ -2617,3 +2617,30 @@ payload is needed for the current task.
   introduces enough drift/confusion that direct startup reads of the full decision log become
   cheaper than maintaining the split.
 - Supersedes: none
+
+## D-110: Make closeout consistency an explicit docs-control rule
+
+- Date: 2026-03-15
+- Status: accepted
+- Decision: treat closeout consistency as an explicit part of done for process/doc refinement and
+  slice closure.
+  - accepted behavior:
+    - `docs/guides/PROCESS_CONTROL.md` defines a `log` doc role for ongoing issue/feedback
+      tracking that is useful but not startup-critical
+    - closure must restore the docs surface to steady state rather than leaving temporary emphasis
+      in startup docs
+    - targeted audit findings must be updated immediately when the slice closes
+    - examples or discovery catalogs must be updated when the public teaching surface changes
+    - handoff should point at the new next work instead of the slice that just closed
+  - accepted non-goals:
+    - adding extra closure layers for their own sake
+    - turning every closed slice into a permanent active packet
+- Why: a technically correct change can still leave process drift if the surrounding docs surface
+  remains temporarily expanded. Making closeout consistency explicit closes that gap and helps keep
+  the active-memory path lean after each finished slice.
+- Tradeoff: slightly more explicit closeout discipline versus allowing stale routing or teaching
+  surfaces to persist after technically successful work.
+- Related Tradeoff: T-0-004.
+- Reversal Trigger: the explicit closeout-consistency rule adds ceremony without measurably reducing
+  stale startup routing, audit drift, or doc-surface regrowth.
+- Supersedes: none
