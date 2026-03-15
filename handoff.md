@@ -555,8 +555,17 @@ Current project context for the Phase H kickoff baseline.
       - unknown fields are ignored inbound; canonical builders stay supported-field-only
       - URL-to-content matching rejects prefix-only matches inside larger URLs
     - `NIP-47`, `NIP-98`, and `NIP-B7` are split and must stop at the deterministic kernel slice.
-    - `NIP-99` is the next kernel-first item in the requested-NIP lane.
-    - `NIP-49`, `NIP-64`, `NIP-88`, `NIP-99`, `NIP-B0`, and `NIP-C0` are the
+    - `NIP-99` is now complete:
+      - accepted kernel slice is bounded classified-listing metadata parse/build/validate for kinds
+        `30402` and `30403`
+      - `d` is required
+      - supported singleton metadata tags are `title`, `summary`, `published_at`, `location`,
+        `price`, `status`, and `g`
+      - ordered `image` tags and ordered `t` hashtags are accepted
+      - `price` is typed as amount + currency with optional frequency
+      - unrelated tags such as `e` and `a` are ignored inbound
+    - `NIP-B0` is the next kernel-first item in the requested-NIP lane.
+    - `NIP-49`, `NIP-64`, `NIP-88`, `NIP-B0`, and `NIP-C0` are the
       kernel-first implementation set.
 
 ## Repo Boundary Note

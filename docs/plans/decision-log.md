@@ -2011,3 +2011,39 @@ Immutable record of accepted planning decisions.
 - Reversal Trigger: stronger ecosystem evidence shows broader duplicate/field handling improves
   interoperability materially without weakening the supported-field trust boundary.
 - Supersedes: none
+
+## D-097: Accept bounded NIP-99 classified-listing metadata helpers
+
+- Date: 2026-03-15
+- Status: accepted
+- Decision: implement `src/nip99_classified_listings.zig` as the accepted `noztr` slice for
+  `NIP-99`.
+  - accepted behavior:
+    - only kinds `30402` and `30403` are accepted
+    - `d` is required
+    - `title`, `summary`, `published_at`, `location`, `price`, `status`, and `g` are treated as
+      supported singleton metadata tags
+    - `image` tags are accepted in ordered form with required URL and optional dimensions
+    - `t` hashtags are accepted in ordered form
+    - `price` is parsed as amount + currency with optional frequency
+    - `status` accepts canonical `active` / `sold` plus bounded other values
+    - unrelated tags such as `e` and `a` are ignored inbound
+  - accepted evidence posture:
+    - rust parity is `LIB_UNSUPPORTED`; there is no dedicated `rust-nostr` NIP-99 helper
+    - the TypeScript lane is also `LIB_UNSUPPORTED`; there is no dedicated `nostr-tools` or
+      applesauce NIP-99 helper
+    - Review A found no additional correctness/parity or trust-boundary issue after the bounded
+      implementation and green gate run
+    - Review B found no boundary or overengineering issue after the example/index fixes; the
+      accepted surface remains metadata-only and keeps commerce/search workflow out of the kernel
+- Why: `NIP-99` is structurally close to `NIP-23` and is a good fit for bounded metadata
+  parse/build/validate helpers, but the accepted kernel slice should stop at structured listing
+  metadata. That gives `nzdk` and app code deterministic listing contracts without pulling listing
+  publish/search/inventory workflow into `noztr`.
+- Tradeoff: narrower metadata-only scope versus omitting broader marketplace behavior that some apps
+  will still need above the kernel.
+- Related Tradeoff: T-0-001, T-0-002.
+- Reversal Trigger: stronger ecosystem evidence shows a clearly deterministic additional listing
+  helper surface that materially improves interoperability without dragging commerce workflow into
+  the kernel.
+- Supersedes: none

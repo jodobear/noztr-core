@@ -79,6 +79,7 @@ Put behavior in the SDK when it involves any of:
 | `86` relay management | bounded relay-management request / response parse-build helpers | NIP-98 auth, HTTP transport, admin sessions, operator workflow | relay-operator client over kernel RPC helpers | deterministic RPC payloads belong in `noztr`; admin flow belongs in SDK |
 | `92` media attachments | bounded per-`imeta` parse/build/validate helpers plus exact URL-in-content matching for accepted inline-media metadata | media fetch, upload flow, preview/render policy, attachment UX | media-attachment pipeline over kernel `imeta` extraction/building and URL matching | kernel scope is correct |
 | `94` file metadata | bounded kind-`1063` file-metadata parse/build/validate helpers for required hashes/MIME/URLs plus optional metadata and fallback URLs | file upload/download flow, hosting service integration, preview fetch, media UX | media/file workflow over kernel file-metadata extraction and builders | kernel scope is correct |
+| `99` classified listings | bounded listing metadata parse/build/validate helpers for kinds `30402` / `30403`, required `d`, optional structured metadata, ordered images/hashtags, and typed price/status handling | listing publish UX, search, inventory/state workflows, commerce extensions | listing publish/search layer over kernel metadata extraction and builders | kernel scope is correct |
 
 ## Review Questions
 

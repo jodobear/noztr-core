@@ -39,6 +39,9 @@ pub const nip94_file_metadata = @import("nip94_file_metadata.zig");
 /// Post-kernel requested-loop concrete export for the NIP-92 media-attachment module.
 pub const nip92_media_attachments = @import("nip92_media_attachments.zig");
 
+/// Post-kernel requested-loop concrete export for the NIP-99 classified-listing module.
+pub const nip99_classified_listings = @import("nip99_classified_listings.zig");
+
 /// Phase I3 concrete export for the NIP-13 proof-of-work module.
 pub const nip13_pow = @import("nip13_pow.zig");
 
@@ -190,6 +193,7 @@ test "root exports limits and error namespaces" {
     try std.testing.expect(@TypeOf(nip40_expire.ExpirationError) == type);
     try std.testing.expect(@TypeOf(nip92_media_attachments.Nip92Error) == type);
     try std.testing.expect(@TypeOf(nip94_file_metadata.Nip94Error) == type);
+    try std.testing.expect(@TypeOf(nip99_classified_listings.Nip99Error) == type);
     try std.testing.expect(@TypeOf(nip13_pow.PowError) == type);
     try std.testing.expect(@TypeOf(nip19_bech32.Nip19Error) == type);
     try std.testing.expect(@TypeOf(nip21_uri.Nip21Error) == type);

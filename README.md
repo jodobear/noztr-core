@@ -18,17 +18,18 @@ backend exceptions.
 - Implemented NIPs from `src/root.zig` exports:
   - `NIP-01` (event, filter, message)
   - `NIP-02`, `NIP-03`, `NIP-05`, `NIP-06`, `NIP-09`, `NIP-10`, `NIP-11`, `NIP-13`
-  - `NIP-17`, `NIP-18`, `NIP-19`, `NIP-21`, `NIP-22`, `NIP-23`, `NIP-24`, `NIP-25`, `NIP-27`
-  - `NIP-26`, `NIP-29`, `NIP-32`, `NIP-36`, `NIP-37`, `NIP-39`, `NIP-40`, `NIP-42`, `NIP-44`,
-    `NIP-46`
-  - `NIP-51` (bounded public/private list helpers)
-  - `NIP-56`, `NIP-57`, `NIP-58`, `NIP-59`, `NIP-65`, `NIP-70`, `NIP-73`, `NIP-84`, `NIP-86`,
-    `NIP-92`, `NIP-94`
+- `NIP-17`, `NIP-18`, `NIP-19`, `NIP-21`, `NIP-22`, `NIP-23`, `NIP-24`, `NIP-25`, `NIP-27`
+- `NIP-26`, `NIP-29`, `NIP-32`, `NIP-36`, `NIP-37`, `NIP-39`, `NIP-40`, `NIP-42`, `NIP-44`,
+  `NIP-46`
+- `NIP-51` (bounded public/private list helpers)
+- `NIP-56`, `NIP-57`, `NIP-58`, `NIP-59`, `NIP-65`, `NIP-70`, `NIP-73`, `NIP-84`, `NIP-86`,
+  `NIP-92`, `NIP-94`, `NIP-99`
   - Optional I6 extension exports (build-flag gated): `NIP-45`, `NIP-50`, `NIP-77`
   - Non-NIP bounded wallet helpers: Nostr-relevant `BIP-85` subset for lowercase-hex entropy text
     and English BIP39 child mnemonic/entropy
-- Current prep focus: kernel-side split work is complete; next recommended focus is `nzdk`
-  planning/execution (`docs/plans/phase-h-kickoff.md`).
+- Current prep focus: requested-NIP loop execution after the kernel-complete baseline; current
+  planning/execution state is tracked in `docs/plans/post-kernel-requested-nips-loop.md` and
+  `docs/plans/phase-h-kickoff.md`.
 
 ## Build and test
 

@@ -41,6 +41,7 @@ comptime {
     _ = @import("nip42_example.zig");
     _ = @import("nip92_example.zig");
     _ = @import("nip94_example.zig");
+    _ = @import("nip99_example.zig");
     _ = @import("nip65_example.zig");
     _ = @import("nip70_example.zig");
     _ = @import("nip73_example.zig");
