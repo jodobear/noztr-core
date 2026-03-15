@@ -1,6 +1,7 @@
 const std = @import("std");
 const limits = @import("limits.zig");
 const libwally = @import("libwally");
+const unicode_nfkd = @import("unicode_nfkd.zig");
 
 const c = libwally.c;
 const hardened_bit: u32 = c.BIP32_INITIAL_HARDENED_CHILD;
@@ -27,13 +28,15 @@ pub fn mnemonic_validate(mnemonic: []const u8) Nip06Error!void {
     std.debug.assert(mnemonic.len <= limits.nip06_mnemonic_bytes_max);
     std.debug.assert(@sizeOf(Nip06Error) > 0);
 
-    try validate_mnemonic_text(mnemonic);
-    try require_known_words(mnemonic);
+    var normalized_storage: [limits.nip06_normalized_bytes_max]u8 = undefined;
+    defer wipe_bytes(normalized_storage[0..]);
+    const normalized = try normalize_mnemonic_text(normalized_storage[0..], mnemonic);
+    try require_known_words(normalized);
     try ensure_backend();
 
-    var mnemonic_storage: [limits.nip06_mnemonic_bytes_max + 1]u8 = undefined;
+    var mnemonic_storage: [limits.nip06_normalized_bytes_max + 1]u8 = undefined;
     defer wipe_bytes(mnemonic_storage[0..]);
-    const mnemonic_z = try write_c_string(mnemonic_storage[0..], mnemonic);
+    const mnemonic_z = try write_c_string(mnemonic_storage[0..], normalized);
     if (c.bip39_mnemonic_validate(null, mnemonic_z.ptr) != c.WALLY_OK) {
         return error.InvalidChecksum;
     }
@@ -49,16 +52,33 @@ pub fn mnemonic_to_seed(
     std.debug.assert(@sizeOf([limits.nip06_seed_bytes]u8) == limits.nip06_seed_bytes);
 
     if (output.len < limits.nip06_seed_bytes) return error.BufferTooSmall;
-    try mnemonic_validate(mnemonic);
     try validate_optional_utf8_text(passphrase, limits.nip06_passphrase_bytes_max);
     try ensure_backend();
 
-    var mnemonic_storage: [limits.nip06_mnemonic_bytes_max + 1]u8 = undefined;
+    var normalized_mnemonic_storage: [limits.nip06_normalized_bytes_max]u8 = undefined;
+    defer wipe_bytes(normalized_mnemonic_storage[0..]);
+    const normalized_mnemonic = try normalize_mnemonic_text(
+        normalized_mnemonic_storage[0..],
+        mnemonic,
+    );
+    try require_known_words(normalized_mnemonic);
+
+    var normalized_passphrase_storage: [limits.nip06_normalized_bytes_max]u8 = undefined;
+    defer wipe_bytes(normalized_passphrase_storage[0..]);
+    const normalized_passphrase = try normalize_optional_text(
+        normalized_passphrase_storage[0..],
+        passphrase,
+    );
+
+    var mnemonic_storage: [limits.nip06_normalized_bytes_max + 1]u8 = undefined;
     defer wipe_bytes(mnemonic_storage[0..]);
-    var passphrase_storage: [limits.nip06_passphrase_bytes_max + 1]u8 = undefined;
+    var passphrase_storage: [limits.nip06_normalized_bytes_max + 1]u8 = undefined;
     defer wipe_bytes(passphrase_storage[0..]);
-    const mnemonic_z = try write_c_string(mnemonic_storage[0..], mnemonic);
-    const passphrase_z = try write_optional_c_string(passphrase_storage[0..], passphrase);
+    const mnemonic_z = try write_c_string(mnemonic_storage[0..], normalized_mnemonic);
+    const passphrase_z = try write_optional_c_string(
+        passphrase_storage[0..],
+        normalized_passphrase,
+    );
 
     const result = c.bip39_mnemonic_to_seed512(
         mnemonic_z.ptr,
@@ -155,7 +175,6 @@ fn validate_mnemonic_text(mnemonic: []const u8) Nip06Error!void {
         return error.InvalidMnemonicLength;
     }
     if (!std.unicode.utf8ValidateSlice(mnemonic)) return error.InvalidUtf8;
-    try require_ascii(mnemonic);
     try require_mnemonic_word_count(mnemonic);
 }
 
@@ -166,16 +185,31 @@ fn validate_optional_utf8_text(text: ?[]const u8, max_len: u16) Nip06Error!void 
     const value = text orelse return;
     if (value.len > max_len) return error.InvalidUtf8;
     if (!std.unicode.utf8ValidateSlice(value)) return error.InvalidUtf8;
-    try require_ascii(value);
 }
 
-fn require_ascii(text: []const u8) Nip06Error!void {
-    std.debug.assert(text.len <= limits.content_bytes_max);
-    std.debug.assert(@sizeOf(u8) == 1);
+fn normalize_mnemonic_text(output: []u8, mnemonic: []const u8) Nip06Error![]const u8 {
+    std.debug.assert(output.len >= limits.nip06_normalized_bytes_max);
+    std.debug.assert(mnemonic.len <= limits.nip06_mnemonic_bytes_max);
 
-    for (text) |byte| {
-        if (byte > 0x7f) return error.InvalidNormalization;
-    }
+    try validate_mnemonic_text(mnemonic);
+    return unicode_nfkd.normalize(output, mnemonic) catch |err| switch (err) {
+        error.InvalidUtf8 => error.InvalidUtf8,
+        error.BufferTooSmall => error.InvalidNormalization,
+        error.InvalidNormalization => error.InvalidNormalization,
+    };
+}
+
+fn normalize_optional_text(output: []u8, text: ?[]const u8) Nip06Error!?[]const u8 {
+    std.debug.assert(output.len >= limits.nip06_normalized_bytes_max);
+    std.debug.assert(text == null or text.?.len <= limits.nip06_passphrase_bytes_max);
+
+    const value = text orelse return null;
+    try validate_optional_utf8_text(value, limits.nip06_passphrase_bytes_max);
+    return unicode_nfkd.normalize(output, value) catch |err| switch (err) {
+        error.InvalidUtf8 => error.InvalidUtf8,
+        error.BufferTooSmall => error.InvalidNormalization,
+        error.InvalidNormalization => error.InvalidNormalization,
+    };
 }
 
 fn require_mnemonic_word_count(mnemonic: []const u8) Nip06Error!void {
@@ -426,7 +460,7 @@ test "mnemonic boundary rejects malformed and invalid inputs" {
     );
     try std.testing.expectError(error.InvalidUtf8, mnemonic_validate(bad_utf8[0..]));
     try std.testing.expectError(
-        error.InvalidNormalization,
+        error.UnknownMnemonicWord,
         mnemonic_validate(non_ascii_mnemonic),
     );
 }
@@ -434,6 +468,7 @@ test "mnemonic boundary rejects malformed and invalid inputs" {
 test "derive boundary enforces account seed and output limits" {
     var seed_bytes = [_]u8{0} ** limits.nip06_seed_bytes;
     const short_seed = [_]u8{0} ** (limits.nip06_seed_bytes - 1);
+    const too_long_passphrase = [_]u8{'a'} ** (limits.nip06_passphrase_bytes_max + 1);
     var full_output: [limits.nip06_secret_key_bytes]u8 = undefined;
     var short_output: [limits.nip06_secret_key_bytes - 1]u8 = undefined;
     var short_seed_output: [limits.nip06_seed_bytes - 1]u8 = undefined;
@@ -447,11 +482,11 @@ test "derive boundary enforces account seed and output limits" {
         ),
     );
     try std.testing.expectError(
-        error.InvalidNormalization,
+        error.InvalidUtf8,
         mnemonic_to_seed(
             seed_bytes[0..],
             "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about",
-            "Trézor",
+            too_long_passphrase[0..],
         ),
     );
     try std.testing.expectError(
@@ -473,6 +508,42 @@ test "derive boundary enforces account seed and output limits" {
     try std.testing.expectError(
         error.BufferTooSmall,
         derive_nostr_secret_key_from_seed(short_output[0..], seed_bytes[0..], 0),
+    );
+}
+
+test "mnemonic to seed normalizes composed and decomposed passphrases" {
+    const mnemonic =
+        "abandon abandon abandon abandon abandon abandon abandon abandon " ++
+        "abandon abandon abandon about";
+    var composed_seed: [limits.nip06_seed_bytes]u8 = undefined;
+    var decomposed_seed: [limits.nip06_seed_bytes]u8 = undefined;
+
+    const composed = try mnemonic_to_seed(composed_seed[0..], mnemonic, "Trézor");
+    const decomposed = try mnemonic_to_seed(decomposed_seed[0..], mnemonic, "Trézor");
+
+    try std.testing.expectEqualSlices(u8, composed, decomposed);
+    try std.testing.expectEqualStrings(
+        "abe7990b331e3f8d9b4b7aef759f8441afef5ed6aa07db70aa9af391acb5e0fb" ++
+            "48f752a86081f22838785e2fff05094d3f7d6e92756b9c030b9a6c5d797e6492",
+        &std.fmt.bytesToHex(composed_seed, .lower),
+    );
+}
+
+test "mnemonic to seed normalizes japanese passphrases" {
+    const mnemonic =
+        "abandon abandon abandon abandon abandon abandon abandon abandon " ++
+        "abandon abandon abandon about";
+    var composed_seed: [limits.nip06_seed_bytes]u8 = undefined;
+    var decomposed_seed: [limits.nip06_seed_bytes]u8 = undefined;
+
+    const composed = try mnemonic_to_seed(composed_seed[0..], mnemonic, "パスフレーズ");
+    const decomposed = try mnemonic_to_seed(decomposed_seed[0..], mnemonic, "パスフレーズ");
+
+    try std.testing.expectEqualSlices(u8, composed, decomposed);
+    try std.testing.expectEqualStrings(
+        "3710f8354bc7288ad70a6c01c0067dfec8f32d543fcf6a458e850c96ddb66571" ++
+            "b39dfcd995f2b56ac049fb100cd091f73472a42ac7b1ec32b12942156642bf8f",
+        &std.fmt.bytesToHex(composed_seed, .lower),
     );
 }
 

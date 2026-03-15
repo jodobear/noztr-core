@@ -1,0 +1,14 @@
+.{
+    .name = .sdk_surface_recipes,
+    .version = "0.0.0",
+    .dependencies = .{
+        .noztr = .{
+            .path = "../..",
+        },
+    },
+    .paths = .{
+        "",
+        "src",
+    },
+    .fingerprint = 0x06789ef74beea2b1,
+}

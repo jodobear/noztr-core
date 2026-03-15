@@ -58,7 +58,8 @@ pub fn build(builder: *std.Build) void {
     const test_step = builder.step("test", "Run noztr unit tests");
     test_step.dependOn(&run_unit_tests.step);
     test_step.dependOn(&run_unit_tests_core_only.step);
-    add_sdk_consumer_smoke_step(builder, test_step);
+    add_example_test_step(builder, test_step, "examples/sdk_consumer_smoke");
+    add_example_test_step(builder, test_step, "examples/sdk_surface_recipes");
 }
 
 fn create_root_module(
@@ -111,20 +112,24 @@ fn add_public_root_module(
     return root_module;
 }
 
-fn add_sdk_consumer_smoke_step(builder: *std.Build, test_step: *std.Build.Step) void {
+fn add_example_test_step(
+    builder: *std.Build,
+    test_step: *std.Build.Step,
+    example_dir: []const u8,
+) void {
     std.debug.assert(@sizeOf(std.Build.Step) > 0);
     std.debug.assert(!@inComptime());
 
-    const consumer_smoke = builder.addSystemCommand(&.{
+    const example_tests = builder.addSystemCommand(&.{
         "zig",
         "build",
         "test",
         "--summary",
         "all",
     });
-    consumer_smoke.setName("run sdk consumer smoke");
-    consumer_smoke.setCwd(builder.path("examples/sdk_consumer_smoke"));
-    test_step.dependOn(&consumer_smoke.step);
+    example_tests.setName(example_dir);
+    example_tests.setCwd(builder.path(example_dir));
+    test_step.dependOn(&example_tests.step);
 }
 
 fn create_secp256k1_module(

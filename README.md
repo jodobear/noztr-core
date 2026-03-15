@@ -24,7 +24,8 @@ backend exceptions.
   - `NIP-51` (bounded public/private list helpers)
   - `NIP-56`, `NIP-57`, `NIP-58`, `NIP-59`, `NIP-65`, `NIP-70`, `NIP-73`, `NIP-84`, `NIP-86`
   - Optional I6 extension exports (build-flag gated): `NIP-45`, `NIP-50`, `NIP-77`
-  - Non-NIP bounded wallet helpers: `BIP-85` hex entropy and English BIP39 child mnemonic/entropy
+  - Non-NIP bounded wallet helpers: Nostr-relevant `BIP-85` subset for hex entropy and English
+    BIP39 child mnemonic/entropy
 - Current prep focus: kernel-side split work is complete; next recommended focus is `nzdk`
   planning/execution (`docs/plans/phase-h-kickoff.md`).
 
@@ -59,9 +60,24 @@ const noztr_module = noztr_dependency.module("noztr");
 exe.root_module.addImport("noztr", noztr_module);
 ```
 
-This repo now carries a downstream smoke package in
-[`examples/sdk_consumer_smoke`](/workspace/projects/noztr/examples/sdk_consumer_smoke) and wires it
-into the main `zig build test --summary all` path so SDK-style local consumption stays checked.
+This repo now carries downstream example packages and wires them into
+`zig build test --summary all` so SDK-style local consumption stays checked:
+
+- [`examples/sdk_consumer_smoke`](/workspace/projects/noztr/examples/sdk_consumer_smoke)
+  - minimal dependency/import smoke path
+- [`examples/sdk_surface_recipes`](/workspace/projects/noztr/examples/sdk_surface_recipes)
+  - concrete SDK-facing recipes for `NIP-05`, `NIP-06`, `BIP-85`, `NIP-39`, `NIP-46`, `NIP-51`,
+    and `NIP-86`
+
+## Current Kernel Notes
+
+- `NIP-06` now applies full BIP39-compatible `NFKD` normalization before mnemonic/passphrase seed
+  derivation.
+- Deprecated `NIP-04` private-list compatibility remains intentionally deferred; current private
+  list support is `NIP-44`-first.
+- The crypto boundary remains inside `noztr` for now; see
+  [`docs/plans/crypto-boundary-evaluation.md`](/workspace/projects/noztr/docs/plans/crypto-boundary-evaluation.md)
+  for the current standalone-library evaluation.
 
 ## Repo layout
 

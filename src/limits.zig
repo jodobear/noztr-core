@@ -83,6 +83,7 @@ pub const Limits = struct {
 
     pub const nip06_mnemonic_bytes_max: u16 = 256;
     pub const nip06_passphrase_bytes_max: u16 = 256;
+    pub const nip06_normalized_bytes_max: u16 = 4_096;
     pub const nip06_seed_bytes: u8 = 64;
     pub const nip06_secret_key_bytes: u8 = 32;
     pub const bip85_entropy_bytes_max: u8 = 64;
@@ -183,6 +184,7 @@ pub const nip46_secret_bytes_max: u16 = Limits.nip46_secret_bytes_max;
 
 pub const nip06_mnemonic_bytes_max: u16 = Limits.nip06_mnemonic_bytes_max;
 pub const nip06_passphrase_bytes_max: u16 = Limits.nip06_passphrase_bytes_max;
+pub const nip06_normalized_bytes_max: u16 = Limits.nip06_normalized_bytes_max;
 pub const nip06_seed_bytes: u8 = Limits.nip06_seed_bytes;
 pub const nip06_secret_key_bytes: u8 = Limits.nip06_secret_key_bytes;
 pub const bip85_entropy_bytes_max: u8 = Limits.bip85_entropy_bytes_max;
