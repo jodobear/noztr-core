@@ -78,12 +78,20 @@ Run this loop for each NIP, serially, without overlap:
    - verify current wording against the official mirror / primary source
    - inspect `rust-nostr`, `nostr-tools`, and applesauce behavior where relevant
    - freeze the exact `noztr` slice, explicit non-goals, and likely example surface
+   - freeze a short spec-to-contract checklist:
+     - supported kinds
+     - required tags / fields
+     - optional tags / fields
+     - multiplicity / ordering rules
+     - normalization / canonicalization rules
+     - ignored / unsupported shapes
    - record any ambiguity before implementation starts
 
 2. Implement the frozen kernel slice
    - keep the code bounded, deterministic, static-capacity, and KISS
    - do not pull SDK/workflow concerns into the kernel
    - add direct examples while implementing, not as an afterthought
+   - add negative fixtures and hostile transcripts where the surface warrants them
 
 3. Review A: correctness / parity / trust boundary
    - spec correctness
@@ -101,7 +109,14 @@ Run this loop for each NIP, serially, without overlap:
 
 6. Fix Review B findings
 
-7. Close the NIP with green gates
+7. Adversarial audit
+   - challenge builder/parser symmetry
+   - challenge public error semantics
+   - run per-field negative corpus
+   - run hostile or contradictory transcripts / fixtures where relevant
+   - if references are `LIB_UNSUPPORTED`, do one extra spec-first challenge pass
+
+8. Close the NIP with green gates
    - `zig build test --summary all`
    - `zig build`
    - parity/evidence lanes updated as appropriate
@@ -117,6 +132,7 @@ Run this loop for each NIP, serially, without overlap:
   - implementation complete
   - Review A complete
   - Review B complete
+  - adversarial audit complete
   - green gates
   - updated docs/examples
   - a scoped git commit
@@ -135,5 +151,6 @@ Run this loop for each NIP, serially, without overlap:
 Every newly implemented NIP in this loop must land with:
 
 - at least one direct per-NIP example in `examples/`
+- at least one invalid or hostile fixture/example when the NIP has a trust-boundary surface
 - README index coverage in `examples/README.md`
 - recipe updates if the NIP materially affects SDK-facing flows

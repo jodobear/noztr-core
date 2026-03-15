@@ -251,6 +251,42 @@ Review execution rule:
 - A mismatch with `nostr-tools` is a compatibility signal to evaluate, not an automatic defect; its
   weight is highest when it reinforces other ecosystem evidence.
 
+Required per-NIP contract discipline:
+- Freeze a short spec-to-contract checklist before closure:
+  - supported kinds
+  - required tags / fields
+  - optional tags / fields
+  - multiplicity and ordering rules
+  - normalization / canonicalization rules
+  - ignored / unsupported shapes
+  - explicit non-goals and SDK-side ownership where relevant
+- No NIP closes until every checklist line is mapped to one of:
+  - code
+  - tests
+  - examples
+  - explicit accepted non-goal
+- Treat builder/parser symmetry as a mandatory closure class where both surfaces exist:
+  - builder output round-trips through parser
+  - parser-accepted canonical shapes are buildable
+  - malformed near-canonical shapes fail predictably
+- Treat public error semantics as a mandatory review class:
+  - error variants must describe the real remediation path
+  - invalid input must not surface as capacity exhaustion
+  - capacity exhaustion must not surface as invalid input
+- When a NIP is `LIB_UNSUPPORTED` or only weakly covered in reference lanes, require one extra
+  spec-first challenge pass before closure.
+
+Required adversarial coverage:
+- Every implemented or newly expanded protocol surface must have:
+  - happy-path tests
+  - per-field negative corpus
+  - hostile/adversarial inputs or transcripts where the protocol shape warrants them
+- "Hostile transcript" means malformed, contradictory, replay-like, oversized-within-bounds,
+  near-canonical, or ordering-sensitive inputs designed to attack the trust boundary rather than
+  merely fail ordinary parsing.
+- Boundary-heavy modules such as auth, encryption, relay-management, wrapping, remote-signing,
+  list privacy, and RPC/message surfaces must explicitly include hostile transcript coverage.
+
 ### Implemented NIP Audit Execution
 
 Run the audit serially, one implemented NIP at a time, before further phase expansion work.
@@ -271,17 +307,23 @@ Per-NIP audit steps:
    - likely overengineering or unnecessary reinvention
 5. Run a second-pass challenge on the draft findings to remove false positives, preference-only
    comments, or conclusions unsupported by the evidence.
-6. Resolve each accepted finding by one of:
+6. Run an adversarial audit pass focused on:
+   - builder/parser symmetry mismatches
+   - public error-contract mismatches
+   - hostile transcripts or near-canonical malformed shapes
+   - checklist lines that are not yet proven by tests/examples
+7. Resolve each accepted finding by one of:
    - immediate fix
    - documented accepted-risk
    - linked follow-up issue
    - explicit intentional divergence
-7. Update canonical docs only where policy, accepted behavior, or current status changed; keep the
+8. Update canonical docs only where policy, accepted behavior, or current status changed; keep the
    remaining audit evidence in the beads issue and update the consolidated audit report in
    `docs/plans/implemented-nip-audit-report.md`.
-8. Create one local git commit scoped to the completed audit item after post-Review-B green gates
+9. Create one local git commit scoped to the completed audit item after post-Review-B/adversarial
+   green gates
    and canonical doc updates are in place.
-9. Close the audit issue only when findings, evidence classes, outcome, and any follow-up items are
+10. Close the audit issue only when findings, evidence classes, outcome, and any follow-up items are
    all recorded explicitly.
 
 Audit quality rules:
@@ -293,6 +335,8 @@ Audit quality rules:
   even when one of them is only `SOURCE_REVIEW_ONLY`.
 - Every completed implemented-NIP audit that changes code or canonical docs must land as its own
   local git commit before the next NIP audit begins.
+- Every completed implemented-NIP audit must also update the canonical consolidated audit artifact
+  when the accepted behavior, findings, or current status changed.
 
 Consolidated audit artifact:
 - `docs/plans/implemented-nip-audit-report.md` is the canonical summary for audit findings,
@@ -330,15 +374,20 @@ Per-surface robustness steps:
 6. Run the same two review-cycle discipline used by the implementation loop:
    - Review Cycle A: correctness, edge cases, parity/ecosystem, overengineering, usability
    - Review Cycle B: challenge the fixes and remove any regression or unnecessary complexity
-7. Run fresh gates after the final candidate:
+7. Add an adversarial hardening pass:
+   - hostile or contradictory transcripts
+   - builder/parser symmetry challenges
+   - public error-contract challenges
+   - invalid fixtures that are realistic enough for SDK/app consumers to misuse
+8. Run fresh gates after the final candidate:
    - focused surface tests first
    - `zig build test --summary all`
    - `zig build`
    - focused parity/interop commands where applicable
-8. Update canonical docs only where accepted behavior, active risks, or current state changed.
+9. Update canonical docs only where accepted behavior, active risks, or current state changed.
    Keep the consolidated outcome in `docs/plans/implemented-nip-audit-report.md` if the pass
    changes accepted conclusions or opens new follow-ups.
-9. Land one local git commit scoped to the completed robustness item before moving to the next one.
+10. Land one local git commit scoped to the completed robustness item before moving to the next one.
 
 Robustness pass quality rules:
 - Reuse existing procedure; do not create a new ad hoc review process per surface.
@@ -384,6 +433,12 @@ Required execution policy:
 - require two explicit reviews per NIP:
   - Review A: correctness / parity / trust boundary
   - Review B: boundary / usability / overengineering
+- require one explicit adversarial audit pass per NIP after Review B fixes:
+  - spec-to-contract checklist completion
+  - builder/parser symmetry
+  - per-field negative corpus
+  - hostile transcripts or hostile fixtures where relevant
+  - public error-contract checks
 - require at least one scoped git commit per NIP before the next NIP starts
 - require examples and active-doc updates as part of each NIP closure
 - for split NIPs, stop at the deterministic protocol-kernel boundary and record the remaining SDK

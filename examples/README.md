@@ -2,6 +2,10 @@
 
 Downstream consumption examples for SDK and application authors.
 
+These examples are intentionally technical and direct. They are not only "happy path" demos.
+Where a surface is trust-boundary-heavy, the example set should also grow hostile or invalid
+fixtures so SDK and app authors can see what `noztr` rejects and why.
+
 ## Start Here
 
 - `consumer_smoke.zig`
@@ -123,3 +127,10 @@ They intentionally do not show:
 - UI or session orchestration
 
 That work belongs in `nzdk` or above it.
+
+## Example Quality Rule
+
+For boundary-heavy surfaces, examples should not stop at valid flows. The preferred set is:
+- one direct valid reference example
+- one invalid or adversarial example fixture where misuse is plausible
+- recipe coverage only when the surface materially affects SDK-facing handoff work

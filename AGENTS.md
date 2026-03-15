@@ -58,6 +58,30 @@ Run tests after every code change.
   - Ensure `./agent-brief` output reflects the current active execution path.
 - Do not rely on memory-only context between sessions.
 
+## Protocol Work Closure Discipline
+
+- For every new or materially changed NIP surface, create and maintain a short spec-to-contract
+  checklist before closure:
+  - supported kinds
+  - required tags / fields
+  - optional tags / fields
+  - multiplicity and ordering rules
+  - normalization / canonicalization rules
+  - ignored or explicitly unsupported shapes
+  - explicit non-goals and SDK-side work
+- No NIP closes until the checklist is mapped to code, tests, examples, or an explicit accepted
+  non-goal.
+- Treat builder/parser symmetry as a required test class:
+  - canonical builder output must round-trip through the parser where applicable
+  - parser-accepted canonical input must be buildable where applicable
+  - near-canonical malformed shapes must fail predictably
+- Review the public error contract explicitly:
+  - public error variants must describe the real cause
+  - do not return capacity errors for invalid input or invalid-input errors for capacity failures
+- When reference libraries are `LIB_UNSUPPORTED` or only weak evidence exists, require one extra
+  spec-first challenge pass before closure.
+- Keep canonical audit and status artifacts current as part of closure, not as later cleanup.
+
 ## Coding Standards
 
 Read `docs/guides/TIGER_STYLE.md` and `docs/guides/NOZTR_STYLE.md` for code work. Tiger is the
@@ -93,6 +117,10 @@ critical rules:
 - `std.testing.allocator` for all test allocations
 - Doc comments (`///`) on public API
 - Tests must cover happy path + error cases
+- For protocol modules, tests must also cover:
+  - per-field negative corpus
+  - builder/parser symmetry where applicable
+  - at least one adversarial or hostile-input case for boundary-heavy surfaces
 
 ## What NOT To Do
 
