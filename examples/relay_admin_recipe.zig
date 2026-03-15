@@ -33,8 +33,14 @@ test "recipe: relay admin requests and responses stay typed" {
         ips[0..],
         arena.allocator(),
     );
+    var response_output: [64]u8 = undefined;
+    const encoded_response = try noztr.nip86_relay_management.response_serialize_json(
+        response_output[0..],
+        response,
+    );
 
     try std.testing.expect(request == .banpubkey);
     try std.testing.expectEqualStrings(request_json, encoded_request);
     try std.testing.expect(response.result == .ack);
+    try std.testing.expectEqualStrings("{\"result\":true,\"error\":null}", encoded_response);
 }

@@ -13,6 +13,27 @@ Downstream consumption examples for SDK and application authors.
 - `discovery_recipe.zig`
   - best first entry point for identity lookup and bunker discovery
 
+## SDK Job Index
+
+- signer/bootstrap handoff:
+  - `remote_signing_recipe.zig`
+  - `nip46_example.zig`
+- identity lookup and proof flows:
+  - `discovery_recipe.zig`
+  - `identity_proof_recipe.zig`
+  - `nip05_example.zig`
+  - `nip39_example.zig`
+- deterministic wallet flows:
+  - `wallet_recipe.zig`
+  - `nip06_example.zig`
+  - `bip85_example.zig`
+- private list handling:
+  - `private_lists_recipe.zig`
+  - `nip51_example.zig`
+- relay admin helpers:
+  - `relay_admin_recipe.zig`
+  - `nip86_example.zig`
+
 ## Reference Examples
 
 Each implemented kernel NIP now has a direct reference example.

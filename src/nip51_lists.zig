@@ -176,6 +176,7 @@ pub fn list_is_supported(event: *const nip01_event.Event) bool {
 }
 
 /// Extracts strict public NIP-51 list items from a supported list event.
+/// See `examples/nip51_example.zig` and `examples/private_lists_recipe.zig`.
 ///
 /// Lifetime and ownership:
 /// - `ListItem.pubkey` and `ListItem.event.event_id` are copied into `out`.
@@ -304,6 +305,7 @@ pub fn list_private_serialize_json(
 }
 
 /// Parses private NIP-51 item JSON into strict list items.
+/// See `examples/private_lists_recipe.zig`.
 pub fn list_private_extract_json(
     event_kind: u32,
     input_json: []const u8,

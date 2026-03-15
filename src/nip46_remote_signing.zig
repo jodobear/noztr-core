@@ -363,6 +363,7 @@ pub fn request_parse_typed(
 }
 
 /// Build a typed `connect` request using caller-provided id storage.
+/// See `examples/nip46_example.zig` and `examples/remote_signing_recipe.zig`.
 pub fn request_build_connect(
     output: *BuiltRequest,
     id: []const u8,
@@ -592,6 +593,7 @@ pub fn envelope_validate(
 }
 
 /// Parse the NIP-46 discovery fields from a signer's `nostr.json?name=_` document.
+/// See `examples/discovery_recipe.zig`.
 pub fn discovery_parse_well_known(
     input: []const u8,
     scratch: std.mem.Allocator,
@@ -654,6 +656,7 @@ pub fn discovery_parse_nip89(
 }
 
 /// Render a discovery `nostrconnect_url` template using one exact placeholder substitution.
+/// See `examples/discovery_recipe.zig` and `examples/remote_signing_recipe.zig`.
 pub fn discovery_render_nostrconnect_url(
     output: []u8,
     template_url: []const u8,

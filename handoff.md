@@ -15,6 +15,9 @@ Current project context for the Phase H kickoff baseline.
   - SDK-facing downstream examples now live in the single top-level `examples/` package
     - direct per-NIP reference examples now cover all implemented kernel exports
     - scenario recipes remain for the highest-value `nzdk` handoff flows
+    - the examples README now has an SDK job index
+    - the most SDK-facing kernel modules now point back to the relevant example files in their
+      public doc comments
   - Nostr-relevant `BIP-85` subset remains implemented and accepted
   - deprecated `NIP-04` private-list compatibility remains deferred
   - crypto-boundary evaluation is recorded in `docs/plans/crypto-boundary-evaluation.md`

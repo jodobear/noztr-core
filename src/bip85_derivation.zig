@@ -38,6 +38,7 @@ pub const Bip39WordCount = enum(u8) {
 };
 
 /// Derive bounded BIP-85 hex entropy from a BIP39 seed.
+/// See `examples/bip85_example.zig` and `examples/wallet_recipe.zig`.
 pub fn derive_hex_entropy_from_seed(
     output: []u8,
     seed: []const u8,
@@ -148,6 +149,7 @@ pub fn derive_bip39_entropy(
 }
 
 /// Derive an English BIP39 child mnemonic from a validated English mnemonic.
+/// See `examples/bip85_example.zig` and `examples/wallet_recipe.zig`.
 pub fn derive_bip39_mnemonic(
     output: []u8,
     mnemonic: []const u8,

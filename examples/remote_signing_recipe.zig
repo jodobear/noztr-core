@@ -30,6 +30,14 @@ test "recipe: remote signing helpers compose without extra sdk machinery" {
             .name = "SDK Client",
         } },
     );
+    const typed_request = try noztr.nip46_remote_signing.request_parse_typed(
+        &request,
+        arena.allocator(),
+    );
+    const parsed_uri = try noztr.nip46_remote_signing.uri_parse(
+        connection_uri,
+        arena.allocator(),
+    );
     var rendered_output: [noztr.limits.nip46_uri_bytes_max]u8 = undefined;
     const rendered = try noztr.nip46_remote_signing.discovery_render_nostrconnect_url(
         rendered_output[0..],
@@ -39,5 +47,7 @@ test "recipe: remote signing helpers compose without extra sdk machinery" {
     );
 
     try std.testing.expectEqual(.connect, request.method);
+    try std.testing.expect(typed_request == .connect);
+    try std.testing.expect(parsed_uri == .client);
     try std.testing.expect(std.mem.indexOf(u8, rendered, "nostrconnect://") != null);
 }

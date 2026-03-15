@@ -91,6 +91,7 @@ pub fn mnemonic_to_seed(
 }
 
 /// Derive the canonical Nostr secret key at `m/44'/1237'/<account>'/0/0`.
+/// See `examples/nip06_example.zig` and `examples/wallet_recipe.zig`.
 pub fn derive_nostr_secret_key_from_seed(
     output: []u8,
     seed: []const u8,
@@ -127,6 +128,7 @@ pub fn derive_nostr_secret_key_from_seed(
 }
 
 /// Validate the mnemonic and derive the canonical Nostr secret key.
+/// See `examples/nip06_example.zig` and `examples/wallet_recipe.zig`.
 pub fn derive_nostr_secret_key(
     output: []u8,
     mnemonic: []const u8,

@@ -89,6 +89,7 @@ pub fn identity_claim_build_tag(
 }
 
 /// Builds the deterministic proof URL for a validated claim.
+/// See `examples/nip39_example.zig` and `examples/identity_proof_recipe.zig`.
 pub fn identity_claim_build_proof_url(
     output: []u8,
     claim: *const IdentityClaim,
@@ -109,6 +110,7 @@ pub fn identity_claim_build_proof_url(
 }
 
 /// Builds the deterministic proof text for a validated claim and public key.
+/// See `examples/nip39_example.zig` and `examples/identity_proof_recipe.zig`.
 pub fn identity_claim_build_expected_text(
     output: []u8,
     claim: *const IdentityClaim,

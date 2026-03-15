@@ -148,6 +148,7 @@ pub fn method_text(method: RelayManagementMethod) []const u8 {
 }
 
 /// Parse a bounded NIP-86 JSON-RPC request.
+/// See `examples/nip86_example.zig` and `examples/relay_admin_recipe.zig`.
 pub fn request_parse_json(input: []const u8, scratch: std.mem.Allocator) Nip86Error!Request {
     std.debug.assert(input.len <= limits.relay_message_bytes_max);
     std.debug.assert(@intFromPtr(scratch.ptr) != 0);
@@ -175,6 +176,7 @@ pub fn request_serialize_json(output: []u8, request: Request) Nip86Error![]const
 }
 
 /// Parse a bounded NIP-86 JSON-RPC response for the expected method.
+/// See `examples/relay_admin_recipe.zig`.
 pub fn response_parse_json(
     input: []const u8,
     expected_method: RelayManagementMethod,
