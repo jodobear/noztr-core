@@ -37,7 +37,7 @@ pub const Bip39WordCount = enum(u8) {
     words_24 = 24,
 };
 
-/// Derive bounded BIP-85 hex entropy from a BIP39 seed.
+/// Derive bounded lowercase-hex BIP-85 entropy text from a BIP39 seed.
 /// See `examples/bip85_example.zig` and `examples/wallet_recipe.zig`.
 pub fn derive_hex_entropy_from_seed(
     output: []u8,
@@ -60,12 +60,10 @@ pub fn derive_hex_entropy_from_seed(
     });
     defer wipe_bytes(derived[0..]);
 
-    if (output.len < bytes_len) return error.BufferTooSmall;
-    @memcpy(output[0..bytes_len], derived[0..bytes_len]);
-    return output[0..bytes_len];
+    return write_lower_hex_entropy(output, derived[0..bytes_len]);
 }
 
-/// Derive bounded BIP-85 hex entropy from a validated English mnemonic.
+/// Derive bounded lowercase-hex BIP-85 entropy text from a validated English mnemonic.
 pub fn derive_hex_entropy(
     output: []u8,
     mnemonic: []const u8,
@@ -202,6 +200,22 @@ fn derive_entropy_material(seed: []const u8, path: []const u32) Bip85Error![64]u
     return hmac_entropy_from_key(&derived_key);
 }
 
+fn write_lower_hex_entropy(output: []u8, entropy: []const u8) Bip85Error![]const u8 {
+    std.debug.assert(output.len <= limits.content_bytes_max);
+    std.debug.assert(entropy.len <= 64);
+
+    if (output.len < entropy.len * 2) return error.BufferTooSmall;
+
+    const alphabet = "0123456789abcdef";
+    var index: usize = 0;
+    while (index < entropy.len) : (index += 1) {
+        const byte = entropy[index];
+        output[index * 2] = alphabet[byte >> 4];
+        output[index * 2 + 1] = alphabet[byte & 0x0f];
+    }
+    return output[0 .. entropy.len * 2];
+}
+
 fn ensure_backend() Bip85Error!void {
     std.debug.assert(@sizeOf(Bip85Error) > 0);
     std.debug.assert(!@inComptime());
@@ -324,7 +338,7 @@ test "derive english bip39 child entropy vector from mnemonic" {
 }
 
 test "derive hex entropy vector from mnemonic" {
-    var entropy_output: [64]u8 = undefined;
+    var entropy_output: [128]u8 = undefined;
     const actual = try derive_hex_entropy(
         entropy_output[0..],
         "install scatter logic circle pencil average fall shoe quantum disease suspect usage",
@@ -332,7 +346,7 @@ test "derive hex entropy vector from mnemonic" {
         64,
         0,
     );
-    try expect_hex(
+    try std.testing.expectEqualStrings(
         "492db4698cf3b73a5a24998aa3e9d7fa96275d85724a91e71aa2d645442f8785" ++
             "55d078fd1f1f67e368976f04137b1f7a0d19232136ca50c44614af72b5582a5c",
         actual,

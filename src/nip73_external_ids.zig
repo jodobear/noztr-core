@@ -228,7 +228,7 @@ fn parse_blockchain_value(value: []const u8, separator: []const u8) Nip73Error!?
 
     const prefix = value[0..marker];
     const chain = if (std.mem.indexOfScalar(u8, prefix, ':')) |index| prefix[0..index] else prefix;
-    try validate_chain_token(chain);
+    validate_chain_token(chain) catch return error.InvalidValue;
     return chain;
 }
 
@@ -335,6 +335,7 @@ test "external id parse rejects malformed value hint and kind" {
     );
     try std.testing.expectError(error.InvalidKind, external_kind_parse("ethereum:1:tx"));
     try std.testing.expectError(error.InvalidValue, external_id_parse("bitcoin::tx:", null));
+    try std.testing.expectError(error.InvalidValue, external_id_parse("Bitcoin:tx:abcd", null));
 
     var built: BuiltTag = .{};
     const mismatched = ExternalId{

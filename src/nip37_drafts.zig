@@ -1,5 +1,6 @@
 const std = @import("std");
 const limits = @import("limits.zig");
+const relay_origin = @import("internal/relay_origin.zig");
 const nip01_event = @import("nip01_event.zig");
 const nip44 = @import("nip44.zig");
 
@@ -198,7 +199,7 @@ pub fn private_relay_build_tag(
     std.debug.assert(relay_url.len <= limits.tag_item_bytes_max);
 
     output.items[0] = "relay";
-    output.items[1] = parse_url(relay_url) catch return error.InvalidPrivateRelayUrl;
+    output.items[1] = parse_relay_url(relay_url) catch return error.InvalidPrivateRelayUrl;
     output.item_count = 2;
     return output.as_event_tag();
 }
@@ -494,7 +495,7 @@ fn parse_private_relay_tag(value: std.json.Value) error{
     }
     if (!std.mem.eql(u8, items[0], "relay")) return error.UnexpectedTag;
     if (value.array.items.len != 2) return error.InvalidPrivateRelayTag;
-    return parse_url(items[1]) catch return error.InvalidPrivateRelayUrl;
+    return parse_relay_url(items[1]) catch return error.InvalidPrivateRelayUrl;
 }
 
 fn validate_private_tag_item(text: []const u8) error{InvalidPrivateTagArray}![]const u8 {
@@ -512,7 +513,7 @@ fn write_private_relay_tag_json(writer: anytype, tag: nip01_event.EventTag) Nip3
 
     if (tag.items.len != 2) return error.InvalidPrivateRelayTag;
     if (!std.mem.eql(u8, tag.items[0], "relay")) return error.InvalidPrivateRelayTag;
-    _ = parse_url(tag.items[1]) catch return error.InvalidPrivateRelayUrl;
+    _ = parse_relay_url(tag.items[1]) catch return error.InvalidPrivateRelayUrl;
     try write_private_byte(writer, '[');
     try write_private_string_json(writer, tag.items[0]);
     try write_private_byte(writer, ',');
@@ -573,6 +574,14 @@ fn parse_url(text: []const u8) error{InvalidUrl}![]const u8 {
     const parsed = std.Uri.parse(text) catch return error.InvalidUrl;
     if (parsed.scheme.len == 0) return error.InvalidUrl;
     if (parsed.host == null) return error.InvalidUrl;
+    return text;
+}
+
+fn parse_relay_url(text: []const u8) error{InvalidUrl}![]const u8 {
+    std.debug.assert(text.len <= limits.tag_item_bytes_max);
+    std.debug.assert(limits.tag_item_bytes_max <= limits.content_bytes_max);
+
+    if (relay_origin.parse_websocket_origin(text) == null) return error.InvalidUrl;
     return text;
 }
 
@@ -801,6 +810,26 @@ test "private relay list extract rejects malformed relay tag" {
         error.InvalidPrivateRelayUrl,
         private_relay_list_extract_json(
             "[[\"relay\",\"not a url\"]]",
+            relay_urls[0..],
+            arena.allocator(),
+        ),
+    );
+}
+
+test "private relay list rejects non-websocket relay urls" {
+    var relay_urls: [1][]const u8 = undefined;
+    var arena = std.heap.ArenaAllocator.init(std.testing.allocator);
+    defer arena.deinit();
+    var built: BuiltTag = .{};
+
+    try std.testing.expectError(
+        error.InvalidPrivateRelayUrl,
+        private_relay_build_tag(&built, "https://relay.example"),
+    );
+    try std.testing.expectError(
+        error.InvalidPrivateRelayUrl,
+        private_relay_list_extract_json(
+            "[[\"relay\",\"https://relay.example\"]]",
             relay_urls[0..],
             arena.allocator(),
         ),

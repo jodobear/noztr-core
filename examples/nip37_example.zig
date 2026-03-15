@@ -43,3 +43,29 @@ test "NIP-37 example: encrypt validated draft JSON and parse the wrap metadata" 
     try std.testing.expectEqualStrings("draft-1", info.identifier);
     try std.testing.expect(!info.is_deleted);
 }
+
+test "NIP-37 example: parse private relay list plaintext" {
+    var builder_a: noztr.nip37_drafts.BuiltTag = .{};
+    var builder_b: noztr.nip37_drafts.BuiltTag = .{};
+    const tag_a = try noztr.nip37_drafts.private_relay_build_tag(&builder_a, "wss://relay.one");
+    const tag_b = try noztr.nip37_drafts.private_relay_build_tag(&builder_b, "wss://relay.two");
+    const tags = [_]noztr.nip01_event.EventTag{ tag_a, tag_b };
+    var json_output: [256]u8 = undefined;
+    var relays: [2][]const u8 = undefined;
+    var arena = std.heap.ArenaAllocator.init(std.testing.allocator);
+    defer arena.deinit();
+
+    const json = try noztr.nip37_drafts.private_relay_list_serialize_json(
+        json_output[0..],
+        tags[0..],
+    );
+    const info = try noztr.nip37_drafts.private_relay_list_extract_json(
+        json,
+        relays[0..],
+        arena.allocator(),
+    );
+
+    try std.testing.expectEqual(@as(u16, 2), info.relay_count);
+    try std.testing.expectEqualStrings("wss://relay.one", relays[0]);
+    try std.testing.expectEqualStrings("wss://relay.two", relays[1]);
+}

@@ -32,7 +32,8 @@ test "recipe: deterministic wallet flows use nip06 plus bip85 directly" {
 
     try std.testing.expectEqual(@as(usize, 64), seed.len);
     try std.testing.expectEqual(@as(usize, 32), secret_key.len);
-    try std.testing.expectEqual(@as(usize, 16), child_hex.len);
+    try std.testing.expectEqual(@as(usize, 32), child_hex.len);
+    try std.testing.expect(std.ascii.isHex(child_hex[0]));
     try std.testing.expectEqualStrings(
         "girl mad pet galaxy egg matter matrix prison refuse sense ordinary nose",
         child_mnemonic,

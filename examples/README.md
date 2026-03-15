@@ -27,6 +27,8 @@ Downstream consumption examples for SDK and application authors.
   - `wallet_recipe.zig`
   - `nip06_example.zig`
   - `bip85_example.zig`
+- private draft and relay-list storage:
+  - `nip37_example.zig`
 - private list handling:
   - `private_lists_recipe.zig`
   - `nip51_example.zig`
