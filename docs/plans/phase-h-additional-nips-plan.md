@@ -288,11 +288,10 @@ Reprioritized after deferred-backlog completion of `NIP-29`:
     - implementation review finding fixed:
       - libwally child derivation no longer aliases parent and output key buffers; separate
         sensitive key slots are now used throughout the derivation path
-    - accepted temporary normalization boundary:
-      - current Phase H behavior accepts ASCII-only mnemonic/passphrase input after UTF-8
-        validation and rejects non-ASCII input with typed `InvalidNormalization`
-      - `no-09f` review is complete: full BIP39-compatible NFKD normalization remains future
-        feature `no-2gp`, not immediate kernel scope
+    - normalization boundary:
+      - `src/unicode_nfkd.zig` now provides full bounded BIP39-compatible `NFKD`
+        normalization for mnemonic/passphrase handling before seed derivation
+      - the old ASCII-only temporary boundary is superseded
 
 ## NIP-06 Phase H Boundary Scope
 
@@ -310,8 +309,8 @@ Reprioritized after deferred-backlog completion of `NIP-29`:
   - convenience stateful key stores or orchestration helpers
 - Follow-up note: broader rust-nostr parity and deep edge-case expansion for NIP-06 remains a later
   phase after the initial narrow boundary is stable.
-  - Additional accepted follow-up from implementation: full Unicode normalization parity for
-    non-ASCII mnemonic/passphrase input remains future feature `no-2gp`.
+  - Additional accepted follow-up from implementation: keep broader wallet/application UX out of
+    the kernel even though full BIP39-compatible `NFKD` normalization is now implemented.
 
 ## NIP-06 H0 Freeze Snapshot
 

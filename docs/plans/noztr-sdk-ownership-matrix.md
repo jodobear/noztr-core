@@ -40,7 +40,7 @@ Put behavior in the SDK when it involves any of:
 | `02` contacts | bounded contact-tag extraction and contact builders | contact sync, graph views, follow recommendations, petname UX | contact-list sync plus social-graph cache | kernel scope is correct |
 | `03` OpenTimestamps | event parsing, bounded proof decode, bounded local proof verification floor | networked OTS/Bitcoin verification, caching, remote proof retrieval | opt-in verifier adapters over caller-supplied HTTP / Bitcoin clients | local proof floor belongs in `noztr`; networked verification belongs in SDK |
 | `05` internet identifiers | bounded address parse/validate, canonical lookup URL composition, raw `nostr.json` verify/parse for `names` plus optional `relays` / `nip46` | HTTP fetch, redirect handling, caching, trust UX | NIP-05 fetch/cache/verify flow over kernel address and document helpers | kernel scope is correct |
-| `06` mnemonic / derivation | mnemonic validate, seed derivation, canonical key derivation, bounded BIP-85 hex/BIP39 derivation, zeroization, typed errors | wallet UX, account selection, secret storage, import/export flows | wallet/account manager over kernel derivation helpers | current split is correct; full NFKD remains out of current scope unless real SDK/interoperability pressure appears |
+| `06` mnemonic / derivation | mnemonic validate, full BIP39-compatible `NFKD` normalization, seed derivation, canonical key derivation, bounded Nostr-relevant BIP-85 hex/BIP39 derivation, zeroization, typed errors | wallet UX, account selection, secret storage, import/export flows | wallet/account manager over kernel derivation helpers | current split is correct; keep broader BIP-85 applications out unless real SDK demand appears |
 | `09` deletions | delete-target extraction and checked wrappers | delete publish flows, local tombstone policy, UI confirmation | deletion compose / publish helpers and tombstone cache policy | kernel scope is correct |
 | `10` threads | bounded root / reply / mention extraction | thread assembly, timeline stitching, reply composition UX | thread graph builder over extracted references | kernel scope is correct |
 | `11` relay info | bounded relay-info subset parsing | relay fetch, cache, policy scoring, capability negotiation | relay-info fetch/cache layer with refresh policy | current split is correct |
@@ -112,6 +112,14 @@ If the answer to `5` is yes, the behavior probably belongs in the SDK.
   - `discovery_render_nostrconnect_url(...)`
   - Current call: keep it in `noztr` as exact protocol-facing placeholder substitution, not client
     orchestration; revisit only if SDK-side redirect/launch handling makes the helper redundant.
+
+## Crypto Boundary Note
+
+- The current `secp256k1` / `libwally` boundary remains in `noztr`.
+- A future standalone lower-level Zig crypto / Bitcoin primitive library is plausible, but should
+  begin as separate research rather than as an extraction of the current wrapper.
+- See
+  [`docs/plans/crypto-boundary-evaluation.md`](/workspace/projects/noztr/docs/plans/crypto-boundary-evaluation.md).
 
 ## Requested Next-NIP Mapping
 

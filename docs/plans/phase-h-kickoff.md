@@ -262,18 +262,15 @@ the validated maintenance baseline.
   - review finding fixed during implementation:
     - child derivation now uses separate parent/child key slots; aliasing libwally parent/output
       buffers caused a real higher-account derivation failure and is no longer allowed
-  - accepted temporary normalization boundary:
-    - current Phase H behavior accepts ASCII-only mnemonic/passphrase input after UTF-8 validation
-      and rejects non-ASCII input with typed `InvalidNormalization`
-    - `no-09f` review is complete: full BIP39-compatible NFKD normalization remains future
-      feature `no-2gp`, not immediate kernel scope
+  - normalization boundary:
+    - current `NIP-06` behavior now applies full bounded BIP39-compatible `NFKD` normalization
+      before mnemonic/passphrase seed derivation
   - robustness pass outcome:
     - no Layer 1 behavior change was required after real-world review
     - local semantics now pin null-passphrase and empty-passphrase equivalence explicitly
     - rust parity overlap is now `HARNESS_COVERED`, `EDGE`, `PASS`
     - TypeScript audit overlap is now `HARNESS_COVERED`, `EDGE`, `PASS`
-    - accepted ASCII-only normalization boundary remains unchanged pending any future `no-2gp`
-      Unicode work
+    - the older ASCII-only temporary boundary is superseded by the accepted `NFKD` implementation
 - Post-wave expansion / `NIP-23` is complete in `no-y6o`
   - bounded `src/nip23_long_form.zig` surface is implemented
   - current implemented scope:
@@ -468,8 +465,8 @@ the validated maintenance baseline.
 - `no-4iw` is resolved by the NIP-10 audit and no longer blocks interpretation of NIP-10 quality.
 - Keep TypeScript parity references non-gating and use them only as secondary ecosystem audit
   evidence.
-- Keep the accepted ASCII-only NIP-06 normalization boundary in place; any future full Unicode
-  NFKD expansion is tracked in `no-2gp`.
+- Keep the accepted bounded BIP39-compatible `NFKD` implementation in place for `NIP-06`; do not
+  widen it into a broad public Unicode utility layer without a separate accepted decision.
 
 ## Blocker Visibility
 

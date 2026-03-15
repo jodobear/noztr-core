@@ -1781,8 +1781,8 @@ Immutable record of accepted planning decisions.
 
 - Date: 2026-03-14
 - Status: accepted
-- Decision: implement `src/bip85_derivation.zig` as a bounded kernel helper module adjacent to
-  `NIP-06`.
+- Decision: implement `src/bip85_derivation.zig` as a bounded Nostr-relevant kernel helper module
+  adjacent to `NIP-06`.
   - accepted kernel floor:
     - deterministic BIP-85 hex entropy derivation from the existing BIP39 seed boundary
     - deterministic English BIP39 child entropy derivation
@@ -1840,4 +1840,55 @@ Immutable record of accepted planning decisions.
 - Related Tradeoff: T-H-ANIP-011.
 - Reversal Trigger: real interoperability evidence shows materially relevant private-list traffic
   still depends on deprecated NIP-04 ciphertext discovery.
+- Supersedes: none
+
+## D-091: Implement full BIP39-compatible NFKD normalization in the NIP-06 boundary
+
+- Date: 2026-03-15
+- Status: accepted
+- Decision: replace the temporary ASCII-only normalization boundary in `src/nip06_mnemonic.zig`
+  with full bounded `NFKD` normalization before BIP39 seed derivation.
+  - accepted implementation floor:
+    - repo-owned static `NFKD` tables generated from local Unicode data
+    - bounded runtime normalizer in `src/unicode_nfkd.zig`
+    - `NIP-06` mnemonic and passphrase inputs normalize before validation / seed derivation
+    - no runtime Unicode dependency is introduced into the kernel
+  - explicitly still out of scope:
+    - broad public Unicode utility APIs
+    - turning `noztr` into a general text-normalization library
+- Why: `nzdk` and other downstream consumers need `noztr` to be the authoritative Zig Nostr core
+  library, and BIP39-compatible wallet flows should not silently diverge on composed vs decomposed
+  Unicode input.
+- Tradeoff: a moderate increase in static data / code size versus correct BIP39 interoperability and
+  a cleaner SDK dependency boundary.
+- Related Tradeoff: T-H-ANIP-011.
+- Reversal Trigger: none expected; only revisit if a future lower-level shared library absorbs this
+  exact bounded normalization surface.
+- Supersedes: `D-055`, `D-089`
+
+## D-092: Keep the current crypto wrapper in noztr and treat standalone extraction as future research
+
+- Date: 2026-03-15
+- Status: accepted
+- Decision: keep the current `secp256k1` / `libwally` wrapper boundary inside `noztr` and do not
+  extract it into a standalone library yet.
+  - accepted current posture:
+    - `noztr` continues to own the protocol-kernel crypto boundary it already uses
+    - a future standalone lower-level Zig Bitcoin primitive library remains plausible
+    - any such library must start as separate ground-up research, not as a direct extraction of the
+      current wrapper
+  - if that future library is opened later, likely scope includes:
+    - secp256k1 primitives
+    - BIP32 derivation/key handling
+    - fixed-capacity typed error / zeroization boundaries
+  - explicitly not implied by this decision:
+    - moving Nostr protocol logic out of `noztr`
+    - broadening `noztr` into a generic Bitcoin / wallet SDK
+- Why: the current wrapper is shaped for `noztr`'s protocol-kernel needs and is not yet the right
+  generally reusable API for Bitcoin / Lightning / Cashu / Nostr consumers.
+- Tradeoff: keep a narrow, locally useful boundary for now versus avoiding a premature shared
+  library with unclear scope.
+- Related Tradeoff: T-H-ANIP-011.
+- Reversal Trigger: separate research establishes a stable primitive surface, target consumers, and
+  dependency posture for a standalone library.
 - Supersedes: none

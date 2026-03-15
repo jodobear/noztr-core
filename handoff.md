@@ -7,6 +7,17 @@ Current project context for the Phase H kickoff baseline.
 - Planning phase records remain closed in `docs/plans/decision-log.md`.
 - Active execution state is Phase H on post-Phase G local-only closure baseline.
 - Frozen defaults and Layer 1 posture remain unchanged.
+- Latest local checkpoint:
+  - `NIP-06` now applies full bounded BIP39-compatible `NFKD` normalization via
+    `src/unicode_nfkd.zig`
+  - SDK-facing downstream examples now include:
+    - `examples/sdk_consumer_smoke`
+    - `examples/sdk_surface_recipes`
+  - Nostr-relevant `BIP-85` subset remains implemented and accepted
+  - deprecated `NIP-04` private-list compatibility remains deferred
+  - crypto-boundary evaluation is recorded in `docs/plans/crypto-boundary-evaluation.md`
+  - open follow-up research item: `no-980` for a possible standalone Zig secp/bitcoin primitive
+    library track
 - Canonical Phase F trackers:
   - `docs/plans/phase-f-kickoff.md`
   - `docs/plans/phase-f-parity-matrix.md`
@@ -46,11 +57,9 @@ Current project context for the Phase H kickoff baseline.
         buffer-too-small outputs
     - review finding fixed:
       - higher-account derivation no longer aliases libwally parent/output key buffers
-    - accepted temporary normalization boundary:
-      - current Phase H behavior accepts ASCII-only mnemonic/passphrase input after UTF-8
-        validation and rejects non-ASCII input with typed `InvalidNormalization`
-      - `no-09f` review is complete: full BIP39-compatible NFKD normalization remains future
-        feature `no-2gp`, not immediate kernel scope
+    - normalization boundary:
+      - current `NIP-06` behavior applies full bounded BIP39-compatible `NFKD` normalization
+        before mnemonic/passphrase seed derivation
 - Wave 1 progress:
   - `NIP-01` audit is complete across `src/nip01_event.zig`, `src/nip01_filter.zig`, and
     `src/nip01_message.zig`: strict parsing now accepts uppercase single-letter `#X` filter keys,
@@ -380,9 +389,9 @@ Current project context for the Phase H kickoff baseline.
        - accepted kernel scope is limited to deterministic derivation helpers only; wallet/account
          UX remains in `nzdk`
        - the main Zig gates and downstream consumer smoke remain green with the new module
-     - `no-2gp` full NIP-06 Unicode NFKD has been re-evaluated in this loop:
-       - it remains out of current kernel scope because no real SDK wallet Unicode pressure or
-         interoperability evidence has appeared beyond the already-recorded non-ASCII caveat
+     - full NIP-06 Unicode `NFKD` is now implemented:
+       - repo-owned static Unicode tables plus bounded runtime normalization are accepted
+       - the old ASCII-only temporary boundary is superseded
      - `no-urr` deprecated NIP-04 private-list compatibility has also been re-evaluated:
        - it remains out of current scope because there is still no evidence-backed need to carry
          deprecated NIP-04 private-list support in the kernel
@@ -469,13 +478,11 @@ Current project context for the Phase H kickoff baseline.
    - local coverage now pins null-passphrase and empty-passphrase equivalence explicitly.
    - rust parity overlap is now `HARNESS_COVERED`, `EDGE`, `PASS`.
    - TypeScript audit overlap is now `HARNESS_COVERED`, `EDGE`, `PASS`.
-   Accepted temporary normalization boundary:
-   - current Phase H behavior accepts ASCII-only mnemonic/passphrase input after UTF-8 validation
-     and rejects non-ASCII input with typed `InvalidNormalization`.
+   Accepted normalization boundary:
+   - current `NIP-06` behavior applies full bounded BIP39-compatible `NFKD` normalization before
+     seed derivation.
    Explicit follow-up:
    - `no-09f` review is complete.
-   - `no-2gp` tracks any future full BIP39-compatible NFKD normalization support for non-ASCII
-     parity.
    - `no-mzd` tracks any future bounded BIP-85 child-entropy / child-mnemonic derivation helpers
      adjacent to the current NIP-06 boundary.
 7. Post-Wave NIP-51 private-list follow-up `no-e7b` is complete.
