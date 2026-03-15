@@ -80,8 +80,7 @@ Measured on 2026-03-15 before the current refinement pass:
 
 ### DOC-LOOP-001
 
-- Status: open
-- Tracking: `no-3jy`
+- Status: fixed in this pass
 - Problem:
   requested-NIP state still exists in multiple active places:
   - `docs/plans/build-plan.md`
@@ -89,7 +88,7 @@ Measured on 2026-03-15 before the current refinement pass:
   - `handoff.md`
 - Why it hurts:
   the next-item and completion-state story can drift if all three are edited narratively.
-- Recommendation:
+- Fix:
   keep:
   - `docs/plans/post-kernel-requested-nips-loop.md` for order and loop rules
   - `handoff.md` for only the current next item
@@ -98,17 +97,17 @@ Measured on 2026-03-15 before the current refinement pass:
 
 ### DOC-PLAN-001
 
-- Status: open
-- Tracking: `no-l38`
+- Status: fixed in this pass
 - Problem:
   `docs/plans/build-plan.md` mixes active baseline, historical execution notes, and multiple
   generations of planning context.
 - Why it hurts:
   it is still authoritative, but its signal-to-noise ratio is lower than it should be for an
   active control doc.
-- Recommendation:
-  split future historical narrative into archive or audit/reference docs and keep the build plan
-  baseline-oriented.
+- Fix:
+  move the long review procedure into `docs/plans/implemented-nip-review-guide.md`, move historical
+  execution detail into `docs/archive/plans/build-plan-history.md`, and keep
+  `docs/plans/build-plan.md` baseline-oriented.
 
 ### DOC-DECISION-001
 
@@ -159,5 +158,7 @@ This pass takes the minimal adoption path:
 6. make closeout-consistency explicit so finished slices restore steady-state routing
 7. keep a stable-ID audit for docs/process findings
 8. shorten handoff to current state
+9. keep `build-plan.md` lean by moving long review procedure to reference and historical narrative
+   to archive
 
 That is enough to reduce startup load immediately without a risky full doc reorg.

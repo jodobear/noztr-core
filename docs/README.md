@@ -63,6 +63,7 @@ These are active references, not startup defaults.
 
 - `docs/plans/decision-log.md`
 - `docs/plans/noztr-sdk-ownership-matrix.md`
+- `docs/plans/implemented-nip-review-guide.md`
 - `docs/plans/nostr-principles.md`
 - `docs/plans/implemented-nip-audit-report.md`
 - `docs/plans/llm-usability-pass.md`

@@ -32,10 +32,8 @@ Current execution state for `noztr`.
 - Active execution state remains Phase H on the post-Phase G local-only closure baseline.
 - Remote readiness remains deferred-by-operator.
 - No git remote is configured in this repo.
-- Current requested-NIP loop status:
-  - complete: `NIP-94`, `NIP-92`, `NIP-99`, `NIP-B0`, `NIP-C0`, `NIP-64`, `NIP-88`, `NIP-49`,
-    `NIP-98`, `NIP-47`
-  - next: split-surface `NIP-B7` / `no-z9g`
+- Current requested-NIP loop is active.
+- Next requested-NIP item: split-surface `NIP-B7` / `no-z9g`.
 - Only expected untracked local artifact:
   - `tools/interop/rust-nostr-parity-all/target/`
 
@@ -75,8 +73,9 @@ Current execution state for `noztr`.
 ## Current Repo State
 
 - Latest docs/control-surface refinement:
-  - commit:
-    - `2b7b4cf` `Refine docs frontmatter and decision routing`
+  - active build-plan is lean baseline only
+  - implemented-surface review procedure is in `docs/plans/implemented-nip-review-guide.md`
+  - historical build-plan narrative is in `docs/archive/plans/build-plan-history.md`
 - Latest requested-NIP closure:
   - `NIP-47` / `no-qbb` closed
   - commits:

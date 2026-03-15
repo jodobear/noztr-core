@@ -86,7 +86,8 @@ Each Wave 1 NIP must complete the full loop below before the next NIP begins.
    - record any intentional divergence rather than silently adjusting Layer 1 behavior.
    - if parity evidence shows a required semantic mismatch, stop and record the decision point before
       changing defaults.
-   - consult the implemented-NIP review criteria in `docs/plans/build-plan.md` when deciding
+  - consult the implemented-NIP review criteria in
+    `docs/plans/implemented-nip-review-guide.md` when deciding
      whether a narrower behavior is justified or is creating unnecessary incompatibility.
    - preserve Zig-native guarantees and API clarity when they improve the implementation without
      weakening protocol correctness, bounds, or compatibility posture.

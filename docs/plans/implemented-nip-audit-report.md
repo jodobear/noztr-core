@@ -24,7 +24,7 @@ completes.
 ## Review Standard
 
 - Judge each NIP against the canonical review axes and lenses in
-  `docs/plans/build-plan.md`.
+  `docs/plans/implemented-nip-review-guide.md`.
 - `rust-nostr` is the active parity lane and strongest production reference.
 - `nostr-tools` is a secondary non-gating ecosystem signal.
 - No reference library is treated as protocol authority.

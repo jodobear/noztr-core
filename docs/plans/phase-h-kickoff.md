@@ -398,7 +398,8 @@ the validated maintenance baseline.
 - Maintain rust-active parity cadence and aggregate Zig quality gates on dependency/toolchain
   changes.
 - Use the implemented-surface robustness / real-world validation execution in
-  `docs/plans/build-plan.md` as the next execution model when we want more hardening work.
+  `docs/plans/implemented-nip-review-guide.md` as the next execution model when we want more
+  hardening work.
 - Current robustness progress:
   - completed: `NIP-46`, `NIP-06`, `NIP-51` private lists, `NIP-44`, `NIP-59`, `NIP-03`,
     `NIP-17`, `NIP-39`, `NIP-29`
