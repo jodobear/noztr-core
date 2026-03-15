@@ -51,6 +51,8 @@ fixtures so SDK and app authors can see what `noztr` rejects and why.
 - listings and metadata commerce helpers:
   - `nip99_example.zig`
   - `listings_adversarial_example.zig`
+- web bookmark metadata helpers:
+  - `nipb0_example.zig`
 
 ## Reference Examples
 
@@ -98,6 +100,7 @@ Each implemented kernel NIP now has a direct reference example.
 - `nip92_example.zig`
 - `nip94_example.zig`
 - `nip99_example.zig`
+- `nipb0_example.zig`
 - optional I6 reference examples:
   - `nip45_example.zig`
   - `nip50_example.zig`

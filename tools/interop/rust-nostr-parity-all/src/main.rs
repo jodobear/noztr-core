@@ -2593,6 +2593,13 @@ async fn main() {
         detail: Some("no dedicated rust-nostr NIP-99 helper".to_string()),
     });
     results.push(NipResult {
+        nip: "NIP-B0",
+        taxonomy: Taxonomy::LibUnsupported,
+        depth: Depth::Baseline,
+        result: CheckResult::Pass,
+        detail: Some("no dedicated rust-nostr NIP-B0 helper".to_string()),
+    });
+    results.push(NipResult {
         nip: "NIP-92",
         taxonomy: Taxonomy::LibUnsupported,
         depth: Depth::Baseline,

@@ -578,8 +578,15 @@ Current project context for the Phase H kickoff baseline.
       - ordered `image` tags and ordered `t` hashtags are accepted
       - `price` is typed as amount + currency with optional frequency
       - unrelated tags such as `e` and `a` are ignored inbound
-    - `NIP-B0` is the next kernel-first item in the requested-NIP lane.
-    - `NIP-49`, `NIP-64`, `NIP-88`, `NIP-B0`, and `NIP-C0` are the
+    - `NIP-B0` is now complete:
+      - accepted kernel slice is bounded web-bookmark metadata parse/build/validate for kind
+        `39701`
+      - `d` is required and must be a scheme-less URL-shaped identifier
+      - `title` and `published_at` are accepted as optional singleton metadata tags
+      - ordered lowercase `t` hashtags are accepted
+      - unrelated tags are ignored inbound
+      - bookmark sync, browser integration, and preview workflow remain out of kernel scope
+    - `NIP-49`, `NIP-64`, `NIP-88`, and `NIP-C0` are the
       kernel-first implementation set.
 
 ## Repo Boundary Note

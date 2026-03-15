@@ -45,6 +45,7 @@ comptime {
     _ = @import("nip92_example.zig");
     _ = @import("nip94_example.zig");
     _ = @import("nip99_example.zig");
+    _ = @import("nipb0_example.zig");
     _ = @import("media_metadata_adversarial_example.zig");
     _ = @import("listings_adversarial_example.zig");
     _ = @import("nip65_example.zig");

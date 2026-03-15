@@ -1748,6 +1748,13 @@ async function main(): Promise<void> {
         detail: "no dedicated nostr-tools or applesauce NIP-99 helper",
     });
     results.push({
+        nip: "NIP-B0",
+        taxonomy: "LIB_UNSUPPORTED",
+        depth: "BASELINE",
+        result: "PASS",
+        detail: "no dedicated nostr-tools or applesauce NIP-B0 helper",
+    });
+    results.push({
         nip: "NIP-92",
         taxonomy: "LIB_UNSUPPORTED",
         depth: "BASELINE",

@@ -76,6 +76,7 @@ completes.
 | 92 | complete | `LIB_UNSUPPORTED BASELINE PASS` | `LIB_UNSUPPORTED BASELINE PASS` | Accepted bounded per-`imeta` parse/build/validate, exact URL-in-content matching, and NIP-94 field reuse for supported metadata semantics; no further Layer 1 change required after the initial implementation and review passes | none | none | Neither active reference lane exposes a dedicated NIP-92 helper; applesauce remains secondary ecosystem evidence for the pair grammar and field semantics |
 | 94 | complete | `HARNESS_COVERED BASELINE PASS` | `LIB_UNSUPPORTED BASELINE PASS` | Accepted bounded kind-`1063` parse/build/validate with required `url` / lowercase MIME / `x`, exact supported-tag shapes, and repeated fallback support; no further Layer 1 change required after the initial implementation and review passes | none | none | Rust provides generic file-metadata support while `nostr-tools` remains a non-dedicated audit signal here; the current helper stays deterministic and metadata-only |
 | 99 | complete | `LIB_UNSUPPORTED BASELINE PASS` | `LIB_UNSUPPORTED BASELINE PASS` | Tightened `d` so listing identifiers must be scheme-less URL-shaped values rather than generic non-empty UTF-8, while keeping the bounded metadata-only surface for `30402` / `30403` unchanged otherwise | none | none | Neither active reference lane exposes a dedicated NIP-99 helper, so the stronger identifier rule is spec-first and keeps addressable listing metadata deterministic without pulling commerce workflow into the kernel |
+| B0 | complete | `LIB_UNSUPPORTED BASELINE PASS` | `LIB_UNSUPPORTED BASELINE PASS` | Accepted bounded kind-`39701` parse/build helpers with required scheme-less `d`, optional `title` / `published_at`, ordered lowercase `t` hashtags, and ignored unrelated tags; no further Layer 1 change required after Review A/B | none | none | Neither active reference lane exposes a dedicated NIP-B0 helper; the accepted surface stays metadata-only and leaves bookmark sync/browser workflow outside the kernel |
 
 ## Decision Summary
 
@@ -177,6 +178,8 @@ completes.
   parse/build/validate surface with required lowercase MIME and exact supported-tag shapes.
 - NIP-99: require `d` to be a scheme-less URL-shaped identifier instead of generic non-empty UTF-8,
   while keeping the current bounded metadata-only listing helper surface.
+- NIP-B0: keep the current bounded kind-`39701` helper with required scheme-less `d`, optional
+  `title` / `published_at`, ordered lowercase `t` hashtags, and no bookmark workflow in-kernel.
 
 ## Accepted Risks
 

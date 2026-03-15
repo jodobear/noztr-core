@@ -2051,3 +2051,36 @@ Immutable record of accepted planning decisions.
   helper surface that materially improves interoperability without dragging commerce workflow into
   the kernel.
 - Supersedes: none
+
+## D-098: Accept bounded NIP-B0 web-bookmarking helpers
+
+- Date: 2026-03-15
+- Status: accepted
+- Decision: implement `src/nipb0_web_bookmarking.zig` as the accepted `noztr` slice for
+  `NIP-B0`.
+  - accepted behavior:
+    - only kind-`39701` events are accepted
+    - `d` is required and must be a scheme-less URL-shaped identifier
+    - `title` and `published_at` are accepted as optional singleton metadata tags
+    - `t` hashtags are accepted in ordered form with lowercase hashtag semantics
+    - unrelated tags are ignored inbound
+    - event `content` may be empty, but when present must be valid UTF-8
+  - accepted evidence posture:
+    - rust parity is `LIB_UNSUPPORTED`; there is no dedicated `rust-nostr` NIP-B0 helper
+    - the TypeScript lane is also `LIB_UNSUPPORTED`; there is no dedicated `nostr-tools` or
+      applesauce NIP-B0 helper
+    - Review A found no correctness, strictness, or symmetry issue after the bounded
+      implementation and green gate run
+    - Review B found no overengineering or boundary issue; the accepted surface remains
+      metadata-only and keeps bookmark sync/browser workflow out of the kernel
+- Why: `NIP-B0` is a straightforward metadata-helper fit for the kernel and is structurally close
+  to the accepted `NIP-23` / `NIP-99` family. A bounded parse/build surface gives downstream SDK
+  code deterministic bookmark identifiers and metadata without dragging preview, sync, or browser
+  integration into `noztr`.
+- Tradeoff: narrower metadata-only scope versus leaving richer bookmark workflow to `nzdk` or app
+  code.
+- Related Tradeoff: T-0-001, T-0-002.
+- Reversal Trigger: stronger ecosystem evidence shows a clearly deterministic additional helper
+  surface that materially improves interoperability without pulling bookmark workflow into the
+  kernel.
+- Supersedes: none
