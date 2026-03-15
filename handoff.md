@@ -623,8 +623,26 @@ Current project context for the Phase H kickoff baseline.
       - malformed tag-pair sections without whitespace separation before movetext now reject
       - full chess move legality, board-state replay, rendering, playback, and engine workflow
         remain out of kernel scope
+    - `NIP-88` is now complete:
+      - accepted kernel slice is bounded poll metadata parse/build plus pure fixed-capacity tally
+        reduction for kinds `1068` and `1018`
+      - poll `content` is required and must be non-empty valid UTF-8
+      - `option` tags are required, ordered, and must use unique alphanumeric option ids
+      - `relay` tags are accepted in ordered repeated form and must be websocket relay URLs
+      - `polltype` is an optional singleton tag with default `singlechoice`
+      - `endsAt` is an optional singleton unix-seconds tag
+      - poll responses require exactly one strict `e` reference plus one-or-more `response` tags
+        on the direct extractor path
+      - canonical builders cover `option`, `relay`, `polltype`, `endsAt`, poll-reference `e`, and
+        `response` tags
+      - the pure tally reducer now keeps exactly one latest same-poll response event per pubkey
+        within poll limits, with equal timestamps broken deterministically by lexical event id
+      - singlechoice counting uses only the first response tag; multiplechoice counting dedupes the
+        first response per distinct option id
+      - latest malformed same-poll responses now suppress older valid votes instead of leaving stale
+        counts in place
+      - poll publish UX, relay fetch, curation, and live refresh workflow remain out of kernel scope
     - requested-NIP loop next execution order is:
-      - `NIP-88`
       - `NIP-49`
       - split surfaces `NIP-98`, `NIP-47`, and `NIP-B7`
 

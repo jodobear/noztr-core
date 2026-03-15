@@ -51,6 +51,9 @@ pub const nipc0_code_snippets = @import("nipc0_code_snippets.zig");
 /// Post-kernel requested-loop concrete export for the NIP-64 chess PGN module.
 pub const nip64_chess_pgn = @import("nip64_chess_pgn.zig");
 
+/// Post-kernel requested-loop concrete export for the NIP-88 polls module.
+pub const nip88_polls = @import("nip88_polls.zig");
+
 /// Phase I3 concrete export for the NIP-13 proof-of-work module.
 pub const nip13_pow = @import("nip13_pow.zig");
 
@@ -209,6 +212,7 @@ test "root exports limits and error namespaces" {
     try std.testing.expect(@TypeOf(nipb0_web_bookmarking.WebBookmarkError) == type);
     try std.testing.expect(@TypeOf(nipc0_code_snippets.CodeSnippetError) == type);
     try std.testing.expect(@TypeOf(nip64_chess_pgn.Nip64Error) == type);
+    try std.testing.expect(@TypeOf(nip88_polls.Nip88Error) == type);
     try std.testing.expect(@TypeOf(nip13_pow.PowError) == type);
     try std.testing.expect(@TypeOf(nip19_bech32.Nip19Error) == type);
     try std.testing.expect(@TypeOf(nip21_uri.Nip21Error) == type);
@@ -275,6 +279,11 @@ test "root exports limits and error namespaces" {
     try std.testing.expect(@TypeOf(nipc0_code_snippets.BuiltTag) == type);
     try std.testing.expect(@TypeOf(nip64_chess_pgn.ChessPgnInfo) == type);
     try std.testing.expect(@TypeOf(nip64_chess_pgn.BuiltTag) == type);
+    try std.testing.expect(@TypeOf(nip88_polls.PollType) == type);
+    try std.testing.expect(@TypeOf(nip88_polls.PollInfo) == type);
+    try std.testing.expect(@TypeOf(nip88_polls.PollResponseInfo) == type);
+    try std.testing.expect(@TypeOf(nip88_polls.OptionTally) == type);
+    try std.testing.expect(@TypeOf(nip88_polls.BuiltTag) == type);
     try std.testing.expect(@TypeOf(nip24_extra_metadata.MetadataExtras) == type);
     try std.testing.expect(@TypeOf(nip24_extra_metadata.CommonTagInfo) == type);
     try std.testing.expect(@TypeOf(nip24_extra_metadata.BuiltTag) == type);

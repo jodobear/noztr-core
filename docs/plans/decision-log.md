@@ -2284,3 +2284,65 @@ Immutable record of accepted planning decisions.
 - Reversal Trigger: future execution evidence shows the stronger reject-corpus and assertion-leak
   requirements add churn without materially reducing post-implementation review findings.
 - Supersedes: none
+
+## D-104: Accept bounded NIP-88 poll metadata helpers and pure tally reduction
+
+- Date: 2026-03-15
+- Status: accepted
+- Decision: implement `src/nip88_polls.zig` as the accepted `noztr` slice for `NIP-88`.
+  - accepted behavior:
+    - only kind-`1068` poll events and kind-`1018` poll-response events are accepted by the strict
+      extractors
+    - poll event `content` is required and must be non-empty valid UTF-8
+    - `option` tags are required, ordered, and must have exact shape
+      `["option", <alphanumeric-id>, <non-empty-label>]`
+    - poll option ids must be unique within one poll
+    - `relay` tags are accepted in ordered repeated form and must be websocket relay URLs
+    - `polltype` is accepted as an optional singleton tag with values `singlechoice` or
+      `multiplechoice`; missing `polltype` defaults to `singlechoice`
+    - `endsAt` is accepted as an optional singleton unix-seconds tag
+    - unrelated tags are ignored inbound on polls
+    - poll responses require exactly one strict `e` tag referencing the poll event plus one-or-more
+      `response` tags on the direct extractor path
+    - direct builders cover canonical `option`, `relay`, `polltype`, `endsAt`, poll-reference `e`,
+      and `response` tags
+    - the pure tally reducer keeps exactly one latest same-poll response event per pubkey within
+      poll limits, with equal timestamps broken deterministically by lexical event id
+    - singlechoice tallying uses only the first response tag
+    - multiplechoice tallying counts the first response tag per distinct poll option id and ignores
+      later duplicate selections for the same id
+    - latest malformed same-poll responses now suppress older valid votes by winning reducer
+      selection but contributing zero counted selections
+    - canonical downstream examples now include:
+      - `examples/nip88_example.zig`
+      - `examples/polls_adversarial_example.zig`
+  - accepted non-goals:
+    - relay fetch and subscription workflow
+    - live result refresh and UI policy
+    - follow-set / proof-of-work / web-of-trust result curation
+    - poll publish UX and response-composition workflow
+  - accepted evidence posture:
+    - the vendored `docs/nips/88.md` text was rechecked against the official source during the
+      freeze pass
+    - `rust-nostr` provides dedicated `NIP-88` poll and poll-response builders, but not a complete
+      matching strict parser or reducer, so rust parity for this pass is source-review only
+    - applesauce provides poll getter helpers and compose operations, but not a matching strict
+      parser/reducer contract, so the TypeScript lane is also source-review only for this pass
+    - Review A found one high-severity reducer bug and it is fixed in the accepted surface:
+      - a latest malformed same-poll response no longer leaves an older valid vote counted
+    - Review B found one low-severity docs/example discoverability gap and it is fixed:
+      - `examples/README.md` now indexes the direct and adversarial `NIP-88` examples
+    - green gates passed on the post-review candidate:
+      - `zig build test --summary all`
+      - `zig build`
+- Why: `NIP-88` is a good kernel fit when scoped to deterministic metadata extraction, canonical
+  tag builders, and a pure fixed-capacity tally reducer. That gives downstream callers a reliable
+  trust-boundary floor for poll parsing and vote counting without dragging relay orchestration,
+  curation policy, or UI workflow into `noztr`.
+- Tradeoff: a narrow pure-reducer kernel slice versus leaving richer poll workflow and curation
+  logic for `nzdk` or applications.
+- Related Tradeoff: T-0-001, T-0-002.
+- Reversal Trigger: stronger protocol or ecosystem evidence shows a clearly bounded additional
+  helper surface that materially improves interoperability without pulling poll workflow or
+  curation policy into the kernel.
+- Supersedes: none
