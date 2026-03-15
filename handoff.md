@@ -222,7 +222,7 @@ Current project context for the Phase H kickoff baseline.
 
 - Status: non-remote release-readiness checklist pass is complete for local closure.
 - Completed: rust parity baseline and aggregate Zig gates are current for kickoff baseline.
-- Completed: rust-active / TS-archived governance wording is aligned across active Phase G artifacts.
+- Completed: rust-active / TS non-gating audit-lane wording is aligned across active Phase G artifacts.
 - Completed: `UT-E-003`/`UT-E-004` remain maintenance-mode only with no burn-down expansion unless a
   new behavior class is discovered.
 - Deferred scope: `no-3uj` remote readiness remains deferred-by-operator.
@@ -230,14 +230,14 @@ Current project context for the Phase H kickoff baseline.
 ## Active Parity Gate
 
 - Active lane: rust only (`tools/interop/rust-nostr-parity-all`).
-- Current rust status: `36 HARNESS_COVERED`, `5 LIB_UNSUPPORTED`, mixed `BASELINE/EDGE/DEEP`,
-  `PASS`; all `41` implemented NIPs are now explicitly accounted for in the Rust lane, with
+- Current rust status: `37 HARNESS_COVERED`, `5 LIB_UNSUPPORTED`, mixed `BASELINE/EDGE/DEEP`,
+  `PASS`; all `42` implemented NIPs are now explicitly accounted for in the Rust lane, with
   `NIP-26`, `NIP-29`, `NIP-37`, `NIP-84`, and `NIP-86` recorded as `LIB_UNSUPPORTED` because the
   active Rust lane exposes no dedicated helper surfaces for them.
-- Current TS audit status: `36 HARNESS_COVERED`, `5 LIB_UNSUPPORTED`, mixed `BASELINE/EDGE/DEEP`,
-  `PASS` (`tools/interop/ts-nostr-parity-all`; non-gating audit evidence lane); all `41`
+- Current TS audit status: `36 HARNESS_COVERED`, `6 LIB_UNSUPPORTED`, mixed `BASELINE/EDGE/DEEP`,
+  `PASS` (`tools/interop/ts-nostr-parity-all`; non-gating audit evidence lane); all `42`
   implemented NIPs are now explicitly accounted for in the TS lane, with `NIP-26`, `NIP-37`,
-  `NIP-58`, `NIP-84`, and `NIP-86` recorded as `LIB_UNSUPPORTED`.
+  `NIP-58`, `NIP-84`, `NIP-86`, and `NIP-94` recorded as `LIB_UNSUPPORTED`.
 - Baseline cadence run (2026-03-09): rust parity harness passed
   (`SUMMARY pass=16 fail=0 harness_covered=16 total=16`).
 - Latest cadence run (2026-03-10): rust parity harness passed
@@ -373,7 +373,7 @@ Current project context for the Phase H kickoff baseline.
 
 ## Pending Actions
 
-1. Keep TypeScript references archive-only in docs and prevent active-cadence wording regressions.
+1. Keep TypeScript parity references non-gating in docs and prevent active-cadence wording regressions.
 2. Continue maintenance cadence reruns (rust parity + aggregate Zig gates) on dependency or toolchain
    changes and record outcomes in Phase H kickoff and handoff docs.
 3. Kernel-first expansion is active.
@@ -540,8 +540,16 @@ Current project context for the Phase H kickoff baseline.
       - extra trailing items after a valid `expiration` timestamp are ignored rather than causing
         the helper to miss the timestamp entirely
       - first valid expiration still wins deterministically
+    - `NIP-94` is now complete:
+      - accepted kernel slice is bounded kind-`1063` parse/build/validate helpers only
+      - `url`, `m`, and `x` are required
+      - `m` now enforces lowercase MIME-type shape rather than generic non-empty text
+      - supported singleton tags require exact item counts; `thumb`/`image` accept only the
+        canonical 2-item or 3-item shapes
+      - repeated `fallback` URLs are supported through caller-owned bounded buffers
     - `NIP-47`, `NIP-98`, and `NIP-B7` are split and must stop at the deterministic kernel slice.
-    - `NIP-49`, `NIP-64`, `NIP-88`, `NIP-92`, `NIP-94`, `NIP-99`, `NIP-B0`, and `NIP-C0` are the
+    - `NIP-92` is the next kernel-first item because `imeta` reuses `NIP-94` fields.
+    - `NIP-49`, `NIP-64`, `NIP-88`, `NIP-92`, `NIP-99`, `NIP-B0`, and `NIP-C0` are the
       kernel-first implementation set.
 
 ## Repo Boundary Note

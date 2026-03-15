@@ -79,6 +79,7 @@ Each implemented kernel NIP now has a direct reference example.
 - `nip73_example.zig`
 - `nip84_example.zig`
 - `nip86_example.zig`
+- `nip94_example.zig`
 - optional I6 reference examples:
   - `nip45_example.zig`
   - `nip50_example.zig`

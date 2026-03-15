@@ -42,8 +42,8 @@ This artifact is finalized for implementation execution and is aligned to:
   (`LIB_SUPPORTED`, `HARNESS_COVERED`, `NOT_COVERED_IN_THIS_PASS`, `LIB_UNSUPPORTED`), canonical
   depth labels (`BASELINE`, `EDGE`, `DEEP`), non-zero exit only on `HARNESS_COVERED` failures,
   and no default use of overloaded `unsupported` wording.
-- `PE-013`: restrict active parity gate operations to the rust lane (`rust-nostr`) and archive the
-  TypeScript `nostr-tools` parity-all lane as historical evidence only.
+- `PE-013`: restrict active parity gate operations to the rust lane (`rust-nostr`) and keep the
+  TypeScript `nostr-tools` parity-all lane as a re-runnable non-gating audit evidence lane.
   - rationale note: `rust-nostr` is the active lane because it is a strong production reference and
     ecosystem proxy, not because it overrides NIP authority or Zig-native design goals.
 
@@ -143,7 +143,7 @@ Implementation status snapshot (post-I7 closure):
     further protocol expansion.
 
 Phase G closure and Phase H transition from current baseline:
-- keep TypeScript references archive-only and prevent active-cadence wording regressions.
+- keep TypeScript parity references non-gating and prevent active-cadence wording regressions.
 - run rust parity cadence plus aggregate Zig gates on dependency/toolchain changes.
 - treat `UT-E-003`/`UT-E-004` as maintenance-mode items; reopen only on new behavior-class discovery.
 - treat remote readiness `no-3uj` as deferred-by-operator and outside the completed Phase G local
@@ -235,6 +235,7 @@ Tracker and landing discipline:
 | 70 | Preserve deny-by-default protected-event semantics and exact tag meaning; review whether any tag-shape exactness exceeds what NIP-70 needs for deterministic behavior. |
 | 73 | Preserve bounded external-id parse/build/match behavior and shared ownership of generic `i` grammar; review kind/value strictness so we reject malformed external IDs without fragmenting the grammar across per-NIP helper reimplementations. |
 | 84 | Preserve deterministic highlight-source extraction, bounded `p` attribution/url-reference parsing, and optional `context`/`comment` handling without drifting into reader UX; review long-form source-tag and role/marker tolerance so the kernel stays interoperable without becoming article/highlight workflow logic. |
+| 94 | Preserve exact kind-`1063` parsing, required `url`/lowercase-MIME/`x` handling, bounded optional metadata tags, repeated fallback support, and typed duplicate/malformed-tag failures; review optional field breadth only where broader deployed shapes remain deterministic and do not weaken the trust boundary for core file metadata. |
 | 77 | Preserve bounded negentropy state transitions and strict session parsing; review message-shape rejection only where broader but still well-defined peer behavior exists. |
 
 Review execution rule:

@@ -6,6 +6,7 @@ use std::str::FromStr;
 use base64::engine::general_purpose::STANDARD;
 use base64::Engine;
 use nostr::filter::MatchEventOptions;
+use nostr::hashes::sha256::Hash as Sha256Hash;
 use nostr::nips::nip01::Coordinate;
 use nostr::nips::nip02::Contact;
 use nostr::nips::nip05::{verify_from_raw_json, Nip05Address, Nip05Profile};
@@ -27,10 +28,12 @@ use nostr::nips::nip57::ZapRequestData;
 use nostr::nips::nip59::{self, UnwrappedGift};
 use nostr::nips::nip65::{self, RelayMetadata};
 use nostr::nips::nip73::ExternalContentId;
+use nostr::nips::nip94::FileMetadata as Nip94FileMetadata;
 use nostr::parser::{NostrParser, Token};
 use nostr::{
-    ClientMessage, Event, EventBuilder, EventId, Filter, JsonUtil, Keys, Kind, PublicKey,
-    RelayMessage, RelayUrl, SecretKey, SubscriptionId, Tag, TagStandard, Timestamp, Url,
+    ClientMessage, Event, EventBuilder, EventId, Filter, ImageDimensions, JsonUtil, Keys, Kind,
+    PublicKey, RelayMessage, RelayUrl, SecretKey, SubscriptionId, Tag, TagStandard, Timestamp,
+    Url,
 };
 use rand::{CryptoRng, RngCore};
 use serde::Deserialize;
@@ -1239,6 +1242,67 @@ fn check_nip57() -> Result<(), String> {
         )
     }) {
         return Err("nip57 receipt missing description tag".to_string());
+    }
+    Ok(())
+}
+
+fn check_nip94() -> Result<(), String> {
+    let keys = parse_keys()?;
+    let url =
+        Url::parse("https://example.com/file.jpg").map_err(|e| format!("nip94 url parse: {e}"))?;
+    let hash = Sha256Hash::from_str(
+        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    )
+    .map_err(|e| format!("nip94 hash parse: {e}"))?;
+    let metadata = Nip94FileMetadata::new(url.clone(), "image/jpeg", hash)
+        .size(1024)
+        .dimensions(ImageDimensions {
+            width: 640,
+            height: 480,
+        })
+        .magnet("magnet:?xt=urn:btih:abcdef")
+        .blurhash("LEHV6nWB2yk8pyo0adR*.7kCMdnj");
+    let event = EventBuilder::file_metadata("caption", metadata)
+        .sign_with_keys(&keys)
+        .map_err(|e| format!("nip94 sign: {e}"))?;
+
+    if event.kind != Kind::FileMetadata {
+        return Err("nip94 event kind mismatch".to_string());
+    }
+    if event.content != "caption" {
+        return Err("nip94 content mismatch".to_string());
+    }
+    if !event_has_url(&event, &url) {
+        return Err("nip94 missing url tag".to_string());
+    }
+    if !event.tags.iter().any(|tag| {
+        matches!(tag.as_standardized(), Some(TagStandard::MimeType(mime)) if mime == "image/jpeg")
+    }) {
+        return Err("nip94 missing mime tag".to_string());
+    }
+    if !event.tags.iter().any(|tag| {
+        matches!(tag.as_standardized(), Some(TagStandard::Sha256(value)) if *value == hash)
+    }) {
+        return Err("nip94 missing hash tag".to_string());
+    }
+    if !event
+        .tags
+        .iter()
+        .any(|tag| tag.as_slice().len() >= 2 && tag.as_slice()[0] == "size" && tag.as_slice()[1] == "1024")
+    {
+        return Err("nip94 missing size tag".to_string());
+    }
+
+    let reparsed = Nip94FileMetadata::try_from(event.tags.to_vec())
+        .map_err(|e| format!("nip94 reparsed metadata: {e}"))?;
+    if reparsed.url != url {
+        return Err("nip94 reparsed url mismatch".to_string());
+    }
+    if reparsed.mime_type != "image/jpeg" {
+        return Err("nip94 reparsed mime mismatch".to_string());
+    }
+    if reparsed.hash != hash {
+        return Err("nip94 reparsed hash mismatch".to_string());
     }
     Ok(())
 }
@@ -2518,6 +2582,7 @@ async fn main() {
     push_harness_covered(&mut results, "NIP-36", Depth::Baseline, check_nip36());
     push_harness_covered(&mut results, "NIP-56", Depth::Baseline, check_nip56());
     push_harness_covered(&mut results, "NIP-57", Depth::Baseline, check_nip57());
+    push_harness_covered(&mut results, "NIP-94", Depth::Baseline, check_nip94());
     push_harness_covered(&mut results, "NIP-05", Depth::Baseline, check_nip05());
     push_harness_covered(&mut results, "NIP-58", Depth::Baseline, check_nip58());
     results.push(NipResult {

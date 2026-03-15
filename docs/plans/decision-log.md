@@ -1946,3 +1946,35 @@ Immutable record of accepted planning decisions.
 - Reversal Trigger: stronger protocol or ecosystem evidence shows extra trailing expiration fields
   should invalidate the tag rather than be ignored.
 - Supersedes: none
+
+## D-095: Accept bounded NIP-94 file-metadata helpers with strict MIME and exact supported-tag shapes
+
+- Date: 2026-03-15
+- Status: accepted
+- Decision: implement `src/nip94_file_metadata.zig` as the accepted `noztr` slice for `NIP-94`.
+  - accepted behavior:
+    - only kind-`1063` events are accepted
+    - required supported tags are `url`, `m`, and `x`
+    - `m` must be a lowercase MIME-type token pair (`type/subtype`)
+    - `ox` is accepted as optional original-file hash metadata
+    - supported singleton tags require exact NIP-shaped item counts
+    - `thumb` and `image` accept only the canonical 2-item or 3-item shapes
+    - repeated `fallback` URLs are accepted through caller-owned bounded buffers
+    - unrelated unknown tags are ignored
+    - the event `content` remains the caption/description text
+  - accepted evidence posture:
+    - rust parity is `HARNESS_COVERED`
+    - the TypeScript lane records `NIP-94` as `LIB_UNSUPPORTED` because there is no dedicated
+      `nostr-tools` helper surface
+    - applesauce was reviewed as secondary ecosystem evidence during the freeze/review pass
+- Why: `NIP-94` is a good protocol-kernel fit for bounded parse/build/validate helpers, but the
+  accepted trust boundary should stay stricter than the initial draft implementation on the core
+  file-metadata tags. Lowercase MIME enforcement and exact supported-tag shapes improve correctness
+  and avoid widening `url`/`m`/`x`-style tags without a parity-backed reason, while keeping the
+  broader file workflow itself out of the kernel.
+- Tradeoff: slightly narrower acceptance for malformed supported tags versus stronger trust-boundary
+  behavior and a cleaner contract for downstream SDK/file-service work.
+- Related Tradeoff: T-0-001, T-0-002.
+- Reversal Trigger: stronger ecosystem evidence shows deployed canonical helpers intentionally rely
+  on broader supported-tag shapes or broader MIME acceptance without introducing ambiguity.
+- Supersedes: none
