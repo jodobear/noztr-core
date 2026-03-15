@@ -10,6 +10,8 @@ read_when:
 depends_on:
   - docs/plans/build-plan.md
   - docs/plans/decision-index.md
+target_findings:
+  - DOC-SYNC-001
 canonical: true
 ---
 
@@ -93,6 +95,10 @@ Run this loop for each NIP, serially, without overlap:
    - verify current wording against the official mirror / primary source
    - inspect `rust-nostr`, `nostr-tools`, and applesauce behavior where relevant
    - freeze the exact `noztr` slice, explicit non-goals, and likely example surface
+   - freeze the closeout touchpoints for this NIP:
+     - teaching surface
+     - audit state
+     - startup/discovery docs
    - freeze a short spec-to-contract checklist:
      - supported kinds
      - required tags / fields
@@ -143,6 +149,7 @@ Run this loop for each NIP, serially, without overlap:
    - `zig build test --summary all`
    - `zig build`
    - parity/evidence lanes updated as appropriate
+   - frozen closeout touchpoints applied explicitly
    - active docs updated
    - examples updated
    - one scoped git commit for the NIP before moving on

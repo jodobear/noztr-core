@@ -2644,3 +2644,31 @@ payload is needed for the current task.
 - Reversal Trigger: the explicit closeout-consistency rule adds ceremony without measurably reducing
   stale startup routing, audit drift, or doc-surface regrowth.
 - Supersedes: none
+
+## D-111: Make refinement-packet synchronization touchpoints explicit
+
+- Date: 2026-03-15
+- Status: accepted
+- Decision: require active refinement packets to declare their closeout synchronization touchpoints
+  early enough that they can be checked deliberately at closure time.
+  - accepted behavior:
+    - `docs/guides/PROCESS_CONTROL.md` defines synchronization discipline for packet/refinement work
+    - shared frontmatter may include `nips`, `target_findings`, and `sync_touchpoints` when they
+      carry signal
+    - active packets should declare whether the slice changes the teaching surface, audit state, or
+      startup/discovery docs
+    - the declaration is a short closeout checklist, not a new workflow phase
+    - the active requested-NIP loop packet incorporates this declaration into its research/freeze
+      and closeout steps
+  - accepted non-goals:
+    - introducing another review cycle
+    - expanding packet docs into full planning artifacts just to name obvious touchpoints
+- Why: the repo already had stronger closeout rules, but some synchronization work was still being
+  discovered late by memory. Declaring the touchpoints early makes doc-routing, audit, and teaching
+  updates visible before the slice is finished without adding real process weight.
+- Tradeoff: a small amount of explicit packet metadata/checklist discipline versus a quieter class
+  of closeout drift.
+- Related Tradeoff: T-0-004.
+- Reversal Trigger: touchpoint declarations become rote noise that do not measurably improve
+  closeout consistency.
+- Supersedes: none

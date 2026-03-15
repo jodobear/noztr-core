@@ -146,6 +146,19 @@ Measured on 2026-03-15 before the current refinement pass:
   add an explicit closeout-consistency rule in `docs/guides/PROCESS_CONTROL.md` that requires
   audit updates, discovery-surface updates, and steady-state routing restoration as part of done.
 
+### DOC-SYNC-001
+
+- Status: fixed in this pass
+- Problem:
+  packet closeout touchpoints were real but not declared early, so doc/audit/startup sync work
+  could still be discovered late by memory or cleanup instinct.
+- Why it hurt:
+  this made it easier for a technically correct slice to land while leaving small routing or audit
+  drift behind until a later pass noticed it.
+- Fix:
+  add explicit synchronization-discipline rules in `docs/guides/PROCESS_CONTROL.md` and fold the
+  touchpoint declaration into the active requested-NIP execution packet.
+
 ## Adoption Notes
 
 This pass takes the minimal adoption path:
@@ -160,5 +173,7 @@ This pass takes the minimal adoption path:
 8. shorten handoff to current state
 9. keep `build-plan.md` lean by moving long review procedure to reference and historical narrative
    to archive
+10. declare refinement-packet sync touchpoints early enough that closeout work is visible before the
+    slice finishes
 
 That is enough to reduce startup load immediately without a risky full doc reorg.

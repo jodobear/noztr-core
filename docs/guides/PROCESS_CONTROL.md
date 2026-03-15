@@ -74,7 +74,10 @@ Supported keys:
 - `status`
 - `owner`
 - `read_when`
+- `nips`
 - `depends_on`
+- `target_findings`
+- `sync_touchpoints`
 - `supersedes`
 - `posture`
 - `phase`
@@ -157,6 +160,22 @@ When refining an existing slice or the process itself:
 3. implement the change
 4. rerun the relevant checks
 5. update the audit doc explicitly
+
+## Synchronization Discipline
+
+When a packet or refinement slice is created, declare the closeout touchpoints early enough that
+they do not get missed at the end.
+
+Use a short declaration, in frontmatter or body text, for whether the slice changes:
+- teaching surface
+  - examples, README/discovery surface, or public usage guidance
+- audit state
+  - findings, posture status, accepted-risk state, or review conclusions
+- startup/discovery docs
+  - handoff, docs index, active packet routing, or other startup-path docs
+
+The declaration should stay short and act as a closeout checklist, not as a new workflow phase or
+long planning artifact.
 
 ## Closeout Consistency Rule
 
