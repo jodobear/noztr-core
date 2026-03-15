@@ -1765,6 +1765,8 @@ Immutable record of accepted planning decisions.
     - request parsing/serialization for all current draft methods
     - typed response parsing/serialization for method-appropriate result payloads
     - bounded validation for pubkeys, event ids, kinds, URLs, IPs, and optional reasons
+    - serializer invalid-text failures must stay on the `InvalidText` path rather than surfacing
+      as capacity errors
   - deferred to SDK or relay application:
     - NIP-98 authorization event handling
     - HTTP transport, admin session handling, retries, operator workflow, and relay policy
@@ -2020,7 +2022,7 @@ Immutable record of accepted planning decisions.
   `NIP-99`.
   - accepted behavior:
     - only kinds `30402` and `30403` are accepted
-    - `d` is required
+    - `d` is required and must be a scheme-less URL-shaped identifier
     - `title`, `summary`, `published_at`, `location`, `price`, `status`, and `g` are treated as
       supported singleton metadata tags
     - `image` tags are accepted in ordered form with required URL and optional dimensions

@@ -123,7 +123,7 @@ pub fn listing_build_identifier_tag(
     std.debug.assert(identifier.len <= limits.tag_item_bytes_max);
 
     output.items[0] = "d";
-    output.items[1] = parse_nonempty_utf8(identifier) catch return error.InvalidIdentifierTag;
+    output.items[1] = parse_scheme_less_url(identifier) catch return error.InvalidIdentifierTag;
     output.item_count = 2;
     return output.as_event_tag();
 }
@@ -300,7 +300,7 @@ fn apply_identifier_tag(tag: nip01_event.EventTag, identifier: *?[]const u8) Nip
     std.debug.assert(@intFromPtr(identifier) != 0);
 
     if (identifier.* != null) return error.DuplicateIdentifierTag;
-    identifier.* = parse_single_utf8_value(tag) catch return error.InvalidIdentifierTag;
+    identifier.* = parse_identifier_value(tag) catch return error.InvalidIdentifierTag;
 }
 
 fn apply_title_tag(tag: nip01_event.EventTag, metadata: *ListingMetadata) Nip99Error!void {
@@ -441,6 +441,14 @@ fn parse_single_utf8_value(tag: nip01_event.EventTag) error{InvalidValue}![]cons
     return parse_nonempty_utf8(tag.items[1]) catch return error.InvalidValue;
 }
 
+fn parse_identifier_value(tag: nip01_event.EventTag) error{InvalidValue}![]const u8 {
+    std.debug.assert(tag.items.len <= limits.tag_items_max);
+    std.debug.assert(limits.tag_items_max >= 2);
+
+    if (tag.items.len != 2) return error.InvalidValue;
+    return parse_scheme_less_url(tag.items[1]) catch return error.InvalidValue;
+}
+
 fn parse_u64_value(tag: nip01_event.EventTag) error{InvalidValue}!u64 {
     std.debug.assert(tag.items.len <= limits.tag_items_max);
     std.debug.assert(limits.tag_items_max >= 2);
@@ -480,6 +488,24 @@ fn parse_nonempty_utf8(text: []const u8) error{InvalidUtf8}![]const u8 {
 
     if (text.len == 0) return error.InvalidUtf8;
     if (!std.unicode.utf8ValidateSlice(text)) return error.InvalidUtf8;
+    return text;
+}
+
+fn parse_scheme_less_url(text: []const u8) error{InvalidUrl}![]const u8 {
+    std.debug.assert(text.len <= limits.tag_item_bytes_max);
+    std.debug.assert(text.len <= limits.content_bytes_max);
+
+    _ = parse_nonempty_utf8(text) catch return error.InvalidUrl;
+    for (text) |byte| {
+        if (std.ascii.isWhitespace(byte)) return error.InvalidUrl;
+    }
+    if (std.mem.indexOf(u8, text, "://") != null) return error.InvalidUrl;
+
+    var buffer: [limits.tag_item_bytes_max + 8]u8 = undefined;
+    const rendered = std.fmt.bufPrint(buffer[0..], "https://{s}", .{text}) catch {
+        return error.InvalidUrl;
+    };
+    _ = parse_url(rendered) catch return error.InvalidUrl;
     return text;
 }
 
@@ -582,7 +608,7 @@ fn test_event(tags: []const nip01_event.EventTag, content: []const u8, kind: u32
 
 test "listing extract parses bounded metadata images and hashtags" {
     const tags = [_]nip01_event.EventTag{
-        .{ .items = &.{ "d", "listing-1" } },
+        .{ .items = &.{ "d", "alice.blog/post" } },
         .{ .items = &.{ "title", "Road bike" } },
         .{ .items = &.{ "summary", "Fast and light" } },
         .{ .items = &.{ "published_at", "1710000000" } },
@@ -598,7 +624,7 @@ test "listing extract parses bounded metadata images and hashtags" {
 
     const parsed = try listing_extract(&test_event(tags[0..], "bike details", 30402), images[0..], hashtags[0..]);
 
-    try std.testing.expectEqualStrings("listing-1", parsed.identifier);
+    try std.testing.expectEqualStrings("alice.blog/post", parsed.identifier);
     try std.testing.expectEqualStrings("Road bike", parsed.title.?);
     try std.testing.expectEqualStrings("500.50", parsed.price.?.amount);
     try std.testing.expectEqualStrings("EUR", parsed.price.?.currency);
@@ -620,20 +646,30 @@ test "listing extract rejects malformed required and supported tags" {
     );
 
     const invalid_price = [_]nip01_event.EventTag{
-        .{ .items = &.{ "d", "listing-1" } },
+        .{ .items = &.{ "d", "alice.blog/post" } },
         .{ .items = &.{ "price", "free", "USD" } },
     };
     try std.testing.expectError(
         error.InvalidPriceTag,
         listing_extract(&test_event(invalid_price[0..], "", 30402), images[0..], hashtags[0..]),
     );
+
+    const invalid_identifier = [_]nip01_event.EventTag{
+        .{ .items = &.{ "d", "not a url id" } },
+    };
+    try std.testing.expectError(
+        error.InvalidIdentifierTag,
+        listing_extract(&test_event(invalid_identifier[0..], "", 30402), images[0..], hashtags[0..]),
+    );
 }
 
 test "listing builders create canonical tags" {
+    var identifier_tag: BuiltTag = .{};
     var price_tag: BuiltTag = .{};
     var image_tag: BuiltTag = .{};
     var status_tag: BuiltTag = .{};
 
+    const identifier = try listing_build_identifier_tag(&identifier_tag, "alice.blog/post");
     const price = try listing_build_price_tag(
         &price_tag,
         &.{ .amount = "50", .currency = "USD", .frequency = null },
@@ -641,10 +677,17 @@ test "listing builders create canonical tags" {
     const image = try listing_build_image_tag(&image_tag, "https://example.com/item.jpg", "400x300");
     const status = try listing_build_status_tag(&status_tag, .active);
 
+    try std.testing.expectEqualStrings("d", identifier.items[0]);
+    try std.testing.expectEqualStrings("alice.blog/post", identifier.items[1]);
     try std.testing.expectEqualStrings("price", price.items[0]);
     try std.testing.expectEqualStrings("50", price.items[1]);
     try std.testing.expectEqualStrings("image", image.items[0]);
     try std.testing.expectEqualStrings("400x300", image.items[2]);
     try std.testing.expectEqualStrings("status", status.items[0]);
     try std.testing.expectEqualStrings("active", status.items[1]);
+
+    try std.testing.expectError(
+        error.InvalidIdentifierTag,
+        listing_build_identifier_tag(&identifier_tag, "https://example.com/post"),
+    );
 }

@@ -869,6 +869,7 @@ fn write_json_string(output: []u8, index: *u32, text: []const u8) Nip86Error!voi
     std.debug.assert(@intFromPtr(index) != 0);
     std.debug.assert(text.len <= limits.relay_message_bytes_max);
 
+    if (!std.unicode.utf8ValidateSlice(text)) return error.InvalidText;
     try write_bytes(output, index, "\"");
     for (text) |byte| {
         switch (byte) {
@@ -878,7 +879,7 @@ fn write_json_string(output: []u8, index: *u32, text: []const u8) Nip86Error!voi
             '\r' => try write_bytes(output, index, "\\r"),
             '\t' => try write_bytes(output, index, "\\t"),
             else => {
-                if (byte < 0x20) return error.BufferTooSmall;
+                if (byte < 0x20) return error.InvalidText;
                 try write_byte(output, index, byte);
             },
         }
@@ -1004,4 +1005,24 @@ test "response parse handles supportedmethods and ack results" {
     try std.testing.expect(methods_response.result == .methods);
     try std.testing.expectEqualStrings("listblockedips", methods_response.result.methods[1]);
     try std.testing.expect(ack_response.result == .ack);
+}
+
+test "serializers reject invalid text instead of surfacing capacity errors" {
+    var output: [256]u8 = undefined;
+
+    try std.testing.expectError(
+        error.InvalidText,
+        request_serialize_json(
+            output[0..],
+            .{ .changerelayname = "bad\x01name" },
+        ),
+    );
+
+    try std.testing.expectError(
+        error.InvalidText,
+        response_serialize_json(
+            output[0..],
+            .{ .result = .ack, .error_text = "bad\x02error" },
+        ),
+    );
 }

@@ -14,7 +14,7 @@ test "NIP-99 example: extract classified listing metadata" {
         .active,
     );
     const tags = [_]noztr.nip01_event.EventTag{
-        .{ .items = &.{ "d", "listing-1" } },
+        .{ .items = &.{ "d", "alice.blog/post" } },
         .{ .items = &.{ "title", "Road bike" } },
         .{ .items = &.{ "price", "500", "EUR" } },
         .{ .items = &.{ "image", "https://example.com/bike.jpg", "800x600" } },
@@ -31,7 +31,7 @@ test "NIP-99 example: extract classified listing metadata" {
 
     try std.testing.expectEqualStrings("price", built_price.items[0]);
     try std.testing.expectEqualStrings("status", built_status.items[0]);
-    try std.testing.expectEqualStrings("listing-1", parsed.identifier);
+    try std.testing.expectEqualStrings("alice.blog/post", parsed.identifier);
     try std.testing.expectEqualStrings("Road bike", parsed.title.?);
     try std.testing.expectEqualStrings("500", parsed.price.?.amount);
     try std.testing.expectEqualStrings("https://example.com/bike.jpg", images[0].url);

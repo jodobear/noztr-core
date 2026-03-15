@@ -72,7 +72,10 @@ completes.
 | 73 | complete | `HARNESS_COVERED BASELINE PASS` | `NOT_COVERED_IN_THIS_PASS` | No Layer 1 change required in this pass; current external-id parsing remains intentionally broader than the NIP normalization table pending stronger ecosystem evidence, and malformed blockchain value inputs now stay on the `InvalidValue` path instead of leaking `InvalidKind` | none | none | The NIP text specifies normalized forms for several IDs, but the strongest production reference lane is also broad here; tightening now would be a compatibility-policy change rather than a clear bug fix, so the kernel keeps the current bounded parser for now |
 | 77 | complete | `HARNESS_COVERED DEEP PASS` | `HARNESS_COVERED EDGE PASS` | NEG-ERR reasons now accept the spec-required `:` delimiter without requiring a following space, and session state now allows bounded reopen on a reused state object | none | none | The prior `\": \"` requirement and idle-only reopen rule were stricter than the NIP text; both changes preserve boundedness while reducing protocol friction |
 | 84 | complete | `LIB_UNSUPPORTED BASELINE PASS` | `LIB_UNSUPPORTED BASELINE PASS` | Accepted the valid three-item highlight-attribution `p` shape where the third slot is a role and no relay hint is present; this fixes a builder/parser mismatch in the module itself | none | none | Neither active reference lane exposes a dedicated NIP-84 helper; the NIP text allows a role as the last value, so accepting `["p", pubkey, role]` keeps the kernel deterministic and more interoperable than the previous parser |
-| 86 | complete | `LIB_UNSUPPORTED BASELINE PASS` | `LIB_UNSUPPORTED BASELINE PASS` | No Layer 1 change required in this pass; the current bounded request/response surface remains acceptable after the initial implementation fixes, and typed method/result handling stays cleanly on the kernel side of the boundary | none | none | The kernel owns JSON-RPC payload parsing/building and typed admin method shapes; NIP-98 auth, HTTP transport, operator workflow, and relay policy remain outside the kernel |
+| 86 | complete | `LIB_UNSUPPORTED BASELINE PASS` | `LIB_UNSUPPORTED BASELINE PASS` | No Layer 1 scope change required; serializer invalid-text handling now returns `InvalidText` instead of leaking `BufferTooSmall`, and the bounded request/response surface otherwise remains acceptable on the kernel side of the boundary | none | none | The kernel owns JSON-RPC payload parsing/building and typed admin method shapes; NIP-98 auth, HTTP transport, operator workflow, and relay policy remain outside the kernel |
+| 92 | complete | `LIB_UNSUPPORTED BASELINE PASS` | `LIB_UNSUPPORTED BASELINE PASS` | Accepted bounded per-`imeta` parse/build/validate, exact URL-in-content matching, and NIP-94 field reuse for supported metadata semantics; no further Layer 1 change required after the initial implementation and review passes | none | none | Neither active reference lane exposes a dedicated NIP-92 helper; applesauce remains secondary ecosystem evidence for the pair grammar and field semantics |
+| 94 | complete | `HARNESS_COVERED BASELINE PASS` | `LIB_UNSUPPORTED BASELINE PASS` | Accepted bounded kind-`1063` parse/build/validate with required `url` / lowercase MIME / `x`, exact supported-tag shapes, and repeated fallback support; no further Layer 1 change required after the initial implementation and review passes | none | none | Rust provides generic file-metadata support while `nostr-tools` remains a non-dedicated audit signal here; the current helper stays deterministic and metadata-only |
+| 99 | complete | `LIB_UNSUPPORTED BASELINE PASS` | `LIB_UNSUPPORTED BASELINE PASS` | Tightened `d` so listing identifiers must be scheme-less URL-shaped values rather than generic non-empty UTF-8, while keeping the bounded metadata-only surface for `30402` / `30403` unchanged otherwise | none | none | Neither active reference lane exposes a dedicated NIP-99 helper, so the stronger identifier rule is spec-first and keeps addressable listing metadata deterministic without pulling commerce workflow into the kernel |
 
 ## Decision Summary
 
@@ -164,8 +167,15 @@ completes.
 - NIP-73: no Layer 1 change required in this pass; keep the current broader external-id parser,
   but keep malformed blockchain value inputs on the `InvalidValue` path instead of leaking
   `InvalidKind`.
-- NIP-86: no Layer 1 change required; keep the current bounded admin request/response payload
-  contract in the kernel and leave NIP-98 auth, transport, and operator workflow outside it.
+- NIP-86: keep the current bounded admin request/response payload contract in the kernel, but make
+  invalid serializer text fail as `InvalidText` instead of `BufferTooSmall`; NIP-98 auth,
+  transport, and operator workflow remain outside it.
+- NIP-92: no further Layer 1 change required; keep the current bounded per-`imeta`
+  parse/build/validate surface plus exact URL-in-content matching and accepted NIP-94 field reuse.
+- NIP-94: no further Layer 1 change required; keep the current bounded kind-`1063`
+  parse/build/validate surface with required lowercase MIME and exact supported-tag shapes.
+- NIP-99: require `d` to be a scheme-less URL-shaped identifier instead of generic non-empty UTF-8,
+  while keeping the current bounded metadata-only listing helper surface.
 
 ## Accepted Risks
 

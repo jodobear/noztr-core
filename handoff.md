@@ -24,7 +24,15 @@ Current project context for the Phase H kickoff baseline.
   - crypto-boundary evaluation is recorded in `docs/plans/crypto-boundary-evaluation.md`
   - standalone Zig secp/bitcoin primitive-library research has moved out to the dedicated
     `zsats-crypto` repo and is no longer tracked as active `noztr` work
-- Historical Phase F/G packet:
+  - strengthened-process full-surface re-audit checkpoint:
+    - fixed `NIP-99` so `d` identifiers now have to be scheme-less URL-shaped values rather than
+      generic non-empty UTF-8
+    - fixed `NIP-86` serializer invalid-text handling so it now stays on the `InvalidText` path
+      instead of leaking `BufferTooSmall`
+    - backfilled the canonical audit report for `NIP-92`, `NIP-94`, and `NIP-99`
+    - continued sweep over the other implemented NIPs found no further evidence-backed Layer 1
+      issues in this pass
+  - Historical Phase F/G packet:
   - `docs/archive/plans/phase-f-kickoff.md`
   - `docs/archive/plans/phase-f-parity-matrix.md`
   - `docs/archive/plans/phase-f-parity-ledger.md`
@@ -558,7 +566,7 @@ Current project context for the Phase H kickoff baseline.
     - `NIP-99` is now complete:
       - accepted kernel slice is bounded classified-listing metadata parse/build/validate for kinds
         `30402` and `30403`
-      - `d` is required
+      - `d` is required and must be a scheme-less URL-shaped identifier
       - supported singleton metadata tags are `title`, `summary`, `published_at`, `location`,
         `price`, `status`, and `g`
       - ordered `image` tags and ordered `t` hashtags are accepted
