@@ -22,11 +22,13 @@ fixtures so SDK and app authors can see what `noztr` rejects and why.
 - signer/bootstrap handoff:
   - `remote_signing_recipe.zig`
   - `nip46_example.zig`
+  - `remote_signing_adversarial_example.zig`
 - identity lookup and proof flows:
   - `discovery_recipe.zig`
   - `identity_proof_recipe.zig`
   - `nip05_example.zig`
   - `nip39_example.zig`
+  - `identity_proof_adversarial_example.zig`
 - deterministic wallet flows:
   - `wallet_recipe.zig`
   - `nip06_example.zig`
@@ -34,14 +36,21 @@ fixtures so SDK and app authors can see what `noztr` rejects and why.
 - media metadata and inline attachments:
   - `nip92_example.zig`
   - `nip94_example.zig`
+  - `media_metadata_adversarial_example.zig`
 - private draft and relay-list storage:
   - `nip37_example.zig`
+  - `private_lists_adversarial_example.zig`
 - private list handling:
   - `private_lists_recipe.zig`
   - `nip51_example.zig`
+  - `private_lists_adversarial_example.zig`
 - relay admin helpers:
   - `relay_admin_recipe.zig`
   - `nip86_example.zig`
+  - `relay_admin_adversarial_example.zig`
+- listings and metadata commerce helpers:
+  - `nip99_example.zig`
+  - `listings_adversarial_example.zig`
 
 ## Reference Examples
 
@@ -112,6 +121,23 @@ The recipe files are slightly higher-level, but still stay inside `noztr` bounda
   - NIP-51 private-list JSON boundary
 - `relay_admin_recipe.zig`
   - NIP-86 relay-management request and response helpers
+
+## Adversarial Examples
+
+These are the first files to open when you need the failure contract for a boundary-heavy surface.
+
+- `remote_signing_adversarial_example.zig`
+  - invalid `nostrconnect_url` template rendering
+- `relay_admin_adversarial_example.zig`
+  - invalid control text on NIP-86 serializer paths
+- `private_lists_adversarial_example.zig`
+  - deprecated NIP-04 private content and non-websocket private relays
+- `identity_proof_adversarial_example.zig`
+  - overlong NIP-39 identity inputs on typed builder paths
+- `media_metadata_adversarial_example.zig`
+  - missing `imeta` metadata and non-canonical file MIME values
+- `listings_adversarial_example.zig`
+  - invalid NIP-99 listing identifiers on both builder and extractor paths
 
 ## Boundary
 
