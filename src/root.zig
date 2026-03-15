@@ -45,6 +45,9 @@ pub const nip99_classified_listings = @import("nip99_classified_listings.zig");
 /// Post-kernel requested-loop concrete export for the NIP-B0 web-bookmarking module.
 pub const nipb0_web_bookmarking = @import("nipb0_web_bookmarking.zig");
 
+/// Post-kernel requested-loop concrete export for the NIP-C0 code-snippet module.
+pub const nipc0_code_snippets = @import("nipc0_code_snippets.zig");
+
 /// Phase I3 concrete export for the NIP-13 proof-of-work module.
 pub const nip13_pow = @import("nip13_pow.zig");
 
@@ -201,6 +204,7 @@ test "root exports limits and error namespaces" {
     try std.testing.expect(@TypeOf(nip94_file_metadata.Nip94Error) == type);
     try std.testing.expect(@TypeOf(nip99_classified_listings.Nip99Error) == type);
     try std.testing.expect(@TypeOf(nipb0_web_bookmarking.WebBookmarkError) == type);
+    try std.testing.expect(@TypeOf(nipc0_code_snippets.CodeSnippetError) == type);
     try std.testing.expect(@TypeOf(nip13_pow.PowError) == type);
     try std.testing.expect(@TypeOf(nip19_bech32.Nip19Error) == type);
     try std.testing.expect(@TypeOf(nip21_uri.Nip21Error) == type);
@@ -261,6 +265,10 @@ test "root exports limits and error namespaces" {
     try std.testing.expect(@TypeOf(nip46_remote_signing.DiscoveryInfo) == type);
     try std.testing.expect(@TypeOf(nip23_long_form.LongFormMetadata) == type);
     try std.testing.expect(@TypeOf(nip23_long_form.BuiltTag) == type);
+    try std.testing.expect(@TypeOf(nipc0_code_snippets.LicenseInfo) == type);
+    try std.testing.expect(@TypeOf(nipc0_code_snippets.RepoReference) == type);
+    try std.testing.expect(@TypeOf(nipc0_code_snippets.CodeSnippetInfo) == type);
+    try std.testing.expect(@TypeOf(nipc0_code_snippets.BuiltTag) == type);
     try std.testing.expect(@TypeOf(nip24_extra_metadata.MetadataExtras) == type);
     try std.testing.expect(@TypeOf(nip24_extra_metadata.CommonTagInfo) == type);
     try std.testing.expect(@TypeOf(nip24_extra_metadata.BuiltTag) == type);

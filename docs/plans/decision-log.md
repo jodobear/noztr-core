@@ -2144,3 +2144,54 @@ Immutable record of accepted planning decisions.
 - Reversal Trigger: future protocol or ecosystem evidence shows reducer replay should preserve or
   model `previous` semantics rather than ignoring them.
 - Supersedes: none
+
+## D-101: Accept bounded NIP-C0 code-snippet metadata helpers
+
+- Date: 2026-03-15
+- Status: accepted
+- Decision: implement `src/nipc0_code_snippets.zig` as the accepted `noztr` slice for `NIP-C0`.
+  - accepted behavior:
+    - only kind-`1337` events are accepted
+    - event `content` is required and must be non-empty valid UTF-8
+    - `l`, `name`, `extension`, `description`, `runtime`, and `repo` are supported optional
+      singleton tags
+    - `license` tags are accepted in ordered repeated form with an optional third-slot text
+      reference
+    - `dep` tags are accepted in ordered repeated form
+    - `repo` accepts either a standard URL or a
+      `30617:<pubkey>:<identifier>` repository coordinate with an optional relay-hint URL
+    - canonical builders lowercase ASCII language tags on output
+    - overlong or malformed builder inputs stay on typed `Invalid*Tag` paths instead of leaking
+      `BufferTooSmall`
+    - unrelated tags are ignored inbound
+    - canonical downstream examples now include:
+      - `examples/nipc0_example.zig`
+      - `examples/code_snippet_adversarial_example.zig`
+  - accepted evidence posture:
+    - the vendored `docs/nips/C0.md` text was rechecked against the official mirror / primary
+      source during the freeze pass
+    - `rust-nostr` provides dedicated outbound `CodeSnippet` builder coverage, but no comparable
+      strict parser surface, so parity evidence for this pass is source-review rather than harness
+    - applesauce provides getter/cast coverage for `kind:1337` metadata, but no comparable strict
+      parse/build contract, so the TypeScript lane is source-review evidence only in this pass
+    - Review A initially found two issues and both are fixed in the accepted surface:
+      - overlong builder inputs now map to typed `Invalid*Tag` failures instead of panicking or
+        surfacing `BufferTooSmall`
+      - canonical `l` builders now lowercase ASCII output to match the NIP text and rust helper
+        behavior
+    - Review B found and fixed low-severity docs/example issues; the accepted surface remains
+      metadata-only and keeps editor/run/share workflow out of the kernel
+    - green gates passed after the review fixes:
+      - `zig build test --summary all`
+      - `zig build`
+- Why: `NIP-C0` is a clean metadata-helper fit for the kernel and gives downstream SDK/app code a
+  deterministic contract for code-snippet metadata, repeated licenses/dependencies, and validated
+  repository references without dragging syntax-highlighting, editing, or execution workflow into
+  `noztr`.
+- Tradeoff: a narrow metadata-only scope versus leaving richer snippet UX and runtime workflow to
+  `nzdk` or application code.
+- Related Tradeoff: T-0-001, T-0-002.
+- Reversal Trigger: stronger protocol or ecosystem evidence shows a clearly deterministic
+  additional helper surface that materially improves interoperability without pulling editor or
+  execution workflow into the kernel.
+- Supersedes: none

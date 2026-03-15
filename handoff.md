@@ -599,8 +599,24 @@ Current project context for the Phase H kickoff baseline.
       - ordered lowercase `t` hashtags are accepted
       - unrelated tags are ignored inbound
       - bookmark sync, browser integration, and preview workflow remain out of kernel scope
-    - `NIP-49`, `NIP-64`, `NIP-88`, and `NIP-C0` are the
-      kernel-first implementation set.
+    - `NIP-C0` is now complete:
+      - accepted kernel slice is bounded code-snippet metadata parse/build/validate for kind
+        `1337`
+      - event `content` is required and must be non-empty valid UTF-8
+      - `l`, `name`, `extension`, `description`, `runtime`, and `repo` are optional singleton tags
+      - `license` tags are accepted in ordered repeated form with optional third-slot references
+      - `dep` tags are accepted in ordered repeated form
+      - `repo` accepts either standard URLs or `30617:<pubkey>:<d>` repository coordinates with an
+        optional relay-hint URL
+      - canonical builders now lowercase ASCII language tags and keep overlong metadata on typed
+        `Invalid*Tag` paths instead of leaking `BufferTooSmall`
+      - unrelated tags are ignored inbound
+      - syntax highlighting, editor integration, and run/share workflow remain out of kernel scope
+    - requested-NIP loop next execution order is:
+      - `NIP-64`
+      - `NIP-88`
+      - `NIP-49`
+      - split surfaces `NIP-98`, `NIP-47`, and `NIP-B7`
 
 ## Repo Boundary Note
 

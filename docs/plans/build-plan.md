@@ -125,6 +125,9 @@ Implementation status snapshot (post-I7 closure):
   `no-3uj` remains deferred-by-operator and outside the completed local closure gate.
 - Active planning state has moved to Phase H kickoff for additional NIP expansion in
   `docs/plans/phase-h-kickoff.md` and `docs/plans/phase-h-additional-nips-plan.md`.
+- Requested-NIP loop progress:
+  - `NIP-94`, `NIP-92`, `NIP-99`, `NIP-B0`, and `NIP-C0` are complete.
+  - Next requested-NIP execution focus is `NIP-64`.
 - NIP-06 dependency strategy is resolved for current planning: adopt `libwally-core` behind the
   approved pinned crypto backend policy and a narrow boundary module.
 - Phase H Wave 1 execution has started:

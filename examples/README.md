@@ -114,6 +114,7 @@ Each implemented kernel NIP now has a direct reference example.
 - `nip94_example.zig`
 - `nip99_example.zig`
 - `nipb0_example.zig`
+- `nipc0_example.zig`
 - optional I6 reference examples:
   - `nip45_example.zig`
   - `nip50_example.zig`
@@ -160,6 +161,8 @@ These are the first files to open when you need the failure contract for a bound
   - missing `imeta` metadata and non-canonical file MIME values
 - `listings_adversarial_example.zig`
   - invalid NIP-99 listing identifiers on both builder and extractor paths
+- `code_snippet_adversarial_example.zig`
+  - malformed NIP-C0 repository references rejected on both builder and extractor paths
 - `nip29_adversarial_example.zig`
   - mixed-group moderation replay rejected by the pure reducer
 
