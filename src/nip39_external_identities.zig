@@ -176,16 +176,16 @@ fn parse_provider(text: []const u8) Nip39Error!IdentityProvider {
 
 fn validate_claim(claim: *const IdentityClaim) Nip39Error!void {
     std.debug.assert(@intFromPtr(claim) != 0);
-    std.debug.assert(claim.identity.len <= limits.tag_item_bytes_max);
+    std.debug.assert(limits.tag_item_bytes_max <= limits.content_bytes_max);
 
     try validate_identity(claim.provider, claim.identity);
     try validate_proof(claim.provider, claim.proof);
 }
 
 fn validate_identity(provider: IdentityProvider, identity: []const u8) Nip39Error!void {
-    std.debug.assert(identity.len <= limits.tag_item_bytes_max);
     std.debug.assert(limits.tag_item_bytes_max <= limits.content_bytes_max);
 
+    if (identity.len > limits.tag_item_bytes_max) return error.InvalidIdentity;
     if (!std.unicode.utf8ValidateSlice(identity)) return error.InvalidIdentity;
     if (identity.len == 0) return error.InvalidIdentity;
     if (std.mem.indexOfScalar(u8, identity, ':') != null) return error.InvalidIdentity;
@@ -198,9 +198,9 @@ fn validate_identity(provider: IdentityProvider, identity: []const u8) Nip39Erro
 }
 
 fn validate_proof(provider: IdentityProvider, proof: []const u8) Nip39Error!void {
-    std.debug.assert(proof.len <= limits.tag_item_bytes_max);
     std.debug.assert(limits.tag_item_bytes_max <= limits.content_bytes_max);
 
+    if (proof.len > limits.tag_item_bytes_max) return error.InvalidProof;
     if (!std.unicode.utf8ValidateSlice(proof)) return error.InvalidProof;
     if (proof.len == 0) return error.InvalidProof;
     if (contains_ascii_space(proof)) return error.InvalidProof;
@@ -448,5 +448,33 @@ test "identity claim builders produce canonical tags urls and texts" {
     try std.testing.expectEqualStrings(
         "https://t.me/nostrdirectory/770",
         try identity_claim_build_proof_url(url_buffer[0..], &telegram),
+    );
+}
+
+test "identity claim builders reject overlong identity and proof on typed paths" {
+    var built_tag: BuiltTag = .{};
+    var long_identity: [limits.tag_item_bytes_max + 1]u8 = undefined;
+    var long_proof: [limits.tag_item_bytes_max + 1]u8 = undefined;
+    @memset(long_identity[0..], 'a');
+    @memset(long_proof[0..], '1');
+
+    const invalid_identity = IdentityClaim{
+        .provider = .github,
+        .identity = long_identity[0..],
+        .proof = "9721ce4ee4fceb91c9711ca2a6c9a5ab",
+    };
+    const invalid_proof = IdentityClaim{
+        .provider = .twitter,
+        .identity = "semisol",
+        .proof = long_proof[0..],
+    };
+
+    try std.testing.expectError(
+        error.InvalidIdentity,
+        identity_claim_build_tag(&built_tag, &invalid_identity),
+    );
+    try std.testing.expectError(
+        error.InvalidProof,
+        identity_claim_build_tag(&built_tag, &invalid_proof),
     );
 }

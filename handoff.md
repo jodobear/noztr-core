@@ -190,7 +190,10 @@ Current project context for the Phase H kickoff baseline.
   - deferred backlog `NIP-39` is now complete in `src/nip39_external_identities.zig` with bounded
     kind-`10011` claim extraction, canonical `i`-tag building, provider-specific proof-URL
     derivation, and expected proof-text generation
-  - deferred backlog `NIP-39` robustness review is complete with no Layer 1 behavior change
+  - deferred backlog `NIP-39` robustness review is complete:
+    - no Layer 1 scope change was required
+    - overlong identity/proof builder inputs now stay on typed `InvalidIdentity` /
+      `InvalidProof` paths instead of surfacing `BufferTooSmall`
   - accepted kernel posture: live provider fetch verification remains out of current kernel scope
     (`D-071`)
   - post-expansion full-kernel audit checkpoint:
