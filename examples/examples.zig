@@ -35,6 +35,7 @@ comptime {
     _ = @import("private_lists_adversarial_example.zig");
     _ = @import("nip44_example.zig");
     _ = @import("nip46_example.zig");
+    _ = @import("nip49_example.zig");
     _ = @import("remote_signing_adversarial_example.zig");
     if (@hasDecl(noztr.nip45_count, "CountError")) _ = @import("nip45_example.zig");
     if (@hasDecl(noztr.nip50_search, "SearchError")) _ = @import("nip50_example.zig");
@@ -57,6 +58,7 @@ comptime {
     _ = @import("code_snippet_adversarial_example.zig");
     _ = @import("chess_pgn_adversarial_example.zig");
     _ = @import("polls_adversarial_example.zig");
+    _ = @import("private_key_encryption_adversarial_example.zig");
     _ = @import("nip65_example.zig");
     _ = @import("nip70_example.zig");
     _ = @import("nip73_example.zig");

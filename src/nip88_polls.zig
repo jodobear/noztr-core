@@ -1054,7 +1054,7 @@ test "poll tally ignores malformed foreign and unsupported response events" {
 
     const tally = try poll_tally_reduce(&poll_event, responses[0..], latest[0..], tallies[0..]);
 
-    try std.testing.expectEqual(@as(u16, 1), tally.candidate_pubkey_count);
+    try std.testing.expectEqual(@as(u16, 2), tally.candidate_pubkey_count);
     try std.testing.expectEqual(@as(u16, 1), tally.counted_pubkey_count);
     try std.testing.expectEqual(@as(u32, 1), tallies[0].vote_count);
 }

@@ -642,9 +642,29 @@ Current project context for the Phase H kickoff baseline.
       - latest malformed same-poll responses now suppress older valid votes instead of leaving stale
         counts in place
       - poll publish UX, relay fetch, curation, and live refresh workflow remain out of kernel scope
+    - `NIP-49` is now complete:
+      - accepted kernel slice is bounded private-key encryption/decryption for canonical
+        `ncryptsec` payloads plus fixed payload parse/serialize and bech32 encode/decode
+      - passwords are normalized through an internal bounded `NFKC` helper backed by checked-in
+        canonical composition tables; this remains an internal helper rather than a broad public
+        Unicode API
+      - key-security bytes are typed as `weak`, `medium`, and `unknown`
+      - `log_n` is typed and bounded on the public boundary, with fixed `scrypt` parameters
+        `r=8`, `p=1`, and an explicit caller-owned scratch sizing helper
+      - encrypt/decrypt helpers validate secp256k1 secret-key shape at the trust boundary
+      - wrong-password or tampered-payload failures stay on `InvalidCiphertext`
+      - canonical examples now include:
+        - `examples/nip49_example.zig`
+        - `examples/private_key_encryption_adversarial_example.zig`
+      - `zig build test --summary all` and `zig build` are green on the post-review candidate
+    - gate-backfill note:
+      - `src/nip88_polls.zig` had one stale candidate-count test expectation in the full harness;
+        the accepted reducer contract already treated malformed same-poll responses as zero-vote
+        candidates, so the test expectation was updated without changing the accepted runtime
+        behavior
     - requested-NIP loop next execution order is:
-      - `NIP-49`
-      - split surfaces `NIP-98`, `NIP-47`, and `NIP-B7`
+      - `NIP-98`
+      - split surfaces `NIP-47` and `NIP-B7`
 
 ## Repo Boundary Note
 

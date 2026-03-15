@@ -2346,3 +2346,56 @@ Immutable record of accepted planning decisions.
   helper surface that materially improves interoperability without pulling poll workflow or
   curation policy into the kernel.
 - Supersedes: none
+
+## D-105: Accept bounded NIP-49 private-key encryption with internal NFKC normalization
+
+- Date: 2026-03-15
+- Status: accepted
+- Decision: implement `src/nip49_private_key_encryption.zig` as the accepted `noztr` slice for
+  `NIP-49`.
+  - accepted behavior:
+    - only version `0x02` payloads are accepted
+    - fixed payload parse/serialize is strict on the 91-byte
+      `version || log_n || salt || nonce || key_security || ciphertext` contract
+    - canonical bech32 encode/decode is exposed for the `ncryptsec` HRP
+    - passwords are normalized through a new internal bounded `NFKC` helper in
+      `src/unicode_nfkc.zig`, backed by checked-in canonical composition tables in
+      `src/unicode_nfkc_data.zig`
+    - the public boundary accepts typed key-security bytes `weak`, `medium`, and `unknown`
+    - the public boundary accepts typed `log_n` values only within the accepted bounded range, with
+      fixed `scrypt` parameters `r=8` and `p=1`
+    - callers must provide fixed-capacity scratch for `scrypt`, and the module exposes an explicit
+      scratch-sizing helper
+    - encrypt/decrypt helpers validate secp256k1 secret-key shape at the public boundary
+    - decrypt authentication failures map to `InvalidCiphertext`, and successful plaintext still
+      must validate as one secp256k1 secret key
+    - canonical downstream examples now include:
+      - `examples/nip49_example.zig`
+      - `examples/private_key_encryption_adversarial_example.zig`
+  - accepted non-goals:
+    - password UX and policy
+    - secret storage, export/import workflow, and recovery policy
+    - any broad public Unicode normalization API beyond the narrow internal helper needed here
+  - accepted evidence posture:
+    - the vendored `docs/nips/49.md` text was rechecked during the freeze pass
+    - `rust-nostr` and vendored `nostr-tools` both normalize passwords with `NFKC`, derive the
+      symmetric key with `scrypt`, and use XChaCha20-Poly1305 over the same fixed payload shape
+    - Review A found two real implementation issues and both are fixed in the accepted surface:
+      - bech32 checksum staging now uses the correct `expanded_hrp + data` buffer size
+      - checksum bit-shift extraction no longer overflows the loop index type
+    - Review B found no additional boundary or overengineering issue; the accepted surface remains
+      a caller-scratch-first kernel helper rather than a password-management workflow
+    - green gates passed on the post-review candidate:
+      - `zig build test --summary all`
+      - `zig build`
+- Why: `NIP-49` is a good kernel fit when kept on deterministic payload framing, typed password
+  normalization, bounded key derivation, and strict secret-key validation. That gives downstream
+  callers a reliable `ncryptsec` trust boundary without pulling password UX, storage, or recovery
+  policy into `noztr`.
+- Tradeoff: a narrower caller-scratch-first encryption boundary versus a more ergonomic but less
+  explicit API that would hide runtime allocation, password workflow, or storage concerns.
+- Related Tradeoff: T-0-001, T-0-002.
+- Reversal Trigger: stronger protocol or ecosystem evidence shows a bounded additional helper
+  surface that materially improves interoperability without widening `noztr` into password UX,
+  storage policy, or a broad Unicode API.
+- Supersedes: none

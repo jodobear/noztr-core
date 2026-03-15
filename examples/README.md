@@ -42,6 +42,7 @@ fixtures so SDK and app authors can see what `noztr` rejects and why.
 - deterministic wallet flows:
   - `wallet_recipe.zig`
   - `nip06_example.zig`
+  - `nip49_example.zig`
   - `bip85_example.zig`
   - `nostr_keys_example.zig`
 - media metadata and inline attachments:
@@ -70,6 +71,9 @@ fixtures so SDK and app authors can see what `noztr` rejects and why.
 - poll metadata and tally helpers:
   - `nip88_example.zig`
   - `polls_adversarial_example.zig`
+- private-key encryption boundary:
+  - `nip49_example.zig`
+  - `private_key_encryption_adversarial_example.zig`
 
 ## Reference Examples
 
@@ -104,6 +108,7 @@ Each implemented kernel NIP now has a direct reference example.
 - `nip42_example.zig`
 - `nip44_example.zig`
 - `nip46_example.zig`
+- `nip49_example.zig`
 - `nip51_example.zig`
 - `nip56_example.zig`
 - `nip57_example.zig`
@@ -175,6 +180,8 @@ These are the first files to open when you need the failure contract for a bound
   - malformed NIP-64 PGN structure rejected on both validator and metadata-builder paths
 - `polls_adversarial_example.zig`
   - latest malformed same-poll responses suppress older votes and invalid response tags stay typed
+- `private_key_encryption_adversarial_example.zig`
+  - wrong passwords stay on `InvalidCiphertext` and invalid scrypt parameters stay typed
 - `nip29_adversarial_example.zig`
   - mixed-group moderation replay rejected by the pure reducer
 

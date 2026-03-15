@@ -81,6 +81,18 @@ pub const Limits = struct {
     pub const nip46_permissions_max: u8 = 32;
     pub const nip46_secret_bytes_max: u16 = 256;
 
+    pub const nip49_version: u8 = 0x02;
+    pub const nip49_key_bytes: u8 = 32;
+    pub const nip49_salt_bytes: u8 = 16;
+    pub const nip49_nonce_bytes: u8 = 24;
+    pub const nip49_ciphertext_bytes: u8 = 48;
+    pub const nip49_payload_bytes: u8 = 91;
+    pub const nip49_bech32_bytes_max: u16 = 162;
+    pub const nip49_password_bytes_max: u16 = 4_096;
+    pub const nip49_password_normalized_bytes_max: u16 = 4_096;
+    pub const nip49_scrypt_r: u8 = 8;
+    pub const nip49_scrypt_p: u8 = 1;
+
     pub const nip06_mnemonic_bytes_max: u16 = 256;
     pub const nip06_passphrase_bytes_max: u16 = 256;
     pub const nip06_normalized_bytes_max: u16 = 4_096;
@@ -181,6 +193,19 @@ pub const nip46_message_params_max: u8 = Limits.nip46_message_params_max;
 pub const nip46_relays_max: u8 = Limits.nip46_relays_max;
 pub const nip46_permissions_max: u8 = Limits.nip46_permissions_max;
 pub const nip46_secret_bytes_max: u16 = Limits.nip46_secret_bytes_max;
+
+pub const nip49_version: u8 = Limits.nip49_version;
+pub const nip49_key_bytes: u8 = Limits.nip49_key_bytes;
+pub const nip49_salt_bytes: u8 = Limits.nip49_salt_bytes;
+pub const nip49_nonce_bytes: u8 = Limits.nip49_nonce_bytes;
+pub const nip49_ciphertext_bytes: u8 = Limits.nip49_ciphertext_bytes;
+pub const nip49_payload_bytes: u8 = Limits.nip49_payload_bytes;
+pub const nip49_bech32_bytes_max: u16 = Limits.nip49_bech32_bytes_max;
+pub const nip49_password_bytes_max: u16 = Limits.nip49_password_bytes_max;
+pub const nip49_password_normalized_bytes_max: u16 =
+    Limits.nip49_password_normalized_bytes_max;
+pub const nip49_scrypt_r: u8 = Limits.nip49_scrypt_r;
+pub const nip49_scrypt_p: u8 = Limits.nip49_scrypt_p;
 
 pub const nip06_mnemonic_bytes_max: u16 = Limits.nip06_mnemonic_bytes_max;
 pub const nip06_passphrase_bytes_max: u16 = Limits.nip06_passphrase_bytes_max;
@@ -300,6 +325,32 @@ comptime {
     std.debug.assert(Limits.nip46_permissions_max > 0);
     std.debug.assert(Limits.nip46_secret_bytes_max > 0);
     std.debug.assert(Limits.nip46_secret_bytes_max <= Limits.tag_item_bytes_max);
+
+    std.debug.assert(Limits.nip49_version == 0x02);
+    std.debug.assert(Limits.nip49_key_bytes == 32);
+    std.debug.assert(Limits.nip49_salt_bytes == 16);
+    std.debug.assert(Limits.nip49_nonce_bytes == 24);
+    std.debug.assert(Limits.nip49_ciphertext_bytes == Limits.nip49_key_bytes + 16);
+    std.debug.assert(
+        Limits.nip49_payload_bytes ==
+            1 +
+                1 +
+                Limits.nip49_salt_bytes +
+                Limits.nip49_nonce_bytes +
+                1 +
+                Limits.nip49_ciphertext_bytes,
+    );
+    std.debug.assert(
+        Limits.nip49_bech32_bytes_max ==
+            9 + 1 + @divFloor((@as(u32, Limits.nip49_payload_bytes) * 8) + 4, 5) + 6,
+    );
+    std.debug.assert(Limits.nip49_password_bytes_max > 0);
+    std.debug.assert(
+        Limits.nip49_password_normalized_bytes_max >= Limits.nip49_password_bytes_max,
+    );
+    std.debug.assert(Limits.nip49_scrypt_r == 8);
+    std.debug.assert(Limits.nip49_scrypt_p == 1);
+
     std.debug.assert(Limits.nip06_mnemonic_bytes_max >= 128);
     std.debug.assert(Limits.nip06_passphrase_bytes_max > 0);
     std.debug.assert(Limits.nip06_seed_bytes == 64);

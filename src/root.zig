@@ -90,6 +90,9 @@ pub const nip51_lists = @import("nip51_lists.zig");
 /// Phase H concrete export for the NIP-46 remote-signing module.
 pub const nip46_remote_signing = @import("nip46_remote_signing.zig");
 
+/// Post-kernel requested-loop concrete export for the NIP-49 private-key encryption module.
+pub const nip49_private_key_encryption = @import("nip49_private_key_encryption.zig");
+
 /// Phase H concrete export for the NIP-06 mnemonic derivation module.
 pub const nip06_mnemonic = @import("nip06_mnemonic.zig");
 
@@ -226,6 +229,7 @@ test "root exports limits and error namespaces" {
     try std.testing.expect(@TypeOf(nip51_lists.ListError) == type);
     try std.testing.expect(@TypeOf(nip51_lists.PrivateListError) == type);
     try std.testing.expect(@TypeOf(nip46_remote_signing.Nip46Error) == type);
+    try std.testing.expect(@TypeOf(nip49_private_key_encryption.Nip49Error) == type);
     try std.testing.expect(@TypeOf(nip06_mnemonic.Nip06Error) == type);
     try std.testing.expect(@TypeOf(bip85_derivation.Bip85Error) == type);
     try std.testing.expect(@TypeOf(nostr_keys.NostrKeysError) == type);
