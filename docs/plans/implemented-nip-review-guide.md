@@ -18,6 +18,10 @@ canonical: true
 Use this guide when reviewing implemented behavior for accidental over-narrowing, trust-boundary
 mistakes, or unnecessary ecosystem friction.
 
+This is a specialized implemented-surface audit and robustness guide.
+For the generic repo-wide staged execution order, use
+`docs/guides/IMPLEMENTATION_QUALITY_GATE.md`.
+
 ## Review Criteria
 
 The standard is not "be permissive". It is "be deterministic, bounded, and compatible unless there

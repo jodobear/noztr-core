@@ -1,4 +1,21 @@
+---
+title: Phase H Additional NIPs Plan
+doc_type: packet
+status: reference
+owner: noztr
+phase: phase-h
+read_when:
+  - tracing_completed_phase_h_expansion_planning
+depends_on:
+  - docs/plans/build-plan.md
+  - docs/plans/decision-index.md
+canonical: true
+---
+
 # Phase H Additional NIPs Plan
+
+Reference-only completed packet. Current live Phase H work is in
+`docs/plans/phase-h-remaining-work.md`.
 
 Date: 2026-03-10
 

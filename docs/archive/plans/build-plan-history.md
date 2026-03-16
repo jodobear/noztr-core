@@ -36,7 +36,7 @@ The pre-trim build plan carried these historical state details directly:
   private-list follow-up, and the requested-NIP loop up through `NIP-47` were all recorded inline
 
 The active build plan now keeps only the current baseline and routes detailed historical material
-to archive, handoff, and the current Phase H packet docs.
+to archive, handoff, the current Phase H remaining-work packet, and reference packets where needed.
 
 ## Archived Phase Schedule Snapshot
 
@@ -69,7 +69,7 @@ The pre-trim build plan preserved a detailed phase/module schedule:
   - all implemented v1 modules
 
 The schedule itself is historical. Current execution sequencing is now carried by the active build
-plan and the active Phase H packet docs.
+plan and `docs/plans/phase-h-remaining-work.md`.
 
 ## Archived Governance And Gate Snapshot
 
@@ -87,7 +87,11 @@ Those have now been split as follows:
 
 - current review and robustness procedure:
   `docs/plans/implemented-nip-review-guide.md`
-- current requested-NIP execution packet:
+- current generic staged gate:
+  `docs/guides/IMPLEMENTATION_QUALITY_GATE.md`
+- current active Phase H packet:
+  `docs/plans/phase-h-remaining-work.md`
+- completed requested-NIP reference packet:
   `docs/plans/post-kernel-requested-nips-loop.md`
 - current active baseline:
   `docs/plans/build-plan.md`

@@ -11,6 +11,7 @@ read_when:
 depends_on:
   - docs/plans/nostr-principles.md
   - docs/plans/decision-index.md
+  - docs/guides/IMPLEMENTATION_QUALITY_GATE.md
   - docs/plans/implemented-nip-review-guide.md
 canonical: true
 ---
@@ -101,17 +102,21 @@ This artifact is the lean active execution baseline and is aligned to:
 - Phase H Wave 1, the implemented-NIP audit, Wave 2 / `NIP-46`, Wave 3 / `NIP-06`, and the
   post-Wave `NIP-51` private-list follow-up are complete.
 - The post-kernel requested-NIP loop is complete through `NIP-B7`.
+- Current live Phase H packet is `docs/plans/phase-h-remaining-work.md`.
+- `OQ-E-006` usability closure is the current remaining Phase H gating item.
 - `docs/plans/post-kernel-requested-nips-loop.md` now remains as reference evidence for the loop
   order, closure rules, and split-surface scope calls rather than as an active execution packet.
-- Docs/control-surface refinement is active under `docs/guides/PROCESS_CONTROL.md` and
-  `docs/plans/docs-surface-audit.md`.
 - NIP-06 dependency strategy is resolved for current planning: adopt `libwally-core` behind the
   approved pinned crypto backend policy and a narrow boundary module.
 
 ## Active Execution Rules
 
-- For requested-NIP work, follow `docs/plans/post-kernel-requested-nips-loop.md` and the closure
-  discipline in `AGENTS.md`.
+- For any new implementation, audit, or robustness slice, use
+  `docs/guides/IMPLEMENTATION_QUALITY_GATE.md`.
+- For active Phase H remaining work and next-slice selection, use
+  `docs/plans/phase-h-remaining-work.md`.
+- The completed requested-NIP loop remains reference-only in
+  `docs/plans/post-kernel-requested-nips-loop.md`.
 - For implemented-surface audits or robustness work, use
   `docs/plans/implemented-nip-review-guide.md`.
 - For kernel-vs-SDK ownership questions, use `docs/plans/noztr-sdk-ownership-matrix.md`.
@@ -124,6 +129,10 @@ This artifact is the lean active execution baseline and is aligned to:
 
 - `docs/plans/decision-index.md`
   - startup route into accepted policy
+- `docs/plans/phase-h-remaining-work.md`
+  - current active Phase H packet and remaining-work routing
+- `docs/guides/IMPLEMENTATION_QUALITY_GATE.md`
+  - canonical staged gate for new slices
 - `docs/plans/post-kernel-requested-nips-loop.md`
   - requested-NIP lane order and closure rules
 - `docs/plans/implemented-nip-review-guide.md`
@@ -160,6 +169,12 @@ This artifact is the lean active execution baseline and is aligned to:
 
 - `docs/archive/plans/build-plan-history.md`
   - archived execution narrative, old phase/module schedule, and old Phase E tradeoff snapshot
+- `docs/plans/phase-h-kickoff.md`
+  - completed Phase H kickoff packet retained for traceability
+- `docs/plans/phase-h-additional-nips-plan.md`
+  - completed Phase H expansion-planning packet retained for traceability
+- `docs/plans/phase-h-wave1-loop.md`
+  - completed Phase H Wave 1 packet retained for traceability
 - `docs/plans/post-kernel-requested-nips-loop.md`
   - completed requested-NIP loop order, review model, and split-surface traceability
 - `docs/archive/plans/phase-f-parity-matrix.md`

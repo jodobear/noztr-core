@@ -9,9 +9,8 @@ explicitly about historical reconstruction.
 Current canonical planning/status docs remain in:
 
 - `docs/plans/build-plan.md`
+- `docs/guides/IMPLEMENTATION_QUALITY_GATE.md`
 - `docs/plans/implemented-nip-review-guide.md`
 - `docs/plans/decision-log.md`
-- `docs/plans/phase-h-kickoff.md`
-- `docs/plans/phase-h-additional-nips-plan.md`
-- `docs/plans/phase-h-wave1-loop.md`
+- `docs/plans/phase-h-remaining-work.md`
 - `handoff.md`

@@ -1,3 +1,19 @@
+---
+title: LLM Usability Pass
+doc_type: log
+status: active
+owner: noztr
+phase: phase-h
+read_when:
+  - executing_oq_e_006
+  - tracing_phase_h_remaining_work
+  - evaluating_rc_usability_defaults
+depends_on:
+  - docs/plans/build-plan.md
+  - docs/plans/decision-index.md
+canonical: true
+---
+
 # LLM Usability Pass (OQ-E-006)
 
 Date: 2026-03-07

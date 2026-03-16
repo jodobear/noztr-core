@@ -12,6 +12,7 @@ depends_on:
   - docs/README.md
   - docs/plans/build-plan.md
   - docs/plans/decision-index.md
+  - docs/plans/phase-h-remaining-work.md
 canonical: true
 ---
 
@@ -25,15 +26,16 @@ Current execution state for `noztr`.
 - `docs/README.md`
 - `docs/plans/build-plan.md`
 - `docs/plans/decision-index.md`
-- `docs/plans/post-kernel-requested-nips-loop.md` only when tracing the completed requested-NIP lane
+- `docs/plans/phase-h-remaining-work.md`
 
 ## Current Status
 
 - Active execution state remains Phase H on the post-Phase G local-only closure baseline.
+- Current active Phase H packet is `docs/plans/phase-h-remaining-work.md`.
 - Remote readiness remains deferred-by-operator.
 - No git remote is configured in this repo.
 - The post-kernel requested-NIP loop is complete through split-surface `NIP-B7`.
-- No active implementation slice is currently selected.
+- `OQ-E-006` remains open and is the current remaining Phase H gating item.
 - Only expected untracked local artifact:
   - `tools/interop/rust-nostr-parity-all/target/`
 
@@ -42,62 +44,43 @@ Current execution state for `noztr`.
 - `AGENTS.md`
   - agent operating rules and closure discipline
 - `docs/README.md`
-  - docs index and active/reference/archive routing
-- `docs/guides/PROCESS_CONTROL.md`
-  - repo-specific process refinement rules for keeping control docs lean
-- `docs/guides/PROCESS_REFINEMENT_PLAYBOOK.md`
-  - reusable `noztr` process lessons for future refinement or cross-repo sharing
+  - current docs routing
 - `docs/plans/build-plan.md`
   - active execution baseline
 - `docs/plans/decision-index.md`
-  - startup route into accepted policy areas
-- `docs/plans/decision-log.md`
-  - on-demand canonical reference for accepted defaults and policy decisions
-- `docs/plans/docs-surface-audit.md`
-  - stable-ID audit of doc bloat, repetition, and control-surface drift
-- `docs/plans/post-kernel-requested-nips-loop.md`
-  - completed requested-NIP packet retained for order/rule traceability
+  - startup route into accepted policy
+- `docs/plans/phase-h-remaining-work.md`
+  - current active Phase H packet
+- `docs/guides/IMPLEMENTATION_QUALITY_GATE.md`
+  - staged implementation and review gate for any new slice
 
-## Active Quality Rules
+## Critical Rules
 
-- For every new or materially changed NIP surface:
-  - freeze a spec-to-contract checklist before closure
-  - freeze an explicit invalid-vs-capacity matrix before coding public builder/validator paths
-  - run builder/parser symmetry tests where applicable
-  - review the public error contract explicitly
-  - include at least one hostile consumer-facing example for boundary-heavy surfaces
-  - run an adversarial audit before closure
-- When reference lanes are weak or `LIB_UNSUPPORTED`:
-  - freeze a reject corpus before coding
-  - include nonsense-token and separator-discipline challenges where relevant
-- `br` mutations, `br sync`, and git-writing steps remain serial-only.
+- use `docs/guides/IMPLEMENTATION_QUALITY_GATE.md` for any new implementation, audit, or
+  robustness slice
+- treat completed Phase H packets as reference-only; keep new pending work in
+  `docs/plans/phase-h-remaining-work.md`
+- keep `handoff.md` state-oriented and keep `br` mutations, `br sync`, and git-writing steps
+  serial-only
 
 ## Current Repo State
 
-- Latest docs/control-surface refinement:
-  - active build-plan is lean baseline only
-  - implemented-surface review procedure is in `docs/plans/implemented-nip-review-guide.md`
-  - historical build-plan narrative is in `docs/archive/plans/build-plan-history.md`
-  - reusable process lessons are now captured in `docs/guides/PROCESS_REFINEMENT_PLAYBOOK.md`
-  - process updates now revise the control surface coherently instead of accumulating additively
-  - resolved docs-audit history is in `docs/archive/plans/docs-surface-audit-history.md`
-- Latest requested-NIP closure:
-  - `NIP-B7` / `no-z9g` is closed locally
-  - the full requested-NIP loop is now complete
+- completed packets retained for traceability:
+  - `docs/plans/phase-h-kickoff.md`
+  - `docs/plans/phase-h-additional-nips-plan.md`
+  - `docs/plans/phase-h-wave1-loop.md`
+  - `docs/plans/post-kernel-requested-nips-loop.md`
 - Only expected untracked local artifact:
   - `tools/interop/rust-nostr-parity-all/target/`
 
 ## Next Work
 
-- Choose the next Phase H implementation or audit slice before starting new code work.
-- Use `docs/plans/noztr-sdk-ownership-matrix.md` when the next candidate touches kernel-vs-SDK
-  scope.
-- Use `docs/guides/PROCESS_CONTROL.md` and `docs/guides/PROCESS_REFINEMENT_PLAYBOOK.md` when
-  touching process/docs.
+- execute `OQ-E-006` from `docs/plans/llm-usability-pass.md`
+- if that pass creates a new code or audit slice, freeze it in `docs/plans/phase-h-remaining-work.md`
+  and run `docs/guides/IMPLEMENTATION_QUALITY_GATE.md`
+- use `docs/plans/noztr-sdk-ownership-matrix.md` when a candidate touches kernel-vs-SDK scope
 
 ## Notes
 
-- Historical execution detail belongs in git history, archived docs, or accepted decision entries,
-  not in this handoff.
-- If the process tightens again, re-audit recently closed requested NIPs before claiming the
-  stronger gate is active.
+- historical execution detail belongs in reference packets, archive, or decision records, not in
+  this handoff

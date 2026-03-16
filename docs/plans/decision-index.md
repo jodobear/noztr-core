@@ -59,6 +59,8 @@ Use this file to decide whether the full canonical decision payload is needed.
 - `D-113` codify explicit review prompts and a shareable process-refinement playbook
 - `D-114` add ordered micro-loop and audit-posture refinement guidance
 - `D-115` treat process updates as coherent control-surface edits
+- `D-116` restore active Phase H packet routing and split the generic implementation gate from
+  specialized audit guidance
 
 ## Docs And Active-Memory Routing
 

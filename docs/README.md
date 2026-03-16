@@ -29,6 +29,8 @@ These docs control active work and should stay lean.
   - active execution baseline
 - `docs/guides/PROCESS_CONTROL.md`
   - repo-specific process refinement rules for keeping the control surface lean
+- `docs/plans/phase-h-remaining-work.md`
+  - current active Phase H packet and next remaining work
 - `docs/plans/docs-surface-audit.md`
   - stable-ID audit of doc bloat, repetition, and control-surface drift
 
@@ -43,12 +45,15 @@ These docs control active work and should stay lean.
   - relevant NIP text in `docs/nips/`
   - `docs/plans/decision-index.md`
   - `docs/plans/build-plan.md`
+  - `docs/guides/IMPLEMENTATION_QUALITY_GATE.md` when starting or closing a slice
   - `docs/plans/decision-log.md` only when a cited decision ID or policy change requires the
     canonical payload
   - Zig guides on demand
 - Process or docs refinement:
   - `docs/guides/PROCESS_CONTROL.md`
+  - `docs/guides/IMPLEMENTATION_QUALITY_GATE.md` if the refinement changes staged execution rules
   - `docs/guides/PROCESS_REFINEMENT_PLAYBOOK.md`
+  - `docs/plans/packet-template.md` when creating or repairing packets
   - `docs/plans/docs-surface-audit.md`
   - `docs/plans/decision-index.md`
   - `docs/plans/decision-log.md` only when a cited decision ID or policy change requires the
@@ -62,13 +67,18 @@ These are active references, not startup defaults.
 
 - `docs/plans/decision-log.md`
 - `docs/plans/noztr-sdk-ownership-matrix.md`
+- `docs/guides/IMPLEMENTATION_QUALITY_GATE.md`
 - `docs/plans/implemented-nip-review-guide.md`
 - `docs/plans/nostr-principles.md`
 - `docs/plans/implemented-nip-audit-report.md`
 - `docs/plans/post-kernel-requested-nips-loop.md`
+- `docs/plans/phase-h-kickoff.md`
+- `docs/plans/phase-h-additional-nips-plan.md`
+- `docs/plans/phase-h-wave1-loop.md`
 - `docs/plans/llm-usability-pass.md`
 - `docs/plans/security-hardening-register.md`
 - `docs/guides/PROCESS_REFINEMENT_PLAYBOOK.md`
+- `docs/plans/packet-template.md`
 - `docs/research/`
 - `docs/release/intentional-divergences.md`
 - `examples/README.md`
@@ -77,9 +87,7 @@ These are active references, not startup defaults.
 
 These are lane- or phase-specific packets. They should be read only when that lane is active.
 
-- `docs/plans/phase-h-kickoff.md`
-- `docs/plans/phase-h-additional-nips-plan.md`
-- `docs/plans/phase-h-wave1-loop.md`
+- `docs/plans/phase-h-remaining-work.md`
 - `docs/plans/prompts/`
 
 ## Archive

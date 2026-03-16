@@ -1,4 +1,21 @@
+---
+title: Phase H Wave 1 Execution Loop
+doc_type: packet
+status: reference
+owner: noztr
+phase: phase-h
+read_when:
+  - tracing_completed_phase_h_wave1_execution
+depends_on:
+  - docs/plans/build-plan.md
+  - docs/plans/decision-index.md
+canonical: true
+---
+
 # Phase H Wave 1 Execution Loop
+
+Reference-only completed packet. Use `docs/guides/IMPLEMENTATION_QUALITY_GATE.md` for the current
+generic staged gate and `docs/plans/phase-h-remaining-work.md` for live Phase H work.
 
 Date: 2026-03-10
 

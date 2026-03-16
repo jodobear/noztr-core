@@ -29,9 +29,12 @@ history?
   - `docs/README.md`
   - `docs/plans/build-plan.md`
   - `docs/plans/decision-index.md`
+  - `docs/plans/phase-h-remaining-work.md`
 - `PROCESS_CONTROL.md` is the canonical local process owner.
+- `IMPLEMENTATION_QUALITY_GATE.md` is the canonical staged execution order for new slices.
 - `PROCESS_REFINEMENT_PLAYBOOK.md` is a reference doc for rationale and cross-repo sharing, not a
   second rule owner.
+- `docs/plans/phase-h-remaining-work.md` is the current active Phase H packet.
 - Resolved findings history now lives in
   `docs/archive/plans/docs-surface-audit-history.md`.
 

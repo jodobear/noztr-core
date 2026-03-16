@@ -55,12 +55,16 @@ Instead:
   - docs routing and role separation
 - `AGENTS.md`
   - agent operating rules
+- `docs/guides/IMPLEMENTATION_QUALITY_GATE.md`
+  - canonical staged implementation, audit, and robustness gate
 - `handoff.md`
   - current status only
 - `docs/plans/decision-index.md`
   - startup route into accepted policy areas
 - `docs/plans/build-plan.md`
   - active execution baseline
+- `docs/plans/packet-template.md`
+  - shared packet skeleton and minimum packet shape
 - `docs/plans/decision-log.md`
   - canonical accepted defaults and policy changes
 
@@ -138,6 +142,7 @@ Suggested pattern:
 - next work
 - critical process rules
 - current repo state that can block the next session
+- pointers to canonical docs rather than copied doctrine where possible
 
 `handoff.md` must not become:
 - a running changelog
@@ -156,6 +161,14 @@ They should mostly contain:
 - closeout conditions
 
 If a packet starts restating the full process, the control docs are not centralized enough.
+
+When a phase remains active after one packet closes:
+- create or update the current remaining-work packet for that phase
+- mark the completed packet `reference` or move it to archive
+- do not leave startup routing pointed at the last completed lane
+
+Packets should use `docs/guides/IMPLEMENTATION_QUALITY_GATE.md` for the generic staged loop and
+reserve their own content for slice-specific deltas.
 
 ## Process-Change Rule
 

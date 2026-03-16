@@ -2870,3 +2870,37 @@ payload is needed for the current task.
 - Reversal Trigger: the coherent-edit requirement adds cost without reducing duplication or drift,
   or the split between control and playbook docs stops buying clarity.
 - Supersedes: none
+
+## D-116: Restore active Phase H packet routing and split the generic implementation gate from specialized audit guidance
+
+- Date: 2026-03-16
+- Status: accepted
+- Decision: keep Phase H active while `OQ-E-006` remains open, restore a current Phase H packet,
+  and separate the repo-wide implementation gate from the implemented-NIP audit guide.
+  - accepted behavior:
+    - `docs/plans/phase-h-remaining-work.md` is the current active Phase H packet
+    - `docs/plans/phase-h-kickoff.md`, `docs/plans/phase-h-additional-nips-plan.md`, and
+      `docs/plans/phase-h-wave1-loop.md` are retained as `reference` packets for completed lanes
+    - `docs/guides/IMPLEMENTATION_QUALITY_GATE.md` is the canonical staged execution order for new
+      implementation, audit, and robustness slices
+    - `docs/plans/implemented-nip-review-guide.md` remains a specialized implemented-surface audit
+      and robustness guide rather than a generic repo-wide gate
+    - `docs/plans/packet-template.md` is the shared packet skeleton for new or repaired packets
+    - startup routing now points to the live Phase H packet instead of completed Phase H packets
+    - `handoff.md` returns to a state-first pointer surface instead of acting like a secondary
+      control manual
+  - accepted non-goals:
+    - rewriting completed Phase H packet history into new summary prose
+    - changing the accepted semantics of completed Phase H implementation slices
+    - closing Phase H before `OQ-E-006` closes
+- Why: the requested-NIP loop closed, but Phase H did not. Leaving startup and packet routing aimed
+  at completed lanes made the repo look more finished than it is and pushed control-doc burden back
+  into `handoff.md`. A current remaining-work packet plus a repo-wide implementation gate restores
+  truthful routing with less repetition.
+- Tradeoff: one more canonical process doc and one small active packet versus continued drift where
+  completed packets masquerade as current work and handoff regrows into a secondary control doc.
+- Related Tradeoff: T-0-004.
+- Reversal Trigger: the separate generic gate and remaining-work packet add more routing noise than
+  clarity, or future work proves that the specialized audit guide alone is sufficient for all new
+  slices.
+- Supersedes: none

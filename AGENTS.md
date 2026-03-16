@@ -15,9 +15,12 @@ exceptions recorded in the decision log.
 - Read `docs/guides/PROCESS_REFINEMENT_PLAYBOOK.md` when the task is refining repo process,
   tightening review gates after real failures, or sharing `noztr` process lessons with another
   repo or agent.
+- Read `docs/guides/IMPLEMENTATION_QUALITY_GATE.md` when the task starts or repairs an
+  implementation, audit, or robustness slice.
 - Read `docs/guides/TIGER_STYLE.md`, `docs/guides/NOZTR_STYLE.md`,
   `docs/guides/zig-patterns.md`, and `docs/guides/zig-anti-patterns.md` only when the task touches
   Zig implementation, public API shape, or code review.
+- Read `docs/plans/packet-template.md` when creating or repairing packet docs.
 - Read `docs/plans/noztr-sdk-ownership-matrix.md` when the task touches kernel-vs-SDK scope,
   deterministic protocol glue, or higher-level workflow ownership.
 - Read planning prompt artifacts only when the task is phase-planning work.
@@ -64,6 +67,9 @@ Run tests after every code change.
   - Ensure `docs/plans/decision-index.md` reflects active policy-routing needs.
   - Ensure `docs/plans/decision-log.md` records accepted default changes.
   - Ensure `./agent-brief` output reflects the current active execution path.
+- Keep the active packet surface current when a phase stays open after a slice closes.
+  - Completed packets move to `reference` or archive.
+  - New pending work goes into the current packet for the still-active phase.
 - Keep `handoff.md` state-oriented; move historical narrative to decision records, reference docs,
   archive, or git history instead of growing the startup path.
 - Do not rely on memory-only context between sessions.
@@ -161,9 +167,11 @@ critical rules:
 - `docs/guides/TIGER_STYLE.md`: hard engineering baseline
 - `docs/guides/NOZTR_STYLE.md`: noztr protocol-kernel style profile
 - `docs/guides/PROCESS_CONTROL.md`: process-control and docs-surface refinement rules
+- `docs/guides/IMPLEMENTATION_QUALITY_GATE.md`: canonical staged implementation/audit gate
 - `docs/guides/PROCESS_REFINEMENT_PLAYBOOK.md`: shareable process lessons learned from real slices
 - `docs/guides/zig-patterns.md`: approved Zig-safe patterns
 - `docs/guides/zig-anti-patterns.md`: forbidden Zig footguns
+- `docs/plans/packet-template.md`: packet skeleton for new or repaired active slices
 - Other guide documents are load-on-demand, not required startup context
 
 <!-- BEGIN BEADS INTEGRATION -->
