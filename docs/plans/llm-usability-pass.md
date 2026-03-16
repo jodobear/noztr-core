@@ -22,8 +22,8 @@ Status: closed
 
 Purpose: evaluate hardened v1 APIs from an LLM-first integration workflow before RC API freeze.
 
-Decision linkage: this pass is closed and is now the decision input for the next Phase H packet that
-selects RC API-freeze or adapter-boundary work.
+Decision linkage: this pass is closed and is now one input into the next Phase H boundary-validation
+packet before any RC API-freeze claim.
 
 ## Scope Snapshot
 
@@ -216,7 +216,7 @@ Closure result:
 
 ## Open Questions
 
-- none in this artifact; next work is packet selection for RC freeze or adapter-boundary execution in
+- none in this artifact; next work is the SDK-informed boundary-validation slice in
   `docs/plans/phase-h-remaining-work.md`
 
 ## Principles Compliance

@@ -104,7 +104,7 @@ This artifact is the lean active execution baseline and is aligned to:
 - The post-kernel requested-NIP loop is complete through `NIP-B7`.
 - Current live Phase H packet is `docs/plans/phase-h-remaining-work.md`.
 - `OQ-E-006` usability closure is complete.
-- Current remaining Phase H work is the explicit RC API-freeze packet in
+- Current remaining Phase H work is the explicit SDK-informed boundary-validation packet in
   `docs/plans/phase-h-remaining-work.md`.
 - `docs/plans/post-kernel-requested-nips-loop.md` now remains as reference evidence for the loop
   order, closure rules, and split-surface scope calls rather than as an active execution packet.
@@ -140,7 +140,7 @@ This artifact is the lean active execution baseline and is aligned to:
 - `docs/plans/implemented-nip-review-guide.md`
   - canonical review matrix plus audit/robustness execution model
 - `docs/plans/llm-usability-pass.md`
-  - closed `OQ-E-006` execution log and RC-freeze input
+  - closed `OQ-E-006` execution log and boundary-validation input
 - `docs/plans/security-hardening-register.md`
   - canonical status tracker for hardening follow-ups
 - `docs/plans/noztr-sdk-ownership-matrix.md`
@@ -150,9 +150,10 @@ This artifact is the lean active execution baseline and is aligned to:
 
 ## Active Risks And Open Questions
 
-- execute the RC API-freeze packet and make the freeze result explicit.
-- Layer 2 compatibility/ergonomic adapter work remains contingent; start it only if the RC-freeze
-  pass finds a real blocker that belongs outside the kernel.
+- execute the SDK-informed boundary-validation packet and make the result explicit.
+- RC API-freeze remains deferred until the boundary-validation slice closes.
+- Layer 2 compatibility/ergonomic adapter work remains contingent; start it only if the
+  boundary-validation pass finds a real blocker that belongs outside the kernel.
 - `UT-E-003` and `UT-E-004` remain maintenance-mode items; reopen only on new behavior-class
   discovery.
 - The deprecated `NIP-04` private-list adapter remains deferred unless real interoperability

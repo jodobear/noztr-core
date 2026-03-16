@@ -36,7 +36,7 @@ Current execution state for `noztr`.
 - No git remote is configured in this repo.
 - The post-kernel requested-NIP loop is complete through split-surface `NIP-B7`.
 - `OQ-E-006` is closed.
-- The next active Phase H slice is RC API-freeze execution.
+- The next active Phase H slice is SDK-informed boundary validation.
 - Only expected untracked local artifact:
   - `tools/interop/rust-nostr-parity-all/target/`
 
@@ -76,8 +76,8 @@ Current execution state for `noztr`.
 
 ## Next Work
 
-- execute the RC API-freeze packet in `docs/plans/phase-h-remaining-work.md`
-- if the freeze finds a real non-kernel blocker, create one explicit Layer 2 adapter-boundary
+- execute the SDK-informed boundary-validation packet in `docs/plans/phase-h-remaining-work.md`
+- if the validation finds a real non-kernel blocker, create one explicit Layer 2 adapter-boundary
   packet instead of widening the kernel by default
 - use `docs/plans/noztr-sdk-ownership-matrix.md` when a candidate touches kernel-vs-SDK scope
 

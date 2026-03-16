@@ -1,12 +1,12 @@
 ---
-title: Phase H RC Freeze Packet
+title: Phase H Boundary Validation Packet
 doc_type: packet
 status: active
 owner: noztr
 phase: phase-h
 read_when:
   - tracing_current_phase_h_work
-  - executing_phase_h_rc_freeze
+  - executing_phase_h_boundary_validation
 depends_on:
   - docs/plans/build-plan.md
   - docs/guides/IMPLEMENTATION_QUALITY_GATE.md
@@ -18,28 +18,31 @@ sync_touchpoints:
 canonical: true
 ---
 
-# Phase H RC Freeze Packet
+# Phase H Boundary Validation Packet
 
 Current active Phase H packet after completion of the requested-NIP loop, earlier Phase H waves, and
 the `OQ-E-006` usability pass.
 
 ## Purpose
 
-- freeze the next active Phase H slice as release-candidate API-freeze work
+- validate the current Layer 1 kernel boundary with SDK-informed pressure before any RC API-freeze
+  claim
 - make the repo execute one explicit next step instead of holding Phase H in packet-selection limbo
-- keep Layer 2 adapter-boundary work deferred unless the freeze exposes a real kernel-boundary blocker
+- keep RC API-freeze deferred until SDK-informed boundary evidence is in
 
 ## Scope Delta
 
-- current active remaining work is RC API-freeze execution on the current strict kernel surface
+- current active remaining work is SDK-informed boundary validation on the current strict kernel
+  surface
 - active slice scope:
-  - confirm RC-freeze readiness of current Layer 1 defaults and public teaching surface
-  - identify any remaining freeze blockers that require either:
+  - test whether current Layer 1 defaults and public teaching surface remain the right boundary once
+    SDK-facing pressure is considered
+  - identify any remaining blockers that require either:
     - a bounded docs/code correction inside the kernel
-    - an explicitly deferred Layer 2 adapter-boundary packet
+    - an explicit Layer 2 adapter-boundary packet
 - out of scope:
-  - starting Layer 2 adapter work by default
-  - broad post-RC redesign
+  - claiming RC API-freeze by default before the validation slice runs
+  - broad SDK design or post-RC redesign
   - reopening completed Phase H waves without new evidence
 - completed Phase H packets remain traceability references only:
   - `docs/plans/phase-h-kickoff.md`
@@ -52,16 +55,19 @@ the `OQ-E-006` usability pass.
 - Phase H remains active
 - the requested-NIP loop is complete through `NIP-B7`
 - `OQ-E-006` is closed
-- the next active Phase H slice is RC API-freeze work
-- explicit Layer 2 adapter-boundary execution remains deferred unless the freeze produces a concrete
-  blocker that belongs outside the kernel
+- the next active Phase H slice is SDK-informed boundary validation
+- RC API-freeze remains deferred until this slice shows the current boundary is stable enough
 
 ## Next Step
 
-1. execute the RC API-freeze slice through `docs/guides/IMPLEMENTATION_QUALITY_GATE.md`
-2. if the freeze finds a real compatibility or ergonomics blocker that does not belong in Layer 1,
-   create one explicit Layer 2 adapter-boundary packet instead of widening the kernel by default
-3. after the freeze closes, update this packet or replace it with the next real Phase H packet
+1. execute the SDK-informed boundary-validation slice through
+   `docs/guides/IMPLEMENTATION_QUALITY_GATE.md`
+2. if the validation finds a real compatibility or ergonomics blocker that does not belong in
+   Layer 1, create one explicit Layer 2 adapter-boundary packet instead of widening the kernel by
+   default
+3. after the validation closes, decide whether the next packet is:
+   - RC API-freeze, or
+   - one bounded adapter-boundary packet
 
 ## Seam Constraints
 
@@ -70,31 +76,30 @@ the `OQ-E-006` usability pass.
 - use `docs/plans/implemented-nip-review-guide.md` only for implemented-NIP audit or robustness work
 - use `docs/guides/IMPLEMENTATION_QUALITY_GATE.md` for any new general implementation or review slice
 - do not begin adapter-boundary implementation just because the adapter lane exists
-- keep RC-freeze pressure on the current strict kernel unless evidence shows a real blocker
+- do not claim RC freeze from this packet alone; the point is to gather the boundary evidence first
 
 ## Open Questions Or Targeted Findings
 
-- `OQ-RC-001`
-  - does the RC-freeze pass find any strict Layer 1 default that still needs an accepted
+- `OQ-BV-001`
+  - does SDK-informed validation show any strict Layer 1 default that still needs an accepted
     divergence, correction, or explicit defer-to-adapter call before freeze?
-- `OQ-RC-002`
-  - are current examples, routing, and docs sufficient for RC freeze without reopening
+- `OQ-BV-002`
+  - are current examples, routing, and docs sufficient for boundary validation without reopening
     `OQ-E-006`-class teaching drift?
 
 ## Tradeoff
 
-- choose RC-freeze now rather than adapter-boundary work first
+- choose boundary validation now rather than claiming RC-freeze readiness immediately
   - benefit:
-    - keeps pressure on the current strict kernel and avoids widening scope without evidence
+    - lets SDK-facing evidence inform the kernel boundary before release-facing claims harden
   - cost:
-    - if a real interoperability blocker still exists, the adapter packet will be discovered one
-      step later instead of being preselected now
+    - RC-freeze work happens one step later, after the validation slice
 
 ## Sync Touchpoints
 
 - teaching surface:
   - `examples/README.md`
-  - any example files touched by the RC-freeze slice
+  - any example files touched by the boundary-validation slice
 - audit state:
   - `docs/plans/llm-usability-pass.md`
   - `docs/plans/security-hardening-register.md`
@@ -110,8 +115,8 @@ the `OQ-E-006` usability pass.
 ## Closeout Conditions
 
 - `OQ-E-006` remains closed in docs and state routing
-- startup routing points to the current RC-freeze packet, not a completed lane
-- the RC-freeze result is explicit:
-  - freeze accepted, or
+- startup routing points to the current boundary-validation packet, not a completed lane
+- the boundary-validation result is explicit:
+  - RC-freeze packet becomes justified, or
   - one bounded blocker packet replaces it
 - superseded Phase H packets are marked `reference` or moved to archive
