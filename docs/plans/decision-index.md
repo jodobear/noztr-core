@@ -75,6 +75,8 @@ Use this file to decide whether the full canonical decision payload is needed.
 - `D-112` accept bounded `NIP-B7` Blossom server-list and fallback helpers
 - `D-119` keep full Blossom protocol/service work out of `noztr` and route it to a dedicated repo
   that `nzdk` integrates
+- `D-120` accept deterministic one-recipient outbound `NIP-59` transcript construction in `noztr`
+  while keeping mailbox fanout and workflow in `nzdk`
 
 ## Recent Requested-NIP Acceptances
 

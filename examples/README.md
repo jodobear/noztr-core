@@ -135,7 +135,7 @@ Each implemented kernel NIP now has a direct reference example.
 - `nip57_example.zig`
 - `nip58_example.zig`
 - `nip59_example.zig`
-  - typed boundary example; `noztr` does not expose a public gift-wrap builder
+  - typed boundary example; public outbound build stays deterministic and one-recipient only
 - `nip64_example.zig`
 - `nip88_example.zig`
 - `nostr_keys_example.zig`
@@ -174,7 +174,7 @@ The recipe files are slightly higher-level, but still stay inside `noztr` bounda
 - `nip03_verification_recipe.zig`
   - NIP-03 extraction plus bounded local-proof verification
 - `nip17_wrap_recipe.zig`
-  - NIP-17 rumor construction, signed seal/wrap transcript building, and unwrap
+  - NIP-17 rumor construction, deterministic one-recipient seal/wrap transcript building, and unwrap
 - `nip29_reducer_recipe.zig`
   - NIP-29 pure reducer replay across metadata, snapshot, and moderation events
 - `private_lists_recipe.zig`

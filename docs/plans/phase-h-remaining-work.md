@@ -57,6 +57,10 @@ the `OQ-E-006` usability pass.
 - `OQ-E-006` is closed
 - the next active Phase H slice is SDK-informed boundary validation
 - RC API-freeze remains deferred until this slice shows the current boundary is stable enough
+- accepted sub-findings from this slice so far:
+  - export public signed event-object JSON serialization from `nip01_event`
+  - keep deterministic one-recipient outbound `NIP-59` transcript construction in `noztr`
+    while leaving recipient fanout and mailbox workflow in `nzdk`
 
 ## Next Step
 

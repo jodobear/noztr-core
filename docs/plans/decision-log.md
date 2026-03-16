@@ -2994,3 +2994,37 @@ payload is needed for the current task.
   fragmentation than clarity, or that a materially larger Blossom surface can be kept purely
   deterministic and transport-free inside `noztr`.
 - Supersedes: none
+
+## D-120: Accept deterministic one-recipient outbound `NIP-59` transcript construction in `noztr`
+
+- Date: 2026-03-16
+- Status: accepted
+- Decision: keep the outbound `NIP-17`/`NIP-59` ownership split at the deterministic transcript
+  seam.
+  - accepted behavior:
+    - `noztr` may expose a bounded public helper that builds one recipient-specific
+      `rumor -> seal -> wrap` transcript
+    - the accepted helper must stay:
+      - deterministic
+      - one-recipient only
+      - caller-buffer-first
+      - caller-driven for secrets, nonces, and timestamps
+      - free of relay, mailbox, sender-copy, and session policy
+    - `nip01_event` may expose unsigned full event-object JSON serialization for unsigned-rumor
+      staging when it stays shape-checked and explicitly distinct from canonical-preimage output
+  - accepted non-goals:
+    - recipient fanout
+    - relay selection or publish workflow
+    - mailbox copy policy
+    - session orchestration
+    - delivery retries or storage policy
+- Why: `nzdk` pressure showed that outbound transcript staging was being duplicated in recipes and
+  SDK code even though the core cryptographic and serialization work is deterministic, bounded, and
+  reusable across callers. Pulling just the one-recipient transcript builder into `noztr` removes
+  duplicated kernel glue without widening the library into mailbox workflow.
+- Tradeoff: a slightly larger `NIP-59` kernel surface versus less duplicated and potentially
+  inconsistent outbound transcript staging in downstream SDK code.
+- Related Tradeoff: T-0-001, T-0-002.
+- Reversal Trigger: the helper starts attracting recipient fanout, relay policy, or session-shaped
+  logic, or real SDK evidence shows that the one-recipient seam is too narrow to be reusable.
+- Supersedes: none

@@ -106,6 +106,9 @@ This artifact is the lean active execution baseline and is aligned to:
 - `OQ-E-006` usability closure is complete.
 - Current remaining Phase H work is the explicit SDK-informed boundary-validation packet in
   `docs/plans/phase-h-remaining-work.md`.
+- Boundary-validation has already accepted two kernel-side SDK handoff corrections:
+  - public signed event-object JSON serialization
+  - deterministic one-recipient `NIP-59` outbound transcript construction
 - `docs/plans/post-kernel-requested-nips-loop.md` now remains as reference evidence for the loop
   order, closure rules, and split-surface scope calls rather than as an active execution packet.
 - NIP-06 dependency strategy is resolved for current planning: adopt `libwally-core` behind the

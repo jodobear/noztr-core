@@ -52,6 +52,8 @@ pub const EventShapeError = error{
     InvalidUtf8, ContentTooLong, TooManyTags, TooManyTagItems, TagItemTooLong,
 };
 pub const EventSerializeError = EventShapeError || error{BufferTooSmall};
+pub const EventUnsignedSerializeError =
+    EventShapeError || error{InvalidSignature, BufferTooSmall};
 pub const EventVerifyError = error{ InvalidId, InvalidSignature, InvalidPubkey, BackendUnavailable };
 pub const EventVerifyIdError = EventVerifyError || EventShapeError;
 
@@ -63,6 +65,8 @@ pub fn event_serialize_canonical_json(output: []u8, event: *const Event)
     EventSerializeError![]const u8;
 pub fn event_serialize_json_object(output: []u8, event: *const Event)
     EventSerializeError![]const u8;
+pub fn event_serialize_json_object_unsigned(output: []u8, event: *const Event)
+    EventUnsignedSerializeError![]const u8;
 pub fn event_compute_id(event: *const Event) EventShapeError![32]u8;
 pub fn event_compute_id_checked(event: *const Event) EventShapeError![32]u8;
 pub fn event_verify_id(event: *const Event) EventVerifyError!void;
@@ -79,6 +83,9 @@ pub fn event_replace_decision(current: *const Event, candidate: *const Event)
 - Failure modes: malformed JSON/field typing, duplicate critical keys, invalid lowercase hex,
   out-of-bounds tags/content, invalid id recomputation, invalid signature/pubkey, typed
   signature-backend outage.
+- Unsigned object-JSON note: `event_serialize_json_object_unsigned` is for full event-object JSON
+  without `sig`. It requires a zeroed `sig` field and must not be taught as canonical preimage
+  serialization.
 - Deterministic behavior: canonical serialization bytes, computed id, and replace ordering are
   deterministic (`created_at`, then lexical `id`).
 - Runtime-shape note: canonical serialize/compute surfaces return `EventShapeError` variants when
@@ -461,7 +468,29 @@ pub const WrapError = error{
     InvalidWrapKind, InvalidSealKind, InvalidSealSignature,
     SenderMismatch, DecryptFailed, OutOfMemory,
 };
+pub const WrapBuildError = nip44.Nip44Error || nostr_keys.NostrKeysError || error{
+    InvalidRumorEvent, InvalidSealEvent, InvalidWrapEvent, BufferTooSmall,
+};
+pub const BuiltOutboundTranscript = struct {
+    rumor_json: []const u8,
+    seal_json: []const u8,
+    seal_payload: []const u8,
+    wrap_payload: []const u8,
+};
+pub const BuiltWrapEvent = struct {
+    event: Event,
+    tags_storage: [1]EventTag,
+    tag_items: [2][]const u8,
+    recipient_hex: [64]u8,
+};
 
+pub fn nip59_build_outbound_for_recipient(output_seal: *Event, output_wrap: *BuiltWrapEvent,
+    sender_secret: *const [32]u8, wrap_secret: *const [32]u8,
+    recipient_pubkey: *const [32]u8, rumor_event: *const Event,
+    rumor_json_output: []u8, seal_json_output: []u8, seal_payload_output: []u8,
+    wrap_payload_output: []u8, seal_created_at: u64, wrap_created_at: u64,
+    seal_nonce: *const [32]u8, wrap_nonce: *const [32]u8)
+    WrapBuildError!BuiltOutboundTranscript;
 pub fn nip59_unwrap(output_rumor: *Event, recipient_private_key_material: *const [32]u8,
     wrap_event: *const Event, scratch: std.mem.Allocator)
     WrapError!void;
@@ -469,18 +498,26 @@ pub fn nip59_validate_wrap_structure(wrap_event: *const Event)
     WrapError!void;
 ```
 
-- Bounds: staged unwrap only; all inner decode and parse operations bounded by existing event/NIP-44
-  limits; strict unwrap parsing uses caller-provided bounded scratch. Unwrap derives per-layer NIP-44
-  conversation keys from recipient private key material using `wrap.pubkey` first, then `seal.pubkey`.
+- Bounds: staged unwrap and one-recipient deterministic build only; all inner parse/encrypt/decrypt
+  operations are bounded by existing event/NIP-44 limits; build outputs are caller-owned buffers and
+  unwrap parsing uses caller-provided bounded scratch. Unwrap derives per-layer NIP-44 conversation
+  keys from recipient private key material using `wrap.pubkey` first, then `seal.pubkey`.
 - Failure modes: wrong outer kind, malformed wrap/seal/rumor layer, invalid seal signature,
-  sender mismatch spoof, decrypt failure at any stage, rumor `sig` field present in strict unwrap.
-- Deterministic behavior: staged order fixed (`wrap -> seal -> rumor`) and failure stage is
-  deterministic for identical inputs.
+  sender mismatch spoof, decrypt failure at any stage, rumor `sig` field present in strict unwrap,
+  invalid signed or sender-mismatched rumor on build, invalid minimal seal/wrap build shape, and
+  typed buffer insufficiency on build outputs.
+- Deterministic behavior: staged order is fixed (`rumor -> seal -> wrap` for build,
+  `wrap -> seal -> rumor` for unwrap); identical inputs including secrets, timestamps, and nonces
+  produce identical build outputs and identical failure variants.
+- Ownership note: `nip59_build_outbound_for_recipient` is accepted only as deterministic
+  one-recipient transcript construction. Recipient fanout, relay selection, mailbox workflow,
+  sender-copy policy, and session orchestration remain SDK-side.
 - Assertion pairs: assert outer signature verifies before decrypt and reject otherwise; assert sender
   continuity across layers and reject mismatch; assert rumor is unsigned and reject any rumor `sig`
-  field.
-- Vectors: happy (`valid wrap->seal->rumor chain`, sender-consistent unwrap);
-  error (`bad outer kind`, `bad seal sig`, `sender mismatch spoof`, malformed rumor payload).
+  field; assert build stays one-recipient and emits exactly one canonical `p` tag.
+- Vectors: happy (`valid wrap->seal->rumor chain`, sender-consistent unwrap,
+  deterministic one-recipient outbound build); error (`bad outer kind`, `bad seal sig`,
+  `sender mismatch spoof`, malformed rumor payload, signed rumor rejected on build).
 
 ### `nip45_count`
 

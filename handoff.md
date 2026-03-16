@@ -37,6 +37,9 @@ Current execution state for `noztr`.
 - The post-kernel requested-NIP loop is complete through split-surface `NIP-B7`.
 - `OQ-E-006` is closed.
 - The next active Phase H slice is SDK-informed boundary validation.
+- Boundary validation has already accepted:
+  - public signed event-object JSON serialization
+  - deterministic one-recipient `NIP-59` outbound transcript construction
 - Only expected untracked local artifact:
   - `tools/interop/rust-nostr-parity-all/target/`
 

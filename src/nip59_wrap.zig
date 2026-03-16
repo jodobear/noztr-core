@@ -2,6 +2,7 @@ const std = @import("std");
 const limits = @import("limits.zig");
 const nip01_event = @import("nip01_event.zig");
 const nip44 = @import("nip44.zig");
+const nostr_keys = @import("nostr_keys.zig");
 const secp256k1_backend = @import("crypto/secp256k1_backend.zig");
 
 const Event = nip01_event.Event;
@@ -22,6 +23,31 @@ pub const WrapError = error{
     OutOfMemory,
 };
 
+pub const WrapBuildError = nip44.Nip44Error || nostr_keys.NostrKeysError || error{
+    InvalidRumorEvent,
+    InvalidSealEvent,
+    InvalidWrapEvent,
+    BufferTooSmall,
+};
+
+pub const BuiltOutboundTranscript = struct {
+    rumor_json: []const u8,
+    seal_json: []const u8,
+    seal_payload: []const u8,
+    wrap_payload: []const u8,
+};
+
+pub const BuiltWrapEvent = struct {
+    /// Semantic output event for the minimal one-recipient wrap layer.
+    event: Event = undefined,
+    /// Caller-owned storage backing the canonical single `p` tag.
+    tags_storage: [1]nip01_event.EventTag = undefined,
+    /// Caller-owned storage for the canonical single `p` tag items.
+    tag_items: [2][]const u8 = undefined,
+    /// Caller-owned lowercase recipient hex backing the canonical single `p` tag.
+    recipient_hex: [limits.pubkey_hex_length]u8 = undefined,
+};
+
 /// Validate kind and cryptographic structure for an outer NIP-59 wrap event.
 pub fn nip59_validate_wrap_structure(wrap_event: *const Event) WrapError!void {
     std.debug.assert(@intFromPtr(wrap_event) != 0);
@@ -33,6 +59,55 @@ pub fn nip59_validate_wrap_structure(wrap_event: *const Event) WrapError!void {
 
     nip01_event.event_verify(wrap_event) catch {
         return error.InvalidWrapEvent;
+    };
+}
+
+/// Build one minimal deterministic `rumor -> seal -> wrap` transcript for one recipient.
+pub fn nip59_build_outbound_for_recipient(
+    output_seal: *Event,
+    output_wrap: *BuiltWrapEvent,
+    sender_secret: *const [32]u8,
+    wrap_secret: *const [32]u8,
+    recipient_pubkey: *const [32]u8,
+    rumor_event: *const Event,
+    rumor_json_output: []u8,
+    seal_json_output: []u8,
+    seal_payload_output: []u8,
+    wrap_payload_output: []u8,
+    seal_created_at: u64,
+    wrap_created_at: u64,
+    seal_nonce: *const [32]u8,
+    wrap_nonce: *const [32]u8,
+) WrapBuildError!BuiltOutboundTranscript {
+    std.debug.assert(@intFromPtr(output_seal) != 0);
+    std.debug.assert(@intFromPtr(output_wrap) != 0);
+
+    try validate_unsigned_rumor_event(rumor_event, sender_secret);
+    const rumor_json = try serialize_rumor_json(rumor_json_output, rumor_event);
+    const seal_payload = try encrypt_payload_for_recipient(
+        seal_payload_output,
+        sender_secret,
+        recipient_pubkey,
+        rumor_json,
+        seal_nonce,
+    );
+    try build_seal_event(output_seal, sender_secret, seal_created_at, seal_payload);
+    const seal_json = nip01_event.event_serialize_json_object(seal_json_output, output_seal) catch {
+        return error.BufferTooSmall;
+    };
+    const wrap_payload = try encrypt_payload_for_recipient(
+        wrap_payload_output,
+        wrap_secret,
+        recipient_pubkey,
+        seal_json,
+        wrap_nonce,
+    );
+    try build_wrap_event(output_wrap, wrap_secret, recipient_pubkey, wrap_created_at, wrap_payload);
+    return .{
+        .rumor_json = rumor_json,
+        .seal_json = seal_json,
+        .seal_payload = seal_payload,
+        .wrap_payload = wrap_payload,
     };
 }
 
@@ -104,6 +179,123 @@ pub fn nip59_unwrap(
     }
 
     output_rumor.* = rumor_event;
+}
+
+fn validate_unsigned_rumor_event(
+    rumor_event: *const Event,
+    sender_secret: *const [32]u8,
+) WrapBuildError!void {
+    std.debug.assert(@intFromPtr(rumor_event) != 0);
+    std.debug.assert(@intFromPtr(sender_secret) != 0);
+    std.debug.assert(rumor_event.kind <= std.math.maxInt(u32));
+
+    nip01_event.event_verify_id_checked(rumor_event) catch return error.InvalidRumorEvent;
+    for (rumor_event.sig) |byte| {
+        if (byte != 0) return error.InvalidRumorEvent;
+    }
+    const sender_pubkey = try nostr_keys.nostr_derive_public_key(sender_secret);
+    if (!std.mem.eql(u8, &sender_pubkey, &rumor_event.pubkey)) {
+        return error.InvalidRumorEvent;
+    }
+}
+
+fn serialize_rumor_json(output: []u8, rumor_event: *const Event) WrapBuildError![]const u8 {
+    std.debug.assert(output.len <= std.math.maxInt(usize));
+    std.debug.assert(@intFromPtr(rumor_event) != 0);
+
+    return nip01_event.event_serialize_json_object_unsigned(output, rumor_event) catch |err| {
+        return switch (err) {
+            error.BufferTooSmall => error.BufferTooSmall,
+            else => error.InvalidRumorEvent,
+        };
+    };
+}
+
+fn encrypt_payload_for_recipient(
+    output: []u8,
+    sender_secret: *const [32]u8,
+    recipient_pubkey: *const [32]u8,
+    plaintext: []const u8,
+    nonce: *const [32]u8,
+) WrapBuildError![]const u8 {
+    std.debug.assert(@intFromPtr(sender_secret) != 0);
+    std.debug.assert(@intFromPtr(recipient_pubkey) != 0);
+
+    var conversation_key = try nip44.nip44_get_conversation_key(sender_secret, recipient_pubkey);
+    defer wipe_bytes(conversation_key[0..]);
+
+    return nip44.nip44_encrypt_with_nonce_to_base64(output, &conversation_key, plaintext, nonce);
+}
+
+fn build_seal_event(
+    output_seal: *Event,
+    sender_secret: *const [32]u8,
+    created_at: u64,
+    payload: []const u8,
+) WrapBuildError!void {
+    std.debug.assert(@intFromPtr(output_seal) != 0);
+    std.debug.assert(@intFromPtr(sender_secret) != 0);
+
+    const sender_pubkey = try nostr_keys.nostr_derive_public_key(sender_secret);
+    output_seal.* = .{
+        .id = [_]u8{0} ** 32,
+        .pubkey = sender_pubkey,
+        .sig = [_]u8{0} ** 64,
+        .kind = seal_event_kind,
+        .created_at = created_at,
+        .content = payload,
+        .tags = &.{},
+    };
+    nostr_keys.nostr_sign_event(sender_secret, output_seal) catch |err| {
+        return switch (err) {
+            error.InvalidEvent => error.InvalidSealEvent,
+            else => err,
+        };
+    };
+}
+
+fn build_wrap_event(
+    output_wrap: *BuiltWrapEvent,
+    wrap_secret: *const [32]u8,
+    recipient_pubkey: *const [32]u8,
+    created_at: u64,
+    payload: []const u8,
+) WrapBuildError!void {
+    std.debug.assert(@intFromPtr(output_wrap) != 0);
+    std.debug.assert(@intFromPtr(wrap_secret) != 0);
+
+    const wrap_pubkey = try nostr_keys.nostr_derive_public_key(wrap_secret);
+    const tags = init_wrap_tags(output_wrap, recipient_pubkey);
+    output_wrap.event = .{
+        .id = [_]u8{0} ** 32,
+        .pubkey = wrap_pubkey,
+        .sig = [_]u8{0} ** 64,
+        .kind = wrap_event_kind,
+        .created_at = created_at,
+        .content = payload,
+        .tags = tags,
+    };
+    nostr_keys.nostr_sign_event(wrap_secret, &output_wrap.event) catch |err| {
+        return switch (err) {
+            error.InvalidEvent => error.InvalidWrapEvent,
+            else => err,
+        };
+    };
+}
+
+fn init_wrap_tags(
+    output_wrap: *BuiltWrapEvent,
+    recipient_pubkey: *const [32]u8,
+) []const nip01_event.EventTag {
+    std.debug.assert(@intFromPtr(output_wrap) != 0);
+    std.debug.assert(@intFromPtr(recipient_pubkey) != 0);
+
+    const recipient_hex = std.fmt.bytesToHex(recipient_pubkey, .lower);
+    @memcpy(output_wrap.recipient_hex[0..], recipient_hex[0..]);
+    output_wrap.tag_items[0] = "p";
+    output_wrap.tag_items[1] = output_wrap.recipient_hex[0..];
+    output_wrap.tags_storage[0] = .{ .items = output_wrap.tag_items[0..2] };
+    return output_wrap.tags_storage[0..1];
 }
 
 fn validate_seal_event(seal_event: *const Event) WrapError!void {
@@ -812,6 +1004,152 @@ fn wrap_secret_key_alt() [32]u8 {
     var secret: [32]u8 = [_]u8{0} ** 32;
     secret[31] = 1;
     return secret;
+}
+
+test "nip59 outbound builder produces one-recipient transcript that unwraps symmetrically" {
+    const sender_secret = [_]u8{0} ** 31 ++ [_]u8{3};
+    const wrap_secret = [_]u8{0} ** 31 ++ [_]u8{4};
+    const recipient_private_key = [_]u8{0} ** 31 ++ [_]u8{5};
+    const sender_pubkey = try nostr_keys.nostr_derive_public_key(&sender_secret);
+    const recipient_pubkey = try nostr_keys.nostr_derive_public_key(&recipient_private_key);
+    var rumor = Event{
+        .id = [_]u8{0} ** 32,
+        .pubkey = sender_pubkey,
+        .sig = [_]u8{0} ** 64,
+        .kind = 14,
+        .created_at = 1_710_000_000,
+        .content = "hello-outbound-builder",
+        .tags = &.{},
+    };
+    var seal: Event = undefined;
+    var wrap: BuiltWrapEvent = .{};
+    var rumor_json_storage: [512]u8 = undefined;
+    var seal_json_storage: [1024]u8 = undefined;
+    var seal_payload_storage: [2048]u8 = undefined;
+    var wrap_payload_storage: [4096]u8 = undefined;
+    var arena = std.heap.ArenaAllocator.init(std.testing.allocator);
+    defer arena.deinit();
+
+    rumor.id = try nip01_event.event_compute_id_checked(&rumor);
+    const built = try nip59_build_outbound_for_recipient(
+        &seal,
+        &wrap,
+        &sender_secret,
+        &wrap_secret,
+        &recipient_pubkey,
+        &rumor,
+        rumor_json_storage[0..],
+        seal_json_storage[0..],
+        seal_payload_storage[0..],
+        wrap_payload_storage[0..],
+        1_710_000_001,
+        1_710_000_002,
+        &fixed_nonce_a,
+        &fixed_nonce_b,
+    );
+
+    try std.testing.expectEqual(@as(u32, 13), seal.kind);
+    try std.testing.expectEqual(@as(u32, 1059), wrap.event.kind);
+    try std.testing.expectEqualStrings("p", wrap.event.tags[0].items[0]);
+    try std.testing.expectEqualStrings(built.wrap_payload, wrap.event.content);
+
+    var output_rumor: Event = undefined;
+    try nip59_unwrap(&output_rumor, &recipient_private_key, &wrap.event, arena.allocator());
+    try std.testing.expectEqualStrings("hello-outbound-builder", output_rumor.content);
+    try std.testing.expect(std.mem.eql(u8, &output_rumor.id, &rumor.id));
+    try std.testing.expectEqualStrings(
+        built.rumor_json,
+        try nip01_event.event_serialize_json_object_unsigned(rumor_json_storage[0..], &rumor),
+    );
+}
+
+test "nip59 outbound builder rejects signed rumor input" {
+    const sender_secret = [_]u8{0} ** 31 ++ [_]u8{3};
+    const wrap_secret = [_]u8{0} ** 31 ++ [_]u8{4};
+    const recipient_private_key = [_]u8{0} ** 31 ++ [_]u8{5};
+    const sender_pubkey = try nostr_keys.nostr_derive_public_key(&sender_secret);
+    const recipient_pubkey = try nostr_keys.nostr_derive_public_key(&recipient_private_key);
+    var rumor = Event{
+        .id = [_]u8{0} ** 32,
+        .pubkey = sender_pubkey,
+        .sig = [_]u8{0} ** 64,
+        .kind = 14,
+        .created_at = 1_710_000_000,
+        .content = "hello-signed-rumor",
+        .tags = &.{},
+    };
+    var seal: Event = undefined;
+    var wrap: BuiltWrapEvent = .{};
+    var rumor_json_storage: [512]u8 = undefined;
+    var seal_json_storage: [1024]u8 = undefined;
+    var seal_payload_storage: [2048]u8 = undefined;
+    var wrap_payload_storage: [4096]u8 = undefined;
+
+    try nostr_keys.nostr_sign_event(&sender_secret, &rumor);
+    try std.testing.expectError(
+        error.InvalidRumorEvent,
+        nip59_build_outbound_for_recipient(
+            &seal,
+            &wrap,
+            &sender_secret,
+            &wrap_secret,
+            &recipient_pubkey,
+            &rumor,
+            rumor_json_storage[0..],
+            seal_json_storage[0..],
+            seal_payload_storage[0..],
+            wrap_payload_storage[0..],
+            1_710_000_001,
+            1_710_000_002,
+            &fixed_nonce_a,
+            &fixed_nonce_b,
+        ),
+    );
+}
+
+test "nip59 outbound builder rejects rumor pubkey that does not match sender secret" {
+    const sender_secret = [_]u8{0} ** 31 ++ [_]u8{3};
+    const wrap_secret = [_]u8{0} ** 31 ++ [_]u8{4};
+    const recipient_private_key = [_]u8{0} ** 31 ++ [_]u8{5};
+    const wrong_sender_secret = [_]u8{0} ** 31 ++ [_]u8{6};
+    const wrong_pubkey = try nostr_keys.nostr_derive_public_key(&wrong_sender_secret);
+    const recipient_pubkey = try nostr_keys.nostr_derive_public_key(&recipient_private_key);
+    var rumor = Event{
+        .id = [_]u8{0} ** 32,
+        .pubkey = wrong_pubkey,
+        .sig = [_]u8{0} ** 64,
+        .kind = 14,
+        .created_at = 1_710_000_000,
+        .content = "hello-mismatched-pubkey",
+        .tags = &.{},
+    };
+    var seal: Event = undefined;
+    var wrap: BuiltWrapEvent = .{};
+    var rumor_json_storage: [512]u8 = undefined;
+    var seal_json_storage: [1024]u8 = undefined;
+    var seal_payload_storage: [2048]u8 = undefined;
+    var wrap_payload_storage: [4096]u8 = undefined;
+
+    rumor.id = try nip01_event.event_compute_id_checked(&rumor);
+    try std.testing.expectError(
+        error.InvalidRumorEvent,
+        nip59_build_outbound_for_recipient(
+            &seal,
+            &wrap,
+            &sender_secret,
+            &wrap_secret,
+            &recipient_pubkey,
+            &rumor,
+            rumor_json_storage[0..],
+            seal_json_storage[0..],
+            seal_payload_storage[0..],
+            wrap_payload_storage[0..],
+            1_710_000_001,
+            1_710_000_002,
+            &fixed_nonce_a,
+            &fixed_nonce_b,
+        ),
+    );
 }
 
 test "nip59 valid structure validation passes for signed wrap" {

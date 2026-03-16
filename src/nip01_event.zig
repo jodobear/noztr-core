@@ -13,6 +13,7 @@ pub const EventShapeError = error{
     TagItemTooLong,
 };
 pub const EventSerializeError = EventShapeError || error{BufferTooSmall};
+pub const EventUnsignedSerializeError = EventShapeError || error{ InvalidSignature, BufferTooSmall };
 pub const EventVerifyIdError = EventVerifyError || EventShapeError;
 
 pub const ReplaceDecision = enum {
@@ -220,7 +221,20 @@ pub fn event_serialize_json_object(
     std.debug.assert(@sizeOf(Event) > 0);
 
     try event_validate_shape(event);
-    return event_serialize_json_object_unchecked(output, event);
+    return event_serialize_json_object_unchecked(output, event, true);
+}
+
+/// Serialize an unsigned event JSON object including `id` but omitting `sig`.
+pub fn event_serialize_json_object_unsigned(
+    output: []u8,
+    event: *const Event,
+) EventUnsignedSerializeError![]const u8 {
+    std.debug.assert(@sizeOf(EventTag) > 0);
+    std.debug.assert(@sizeOf(Event) > 0);
+
+    try event_validate_shape(event);
+    if (!event_signature_is_zero(&event.sig)) return error.InvalidSignature;
+    return event_serialize_json_object_unchecked(output, event, false);
 }
 
 fn event_serialize_canonical_json_unchecked(
@@ -251,13 +265,13 @@ fn event_serialize_canonical_json_unchecked(
 fn event_serialize_json_object_unchecked(
     output: []u8,
     event: *const Event,
+    include_signature: bool,
 ) error{BufferTooSmall}![]const u8 {
     std.debug.assert(output.len <= std.math.maxInt(usize));
     std.debug.assert(event.tags.len <= limits.tags_max);
 
     const id_hex = std.fmt.bytesToHex(event.id, .lower);
     const pubkey_hex = std.fmt.bytesToHex(event.pubkey, .lower);
-    const sig_hex = std.fmt.bytesToHex(event.sig, .lower);
     var index: u32 = 0;
 
     try write_buffer_bytes(output, &index, "{\"id\":\"");
@@ -272,11 +286,27 @@ fn event_serialize_json_object_unchecked(
     try write_buffer_tags(output, &index, event.tags);
     try write_buffer_bytes(output, &index, ",\"content\":");
     try write_buffer_json_string(output, &index, event.content);
+    if (!include_signature) {
+        try write_buffer_bytes(output, &index, "}");
+        return output[0..@intCast(index)];
+    }
+
+    const sig_hex = std.fmt.bytesToHex(event.sig, .lower);
     try write_buffer_bytes(output, &index, ",\"sig\":\"");
     try write_buffer_bytes(output, &index, sig_hex[0..]);
     try write_buffer_bytes(output, &index, "\"}");
 
     return output[0..@intCast(index)];
+}
+
+fn event_signature_is_zero(signature: *const [64]u8) bool {
+    std.debug.assert(@intFromPtr(signature) != 0);
+    std.debug.assert(signature[0] <= 255);
+
+    for (signature) |byte| {
+        if (byte != 0) return false;
+    }
+    return true;
 }
 
 pub fn event_compute_id(event: *const Event) EventShapeError![32]u8 {
@@ -952,6 +982,45 @@ test "event json object serialization is deterministic and parse-symmetric" {
     try std.testing.expectEqualDeep(event, reparsed);
 }
 
+test "event unsigned json object serialization omits sig and rejects signed input" {
+    const tags = [_]EventTag{
+        .{ .items = &.{ "p", "aaaaaaaa" } },
+    };
+    const unsigned_event = Event{
+        .id = [_]u8{0x10} ** 32,
+        .pubkey = [_]u8{0x11} ** 32,
+        .sig = [_]u8{0} ** 64,
+        .kind = 14,
+        .created_at = 123,
+        .content = "line\n\"quoted\"",
+        .tags = tags[0..],
+    };
+    const signed_event = Event{
+        .id = unsigned_event.id,
+        .pubkey = unsigned_event.pubkey,
+        .sig = [_]u8{0x22} ** 64,
+        .kind = unsigned_event.kind,
+        .created_at = unsigned_event.created_at,
+        .content = unsigned_event.content,
+        .tags = unsigned_event.tags,
+    };
+    var output: [384]u8 = undefined;
+
+    const serialized = try event_serialize_json_object_unsigned(output[0..], &unsigned_event);
+    try std.testing.expect(std.mem.indexOf(u8, serialized, "\"sig\"") == null);
+    try std.testing.expectEqualStrings(
+        "{\"id\":\"1010101010101010101010101010101010101010101010101010101010101010\"," ++
+            "\"pubkey\":\"1111111111111111111111111111111111111111111111111111111111111111\"," ++
+            "\"created_at\":123,\"kind\":14,\"tags\":[[\"p\",\"aaaaaaaa\"]]," ++
+            "\"content\":\"line\\n\\\"quoted\\\"\"}",
+        serialized,
+    );
+    try std.testing.expectError(
+        error.InvalidSignature,
+        event_serialize_json_object_unsigned(output[0..], &signed_event),
+    );
+}
+
 test "event verify id follows canonical hash compute" {
     var event = Event{
         .id = [_]u8{0} ** 32,
@@ -1061,6 +1130,27 @@ test "event serialize json object forces buffer too small on public path" {
     );
 
     const serialized = try event_serialize_json_object(&adequate_output, &event);
+    try std.testing.expect(serialized.len > tiny_output.len);
+}
+
+test "event serialize unsigned json object forces buffer too small on public path" {
+    const event = Event{
+        .id = [_]u8{0} ** 32,
+        .pubkey = [_]u8{0x11} ** 32,
+        .sig = [_]u8{0} ** 64,
+        .kind = 14,
+        .created_at = 1,
+        .content = "ok",
+    };
+    var tiny_output: [8]u8 = undefined;
+    var adequate_output: [256]u8 = undefined;
+
+    try std.testing.expectError(
+        error.BufferTooSmall,
+        event_serialize_json_object_unsigned(&tiny_output, &event),
+    );
+
+    const serialized = try event_serialize_json_object_unsigned(&adequate_output, &event);
     try std.testing.expect(serialized.len > tiny_output.len);
 }
 
