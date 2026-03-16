@@ -104,8 +104,8 @@ This artifact is the lean active execution baseline and is aligned to:
 - The post-kernel requested-NIP loop is complete through `NIP-B7`.
 - Current live Phase H packet is `docs/plans/phase-h-remaining-work.md`.
 - `OQ-E-006` usability closure is complete.
-- Current remaining Phase H work is to choose and freeze the next packet for RC API-freeze or
-  adapter-boundary execution.
+- Current remaining Phase H work is the explicit RC API-freeze packet in
+  `docs/plans/phase-h-remaining-work.md`.
 - `docs/plans/post-kernel-requested-nips-loop.md` now remains as reference evidence for the loop
   order, closure rules, and split-surface scope calls rather than as an active execution packet.
 - NIP-06 dependency strategy is resolved for current planning: adopt `libwally-core` behind the
@@ -150,9 +150,9 @@ This artifact is the lean active execution baseline and is aligned to:
 
 ## Active Risks And Open Questions
 
-- choose and freeze the next Phase H packet for RC API-freeze or Layer 2 adapter-boundary work.
-- Layer 2 compatibility/ergonomic adapter work is no longer blocked by `OQ-E-006`, but still
-  requires an explicit packet before execution.
+- execute the RC API-freeze packet and make the freeze result explicit.
+- Layer 2 compatibility/ergonomic adapter work remains contingent; start it only if the RC-freeze
+  pass finds a real blocker that belongs outside the kernel.
 - `UT-E-003` and `UT-E-004` remain maintenance-mode items; reopen only on new behavior-class
   discovery.
 - The deprecated `NIP-04` private-list adapter remains deferred unless real interoperability
