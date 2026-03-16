@@ -1,24 +1,41 @@
 const std = @import("std");
 const noztr = @import("noztr");
+const common = @import("common.zig");
 
-test "NIP-01 example: parse event, match filter, and encode relay message" {
+test "NIP-01 example: canonical event lifecycle stays explicit" {
     var arena = std.heap.ArenaAllocator.init(std.testing.allocator);
     defer arena.deinit();
 
-    const event_json =
-        "{\"id\":\"4ca8d5f0ac83a3f6c7f7a75e8f2a9f1f66a11f88d0f8bcb6d78f35f6db6a5d1e\"," ++
-        "\"pubkey\":\"0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef\"," ++
-        "\"created_at\":1,\"kind\":1,\"tags\":[],\"content\":\"hello\"," ++
-        "\"sig\":\"0000000000000000000000000000000000000000000000000000000000000000" ++
-        "0000000000000000000000000000000000000000000000000000000000000000\"}";
-    const event = try noztr.nip01_event.event_parse_json(event_json, arena.allocator());
+    const secret_key = [_]u8{0x11} ** 32;
+    const pubkey = try common.derive_public_key(&secret_key);
+    var event = common.simple_event(1, pubkey, "hello", &.{});
+    var event_json_output: [512]u8 = undefined;
+    var preimage_output: [256]u8 = undefined;
+    var relay_output: [640]u8 = undefined;
+
+    try common.sign_event(&secret_key, &event);
+    const event_json = try common.simple_event_json(event_json_output[0..], &event);
+    const canonical_json = try noztr.nip01_event.event_serialize_canonical_json(
+        preimage_output[0..],
+        &event,
+    );
+    const reparsed = try noztr.nip01_event.event_parse_json(event_json, arena.allocator());
+    const computed_id = try noztr.nip01_event.event_compute_id_checked(&reparsed);
     const filter = try noztr.nip01_filter.filter_parse_json("{\"kinds\":[1]}", arena.allocator());
-    var output: [512]u8 = undefined;
     const relay_json = try noztr.nip01_message.relay_message_serialize_json(
-        output[0..],
-        &.{ .event = .{ .subscription_id = "sub", .event = event } },
+        relay_output[0..],
+        &.{ .event = .{ .subscription_id = "sub", .event = reparsed } },
     );
 
-    try std.testing.expect(noztr.nip01_filter.filter_matches_event(&filter, &event));
+    try std.testing.expectEqualSlices(u8, event.id[0..], reparsed.id[0..]);
+    try std.testing.expectEqualSlices(
+        u8,
+        event.id[0..],
+        computed_id[0..],
+    );
+    try noztr.nip01_event.event_verify_id(&reparsed);
+    try noztr.nip01_event.event_verify(&reparsed);
+    try std.testing.expect(noztr.nip01_filter.filter_matches_event(&filter, &reparsed));
+    try std.testing.expect(std.mem.startsWith(u8, canonical_json, "[0,\""));
     try std.testing.expect(std.mem.indexOf(u8, relay_json, "\"EVENT\"") != null);
 }

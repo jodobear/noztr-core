@@ -249,7 +249,7 @@ payload is needed for the current task.
 
 - Status snapshot:
   - `event_compute_id` all-zero fallback follow-up: closed (canonical typed runtime-shape failure).
-  - LLM-first usability evaluation (`OQ-E-006`): in-progress (`docs/plans/llm-usability-pass.md`).
+  - superseded: LLM-first usability evaluation closure state moved to `D-117`.
   - security hardening tracker remains canonical: `docs/plans/security-hardening-register.md`.
 
 ## D-015: Record Tiger cleanliness and strictness-profile evaluation inputs
@@ -260,9 +260,10 @@ payload is needed for the current task.
   - Tiger hard rules are currently clean for `src/` on hard checks (`>100` columns: none,
     `>70`-line functions: none).
   - strict-width and anti-pattern cleanup remains tracked as quality follow-up where applicable.
-  - strictness/interoperability choices remain under evaluation through `OQ-E-006`: strict filter full-hex
-    requirement, unknown filter-field rejection, strict relay `OK` status-prefix validation,
-    and strict NIP-42 origin matching (path-bound plus `ws`/`wss` distinction).
+  - strictness/interoperability choices were validated through `OQ-E-006` and now carry forward as
+    RC-freeze inputs: strict filter full-hex requirement, unknown filter-field rejection, strict
+    relay `OK` status-prefix validation, and strict NIP-42 origin matching (path-bound plus
+    `ws`/`wss` distinction).
 - Why: keeps current implementation hygiene and strictness-default evaluation criteria explicit before RC
   profile defaults are frozen.
 - Tradeoff: additional documentation maintenance versus lower policy drift across planning artifacts.
@@ -2904,3 +2905,29 @@ payload is needed for the current task.
   clarity, or future work proves that the specialized audit guide alone is sufficient for all new
   slices.
 - Supersedes: none
+
+## D-117: Close OQ-E-006 with teaching-surface fixes and keep current strict defaults as RC-freeze inputs
+
+- Date: 2026-03-16
+- Status: accepted
+- Decision: close `OQ-E-006` after a full battery run with teaching-surface fixes only:
+  - add one strict-core recipe for event lifecycle, message grammar, transcript flow, and checked
+    wrapper usage
+  - strengthen the thin `NIP-01` and `NIP-42` reference examples to show the canonical verified flow
+  - keep the current strict filter, relay `OK`, and NIP-42 origin defaults as carried-forward
+    RC-freeze inputs
+- Why: the usability pass found real discoverability gaps in examples and routing, but did not
+  produce evidence that the current strict kernel defaults should be weakened or rolled back.
+- Tradeoff: a modest increase in example-surface maintenance versus materially lower LLM and SDK
+  guesswork on the canonical strict path.
+- Related Tradeoff: T-0-001, T-0-004.
+- Reversal Trigger: a later RC-freeze or adapter-boundary slice finds evidence that the current
+  strict defaults cause unacceptable interoperability or usability failure at the kernel boundary.
+- Supersedes: the open-status snapshot in `D-014`
+
+- Closure snapshot:
+  - `OQ-E-006`: closed (`docs/plans/llm-usability-pass.md`)
+  - battery result: pass (`R1=2`, `R2=2`, `R3=1`, `R4=2`, `R5=2`, average `1.8`)
+  - Medium+ blockers: none remaining after example-routing fixes
+  - next work: choose and freeze the next Phase H packet for RC API-freeze or Layer 2
+    adapter-boundary execution

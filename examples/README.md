@@ -10,6 +10,8 @@ fixtures so SDK and app authors can see what `noztr` rejects and why.
 
 - `consumer_smoke.zig`
   - minimal package/import check
+- `strict_core_recipe.zig`
+  - best first entry point for strict event, message, transcript, and wrapper flows
 - `remote_signing_recipe.zig`
   - best first entry point for `nzdk` signer/session work
 - `wallet_recipe.zig`
@@ -23,6 +25,13 @@ fixtures so SDK and app authors can see what `noztr` rejects and why.
   - `remote_signing_recipe.zig`
   - `nip46_example.zig`
   - `remote_signing_adversarial_example.zig`
+- strict core trust-boundary flows:
+  - `strict_core_recipe.zig`
+  - `nip01_example.zig`
+  - `nip42_example.zig`
+  - `nip70_example.zig`
+  - `nip13_example.zig`
+  - `nip09_example.zig`
 - mailbox/private-message handoff:
   - `nip17_wrap_recipe.zig`
   - `nip17_example.zig`
@@ -156,6 +165,8 @@ The recipe files are slightly higher-level, but still stay inside `noztr` bounda
   - NIP-05 plus NIP-46 discovery parsing
 - `wallet_recipe.zig`
   - NIP-06 plus Nostr-focused BIP-85 helpers
+- `strict_core_recipe.zig`
+  - canonical event lifecycle, strict message grammar, transcript flow, and checked wrappers
 - `identity_proof_recipe.zig`
   - NIP-39 proof URL and expected-text helpers
 - `remote_signing_recipe.zig`

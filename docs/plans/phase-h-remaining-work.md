@@ -20,7 +20,8 @@ canonical: true
 
 # Phase H Remaining Work
 
-Current active Phase H packet after completion of the requested-NIP loop and earlier Phase H waves.
+Current active Phase H packet after completion of the requested-NIP loop, earlier Phase H waves, and
+the `OQ-E-006` usability pass.
 
 ## Purpose
 
@@ -30,7 +31,7 @@ Current active Phase H packet after completion of the requested-NIP loop and ear
 
 ## Scope Delta
 
-- current active remaining work is `OQ-E-006` closure in `docs/plans/llm-usability-pass.md`
+- current active remaining work is next-packet selection after `OQ-E-006` closure
 - any new implementation, audit, or robustness slice started during Phase H must be frozen here
   before work begins
 - completed Phase H packets remain traceability references only:
@@ -43,15 +44,16 @@ Current active Phase H packet after completion of the requested-NIP loop and ear
 
 - Phase H remains active
 - the requested-NIP loop is complete through `NIP-B7`
-- no new implementation slice is currently active beyond the remaining Phase H closeout work
-- `OQ-E-006` remains open and is the current Phase H gating item before RC API-freeze decisions
+- `OQ-E-006` is closed
+- no new implementation slice is active yet after the usability pass closeout
+- the current Phase H decision is whether the next packet should be RC API-freeze work or explicit
+  Layer 2 adapter-boundary work
 
 ## Next Step
 
-1. run the `OQ-E-006` task battery and score the current usability pass
-2. if that pass produces code or docs fixes, freeze each resulting slice here and run
-   `docs/guides/IMPLEMENTATION_QUALITY_GATE.md`
-3. after `OQ-E-006` closes, decide the next Phase H packet for RC-freeze or adapter-boundary work
+1. choose the next Phase H packet for RC API-freeze or Layer 2 adapter-boundary execution
+2. freeze that slice here before any new implementation or audit work begins
+3. route the chosen slice through `docs/guides/IMPLEMENTATION_QUALITY_GATE.md`
 
 ## Seam Constraints
 
@@ -74,6 +76,6 @@ Current active Phase H packet after completion of the requested-NIP loop and ear
 
 ## Closeout Conditions
 
-- `OQ-E-006` is either closed or explicitly replaced by the next Phase H packet
+- `OQ-E-006` remains closed in docs and state routing
 - startup routing points to the current packet, not a completed one
 - superseded Phase H packets are marked `reference` or moved to archive

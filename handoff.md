@@ -35,7 +35,8 @@ Current execution state for `noztr`.
 - Remote readiness remains deferred-by-operator.
 - No git remote is configured in this repo.
 - The post-kernel requested-NIP loop is complete through split-surface `NIP-B7`.
-- `OQ-E-006` remains open and is the current remaining Phase H gating item.
+- `OQ-E-006` is closed.
+- No new implementation slice is active yet after the usability-pass closeout.
 - Only expected untracked local artifact:
   - `tools/interop/rust-nostr-parity-all/target/`
 
@@ -75,9 +76,8 @@ Current execution state for `noztr`.
 
 ## Next Work
 
-- execute `OQ-E-006` from `docs/plans/llm-usability-pass.md`
-- if that pass creates a new code or audit slice, freeze it in `docs/plans/phase-h-remaining-work.md`
-  and run `docs/guides/IMPLEMENTATION_QUALITY_GATE.md`
+- choose and freeze the next Phase H packet for RC API-freeze or Layer 2 adapter-boundary work
+- run `docs/guides/IMPLEMENTATION_QUALITY_GATE.md` for that slice once it is frozen
 - use `docs/plans/noztr-sdk-ownership-matrix.md` when a candidate touches kernel-vs-SDK scope
 
 ## Notes

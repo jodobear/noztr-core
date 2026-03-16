@@ -103,7 +103,9 @@ This artifact is the lean active execution baseline and is aligned to:
   post-Wave `NIP-51` private-list follow-up are complete.
 - The post-kernel requested-NIP loop is complete through `NIP-B7`.
 - Current live Phase H packet is `docs/plans/phase-h-remaining-work.md`.
-- `OQ-E-006` usability closure is the current remaining Phase H gating item.
+- `OQ-E-006` usability closure is complete.
+- Current remaining Phase H work is to choose and freeze the next packet for RC API-freeze or
+  adapter-boundary execution.
 - `docs/plans/post-kernel-requested-nips-loop.md` now remains as reference evidence for the loop
   order, closure rules, and split-surface scope calls rather than as an active execution packet.
 - NIP-06 dependency strategy is resolved for current planning: adopt `libwally-core` behind the
@@ -138,7 +140,7 @@ This artifact is the lean active execution baseline and is aligned to:
 - `docs/plans/implemented-nip-review-guide.md`
   - canonical review matrix plus audit/robustness execution model
 - `docs/plans/llm-usability-pass.md`
-  - active `OQ-E-006` closure criteria
+  - closed `OQ-E-006` execution log and RC-freeze input
 - `docs/plans/security-hardening-register.md`
   - canonical status tracker for hardening follow-ups
 - `docs/plans/noztr-sdk-ownership-matrix.md`
@@ -148,10 +150,9 @@ This artifact is the lean active execution baseline and is aligned to:
 
 ## Active Risks And Open Questions
 
-- `OQ-E-006` remains open:
-  - complete the LLM-first usability evaluation closure criteria in
-    `docs/plans/llm-usability-pass.md` before release-candidate API freeze
-- Layer 2 compatibility/ergonomic adapter work remains deferred until `OQ-E-006` closes.
+- choose and freeze the next Phase H packet for RC API-freeze or Layer 2 adapter-boundary work.
+- Layer 2 compatibility/ergonomic adapter work is no longer blocked by `OQ-E-006`, but still
+  requires an explicit packet before execution.
 - `UT-E-003` and `UT-E-004` remain maintenance-mode items; reopen only on new behavior-class
   discovery.
 - The deprecated `NIP-04` private-list adapter remains deferred unless real interoperability

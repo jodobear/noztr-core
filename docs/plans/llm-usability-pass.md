@@ -1,7 +1,7 @@
 ---
 title: LLM Usability Pass
 doc_type: log
-status: active
+status: closed
 owner: noztr
 phase: phase-h
 read_when:
@@ -16,14 +16,14 @@ canonical: true
 
 # LLM Usability Pass (OQ-E-006)
 
-Date: 2026-03-07
+Date: 2026-03-16
 
-Status: in-progress
+Status: closed
 
 Purpose: evaluate hardened v1 APIs from an LLM-first integration workflow before RC API freeze.
 
-Decision linkage: this pass remains in progress and is the decision input for first RC strictness-profile
-default freezing.
+Decision linkage: this pass is closed and is now the decision input for the next Phase H packet that
+selects RC API-freeze or adapter-boundary work.
 
 ## Scope Snapshot
 
@@ -73,36 +73,98 @@ Pass threshold:
 - No `0` on `R2` or `R4`.
 - Average score >= `1.4` across `R1`..`R5` for the first full battery run.
 
-## Initial Findings and Recommendations
+## Execution Run: 2026-03-16
 
-Initial findings after parity refresh of current docs:
+Micro-freeze:
 
-- `F1`: event API naming drift existed in contracts (`EventComputeIdError` vs implemented
-  `EventShapeError`, missing `event_serialize_canonical_json` / checked id surfaces).
-- `F2`: message transcript semantics drift existed in contracts (`CLOSED` now allowed pre-EOSE,
-  plus canonical `transcript_apply_relay` usage).
-- `F3`: PoW wrapper error naming drift existed in contracts (`InvalidEventId` vs canonical
-  `InvalidId` under `PowVerifiedIdError`).
-- `F4`: security follow-up status drift existed for usability sequencing (pending vs started).
-- `F5`: transcript naming needed explicit doc cleanup so canonical strict flow
-  (`transcript_mark_client_req` + `transcript_apply_relay`) is the only public Layer 1 path.
+- Scope:
+  - execute the `T1`..`T6` battery against the current strict-default API surface
+  - repair teaching-surface gaps in examples and example routing only
+- Non-goals:
+  - no kernel behavior change
+  - no new strictness-default change
+  - no SDK-side workflow expansion
+- Accepted valid input versus canonical emitted output:
+  - teach canonical event serialization and checked id/signature flow
+  - teach strict default message grammar through `nip01_message`
+  - teach canonical transcript flow as `transcript_mark_client_req` then `transcript_apply_relay`
+  - teach checked wrapper entry points as the default trust-boundary surface
+- Invalid-vs-capacity matrix:
+  - this slice adds no new public builder or validator
+  - no invalid-vs-capacity mapping changed in code or docs
+- Sync touchpoints:
+  - `examples/nip01_example.zig`
+  - `examples/nip42_example.zig`
+  - `examples/strict_core_recipe.zig`
+  - `examples/examples.zig`
+  - `examples/README.md`
+  - `docs/plans/security-hardening-register.md`
+  - `docs/plans/build-plan.md`
+  - `docs/plans/phase-h-remaining-work.md`
+  - `docs/plans/decision-index.md`
+  - `docs/plans/decision-log.md`
+  - `handoff.md`
 
-Recommendations:
+Battery results:
 
-- `REC-1`: keep wrapper names (`*_checked`, `*_verified_id`) as canonical trust-boundary defaults in
-  docs and examples.
-- `REC-2`: include one compact transcript state diagram in this artifact before closure to reduce
-  ordering ambiguity for LLM-generated call sequences.
-- `REC-3`: keep error-name parity checks in the task battery as a standing gate each time
-  `v1-api-contracts.md` is updated.
-- `REC-4`: track OQ-E-006 progress only through this artifact plus
-  `docs/plans/security-hardening-register.md` to avoid status drift.
-- `REC-5`: document canonical-only transcript flow for unreleased Layer 1 APIs:
-  `transcript_mark_client_req` then `transcript_apply_relay`.
+- `T1` pass:
+  - `examples/nip01_example.zig` now teaches canonical serialize -> parse -> checked id -> verify
+- `T2` pass:
+  - `examples/strict_core_recipe.zig` now teaches multi-filter parsing and deterministic
+    `filters_match_event` behavior
+- `T3` pass:
+  - `examples/strict_core_recipe.zig` now teaches strict `REQ`, `COUNT`, and relay `OK` grammar
+    through `nip01_message`
+- `T4` pass:
+  - `examples/strict_core_recipe.zig` now teaches canonical transcript ordering, including early
+    `REQ -> CLOSED`
+- `T5` pass:
+  - `examples/nip42_example.zig` now teaches `auth_validate_event`, `auth_state_accept_event`, and
+    protected-event policy coupling with `nip70_protected`
+- `T6` pass:
+  - `examples/strict_core_recipe.zig`, `examples/nip13_example.zig`, and `examples/nip09_example.zig`
+    together teach the checked wrapper defaults
+
+Usability findings from the executed battery:
+
+- `F1` fixed:
+  - there was no single obvious strict-core example for a cold reader crossing event, message,
+    transcript, and checked wrapper paths
+- `F2` fixed:
+  - `nip01_example.zig` was too thin for the actual canonical event lifecycle
+- `F3` fixed:
+  - `nip42_example.zig` did not show the validated auth path or protected-event coupling
+- `F4` accepted low:
+  - transcript and auth flows still require callers to compose multiple kernel modules directly, but
+    the composition is now taught explicitly and stays inside deterministic kernel ownership
+- `F5` reviewed with no fix needed:
+  - `src/root.zig` export names and `docs/plans/v1-api-contracts.md` naming are aligned
+
+Rubric result:
+
+- `R1 discoverability`: `2`
+- `R2 boundary clarity`: `2`
+- `R3 composition cost`: `1`
+- `R4 misuse resistance`: `2`
+- `R5 docs parity`: `2`
+- Average: `1.8`
+
+Pass outcome:
+
+- threshold met
+- no `0` on `R2` or `R4`
+- no remaining Medium+ usability blocker
+
+Canonical transcript reminder:
+
+```text
+REQ marked -> EVENT* -> EOSE? -> EVENT* -> CLOSED?
+REQ marked -> CLOSED
+```
 
 ## Strictness Profile Decision Inputs (Current)
 
-- Keep these currently strict behaviors as explicit evaluation targets for RC defaults:
+- Keep these currently strict behaviors as carried-forward RC freeze inputs:
   - filter `ids`/`authors` lowercase hex-prefix semantics (`1..64`).
   - unknown filter-field rejection.
   - relay `OK` status-prefix strictness.
@@ -123,11 +185,17 @@ Recommendations:
   `docs/plans/security-hardening-register.md`, and `handoff.md` reflect the same usability status.
 - C5 decision-log entry records closure state transition for `OQ-E-006` before RC API freeze.
 
+Closure result:
+
+- satisfied on `2026-03-16`
+
 ## Decisions
 
 - `UL-001`: treat this artifact as the canonical execution log for usability pass status and closure
   criteria.
 - `UL-002`: run usability evaluation on hardened strict APIs only (post-security checkpoint sequence).
+- `UL-003`: close `OQ-E-006` with teaching-surface fixes only; no kernel-behavior rollback or
+  strictness downgrade was required by the battery.
 
 ## Tradeoffs
 
@@ -148,18 +216,16 @@ Recommendations:
 
 ## Open Questions
 
-- `OQ-UL-001`: does canonical transcript helper naming
-  (`transcript_mark_client_req` + `transcript_apply_relay`) require an example-first docs update
-  beyond current signatures to reduce LLM misuse risk.
-- `OQ-UL-002`: should RC defaults preserve the current strict profile on filter/relay-origin/status
-  parsing, or downgrade selected paths for interoperability.
+- none in this artifact; next work is packet selection for RC freeze or adapter-boundary execution in
+  `docs/plans/phase-h-remaining-work.md`
 
 ## Principles Compliance
 
 - Required sections present: `Decisions`, `Tradeoffs`, `Open Questions`, `Principles Compliance`.
 - `P01`: trust-boundary wrappers and typed failures are explicitly evaluated.
 - `P02`: scope remains protocol-kernel APIs and avoids transport-coupled UX assumptions.
-- `P03`: parity drift checks are explicit in task battery and findings.
+- `P03`: parity drift checks are explicit in task battery and findings, and no contract drift remains
+  open after the closure run.
 - `P04`: relay/auth/protected policy usability is included as a dedicated battery task.
 - `P05`: deterministic transcript and grammar semantics are explicitly tested.
 - `P06`: evaluation focuses on bounded strict APIs and does not introduce unbounded runtime behavior.

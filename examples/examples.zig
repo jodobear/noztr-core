@@ -73,6 +73,7 @@ comptime {
     _ = @import("nip86_example.zig");
     _ = @import("relay_admin_adversarial_example.zig");
     _ = @import("discovery_recipe.zig");
+    _ = @import("strict_core_recipe.zig");
     _ = @import("wallet_recipe.zig");
     _ = @import("identity_proof_recipe.zig");
     _ = @import("remote_signing_recipe.zig");

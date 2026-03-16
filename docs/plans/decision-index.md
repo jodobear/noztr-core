@@ -61,6 +61,8 @@ Use this file to decide whether the full canonical decision payload is needed.
 - `D-115` treat process updates as coherent control-surface edits
 - `D-116` restore active Phase H packet routing and split the generic implementation gate from
   specialized audit guidance
+- `D-117` close `OQ-E-006` with teaching-surface fixes and carry current strict defaults forward as
+  RC-freeze inputs
 
 ## Docs And Active-Memory Routing
 
