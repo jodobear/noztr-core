@@ -2957,3 +2957,40 @@ payload is needed for the current task.
 - Reversal Trigger: the example-layer check stops catching real teaching mistakes or becomes too
   vague to apply consistently.
 - Supersedes: none
+
+## D-119: Keep full Blossom protocol/service work out of `noztr`
+
+- Date: 2026-03-16
+- Status: accepted
+- Decision: keep Blossom ownership split at the deterministic protocol-kernel boundary.
+  - accepted behavior:
+    - `noztr` keeps only deterministic Blossom kernel seams
+    - the currently accepted `NIP-B7` slice remains:
+      - ordered `kind:10063` server-list parsing/building
+      - deterministic fallback path/URL derivation
+    - future Blossom additions in `noztr` are allowed only if they stay:
+      - protocol-facing
+      - pure and deterministic
+      - bounded and fixed-capacity
+      - transport-free and service-policy-free
+    - plausible future kernel candidates may include:
+      - bounded `BUD-10` URI parsing/building
+      - bounded descriptor or auth-token helpers that remain transport-free
+    - the full Blossom protocol/service stack does not belong in `noztr`
+    - the full Blossom protocol/service stack should live in a dedicated repo that `nzdk`
+      integrates rather than owns directly
+  - accepted non-goals for `noztr`:
+    - Blossom HTTP client/server endpoint flows
+    - upload, download, mirror, media, report, or payment workflow
+    - storage, cache, retry, availability, or service policy
+- Why: Blossom is important ecosystem infrastructure, but the full stack is a protocol-plus-service
+  system rather than a pure kernel seam. Keeping the service/runtime surface out of `noztr`
+  preserves the strict deterministic boundary while still leaving room for narrow reusable helpers
+  that materially improve interoperability.
+- Tradeoff: one extra repo boundary versus a cleaner kernel and a clearer separation between
+  deterministic protocol glue and service/runtime workflow.
+- Related Tradeoff: T-0-001, T-0-002.
+- Reversal Trigger: protocol or ecosystem evidence shows that the dedicated-repo split creates more
+  fragmentation than clarity, or that a materially larger Blossom surface can be kept purely
+  deterministic and transport-free inside `noztr`.
+- Supersedes: none

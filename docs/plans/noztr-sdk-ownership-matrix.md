@@ -116,6 +116,23 @@ If the answer to `5` is yes, the behavior probably belongs in the SDK.
   - Current call: keep it in `noztr` as exact protocol-facing placeholder substitution, not client
     orchestration; revisit only if SDK-side redirect/launch handling makes the helper redundant.
 
+## Blossom Boundary Note
+
+- `noztr` owns only deterministic Blossom kernel seams.
+  - current accepted slice:
+    - ordered `kind:10063` server-list parsing/building
+    - deterministic fallback path/URL derivation
+  - possible future kernel candidates remain narrow:
+    - bounded `BUD-10` URI parsing/building
+    - bounded descriptor or auth-token helpers that stay transport-free and deterministic
+- the full Blossom stack does not belong in `noztr`.
+  - keep out of the kernel:
+    - HTTP endpoint/client/server flows
+    - upload, download, mirror, media, report, and payment workflow
+    - storage, cache, retry, availability, and service policy
+- the full Blossom stack should live in a dedicated repo, with `nzdk` integrating that repo rather
+  than becoming its primary home.
+
 ## Crypto Boundary Note
 
 - The current `secp256k1` / `libwally` boundary remains in `noztr`.
@@ -141,5 +158,5 @@ requirements. The ownership split for the newly requested set is:
 | `98` | split | deterministic HTTP-auth event and header helpers | HTTP middleware and request execution | stop at kernel slice |
 | `99` | `noztr` | classified-listing metadata parse/build/validate helpers | commerce/search/inventory workflow | kernel-first |
 | `B0` | `noztr` | web-bookmark event parse/build helpers | bookmark sync and preview/browser workflow | kernel-first |
-| `B7` | split | Blossom server-list and fallback URL helpers | BUD/media service workflow | stop at kernel slice |
+| `B7` | split | Blossom server-list and fallback URL helpers plus future deterministic Blossom seam candidates only if they stay transport-free | dedicated Blossom repo integration and higher-level media/service workflow | stop at kernel slice; do not make `nzdk` the primary Blossom home |
 | `C0` | `noztr` | code-snippet event parse/build helpers | syntax highlighting/editor/run workflow | kernel-first |

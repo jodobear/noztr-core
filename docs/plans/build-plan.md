@@ -124,6 +124,8 @@ This artifact is the lean active execution baseline and is aligned to:
 - For kernel-vs-SDK ownership questions, use `docs/plans/noztr-sdk-ownership-matrix.md`.
 - For split surfaces, stop at the deterministic protocol-kernel boundary and record the remaining
   SDK-side surface explicitly.
+- For Blossom specifically, keep only deterministic kernel seams in `noztr`; route the full
+  protocol/service stack to a dedicated repo that `nzdk` integrates rather than owns.
 - Any default-affecting change still requires a canonical entry in `docs/plans/decision-log.md`.
 - Docs/process closeout must restore the docs surface to steady state after the slice closes.
 
@@ -158,6 +160,8 @@ This artifact is the lean active execution baseline and is aligned to:
   discovery.
 - The deprecated `NIP-04` private-list adapter remains deferred unless real interoperability
   evidence justifies widening the kernel.
+- Blossom scope remains intentionally narrow in `noztr`; revisit only if SDK-informed validation
+  finds another bounded deterministic seam that materially improves interoperability.
 
 ## Active Quality Gates
 

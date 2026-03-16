@@ -70,6 +70,12 @@ Use this file to decide whether the full canonical decision payload is needed.
 - `D-108` adopt lean control-surface rules for docs and handoff state
 - `D-109` adopt unified docs frontmatter schema and decision-index routing
 
+## Ownership And Boundary Calls
+
+- `D-112` accept bounded `NIP-B7` Blossom server-list and fallback helpers
+- `D-119` keep full Blossom protocol/service work out of `noztr` and route it to a dedicated repo
+  that `nzdk` integrates
+
 ## Recent Requested-NIP Acceptances
 
 - `D-097` accept bounded `NIP-99` classified-listing metadata helpers
@@ -82,4 +88,3 @@ Use this file to decide whether the full canonical decision payload is needed.
 - `D-105` accept bounded `NIP-49` private-key encryption with internal `NFKC` normalization
 - `D-106` accept bounded `NIP-98` HTTP-auth event and header helpers
 - `D-107` accept bounded `NIP-47` Wallet Connect kernel helpers
-- `D-112` accept bounded `NIP-B7` Blossom server-list and fallback helpers
