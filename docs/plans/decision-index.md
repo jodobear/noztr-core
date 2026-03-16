@@ -63,6 +63,7 @@ Use this file to decide whether the full canonical decision payload is needed.
   specialized audit guidance
 - `D-117` close `OQ-E-006` with teaching-surface fixes and carry current strict defaults forward as
   RC-freeze inputs
+- `D-118` require explicit example-layer contract checks for example-bearing slices
 
 ## Docs And Active-Memory Routing
 

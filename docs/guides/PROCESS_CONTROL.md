@@ -233,6 +233,26 @@ Minimum Review B prompts:
 - did the surface stay inside deterministic kernel ownership?
 - did workflow or policy behavior leak in from the SDK layer?
 - do the examples show both intended use and intended rejection?
+- do the examples teach the right contract layer instead of mixing:
+  - full object JSON
+  - canonical preimage
+  - message envelope
+  - checked wrapper result
+
+## Example Contract Rule
+
+When a slice adds or changes examples, make the example contract layer explicit.
+
+Common layers that must not be casually mixed:
+- full object JSON
+- canonical preimage
+- message envelope
+- checked wrapper result
+
+If an example claims parse/serialize round-trip:
+- verify that the parser and serializer operate on the same layer
+- say when a serializer is only for id-preimage or envelope output rather than full object parsing
+- do not let a plausible-looking example become the first place a semantic contract bug hides
 
 ## Synchronization Rule
 

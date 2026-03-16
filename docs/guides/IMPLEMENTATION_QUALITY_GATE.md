@@ -44,6 +44,11 @@ Specialized references:
    - keep the surface bounded, deterministic, and inside protocol-kernel ownership
    - add tests and examples with the code instead of later
    - do not widen scope to absorb adjacent workflow or SDK behavior
+   - if examples are part of the slice, make the contract layer explicit:
+     - full object JSON
+     - canonical preimage
+     - message envelope
+     - checked wrapper result
 
 3. Review A
    - validate correctness, trust-boundary behavior, and parity/evidence posture
@@ -63,6 +68,8 @@ Specialized references:
      - did the surface stay inside deterministic kernel ownership
      - did workflow or policy behavior leak in from the SDK layer
      - do examples show intended use and intended rejection
+     - do examples teach the correct contract layer instead of crossing full object JSON, canonical
+       preimage, message envelope, or checked wrapper semantics
 
 6. Fix Review B findings
 
@@ -72,6 +79,8 @@ Specialized references:
    - run hostile and contradictory inputs where the surface warrants them
    - for tokenized or sectioned grammars, challenge nonsense tokens and separator discipline
    - when reference evidence is weak or `LIB_UNSUPPORTED`, rerun the spec-first challenge pass
+   - for example-bearing slices, verify that any claimed parse/serialize round-trip stays within one
+     contract layer
 
 8. Green gates
    - run focused checks first when useful

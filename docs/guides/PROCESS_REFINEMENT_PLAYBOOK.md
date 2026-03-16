@@ -110,6 +110,22 @@ What helped:
 - one hostile example
 - README or discovery-surface updates in the same closeout pass
 
+### 6a. Example layers can be semantically wrong while still looking plausible
+
+One recent failure was not in kernel code. It was in the teaching surface: an example used a
+canonical id-preimage serializer as if it emitted full event-object JSON.
+
+What helped:
+- name the contract layer in the example freeze
+- distinguish full object JSON from canonical preimage
+- distinguish message envelopes from object-level parsing
+- treat checked wrappers as their own layer, not as generic parse/serialize helpers
+
+Why this matters:
+- example bugs can survive first-pass review because they look coherent
+- they often fail only when the full gate runs
+- they teach the wrong mental model even if the library code itself is correct
+
 ### 7. Ordered micro-loops reduce synchronization errors
 
 Trying to update code, tests, examples, audits, and docs all at once increases context switching
@@ -157,6 +173,8 @@ Review B prompts that paid off:
 - did the surface stay inside deterministic protocol-kernel ownership?
 - did workflow or policy behavior leak in from the SDK layer?
 - do the examples show both intended use and intended rejection?
+- do the examples teach the correct contract layer instead of mixing full object JSON, canonical
+  preimage, message envelope, or checked wrapper semantics?
 
 ## How To Define Repo-Specific Audit Postures
 

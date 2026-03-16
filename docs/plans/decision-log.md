@@ -2931,3 +2931,29 @@ payload is needed for the current task.
   - Medium+ blockers: none remaining after example-routing fixes
   - next work: choose and freeze the next Phase H packet for RC API-freeze or Layer 2
     adapter-boundary execution
+
+## D-118: Require explicit example-layer contract checks for example-bearing slices
+
+- Date: 2026-03-16
+- Status: accepted
+- Decision: when a slice adds or changes examples, Review B and the implementation gate must check
+  that the example is teaching the correct contract layer.
+  - minimum explicit layer distinctions:
+    - full object JSON
+    - canonical preimage
+    - message envelope
+    - checked wrapper result
+  - required behavior:
+    - if an example claims parse/serialize round-trip, confirm parser and serializer are on the same
+      layer
+    - if a serializer only emits canonical id-preimage or envelope output, say so and do not teach
+      it as full object parsing
+- Why: `OQ-E-006` surfaced a real teaching bug where a plausible example crossed the event-object
+  and canonical-preimage layers. The library contract was correct, but the example taught the wrong
+  model until the full gate caught it.
+- Tradeoff: one more narrow review prompt versus lower risk that examples become the first place
+  semantic contract confusion escapes.
+- Related Tradeoff: T-0-004.
+- Reversal Trigger: the example-layer check stops catching real teaching mistakes or becomes too
+  vague to apply consistently.
+- Supersedes: none
