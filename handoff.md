@@ -13,7 +13,7 @@ depends_on:
   - docs/plans/build-plan.md
   - docs/plans/decision-index.md
   - docs/plans/phase-h-remaining-work.md
-  - docs/plans/post-exhaustive-audit-remediation-plan.md
+  - docs/plans/llm-structured-usability-audit.md
 canonical: true
 ---
 
@@ -28,7 +28,7 @@ Current execution state for `noztr`.
 - `docs/plans/build-plan.md`
 - `docs/plans/decision-index.md`
 - `docs/plans/phase-h-remaining-work.md`
-- `docs/plans/post-exhaustive-audit-remediation-plan.md`
+- `docs/plans/llm-structured-usability-audit.md`
 
 ## Current Status
 
@@ -39,7 +39,8 @@ Current execution state for `noztr`.
 - The post-kernel requested-NIP loop is complete through split-surface `NIP-B7`.
 - `OQ-E-006` is closed.
 - The exhaustive pre-freeze audit and `no-mja` meta-analysis are complete.
-- The next active Phase H slice is the post-exhaustive-audit remediation program.
+- The prepared remediation program is deferred pending one supplemental LLM-first audit.
+- The next active Phase H slice is the LLM structured usability audit supplement.
 - Boundary validation has already accepted:
   - public signed event-object JSON serialization
   - deterministic one-recipient `NIP-59` outbound transcript construction
@@ -72,8 +73,12 @@ Current execution state for `noztr`.
   - startup route into accepted policy
 - `docs/plans/phase-h-remaining-work.md`
   - current active Phase H packet
+- `docs/plans/llm-structured-usability-audit.md`
+  - immediate next packet before remediation execution begins
 - `docs/plans/post-exhaustive-audit-remediation-plan.md`
-  - current remediation packet after the completed exhaustive audit
+  - prepared remediation packet after the completed exhaustive audit
+- `docs/plans/noztr-sdk-remediation-brief.md`
+  - structured downstream brief for `nzdk` during remediation
 - `docs/guides/IMPLEMENTATION_QUALITY_GATE.md`
   - staged implementation and review gate for any new slice
 
@@ -99,7 +104,9 @@ Current execution state for `noztr`.
 ## Next Work
 
 - execute the SDK-informed boundary-validation packet in `docs/plans/phase-h-remaining-work.md`
-- execute `docs/plans/post-exhaustive-audit-remediation-plan.md`
+- execute `docs/plans/llm-structured-usability-audit.md`
+- revise the meta-analysis after the supplement closes
+- only then execute `docs/plans/post-exhaustive-audit-remediation-plan.md`
 - current remediation tracker epic and child lanes:
   - `no-65ev`
   - `no-65ev.1`
@@ -107,6 +114,9 @@ Current execution state for `noztr`.
   - `no-65ev.3`
   - `no-65ev.4`
   - `no-65ev.5`
+- current supplemental audit lanes:
+  - `no-ad91`
+  - `no-kbwf`
 - keep the completed exhaustive audit reports, matrix, and meta-analysis as reference evidence and
   reopen them only on new contrary evidence
 - if the validation finds a real non-kernel blocker, create one explicit Layer 2 adapter-boundary

@@ -1,7 +1,7 @@
 ---
 title: Post Exhaustive Audit Remediation Plan
 doc_type: packet
-status: active
+status: deferred
 owner: noztr
 phase: phase-h
 read_when:
@@ -22,12 +22,14 @@ canonical: true
 
 # Post-Exhaustive Audit Remediation Plan
 
-Current active Phase H packet after completion of the exhaustive pre-freeze audit and its
-meta-analysis.
+Prepared remediation packet after completion of the exhaustive pre-freeze audit and its
+meta-analysis. Execution is deferred pending the supplemental LLM usability audit and revised
+synthesis.
 
 ## Purpose
 
-- execute the remediation program chosen by the completed exhaustive audit
+- execute the remediation program chosen by the completed exhaustive audit once the supplemental
+  LLM audit and revised synthesis are complete
 - keep remediation ordered and explicit instead of scattering fixes ad hoc
 - block RC-freeze claims until the redesign/fix lanes and the follow-up freeze recheck complete
 
@@ -48,6 +50,9 @@ meta-analysis.
 
 - the exhaustive audit program `no-ard` is complete
 - the meta-analysis `no-mja` is complete
+- execution is deferred pending:
+  - `no-ad91`
+  - `no-kbwf`
 - remediation tracker epic:
   - `no-65ev`
 - current child lanes:
@@ -73,10 +78,11 @@ meta-analysis.
 
 ## Next Step
 
-1. execute the bounded backend redesign lane first
-2. then execute the targeted hardening, docs, and performance lanes
-3. then run the blocked post-remediation freeze recheck lane
-4. only after that decide whether RC-freeze work is honestly ready
+1. wait for the LLM structured usability supplement and revised synthesis to close
+2. then execute the bounded backend redesign lane first
+3. then execute the targeted hardening, docs, and performance lanes
+4. then run the blocked post-remediation freeze recheck lane
+5. only after that decide whether RC-freeze work is honestly ready
 
 ## Open Questions Or Targeted Findings
 

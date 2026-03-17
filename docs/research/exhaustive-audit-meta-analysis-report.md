@@ -140,3 +140,5 @@ canonical: true
 - no major rewrite is justified from the completed evidence
 - the correct next move is a bounded-remediation program led by one backend-boundary redesign lane,
   followed by targeted hardening/cleanup lanes and then a fresh freeze-readiness check
+- remediation execution is currently deferred pending one supplemental LLM ease-of-use audit and a
+  revised synthesis update before fixes begin
