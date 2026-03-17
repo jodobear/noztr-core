@@ -1,7 +1,7 @@
 ---
 title: Exhaustive Pre-Freeze Audit Draft
 doc_type: packet
-status: active
+status: reference
 owner: noztr
 phase: phase-h
 read_when:
@@ -81,8 +81,9 @@ Posture:
 - the targeted post-audit follow-up slices `no-ow4` and `no-3jb` are complete
 - the remaining synthesis slice `no-mja` is now blocked on this draft being complete enough to
   support an honest freeze-readiness judgment
-- this draft starts empty on purpose; no section should claim coverage until the actual audit pass
-  lands evidence here
+- the angle reports and `no-mja` synthesis are complete
+- this draft now remains as reference evidence for the completed pre-freeze audit rather than as an
+  active execution packet
 
 ## Audit Axes
 
@@ -137,15 +138,19 @@ Why this order:
     `docs/research/exhaustive-audit-angle-6-zig-engineering-report.md`
   - performance / memory posture:
     `docs/research/exhaustive-audit-angle-7-performance-memory-report.md`
+  - API consistency / determinism:
+    `docs/research/exhaustive-audit-angle-8-api-consistency-report.md`
+  - docs/examples / discoverability:
+    `docs/research/exhaustive-audit-angle-9-docs-discoverability-report.md`
+  - meta-analysis:
+    `docs/research/exhaustive-audit-meta-analysis-report.md`
 - completed in prior targeted lanes:
   - `libnostr-z` report-only comparison
   - TigerBeetle Zig-quality report-only comparison
   - structural hotspot follow-up
   - explicit-state and fixed-capacity follow-up
 - still required for this exhaustive pass:
-  - explicit API consistency / determinism review
-  - explicit docs/examples/discoverability review
-  - explicit final residual-risk and blocker summary
+  - none
 
 ### Standards
 
@@ -227,6 +232,12 @@ Rewrite-pressure interpretation:
   - the `libwally` boundary is still fragmented across `NIP-06` and `BIP-85`, and
     `bip85_derivation.ensure_backend()` bootstraps readiness indirectly through
     `nip06_mnemonic.mnemonic_validate(...)`
+  - the examples index still routes successful deterministic `NIP-59` outbound construction to the
+    wrong primary entry point
+  - `NIP-05` still lacks a hostile consumer-facing example despite remaining a boundary-heavy
+    lookup and verification surface
+  - the root `README.md` still routes readers toward completed packets instead of the current
+    exhaustive-audit posture
   - `NIP-88` tally reduction still uses quadratic lookup on the main aggregation path
   - `NIP-29` group reducers still rebuild user state with repeated linear membership lookup
 - low
@@ -300,10 +311,39 @@ Rewrite-pressure interpretation:
     evidence
   - reversal trigger:
     - any measured workload or caller feedback showing that tradeoff is materially harmful
+- API consistency / determinism
+  - accepted `nip05_identity.profile_verify_json(...) -> bool` as an intentional verifier-shape
+    decision rather than a missing typed error path
+  - reversal trigger:
+    - any consumer evidence showing repeated ambiguity or misuse around that direct verifier shape
+  - accepted the current caller-owned scratch posture on `NIP-05`, `NIP-46`, and `NIP-77` as a
+    coherent ownership contract pending later contrary evidence
+  - reversal trigger:
+    - any later remediation or SDK evidence showing that the accepted ownership shape is materially
+      too awkward or inconsistent
+  - accepted the `NIP-59` one-recipient outbound builder split as the correct kernel boundary
+  - reversal trigger:
+    - any SDK evidence showing a missing deterministic kernel primitive on that seam
+- docs/examples / discoverability
+  - accepted the internal control surface as coherent even though the root `README.md` remains
+    stale
+  - reversal trigger:
+    - any future drift that makes the active control docs contradict each other again
+  - accepted the current `NIP-59` underlying teaching material as present; the live issue is index
+    routing rather than missing core example coverage
+  - reversal trigger:
+    - any future change that blurs the one-recipient transcript seam itself
 
 ### Open Blockers
 
-- none recorded yet
+- meta-analysis outcome:
+  - RC-freeze remains blocked pending remediation
+  - blocking findings:
+    - `NIP-86` public-path assertion leaks
+    - `NIP-46` direct helper assertion leaks
+    - crypto backend-outage misclassification in `NIP-44` and `NIP-26`
+    - fragmented `libwally` readiness/derivation seam across `NIP-06` and `BIP-85`
+    - examples/discovery drift on `NIP-59`, `NIP-05`, and the root `README.md`
 
 ### Deferred Remediation Candidates
 
@@ -312,20 +352,25 @@ Rewrite-pressure interpretation:
   - `NIP-46` direct helper assertion leaks
   - `NIP-25` misuse-prone public classifier semantics
   - crypto leaf backend-outage misclassification in `NIP-44` and `NIP-26`
+- targeted fixes for:
+  - `NIP-59` example routing in `examples/README.md`
+  - hostile `NIP-05` example coverage
+  - stale root `README.md` discovery routing
 - bounded redesign candidate for:
   - fragmented `libwally` readiness and derivation seam across `NIP-06` and `BIP-85`
 - targeted fix candidate for:
   - test-oriented verify-counter helpers living in `secp256k1_backend`
+- targeted performance fixes for:
+  - `NIP-88` tally reduction hotspot
+  - `NIP-29` repeated linear membership lookup
+  - `NIP-06` repeated passes and scans
 
 ## Next Step
 
-1. close `no-jacg` with the performance / memory report and matrix updates
-2. execute API consistency / determinism as `no-ohgb`
-3. keep `docs/plans/exhaustive-pre-freeze-audit-matrix.md` current as the hard coverage ledger
-4. write each remaining angle report against `docs/plans/audit-angle-report-template.md`
-5. record findings in this draft instead of fixing them
-6. hand the completed draft and angle reports to `no-mja` for meta-analysis and freeze-readiness
-   consolidation
+1. treat this draft and the matrix as completed reference evidence
+2. follow the remediation posture in
+   `docs/research/exhaustive-audit-meta-analysis-report.md`
+3. execute the new post-exhaustive remediation packet before any RC-freeze claim
 
 ## Sync Touchpoints
 
@@ -336,14 +381,14 @@ Rewrite-pressure interpretation:
   - `docs/plans/post-audit-improvement-plan.md`
 - canonical audit/state artifacts:
   - `docs/plans/implemented-nip-audit-report.md`
-  - any focused audit report touched by findings
+  - the completed angle reports under `docs/research/`
+  - `docs/research/exhaustive-audit-meta-analysis-report.md`
 
 ## Closeout Conditions
 
 - the draft states exactly what was reviewed and what was not
-- every material finding is either:
-  - recorded as a deferred remediation candidate,
-  - recorded as an explicit accepted exception, or
-  - left as one named blocker lane for immediate critical action
-- `no-mja` can synthesize freeze-readiness and remediation posture without vague or overstated
-  claims
+- every material finding is recorded as:
+  - a deferred remediation candidate,
+  - an explicit accepted exception, or
+  - a named freeze blocker
+- the meta-analysis report names the remediation posture without vague or overstated claims

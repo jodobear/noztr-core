@@ -13,7 +13,7 @@ depends_on:
   - docs/plans/build-plan.md
   - docs/plans/decision-index.md
   - docs/plans/phase-h-remaining-work.md
-  - docs/plans/post-audit-improvement-plan.md
+  - docs/plans/post-exhaustive-audit-remediation-plan.md
 canonical: true
 ---
 
@@ -28,7 +28,7 @@ Current execution state for `noztr`.
 - `docs/plans/build-plan.md`
 - `docs/plans/decision-index.md`
 - `docs/plans/phase-h-remaining-work.md`
-- `docs/plans/post-audit-improvement-plan.md`
+- `docs/plans/post-exhaustive-audit-remediation-plan.md`
 
 ## Current Status
 
@@ -38,7 +38,8 @@ Current execution state for `noztr`.
 - No git remote is configured in this repo.
 - The post-kernel requested-NIP loop is complete through split-surface `NIP-B7`.
 - `OQ-E-006` is closed.
-- The next active Phase H slice is SDK-informed boundary validation.
+- The exhaustive pre-freeze audit and `no-mja` meta-analysis are complete.
+- The next active Phase H slice is the post-exhaustive-audit remediation program.
 - Boundary validation has already accepted:
   - public signed event-object JSON serialization
   - deterministic one-recipient `NIP-59` outbound transcript construction
@@ -51,9 +52,11 @@ Current execution state for `noztr`.
     - isolate `NIP-06` backend state into one internal cell
     - accept current bounded scratch-backed public ingress in `NIP-05`, `NIP-46`, and `NIP-77`
     - accept reviewed `bool` / `?` helper boundaries as intentional
-- accepted process correction:
-  - do not treat targeted follow-up lanes as equivalent to one exhaustive pre-freeze audit
-  - do not treat the exhaustive pre-freeze audit lane as patch-as-you-go remediation by default
+- completed audit result:
+  - no major rewrite justified
+  - bounded redesign first
+  - then targeted fixes
+  - then a freeze recheck
 - Only expected untracked local artifact:
   - `tools/interop/rust-nostr-parity-all/target/`
 
@@ -69,8 +72,8 @@ Current execution state for `noztr`.
   - startup route into accepted policy
 - `docs/plans/phase-h-remaining-work.md`
   - current active Phase H packet
-- `docs/plans/post-audit-improvement-plan.md`
-  - ordered execution plan for the completed audit follow-ups
+- `docs/plans/post-exhaustive-audit-remediation-plan.md`
+  - current remediation packet after the completed exhaustive audit
 - `docs/guides/IMPLEMENTATION_QUALITY_GATE.md`
   - staged implementation and review gate for any new slice
 
@@ -96,20 +99,16 @@ Current execution state for `noztr`.
 ## Next Work
 
 - execute the SDK-informed boundary-validation packet in `docs/plans/phase-h-remaining-work.md`
-- execute `docs/plans/post-audit-improvement-plan.md` in order:
-  - `no-ard`
-  - `no-mja` only after `no-ard`
-- keep `no-ard` evidence-first:
-  - use `docs/plans/exhaustive-pre-freeze-audit-matrix.md` as the hard coverage ledger
-  - use `docs/plans/audit-angle-standards.md` as the per-angle completion bar
-  - use `docs/plans/audit-angle-report-template.md` for each dedicated angle report
-  - use `docs/plans/audit-meta-analysis-template.md` only after the angle reports are complete
-  - execute the angle lanes in frozen order tracked in both docs and `br`
-  - record findings in the working draft and reports instead of fixing them
-  - do not land fixes until the post-audit meta-analysis decides between targeted fixes, bounded
-    redesign, or major rewrite
-- keep the completed audit reports as reference evidence and reopen them only on new contrary
-  evidence
+- execute `docs/plans/post-exhaustive-audit-remediation-plan.md`
+- current remediation tracker epic and child lanes:
+  - `no-65ev`
+  - `no-65ev.1`
+  - `no-65ev.2`
+  - `no-65ev.3`
+  - `no-65ev.4`
+  - `no-65ev.5`
+- keep the completed exhaustive audit reports, matrix, and meta-analysis as reference evidence and
+  reopen them only on new contrary evidence
 - if the validation finds a real non-kernel blocker, create one explicit Layer 2 adapter-boundary
   packet instead of widening the kernel by default
 - use `docs/plans/noztr-sdk-ownership-matrix.md` when a candidate touches kernel-vs-SDK scope

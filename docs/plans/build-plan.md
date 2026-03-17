@@ -123,6 +123,9 @@ This artifact is the lean active execution baseline and is aligned to:
     exists
 - `docs/plans/post-kernel-requested-nips-loop.md` now remains as reference evidence for the loop
   order, closure rules, and split-surface scope calls rather than as an active execution packet.
+- The exhaustive pre-freeze audit and its meta-analysis are complete.
+- Current active next slice is the post-exhaustive-audit remediation program in
+  `docs/plans/post-exhaustive-audit-remediation-plan.md`.
 - NIP-06 dependency strategy is resolved for current planning: adopt `libwally-core` behind the
   approved pinned crypto backend policy and a narrow boundary module.
 
@@ -132,6 +135,8 @@ This artifact is the lean active execution baseline and is aligned to:
   `docs/guides/IMPLEMENTATION_QUALITY_GATE.md`.
 - For active Phase H remaining work and next-slice selection, use
   `docs/plans/phase-h-remaining-work.md`.
+- For the current remediation sequence after the completed exhaustive audit, use
+  `docs/plans/post-exhaustive-audit-remediation-plan.md`.
 - The completed requested-NIP loop remains reference-only in
   `docs/plans/post-kernel-requested-nips-loop.md`.
 - For implemented-surface audits or robustness work, use
@@ -150,6 +155,8 @@ This artifact is the lean active execution baseline and is aligned to:
   - startup route into accepted policy
 - `docs/plans/phase-h-remaining-work.md`
   - current active Phase H packet and remaining-work routing
+- `docs/plans/post-exhaustive-audit-remediation-plan.md`
+  - ordered remediation program after the completed exhaustive audit
 - `docs/guides/IMPLEMENTATION_QUALITY_GATE.md`
   - canonical staged gate for new slices
 - `docs/plans/post-kernel-requested-nips-loop.md`
@@ -172,17 +179,17 @@ This artifact is the lean active execution baseline and is aligned to:
   SDK or RC-freeze work surfaces a concrete contrary finding.
 - keep the TigerBeetle Zig-quality comparison lane report-only; use it to challenge Zig usage and
   engineering discipline without treating TigerBeetle as protocol authority.
-- execute `docs/plans/post-audit-improvement-plan.md` as the ordered response to the completed
-  `libnostr-z` and TigerBeetle audits.
-- before any RC-freeze claim, complete one explicit exhaustive pre-freeze audit draft that states
-  actual whole-library coverage, performance posture, crypto/backend-wrapper review, accepted
-  exceptions, and remaining blockers without overstatement.
-- the exhaustive pre-freeze audit is audit-only:
-  - do not land fixes during the angle audits
-  - use the later meta-analysis to choose targeted fixes, bounded redesign, or major rewrite
-- keep the completed TigerBeetle Zig-quality report as reference evidence; the current concrete
-  remaining follow-up lanes are `no-ard` for the exhaustive audit draft and `no-mja` for later
-  freeze-readiness consolidation after that draft is complete.
+- the completed `libnostr-z` and TigerBeetle comparison reports remain reference evidence, not live
+  execution packets.
+- the exhaustive pre-freeze audit is complete and now remains as reference evidence for the chosen
+  remediation posture.
+- current remaining freeze blockers are:
+  - public helper assertion leaks in `NIP-86` and `NIP-46`
+  - backend-outage misclassification in `NIP-44` and `NIP-26`
+  - fragmented `libwally` readiness and derivation seam across `NIP-06` and `BIP-85`
+  - docs/examples/discovery drift on `NIP-59`, `NIP-05`, and the root `README.md`
+- the selected remediation posture is bounded redesign first, then targeted fixes, then a
+  freeze-readiness recheck.
 - RC API-freeze remains deferred until the boundary-validation slice closes.
 - Layer 2 compatibility/ergonomic adapter work remains contingent; start it only if the
   boundary-validation pass finds a real blocker that belongs outside the kernel.

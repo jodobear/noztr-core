@@ -31,15 +31,8 @@ These docs control active work and should stay lean.
   - repo-specific process refinement rules for keeping the control surface lean
 - `docs/plans/phase-h-remaining-work.md`
   - current active Phase H packet and next remaining work
-- `docs/plans/post-audit-improvement-plan.md`
-  - ordered execution plan for the completed `libnostr-z` and TigerBeetle audit follow-ups
-- `docs/plans/exhaustive-pre-freeze-audit.md`
-  - live working draft for the exhaustive pre-freeze audit that must precede freeze-readiness
-    synthesis
-- `docs/plans/exhaustive-pre-freeze-audit-matrix.md`
-  - hard coverage ledger for the exhaustive audit
-- `docs/plans/audit-angle-standards.md`
-  - per-angle completion standards for the exhaustive audit
+- `docs/plans/post-exhaustive-audit-remediation-plan.md`
+  - current active remediation packet after the completed exhaustive audit
 - `docs/plans/docs-surface-audit.md`
   - stable-ID audit of doc bloat, repetition, and control-surface drift
 
@@ -69,6 +62,11 @@ These docs control active work and should stay lean.
     canonical payload
 - Ownership and kernel-vs-SDK questions:
   - `docs/plans/noztr-sdk-ownership-matrix.md`
+- Reviewing the completed exhaustive audit:
+  - `docs/research/exhaustive-audit-meta-analysis-report.md`
+  - `docs/plans/exhaustive-pre-freeze-audit.md`
+  - `docs/plans/exhaustive-pre-freeze-audit-matrix.md`
+  - `docs/plans/audit-angle-standards.md`
 
 ## Reference Docs
 
@@ -77,12 +75,13 @@ These are active references, not startup defaults.
 - `docs/plans/decision-log.md`
 - `docs/plans/noztr-sdk-ownership-matrix.md`
 - `docs/guides/IMPLEMENTATION_QUALITY_GATE.md`
-- `docs/plans/post-audit-improvement-plan.md`
 - `docs/plans/exhaustive-pre-freeze-audit.md`
 - `docs/plans/exhaustive-pre-freeze-audit-matrix.md`
 - `docs/plans/audit-angle-standards.md`
 - `docs/plans/audit-angle-report-template.md`
 - `docs/plans/audit-meta-analysis-template.md`
+- `docs/plans/post-audit-improvement-plan.md`
+- `docs/plans/post-exhaustive-audit-remediation-plan.md`
 - `docs/plans/implemented-nip-review-guide.md`
 - `docs/plans/nostr-principles.md`
 - `docs/plans/implemented-nip-audit-report.md`
@@ -103,7 +102,6 @@ These are active references, not startup defaults.
 These are lane- or phase-specific packets. They should be read only when that lane is active.
 
 - `docs/plans/phase-h-remaining-work.md`
-- `docs/plans/exhaustive-pre-freeze-audit.md`
 - `docs/plans/prompts/`
 
 ## Archive

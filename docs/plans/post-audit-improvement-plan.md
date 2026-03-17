@@ -1,13 +1,12 @@
 ---
 title: Post-Audit Improvement Plan
 doc_type: plan
-status: active
+status: reference
 owner: noztr
 phase: phase-h
 read_when:
-  - planning_post_audit_improvements
-  - executing_tigerbeetle_followups
-  - preparing_freeze_confidence
+  - reviewing_completed_post_audit_followups
+  - tracing_pre_meta_analysis_history
 depends_on:
   - docs/plans/phase-h-remaining-work.md
   - docs/research/libnostr-z-comparison-report.md
@@ -161,7 +160,7 @@ Tracker lane:
 - `no-mja`
 
 Status:
-- deferred pending exhaustive audit draft `no-ard`
+- complete
 
 Goals:
 - update the boundary-validation packet with the final post-audit result
@@ -194,7 +193,7 @@ Tracker lane:
 - `no-ard`
 
 Status:
-- next active slice
+- complete
 
 Goals:
 - run a deliberately exhaustive pre-freeze audit before any RC-freeze claim
@@ -220,6 +219,15 @@ Closure bar:
 - Use `libnostr-z` only as a packaging and behavior signal, not as a memory or runtime model.
 - Use TigerBeetle as an engineering bar, but adapt it to `noztr`’s protocol-kernel reality rather
   than copying application- or database-oriented structure mechanically.
+
+## Outcome
+
+- this plan is complete and now remains as reference evidence for the pre-meta-analysis follow-up
+  program
+- the exhaustive audit and meta-analysis moved the repo to a new remediation posture:
+  - bounded redesign first
+  - targeted fixes grouped behind it
+  - RC-freeze still deferred pending remediation
 
 ## Success Criteria
 

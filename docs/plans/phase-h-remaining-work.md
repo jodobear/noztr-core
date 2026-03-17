@@ -11,7 +11,7 @@ depends_on:
   - docs/plans/build-plan.md
   - docs/guides/IMPLEMENTATION_QUALITY_GATE.md
   - docs/plans/llm-usability-pass.md
-  - docs/plans/post-audit-improvement-plan.md
+  - docs/plans/post-exhaustive-audit-remediation-plan.md
 sync_touchpoints:
   - handoff.md
   - docs/README.md
@@ -56,7 +56,7 @@ the `OQ-E-006` usability pass.
 - Phase H remains active
 - the requested-NIP loop is complete through `NIP-B7`
 - `OQ-E-006` is closed
-- the next active Phase H slice is SDK-informed boundary validation
+- the next active Phase H slice is post-exhaustive-audit remediation
 - RC API-freeze remains deferred until this slice shows the current boundary is stable enough
 - accepted sub-findings from this slice so far:
   - export public signed event-object JSON serialization from `nip01_event`
@@ -72,20 +72,19 @@ the `OQ-E-006` usability pass.
   - close `no-3jb` by isolating `NIP-06` backend state and explicitly accepting the current
     caller-owned scratch posture in `NIP-05`, `NIP-46`, and `NIP-77`, plus the reviewed
     `bool` / `?` helper boundaries, as bounded exceptions
+  - complete the exhaustive pre-freeze audit and meta-analysis
+  - choose a bounded-redesign-first remediation posture instead of a major rewrite
 
 ## Next Step
 
-1. execute the SDK-informed boundary-validation slice through
-   `docs/guides/IMPLEMENTATION_QUALITY_GATE.md`
-2. execute `docs/plans/post-audit-improvement-plan.md` in order:
-   - execute `no-ard` to complete the exhaustive pre-freeze audit draft
-   - execute `no-mja` only after `no-ard` completes
-3. if the validation finds a real compatibility or ergonomics blocker that does not belong in
+1. execute `docs/plans/post-exhaustive-audit-remediation-plan.md`
+2. keep RC API-freeze deferred until the remediation program and one freeze recheck complete
+3. if remediation surfaces a real compatibility or ergonomics blocker that does not belong in
    Layer 1, create one explicit Layer 2 adapter-boundary packet instead of widening the kernel by
    default
-4. after the validation closes, decide whether the next packet is:
+4. after remediation and recheck close, decide whether the next packet is:
    - RC API-freeze, or
-   - one bounded adapter-boundary packet
+   - one explicit remaining blocker packet
 
 ## Seam Constraints
 
@@ -125,16 +124,13 @@ the `OQ-E-006` usability pass.
     crypto/backend wrappers, and docs/examples completeness?
   - current result:
     - no
-    - active next lane:
-      - `no-ard` exhaustive pre-freeze audit draft
-      - `no-mja` remains deferred until `no-ard` closes
-  - execution rule:
-    - `no-ard` runs audit-only
-    - no fixes land until the angle reports and `no-mja` meta-analysis complete
-    - the frozen audit order is enforced in both the packet docs and `br` dependencies
-    - dedicated angle issues:
-      - `no-3ib`, `no-f2u`, `no-odj`, `no-dwu`, `no-ys3`, `no-5a7o`, `no-jacg`, `no-ohgb`,
-        `no-l5h7`
+    - the exhaustive audit and `no-mja` meta-analysis are complete
+    - current selected posture:
+      - bounded redesign first
+      - then targeted fixes
+      - then a freeze recheck
+    - current active remediation packet:
+      - `docs/plans/post-exhaustive-audit-remediation-plan.md`
 
 ## Tradeoff
 
@@ -153,6 +149,7 @@ the `OQ-E-006` usability pass.
 - audit state:
   - `docs/plans/llm-usability-pass.md`
   - `docs/plans/security-hardening-register.md`
+  - `docs/research/exhaustive-audit-meta-analysis-report.md`
 - startup and discovery docs:
   - `handoff.md`
   - `docs/README.md`
@@ -167,6 +164,6 @@ the `OQ-E-006` usability pass.
 - `OQ-E-006` remains closed in docs and state routing
 - startup routing points to the current boundary-validation packet, not a completed lane
 - the boundary-validation result is explicit:
-  - RC-freeze packet becomes justified, or
-  - one bounded blocker packet replaces it
+  - a remediation packet is active, or
+  - RC-freeze packet becomes justified after remediation and recheck
 - superseded Phase H packets are marked `reference` or moved to archive
