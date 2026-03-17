@@ -123,15 +123,14 @@ Why this order:
 
 ### Coverage Status
 
-- not yet reviewed:
-  - full exhaustive pass has not started
+- completed angle reports:
+  - protocol correctness: `docs/research/exhaustive-audit-angle-1-protocol-correctness-report.md`
 - completed in prior targeted lanes:
   - `libnostr-z` report-only comparison
   - TigerBeetle Zig-quality report-only comparison
   - structural hotspot follow-up
   - explicit-state and fixed-capacity follow-up
 - still required for this exhaustive pass:
-  - explicit whole-codebase matrix coverage across source, examples, build, and control surfaces
   - explicit parity/interoperability review lane output
   - explicit security and misuse-resistance review lane output
   - explicit cryptographic-correctness review lane output
@@ -205,12 +204,17 @@ Rewrite-pressure interpretation:
 
 ### Findings Ledger
 
-- none yet in this working draft
+- none from angle 1 protocol correctness
 
 ### Accepted Exceptions Ledger
 
-- none yet in this working draft beyond already accepted prior slices; restate here only when the
-  exhaustive pass confirms they remain acceptable in pre-freeze posture
+- protocol correctness
+  - accepted reuse of `docs/plans/implemented-nip-audit-report.md` as the owning correctness
+    artifact for implemented NIP surfaces, with fresh shared-core spot checks in
+    `docs/research/exhaustive-audit-angle-1-protocol-correctness-report.md`
+  - reversal trigger:
+    - any later audit angle, SDK evidence, or parity evidence that shows a leaf module correctness
+      defect not already captured in the canonical implemented-NIP report
 
 ### Open Blockers
 
@@ -222,10 +226,10 @@ Rewrite-pressure interpretation:
 
 ## Next Step
 
-1. freeze the exact audit coverage map and audit sequence under `no-ard`
-2. keep `docs/plans/exhaustive-pre-freeze-audit-matrix.md` current as the hard coverage ledger
-3. use one dedicated `br` issue per audit angle in the frozen execution order
-4. write each angle report against `docs/plans/audit-angle-report-template.md`
+1. close `no-3ib` with the protocol-correctness report and matrix updates
+2. execute ecosystem parity / interoperability as `no-f2u`
+3. keep `docs/plans/exhaustive-pre-freeze-audit-matrix.md` current as the hard coverage ledger
+4. write each remaining angle report against `docs/plans/audit-angle-report-template.md`
 5. record findings in this draft instead of fixing them
 6. hand the completed draft and angle reports to `no-mja` for meta-analysis and freeze-readiness
    consolidation
