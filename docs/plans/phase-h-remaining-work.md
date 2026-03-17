@@ -59,6 +59,7 @@ the `OQ-E-006` usability pass.
 - `OQ-E-006` is closed
 - the empirical benchmark supplement is complete
 - the external crypto/backend assurance supplement is complete
+- the first remediation lane, `no-65ev.1`, is complete
 - the next active Phase H slice is post-exhaustive-audit remediation
 - RC API-freeze remains deferred until this slice shows the current boundary is stable enough
 - accepted sub-findings from this slice so far:
@@ -85,10 +86,14 @@ the `OQ-E-006` usability pass.
     bounded redesign rather than major rewrite
   - sharpen the backend redesign lane to include `libwally` provenance and feature-floor
     reconciliation in addition to the local seam redesign
+  - complete the bounded backend redesign lane and move remediation to the remaining hardening,
+    docs, and performance lanes
 
 ## Next Step
 
 1. execute `docs/plans/post-exhaustive-audit-remediation-plan.md`
+  - immediate next lane:
+    - `no-65ev.2`
 2. keep RC API-freeze deferred until the remediation program and one freeze recheck complete
 3. if remediation surfaces a real compatibility or ergonomics blocker that does not belong in
    Layer 1, create one explicit Layer 2 adapter-boundary packet instead of widening the kernel by
@@ -143,6 +148,7 @@ the `OQ-E-006` usability pass.
     - supplemental LLM structured usability audit is complete
     - empirical benchmark supplement is complete
     - external crypto/backend assurance supplement is complete
+    - bounded backend redesign lane is complete
     - current active remediation packet:
       - `docs/plans/post-exhaustive-audit-remediation-plan.md`
 

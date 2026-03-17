@@ -1,13 +1,12 @@
 const std = @import("std");
 const limits = @import("limits.zig");
 const nip06_mnemonic = @import("nip06_mnemonic.zig");
-const libwally = @import("libwally");
+const libwally_backend = @import("internal/libwally_backend.zig");
 
 const HmacSha512 = std.crypto.auth.hmac.sha2.HmacSha512;
-const c = libwally.c;
-const hardened_bit: u32 = c.BIP32_INITIAL_HARDENED_CHILD;
+const c = libwally_backend.c;
+const hardened_bit = libwally_backend.hardened_bit;
 const entropy_hmac_key = "bip-entropy-from-k";
-const private_skip_hash: u32 = c.BIP32_FLAG_KEY_PRIVATE | c.BIP32_FLAG_SKIP_HASH;
 const bip85_root: u32 = hardened_bit | 83_696_968;
 const bip39_app: u32 = hardened_bit | 39;
 const hex_app: u32 = hardened_bit | 128_169;
@@ -187,15 +186,15 @@ fn derive_entropy_material(seed: []const u8, path: []const u32) Bip85Error![64]u
     std.debug.assert(seed.len == limits.nip06_seed_bytes);
     std.debug.assert(path.len > 0);
 
-    try ensure_backend();
+    try libwally_backend.ensure_ready();
 
     var master_key: c.struct_ext_key = undefined;
     defer wipe_ext_key(&master_key);
-    try create_master_key(seed, &master_key);
+    try libwally_backend.create_master_key_from_seed(seed, &master_key);
 
     var derived_key: c.struct_ext_key = undefined;
     defer wipe_ext_key(&derived_key);
-    try derive_hardened_path(&master_key, path, &derived_key);
+    try libwally_backend.derive_hardened_path(&master_key, path, &derived_key);
 
     return hmac_entropy_from_key(&derived_key);
 }
@@ -214,51 +213,6 @@ fn write_lower_hex_entropy(output: []u8, entropy: []const u8) Bip85Error![]const
         output[index * 2 + 1] = alphabet[byte & 0x0f];
     }
     return output[0 .. entropy.len * 2];
-}
-
-fn ensure_backend() Bip85Error!void {
-    std.debug.assert(@sizeOf(Bip85Error) > 0);
-    std.debug.assert(!@inComptime());
-
-    nip06_mnemonic.mnemonic_validate(
-        "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about",
-    ) catch |err| switch (err) {
-        error.InvalidChecksum => return,
-        error.BackendUnavailable => return error.BackendUnavailable,
-        else => return error.BackendUnavailable,
-    };
-}
-
-fn create_master_key(seed: []const u8, output: *c.struct_ext_key) Bip85Error!void {
-    std.debug.assert(seed.len == limits.nip06_seed_bytes);
-    std.debug.assert(@sizeOf(c.struct_ext_key) > limits.nip06_seed_bytes);
-
-    const result = c.bip32_key_from_seed(
-        seed.ptr,
-        seed.len,
-        c.BIP32_VER_MAIN_PRIVATE,
-        c.BIP32_FLAG_SKIP_HASH,
-        output,
-    );
-    if (result != c.WALLY_OK) return error.DerivationFailure;
-}
-
-fn derive_hardened_path(
-    parent: *const c.struct_ext_key,
-    path: []const u32,
-    output: *c.struct_ext_key,
-) Bip85Error!void {
-    std.debug.assert(path.len > 0);
-    std.debug.assert(path.len <= 5);
-
-    const result = c.bip32_key_from_parent_path(
-        parent,
-        path.ptr,
-        path.len,
-        private_skip_hash,
-        output,
-    );
-    if (result != c.WALLY_OK) return error.DerivationFailure;
 }
 
 fn hmac_entropy_from_key(hdkey: *const c.struct_ext_key) [64]u8 {

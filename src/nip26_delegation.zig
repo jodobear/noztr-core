@@ -12,6 +12,7 @@ pub const Nip26Error = error{
     InvalidConditionValue,
     InvalidSignature,
     InvalidSecretKey,
+    BackendUnavailable,
     TooManyConditions,
     ConditionsNotMet,
     BufferTooSmall,
@@ -378,7 +379,7 @@ fn map_verify_error(verify_error: secp256k1_backend.BackendVerifyError) Nip26Err
     return switch (verify_error) {
         error.InvalidPublicKey => error.InvalidDelegatorPubkey,
         error.InvalidSignature => error.InvalidSignature,
-        error.BackendUnavailable => error.InvalidSignature,
+        error.BackendUnavailable => error.BackendUnavailable,
     };
 }
 
@@ -388,7 +389,7 @@ fn map_sign_error(sign_error: secp256k1_backend.BackendSignError) Nip26Error {
 
     return switch (sign_error) {
         error.InvalidSecretKey => error.InvalidSecretKey,
-        error.BackendUnavailable => error.InvalidSecretKey,
+        error.BackendUnavailable => error.BackendUnavailable,
     };
 }
 
@@ -491,6 +492,13 @@ test "delegation event validate enforces signature and all conditions" {
         error.ConditionsNotMet,
         delegation_event_validate(&tag, &wrong_kind, parsed_conditions[0..]),
     );
+}
+
+test "delegation backend mapping preserves outage distinct from caller blame" {
+    try std.testing.expect(map_verify_error(error.BackendUnavailable) == error.BackendUnavailable);
+    try std.testing.expect(map_sign_error(error.BackendUnavailable) == error.BackendUnavailable);
+    try std.testing.expect(map_verify_error(error.BackendUnavailable) != error.InvalidSignature);
+    try std.testing.expect(map_sign_error(error.BackendUnavailable) != error.InvalidSecretKey);
 }
 
 fn test_event(pubkey: [32]u8, kind: u32, created_at: u64) nip01_event.Event {

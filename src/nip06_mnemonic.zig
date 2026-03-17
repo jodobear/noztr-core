@@ -1,11 +1,10 @@
 const std = @import("std");
 const limits = @import("limits.zig");
-const libwally = @import("libwally");
 const unicode_nfkd = @import("unicode_nfkd.zig");
+const libwally_backend = @import("internal/libwally_backend.zig");
 
-const c = libwally.c;
-const hardened_bit: u32 = c.BIP32_INITIAL_HARDENED_CHILD;
-const private_skip_hash: u32 = c.BIP32_FLAG_KEY_PRIVATE | c.BIP32_FLAG_SKIP_HASH;
+const c = libwally_backend.c;
+const hardened_bit = libwally_backend.hardened_bit;
 
 pub const Nip06Error = error{
     InvalidMnemonicLength,
@@ -20,13 +19,6 @@ pub const Nip06Error = error{
     BackendUnavailable,
 };
 
-const BackendState = struct {
-    once: @TypeOf(std.once(init_backend_once)) = std.once(init_backend_once),
-    err: ?Nip06Error = null,
-};
-
-var backend_state = BackendState{};
-
 /// Validate an English BIP39 mnemonic for the NIP-06 derivation boundary.
 pub fn mnemonic_validate(mnemonic: []const u8) Nip06Error!void {
     std.debug.assert(mnemonic.len <= limits.nip06_mnemonic_bytes_max);
@@ -36,7 +28,7 @@ pub fn mnemonic_validate(mnemonic: []const u8) Nip06Error!void {
     defer wipe_bytes(normalized_storage[0..]);
     const normalized = try normalize_mnemonic_text(normalized_storage[0..], mnemonic);
     try require_known_words(normalized);
-    try ensure_backend();
+    try libwally_backend.ensure_ready();
 
     var mnemonic_storage: [limits.nip06_normalized_bytes_max + 1]u8 = undefined;
     defer wipe_bytes(mnemonic_storage[0..]);
@@ -57,7 +49,7 @@ pub fn mnemonic_to_seed(
 
     if (output.len < limits.nip06_seed_bytes) return error.BufferTooSmall;
     try validate_optional_utf8_text(passphrase, limits.nip06_passphrase_bytes_max);
-    try ensure_backend();
+    try libwally_backend.ensure_ready();
 
     var normalized_mnemonic_storage: [limits.nip06_normalized_bytes_max]u8 = undefined;
     defer wipe_bytes(normalized_mnemonic_storage[0..]);
@@ -107,26 +99,26 @@ pub fn derive_nostr_secret_key_from_seed(
     if (output.len < limits.nip06_secret_key_bytes) return error.BufferTooSmall;
     if (seed.len != limits.nip06_seed_bytes) return error.InvalidSeed;
     if (account >= hardened_bit) return error.InvalidAccount;
-    try ensure_backend();
+    try libwally_backend.ensure_ready();
 
     var master_key: c.struct_ext_key = undefined;
     defer wipe_ext_key(&master_key);
-    try create_master_key(seed, &master_key);
+    try libwally_backend.create_master_key_from_seed(seed, &master_key);
 
     var current_key = master_key;
     defer wipe_ext_key(&current_key);
     var next_key: c.struct_ext_key = undefined;
     defer wipe_ext_key(&next_key);
 
-    try derive_hardened_child(&current_key, 44, &next_key);
+    try libwally_backend.derive_hardened_child(&current_key, 44, &next_key);
     std.mem.swap(c.struct_ext_key, &current_key, &next_key);
-    try derive_hardened_child(&current_key, 1237, &next_key);
+    try libwally_backend.derive_hardened_child(&current_key, 1237, &next_key);
     std.mem.swap(c.struct_ext_key, &current_key, &next_key);
-    try derive_hardened_child(&current_key, account, &next_key);
+    try libwally_backend.derive_hardened_child(&current_key, account, &next_key);
     std.mem.swap(c.struct_ext_key, &current_key, &next_key);
-    try derive_normal_child(&current_key, 0, &next_key);
+    try libwally_backend.derive_normal_child(&current_key, 0, &next_key);
     std.mem.swap(c.struct_ext_key, &current_key, &next_key);
-    try derive_normal_child(&current_key, 0, &next_key);
+    try libwally_backend.derive_normal_child(&current_key, 0, &next_key);
     std.mem.swap(c.struct_ext_key, &current_key, &next_key);
     return copy_secret_key(output, &current_key);
 }
@@ -146,31 +138,6 @@ pub fn derive_nostr_secret_key(
     defer wipe_bytes(seed[0..]);
     _ = try mnemonic_to_seed(seed[0..], mnemonic, passphrase);
     return derive_nostr_secret_key_from_seed(output, seed[0..], account);
-}
-
-fn ensure_backend() Nip06Error!void {
-    std.debug.assert(backend_state.err == null or @intFromError(backend_state.err.?) >= 0);
-    std.debug.assert(!@inComptime());
-
-    backend_state.once.call();
-    if (backend_state.err) |err| return err;
-}
-
-fn init_backend_once() void {
-    std.debug.assert(!@inComptime());
-    std.debug.assert(backend_state.err == null);
-
-    if (c.wally_init(0) != c.WALLY_OK) {
-        backend_state.err = error.BackendUnavailable;
-        return;
-    }
-
-    var entropy: [c.WALLY_SECP_RANDOMIZE_LEN]u8 = undefined;
-    std.crypto.random.bytes(&entropy);
-    defer wipe_bytes(entropy[0..]);
-    if (c.wally_secp_randomize(&entropy, entropy.len) != c.WALLY_OK) {
-        backend_state.err = error.BackendUnavailable;
-    }
 }
 
 fn validate_mnemonic_text(mnemonic: []const u8) Nip06Error!void {
@@ -295,45 +262,6 @@ fn write_optional_c_string(buffer: []u8, text: ?[]const u8) Nip06Error!?[:0]cons
 
     const value = text orelse return null;
     return try write_c_string(buffer, value);
-}
-
-fn create_master_key(seed: []const u8, output: *c.struct_ext_key) Nip06Error!void {
-    std.debug.assert(seed.len == limits.nip06_seed_bytes);
-    std.debug.assert(@sizeOf(c.struct_ext_key) > limits.nip06_seed_bytes);
-
-    const result = c.bip32_key_from_seed(
-        seed.ptr,
-        seed.len,
-        c.BIP32_VER_MAIN_PRIVATE,
-        c.BIP32_FLAG_SKIP_HASH,
-        output,
-    );
-    if (result != c.WALLY_OK) return error.DerivationFailure;
-}
-
-fn derive_hardened_child(
-    parent: *const c.struct_ext_key,
-    index: u32,
-    output: *c.struct_ext_key,
-) Nip06Error!void {
-    std.debug.assert(index < hardened_bit);
-    std.debug.assert(@sizeOf(c.struct_ext_key) > 0);
-
-    const child_index = hardened_bit | index;
-    const result = c.bip32_key_from_parent(parent, child_index, private_skip_hash, output);
-    if (result != c.WALLY_OK) return error.DerivationFailure;
-}
-
-fn derive_normal_child(
-    parent: *const c.struct_ext_key,
-    index: u32,
-    output: *c.struct_ext_key,
-) Nip06Error!void {
-    std.debug.assert(index < hardened_bit);
-    std.debug.assert(@sizeOf(c.struct_ext_key) > 0);
-
-    const result = c.bip32_key_from_parent(parent, index, private_skip_hash, output);
-    if (result != c.WALLY_OK) return error.DerivationFailure;
 }
 
 fn copy_secret_key(output: []u8, hdkey: *const c.struct_ext_key) Nip06Error![]const u8 {

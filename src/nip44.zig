@@ -23,6 +23,7 @@ pub const Nip44Error = error{
     InvalidMac,
     InvalidPadding,
     BufferTooSmall,
+    BackendUnavailable,
     EntropyUnavailable,
 };
 
@@ -52,11 +53,7 @@ pub fn nip44_get_conversation_key(
     defer wipe_bytes(shared_x[0..]);
 
     secp256k1_backend.derive_shared_secret_x(private_key, public_key, &shared_x) catch |err| {
-        return switch (err) {
-            error.InvalidPrivateKey => error.InvalidPrivateKey,
-            error.InvalidPublicKey => error.InvalidPublicKey,
-            error.BackendUnavailable => error.EntropyUnavailable,
-        };
+        return map_shared_secret_error(err);
     };
 
     const conversation_key = HkdfSha256.extract(nip44_v2_salt, shared_x[0..]);
@@ -576,6 +573,19 @@ fn force_invalid_nonce_length() Nip44Error!void {
     return error.InvalidNonceLength;
 }
 
+fn map_shared_secret_error(
+    shared_secret_error: secp256k1_backend.BackendSharedSecretError,
+) Nip44Error {
+    std.debug.assert(@intFromError(shared_secret_error) >= 0);
+    std.debug.assert(@typeInfo(Nip44Error) == .error_set);
+
+    return switch (shared_secret_error) {
+        error.InvalidPrivateKey => error.InvalidPrivateKey,
+        error.InvalidPublicKey => error.InvalidPublicKey,
+        error.BackendUnavailable => error.BackendUnavailable,
+    };
+}
+
 test "nip44 valid vectors derive conversation keys" {
     for (conversation_vectors) |vector| {
         const private_key = try parse_hex_32(vector.private_key_hex);
@@ -873,4 +883,11 @@ test "nip44 conversation key invalid key forcing" {
         error.InvalidPublicKey,
         nip44_get_conversation_key(&valid_private, &invalid_public),
     );
+}
+
+test "nip44 backend outage mapping stays distinct from entropy failure" {
+    const mapped_error = map_shared_secret_error(error.BackendUnavailable);
+
+    try std.testing.expect(mapped_error == error.BackendUnavailable);
+    try std.testing.expect(mapped_error != error.EntropyUnavailable);
 }

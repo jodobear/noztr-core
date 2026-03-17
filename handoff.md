@@ -42,6 +42,7 @@ Current execution state for `noztr`.
 - The supplemental LLM structured usability audit is complete.
 - The empirical benchmark supplement is complete.
 - The external crypto/backend assurance supplement is complete.
+- The first remediation lane, `no-65ev.1`, is complete.
 - The next active Phase H slice is the post-exhaustive-audit remediation program.
 - Boundary validation has already accepted:
   - public signed event-object JSON serialization
@@ -110,7 +111,6 @@ Current execution state for `noztr`.
 - execute `docs/plans/post-exhaustive-audit-remediation-plan.md`
 - current remediation tracker epic and child lanes:
   - `no-65ev`
-  - `no-65ev.1`
   - `no-65ev.2`
   - `no-65ev.3`
   - `no-65ev.4`

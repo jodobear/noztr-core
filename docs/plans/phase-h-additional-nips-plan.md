@@ -334,7 +334,8 @@ Reprioritized after deferred-backlog completion of `NIP-29`:
 - Selected integration target
   - upstream: `ElementsProject/libwally-core`
   - selected release tag: `release_1.5.2`
-  - selected commit: `6439e6e3262c47ce0e51aa95d7b4ff67d9952c52`
+  - selected commit at H0 freeze time: `6439e6e3262c47ce0e51aa95d7b4ff67d9952c52`
+  - current live pin after `D-125`: `455ec5b0188e1fc76f38c9b7aad7f4e24b421eb4`
 - Frozen file target
   - `src/nip06_mnemonic.zig`
 - Frozen public surface
@@ -347,6 +348,10 @@ Reprioritized after deferred-backlog completion of `NIP-29`:
     creation from seed, and derivation along `m/44'/1237'/<account>'/0/0`
   - public-key derivation stays on the existing secp boundary
   - no direct `libwally-core` usage is allowed outside `src/nip06_mnemonic.zig`
+  - current live note after `D-125`:
+    - shared `libwally` readiness and BIP32 derivation now live in
+      `src/internal/libwally_backend.zig`
+    - public `NIP-06` surface remains unchanged
 - Frozen public failure surface
   - malformed mnemonic length
   - unknown mnemonic word

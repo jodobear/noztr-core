@@ -3199,3 +3199,44 @@ payload is needed for the current task.
   does not materially improve the later remediation decision.
 - Supersedes: parts of `D-122` and `D-123` where they allowed narrower angle sets or immediate
   in-audit fixes.
+
+## D-125: Consolidate the libwally backend seam and reconcile the live backend pin/build floor
+
+- Date: 2026-03-17
+- Status: accepted
+- Decision: close the first post-audit remediation lane by sharpening the approved `libwally`
+  boundary in three ways.
+  - accepted behavior:
+    - move shared `libwally` readiness and BIP32 derivation entry points behind one internal seam:
+      - `src/internal/libwally_backend.zig`
+    - remove the old indirect `BIP-85` readiness probe through
+      `nip06_mnemonic.mnemonic_validate(...)`
+    - preserve typed backend-outage semantics on older crypto-bearing leaves by exposing
+      `BackendUnavailable` distinctly in:
+      - `nip44_get_conversation_key(...)`
+      - `delegation_signature_sign(...)`
+      - `delegation_signature_verify(...)`
+    - reconcile canonical provenance to the live `libwally-core` pin in `build.zig.zon`:
+      - commit: `455ec5b0188e1fc76f38c9b7aad7f4e24b421eb4`
+      - content hash: `N-V-__8AAAitUgDcU4g8UG0hStyFchfa999eIbWld-EKdpd4`
+    - record the approved backend feature floor explicitly:
+      - `BUILD_MINIMAL`
+      - `BUILD_STANDARD_SECP`
+      - `WALLY_ABI_NO_ELEMENTS`
+      - direct source floor limited to the files selected in `build.zig`
+      - secp dependency remains the separately pinned `bitcoin-core/secp256k1` backend
+  - accepted non-goals:
+    - widening the public `NIP-06` or `BIP-85` API
+    - changing wallet workflow ownership or moving protocol logic into `nzdk`
+    - broad crypto-library extraction or major rewrite
+- Why: the exhaustive audit and external assurance supplement showed one real redesign cluster:
+  local `libwally` readiness and derivation were still fragmented, backend-outage semantics were
+  misclassified on older leaves, and the canonical recorded `libwally` provenance no longer matched
+  the live build graph. Closing all three in one bounded lane sharpens the backend story without
+  expanding the kernel.
+- Tradeoff: one extra internal backend module and a small public error-surface expansion versus a
+  cleaner derivation seam, more honest outage handling, and truthful backend provenance.
+- Related Tradeoff: T-H-ANIP-002, T-H-ANIP-011.
+- Reversal Trigger: the approved backend exception is removed entirely or a later bounded primitive
+  library supersedes this exact seam without widening the current protocol ownership boundary.
+- Supersedes: the stale live-pin portion of `D-035`.

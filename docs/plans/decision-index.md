@@ -82,6 +82,7 @@ Use this file to decide whether the full canonical decision payload is needed.
   that `nzdk` integrates
 - `D-120` accept deterministic one-recipient outbound `NIP-59` transcript construction in `noztr`
   while keeping mailbox fanout and workflow in `nzdk`
+- `D-125` consolidate the `libwally` backend seam and reconcile the live backend pin/build floor
 
 ## Recent Requested-NIP Acceptances
 

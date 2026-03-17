@@ -59,10 +59,12 @@ assurance supplement, and the revised synthesis.
   - `no-65ev`
 - current child lanes:
   - `no-65ev.1`
-    - bounded redesign: `libwally` backend seam, backend-outage mapping, and backend
-      provenance/build-floor reconciliation
+    - complete:
+      - bounded redesign of the `libwally` backend seam, backend-outage mapping, and backend
+        provenance/build-floor reconciliation
   - `no-65ev.2`
-    - targeted hardening: remaining public helper assertion leaks and direct-helper misuse
+    - next active lane:
+      - targeted hardening of remaining public helper assertion leaks and direct-helper misuse
   - `no-65ev.3`
     - targeted docs/examples/discovery and structured-LLM-surface cleanup
   - `no-65ev.4`
@@ -81,8 +83,8 @@ assurance supplement, and the revised synthesis.
 
 ## Next Step
 
-1. execute the bounded backend redesign lane first
-2. then execute the targeted hardening, docs, and performance lanes
+1. execute the targeted hardening lane `no-65ev.2`
+2. then execute the docs and performance lanes
 3. then run the blocked post-remediation freeze recheck lane
 4. only after that decide whether RC-freeze work is honestly ready
 
@@ -92,6 +94,10 @@ assurance supplement, and the revised synthesis.
   - can the `libwally` readiness and derivation seam be consolidated cleanly enough that backend
     error mapping, ownership, and recorded provenance/build-floor assumptions remain sharp without
     widening the kernel?
+  - current result:
+    - yes
+    - `no-65ev.1` closed this lane with one internal backend seam, explicit public outage mapping
+      on the affected crypto consumers, and reconciled backend provenance/build-floor policy
 - `AQ-REM-002`
   - after the targeted hardening lanes close, does any public helper family still rely on debug
     assertions or inconsistent direct-call semantics?

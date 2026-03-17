@@ -30,17 +30,39 @@ Structured downstream handoff surface for `nzdk` as the post-audit remediation p
 
 ## Current State
 
-- no remediation fixes have landed yet
+- `no-65ev.1` has landed
 - the supplemental LLM structured usability audit is complete
 - the empirical benchmark supplement is complete
 - the external crypto/backend assurance supplement is complete
 - remediation execution is now reactivated under the revised synthesis
 
+## Landed Remediation Updates
+
+### `no-65ev.1`
+
+- landed issue:
+  - `no-65ev.1`
+- exact public surface change:
+  - `nip44_get_conversation_key(...)` now returns `BackendUnavailable` distinctly instead of
+    collapsing backend outage into `EntropyUnavailable`
+  - `delegation_signature_sign(...)` and `delegation_signature_verify(...)` now return
+    `BackendUnavailable` distinctly instead of collapsing outage into `InvalidSecretKey` or
+    `InvalidSignature`
+  - `NIP-06` and `BIP-85` keep their public API shape, but now share one internal `libwally`
+    backend seam instead of split readiness logic
+- likely `nzdk` impact:
+  - refresh any code or tests that treated those `NIP-44` / `NIP-26` paths as caller-blame-only
+    failures
+  - no intended happy-path behavior change on `NIP-06` or `BIP-85`
+- concise downstream recheck prompt:
+  - recheck conversation-key acquisition, delegation signing/verification, wallet bootstrap, and
+    any `BIP-85` consumers for the new typed `BackendUnavailable` outcomes
+
 ## Remediation Lanes
 
 | Lane | Kernel scope | Likely `nzdk` impact | `nzdk` recheck after landing | Current status |
 | --- | --- | --- | --- | --- |
-| `no-65ev.1` | `libwally` seam, `NIP-06`, `BIP-85`, `NIP-44`, `NIP-26` backend-outage mapping, and backend provenance/build-floor reconciliation | possible typed error or boundary-contract changes in crypto-bearing helpers; provenance/doc updates should not change runtime behavior by themselves | wallet/bootstrap, delegation, conversation-key acquisition, BIP-85 consumers | open |
+| `no-65ev.1` | `libwally` seam, `NIP-06`, `BIP-85`, `NIP-44`, `NIP-26` backend-outage mapping, and backend provenance/build-floor reconciliation | landed: typed outage handling tightened on `NIP-44` / `NIP-26`; no intended happy-path API expansion | wallet/bootstrap, delegation, conversation-key acquisition, BIP-85 consumers | landed |
 | `no-65ev.2` | `NIP-86`, `NIP-46`, `NIP-25` public helper hardening | direct helper failure behavior may tighten | admin helper wrappers, remote-signing helper tests, any direct reaction helper use | open |
 | `no-65ev.3` | examples/docs/discovery only | teaching/discovery updates, no runtime contract change intended | docs/examples references only | open |
 | `no-65ev.4` | `NIP-88`, `NIP-29` local performance cleanup; `NIP-06` only if touched indirectly by backend redesign | no intended happy-path API change | only if `nzdk` relies on specific complexity or ordering assumptions | open |

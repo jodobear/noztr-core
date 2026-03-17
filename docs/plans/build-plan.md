@@ -127,6 +127,7 @@ This artifact is the lean active execution baseline and is aligned to:
 - The supplemental LLM structured usability audit is complete.
 - The empirical benchmark supplement is complete.
 - The external crypto/backend assurance supplement is complete.
+- The first remediation lane, `no-65ev.1`, is complete.
 - Current active next slice is the post-exhaustive-audit remediation program in
   `docs/plans/post-exhaustive-audit-remediation-plan.md`.
 - NIP-06 dependency strategy is resolved for current planning: adopt `libwally-core` behind the
@@ -209,14 +210,16 @@ This artifact is the lean active execution baseline and is aligned to:
   - `secp256k1` external assurance remained strong for the current narrow wrapper posture
   - `libwally` remained acceptable, but the canonical recorded pin and backend feature floor now
     need explicit reconciliation in the backend redesign lane
+- `no-65ev.1` is complete:
+  - `libwally` readiness and derivation now sit behind one internal backend seam
+  - `BIP-85` no longer bootstraps readiness through `mnemonic_validate(...)`
+  - `NIP-44` and `NIP-26` now preserve typed `BackendUnavailable` at the public boundary
+  - canonical backend provenance/build-floor policy is reconciled to the live build graph
 - the completed benchmark supplement refined the performance lane:
   - keep `NIP-29` and `NIP-88` in the targeted performance cleanup lane
   - do not treat `NIP-06` repeated scans as a standalone required performance remediation item
 - current remaining freeze blockers are:
   - public helper assertion leaks in `NIP-86` and `NIP-46`
-  - backend-outage misclassification in `NIP-44` and `NIP-26`
-  - fragmented `libwally` readiness and derivation seam across `NIP-06` and `BIP-85`
-  - canonical provenance/build-floor drift around the current `libwally` pin
   - docs/examples/discovery drift on `NIP-59`, `NIP-05`, and the root `README.md`
 - the selected remediation posture is bounded redesign first, then targeted fixes, then a
   freeze-readiness recheck.
