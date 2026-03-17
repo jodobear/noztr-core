@@ -31,6 +31,7 @@ Structured downstream handoff surface for `nzdk` as the post-audit remediation p
 ## Current State
 
 - `no-65ev.1` has landed
+- `no-65ev.2` has landed
 - the supplemental LLM structured usability audit is complete
 - the empirical benchmark supplement is complete
 - the external crypto/backend assurance supplement is complete
@@ -58,12 +59,37 @@ Structured downstream handoff surface for `nzdk` as the post-audit remediation p
   - recheck conversation-key acquisition, delegation signing/verification, wallet bootstrap, and
     any `BIP-85` consumers for the new typed `BackendUnavailable` outcomes
 
+### `no-65ev.2`
+
+- landed issue:
+  - `no-65ev.2`
+- exact public surface change:
+  - `nip86_relay_management.method_parse(...)` now rejects overlong caller input as
+    `InvalidMethod` instead of relying on debug assertions
+  - `nip86_relay_management.request_parse_json(...)` and
+    `nip86_relay_management.response_parse_json(...)` now reject overlong caller input as
+    `InvalidRequest` and `InvalidResponse`
+  - `nip46_remote_signing.method_parse(...)` now rejects overlong caller input as `InvalidMethod`
+  - `nip46_remote_signing.permission_parse(...)` now rejects overlong scoped caller input as
+    `InvalidPermission`
+  - `nip25_reactions.reaction_classify_content(...)` now returns
+    `ReactionError!ReactionType` and rejects overlong or non-UTF-8 direct input as
+    `InvalidContent`
+- likely `nzdk` impact:
+  - refresh any tests or wrappers that depended on assertion-like failure behavior for direct
+    helper misuse
+  - update any direct `reaction_classify_content(...)` call sites for the new error-returning
+    contract
+- concise downstream recheck prompt:
+  - recheck direct admin-helper use, direct remote-signing token helper use, and any direct
+    reaction-content classification call sites for the tightened typed failure contracts
+
 ## Remediation Lanes
 
 | Lane | Kernel scope | Likely `nzdk` impact | `nzdk` recheck after landing | Current status |
 | --- | --- | --- | --- | --- |
 | `no-65ev.1` | `libwally` seam, `NIP-06`, `BIP-85`, `NIP-44`, `NIP-26` backend-outage mapping, and backend provenance/build-floor reconciliation | landed: typed outage handling tightened on `NIP-44` / `NIP-26`; no intended happy-path API expansion | wallet/bootstrap, delegation, conversation-key acquisition, BIP-85 consumers | landed |
-| `no-65ev.2` | `NIP-86`, `NIP-46`, `NIP-25` public helper hardening | direct helper failure behavior may tighten | admin helper wrappers, remote-signing helper tests, any direct reaction helper use | open |
+| `no-65ev.2` | `NIP-86`, `NIP-46`, `NIP-25` public helper hardening | landed: direct helper misuse now stays on typed errors; `reaction_classify_content(...)` now returns `ReactionError!ReactionType` | admin helper wrappers, remote-signing helper tests, any direct reaction helper use | landed |
 | `no-65ev.3` | examples/docs/discovery only | teaching/discovery updates, no runtime contract change intended | docs/examples references only | open |
 | `no-65ev.4` | `NIP-88`, `NIP-29` local performance cleanup; `NIP-06` only if touched indirectly by backend redesign | no intended happy-path API change | only if `nzdk` relies on specific complexity or ordering assumptions | open |
 | `no-65ev.5` | freeze recheck only | no direct runtime change | none unless new blocker is found | open |

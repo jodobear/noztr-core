@@ -6,6 +6,7 @@ pub const reaction_event_kind: u32 = 7;
 
 pub const ReactionError = error{
     InvalidReactionKind,
+    InvalidContent,
     MissingEventTag,
     InvalidEventTag,
     InvalidEventId,
@@ -65,9 +66,12 @@ pub fn reaction_is_reaction(event: *const nip01_event.Event) bool {
 }
 
 /// Classifies a reaction content value.
-pub fn reaction_classify_content(content: []const u8) ReactionType {
-    std.debug.assert(content.len <= limits.content_bytes_max);
-    std.debug.assert(std.unicode.utf8ValidateSlice(content));
+pub fn reaction_classify_content(content: []const u8) ReactionError!ReactionType {
+    std.debug.assert(limits.content_bytes_max > 0);
+    std.debug.assert(@sizeOf(ReactionType) > 0);
+
+    if (content.len > limits.content_bytes_max) return error.InvalidContent;
+    if (!std.unicode.utf8ValidateSlice(content)) return error.InvalidContent;
 
     if (content.len == 0) {
         return .like;
@@ -95,7 +99,7 @@ pub fn reaction_parse(event: *const nip01_event.Event) ReactionError!ReactionTar
 
     var parsed = ReactionTarget{
         .event_id = undefined,
-        .reaction_type = reaction_classify_content(event.content),
+        .reaction_type = try reaction_classify_content(event.content),
         .content = event.content,
     };
     var found_event = false;
@@ -522,14 +526,33 @@ fn reaction_event(
 }
 
 test "reaction classify content covers like dislike emoji and custom emoji" {
-    try std.testing.expectEqual(ReactionType.like, reaction_classify_content(""));
-    try std.testing.expectEqual(ReactionType.like, reaction_classify_content("+"));
-    try std.testing.expectEqual(ReactionType.dislike, reaction_classify_content("-"));
-    try std.testing.expectEqual(ReactionType.emoji, reaction_classify_content("🤙"));
-    try std.testing.expectEqual(ReactionType.custom_emoji, reaction_classify_content(":soapbox:"));
-    try std.testing.expectEqual(ReactionType.emoji, reaction_classify_content(":soap-box:"));
-    try std.testing.expect(reaction_classify_content("+").is_positive());
-    try std.testing.expect(reaction_classify_content("-").is_negative());
+    try std.testing.expectEqual(ReactionType.like, try reaction_classify_content(""));
+    try std.testing.expectEqual(ReactionType.like, try reaction_classify_content("+"));
+    try std.testing.expectEqual(ReactionType.dislike, try reaction_classify_content("-"));
+    try std.testing.expectEqual(ReactionType.emoji, try reaction_classify_content("🤙"));
+    try std.testing.expectEqual(
+        ReactionType.custom_emoji,
+        try reaction_classify_content(":soapbox:"),
+    );
+    try std.testing.expectEqual(ReactionType.emoji, try reaction_classify_content(":soap-box:"));
+    try std.testing.expect((try reaction_classify_content("+")).is_positive());
+    try std.testing.expect((try reaction_classify_content("-")).is_negative());
+}
+
+test "reaction classify content rejects invalid direct helper input" {
+    var overlong_content: [limits.content_bytes_max + 1]u8 = undefined;
+    @memset(overlong_content[0..], 'a');
+
+    try std.testing.expectError(
+        error.InvalidContent,
+        reaction_classify_content(overlong_content[0..]),
+    );
+
+    const invalid_utf8 = [_]u8{0xff};
+    try std.testing.expectError(
+        error.InvalidContent,
+        reaction_classify_content(invalid_utf8[0..]),
+    );
 }
 
 test "reaction parse valid like path uses last e and last p tags" {

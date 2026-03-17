@@ -93,8 +93,10 @@ pub const Response = struct {
 };
 
 pub fn method_parse(text: []const u8) Nip86Error!RelayManagementMethod {
-    std.debug.assert(text.len <= limits.tag_item_bytes_max);
     std.debug.assert(@sizeOf(RelayManagementMethod) > 0);
+    std.debug.assert(limits.tag_item_bytes_max > 0);
+
+    if (text.len > limits.tag_item_bytes_max) return error.InvalidMethod;
 
     if (std.mem.eql(u8, text, "supportedmethods")) return .supportedmethods;
     if (std.mem.eql(u8, text, "banpubkey")) return .banpubkey;
@@ -150,8 +152,10 @@ pub fn method_text(method: RelayManagementMethod) []const u8 {
 /// Parse a bounded NIP-86 JSON-RPC request.
 /// See `examples/nip86_example.zig` and `examples/relay_admin_recipe.zig`.
 pub fn request_parse_json(input: []const u8, scratch: std.mem.Allocator) Nip86Error!Request {
-    std.debug.assert(input.len <= limits.relay_message_bytes_max);
     std.debug.assert(@intFromPtr(scratch.ptr) != 0);
+    std.debug.assert(limits.relay_message_bytes_max > 0);
+
+    if (input.len > limits.relay_message_bytes_max) return error.InvalidRequest;
 
     var parse_arena = std.heap.ArenaAllocator.init(scratch);
     defer parse_arena.deinit();
@@ -187,8 +191,10 @@ pub fn response_parse_json(
     out_ips: []IpReason,
     scratch: std.mem.Allocator,
 ) Nip86Error!Response {
-    std.debug.assert(input.len <= limits.relay_message_bytes_max);
     std.debug.assert(@intFromPtr(scratch.ptr) != 0);
+    std.debug.assert(limits.relay_message_bytes_max > 0);
+
+    if (input.len > limits.relay_message_bytes_max) return error.InvalidResponse;
 
     var parse_arena = std.heap.ArenaAllocator.init(scratch);
     defer parse_arena.deinit();
@@ -1023,6 +1029,47 @@ test "serializers reject invalid text instead of surfacing capacity errors" {
         response_serialize_json(
             output[0..],
             .{ .result = .ack, .error_text = "bad\x02error" },
+        ),
+    );
+}
+
+test "public relay-management parse helpers reject overlong caller input with typed errors" {
+    var overlong_method: [limits.tag_item_bytes_max + 1]u8 = undefined;
+    @memset(overlong_method[0..], 'a');
+    try std.testing.expectError(
+        error.InvalidMethod,
+        method_parse(overlong_method[0..]),
+    );
+
+    const message_len = limits.relay_message_bytes_max + 1;
+    const overlong_json = try std.testing.allocator.alloc(u8, message_len);
+    defer std.testing.allocator.free(overlong_json);
+    @memset(overlong_json, 'a');
+
+    var arena = std.heap.ArenaAllocator.init(std.testing.allocator);
+    defer arena.deinit();
+
+    try std.testing.expectError(
+        error.InvalidRequest,
+        request_parse_json(overlong_json, arena.allocator()),
+    );
+
+    var methods: [1][]const u8 = undefined;
+    var pubkeys: [1]PubkeyReason = undefined;
+    var events: [1]EventIdReason = undefined;
+    var kinds: [1]u32 = undefined;
+    var ips: [1]IpReason = undefined;
+    try std.testing.expectError(
+        error.InvalidResponse,
+        response_parse_json(
+            overlong_json,
+            .supportedmethods,
+            methods[0..],
+            pubkeys[0..],
+            events[0..],
+            kinds[0..],
+            ips[0..],
+            arena.allocator(),
         ),
     );
 }

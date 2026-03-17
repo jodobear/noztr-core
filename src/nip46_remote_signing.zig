@@ -182,8 +182,10 @@ pub const DiscoveryInfo = struct {
 const nostrconnect_url_placeholder = "<nostrconnect>";
 
 pub fn method_parse(text: []const u8) Nip46Error!RemoteSigningMethod {
-    std.debug.assert(text.len <= limits.tag_item_bytes_max);
     std.debug.assert(@sizeOf(RemoteSigningMethod) > 0);
+    std.debug.assert(limits.tag_item_bytes_max > 0);
+
+    if (text.len > limits.tag_item_bytes_max) return error.InvalidMethod;
 
     if (std.mem.eql(u8, text, "connect")) return .connect;
     if (std.mem.eql(u8, text, "sign_event")) return .sign_event;
@@ -215,13 +217,14 @@ pub fn method_text(method: RemoteSigningMethod) []const u8 {
 }
 
 pub fn permission_parse(text: []const u8) Nip46Error!Permission {
-    std.debug.assert(text.len <= limits.tag_item_bytes_max);
     std.debug.assert(@sizeOf(Permission) > 0);
+    std.debug.assert(limits.tag_item_bytes_max > 0);
 
     const colon = std.mem.indexOfScalar(u8, text, ':');
     if (colon == null) {
         return .{ .method = try method_parse(text) };
     }
+    if (text.len > limits.tag_item_bytes_max) return error.InvalidPermission;
 
     const method_name = text[0..colon.?];
     const scope_text = text[colon.? + 1 ..];
@@ -2870,5 +2873,22 @@ test "nip46 public uri and builder paths reject overlong caller input with typed
                 "?relay=" ++ ("a" ** 4097) ++ "&secret=s3cr3t",
             arena.allocator(),
         ),
+    );
+}
+
+test "direct nip46 token helpers reject overlong caller input with typed errors" {
+    var overlong_token: [limits.tag_item_bytes_max + 1]u8 = undefined;
+    @memset(overlong_token[0..], 'a');
+
+    try std.testing.expectError(
+        error.InvalidMethod,
+        method_parse(overlong_token[0..]),
+    );
+
+    overlong_token[0] = 'p';
+    overlong_token[1] = ':';
+    try std.testing.expectError(
+        error.InvalidPermission,
+        permission_parse(overlong_token[0..]),
     );
 }

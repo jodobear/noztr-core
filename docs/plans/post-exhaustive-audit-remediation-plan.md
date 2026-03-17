@@ -63,10 +63,12 @@ assurance supplement, and the revised synthesis.
       - bounded redesign of the `libwally` backend seam, backend-outage mapping, and backend
         provenance/build-floor reconciliation
   - `no-65ev.2`
-    - next active lane:
+    - complete:
       - targeted hardening of remaining public helper assertion leaks and direct-helper misuse
+        across `NIP-86`, `NIP-46`, and `NIP-25`
   - `no-65ev.3`
-    - targeted docs/examples/discovery and structured-LLM-surface cleanup
+    - next active lane:
+      - targeted docs/examples/discovery and structured-LLM-surface cleanup
   - `no-65ev.4`
     - targeted performance hotspot cleanup for `NIP-88` and `NIP-29`
   - `no-65ev.5`
@@ -83,8 +85,8 @@ assurance supplement, and the revised synthesis.
 
 ## Next Step
 
-1. execute the targeted hardening lane `no-65ev.2`
-2. then execute the docs and performance lanes
+1. execute the docs lane `no-65ev.3`
+2. then execute the performance lane `no-65ev.4`
 3. then run the blocked post-remediation freeze recheck lane
 4. only after that decide whether RC-freeze work is honestly ready
 
