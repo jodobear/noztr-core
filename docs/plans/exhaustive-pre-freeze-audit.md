@@ -208,7 +208,15 @@ Rewrite-pressure interpretation:
 
 - none from angle 1 protocol correctness
 - none from angle 2 parity / interoperability
-- none from angle 3 security / misuse resistance
+- high
+  - `NIP-86` still has public-path assertion leaks on overlong caller input in
+    `method_parse(...)`, `request_parse_json(...)`, and `response_parse_json(...)`
+- medium
+  - `NIP-46` direct public token helpers `method_parse(...)` and `permission_parse(...)` still rely
+    on size assertions for caller-controlled input
+- low
+  - `NIP-25` exposes a misuse-prone public classifier that asserts UTF-8 instead of handling direct
+    malformed input safely
 
 ### Accepted Exceptions Ledger
 
@@ -230,11 +238,10 @@ Rewrite-pressure interpretation:
     - ecosystem or SDK integration evidence showing real incompatibility on a currently weak-evidence
       surface
 - security / misuse resistance
-  - accepted reuse of the hardening register and the canonical implemented-NIP audit artifact for
-    some later leaf-module hostile-input evidence
+  - accepted internal `relay_origin.parse_websocket_origin(...) -> ?WebsocketOrigin` as an internal
+    primitive because current public callers already map failure to typed public errors
   - reversal trigger:
-    - any newly discovered public invalid-input path that still depends on debug assertions or
-      misclassifies invalid input as capacity failure
+    - any future public surface that leaks that collapsed `null` behavior directly
 
 ### Open Blockers
 
@@ -242,7 +249,10 @@ Rewrite-pressure interpretation:
 
 ### Deferred Remediation Candidates
 
-- none recorded yet
+- targeted fixes for:
+  - `NIP-86` public-path assertion leaks
+  - `NIP-46` direct helper assertion leaks
+  - `NIP-25` misuse-prone public classifier semantics
 
 ## Next Step
 
