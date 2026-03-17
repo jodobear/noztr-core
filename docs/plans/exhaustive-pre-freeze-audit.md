@@ -125,13 +125,14 @@ Why this order:
 
 - completed angle reports:
   - protocol correctness: `docs/research/exhaustive-audit-angle-1-protocol-correctness-report.md`
+  - ecosystem parity / interoperability:
+    `docs/research/exhaustive-audit-angle-2-parity-interoperability-report.md`
 - completed in prior targeted lanes:
   - `libnostr-z` report-only comparison
   - TigerBeetle Zig-quality report-only comparison
   - structural hotspot follow-up
   - explicit-state and fixed-capacity follow-up
 - still required for this exhaustive pass:
-  - explicit parity/interoperability review lane output
   - explicit security and misuse-resistance review lane output
   - explicit cryptographic-correctness review lane output
   - explicit performance-focused review
@@ -205,6 +206,7 @@ Rewrite-pressure interpretation:
 ### Findings Ledger
 
 - none from angle 1 protocol correctness
+- none from angle 2 parity / interoperability
 
 ### Accepted Exceptions Ledger
 
@@ -215,6 +217,16 @@ Rewrite-pressure interpretation:
   - reversal trigger:
     - any later audit angle, SDK evidence, or parity evidence that shows a leaf module correctness
       defect not already captured in the canonical implemented-NIP report
+- parity / interoperability
+  - accepted uneven interoperability evidence quality across the implemented surface:
+    - strong rust harness overlap where available
+    - weaker `SOURCE_REVIEW_ONLY`, `LIB_UNSUPPORTED`, or `NOT_COVERED_IN_THIS_PASS` evidence on
+      other surfaces
+  - rationale:
+    - the canonical interoperability artifact names that gradient explicitly instead of hiding it
+  - reversal trigger:
+    - ecosystem or SDK integration evidence showing real incompatibility on a currently weak-evidence
+      surface
 
 ### Open Blockers
 
@@ -226,8 +238,8 @@ Rewrite-pressure interpretation:
 
 ## Next Step
 
-1. close `no-3ib` with the protocol-correctness report and matrix updates
-2. execute ecosystem parity / interoperability as `no-f2u`
+1. close `no-f2u` with the parity/interoperability report and matrix updates
+2. execute security / misuse resistance as `no-odj`
 3. keep `docs/plans/exhaustive-pre-freeze-audit-matrix.md` current as the hard coverage ledger
 4. write each remaining angle report against `docs/plans/audit-angle-report-template.md`
 5. record findings in this draft instead of fixing them
