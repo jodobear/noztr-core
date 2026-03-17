@@ -133,6 +133,8 @@ Why this order:
     `docs/research/exhaustive-audit-angle-4-cryptographic-correctness-report.md`
   - crypto/backend-wrapper quality:
     `docs/research/exhaustive-audit-angle-5-crypto-backend-wrapper-report.md`
+  - Zig engineering quality:
+    `docs/research/exhaustive-audit-angle-6-zig-engineering-report.md`
 - completed in prior targeted lanes:
   - `libnostr-z` report-only comparison
   - TigerBeetle Zig-quality report-only comparison
@@ -140,6 +142,8 @@ Why this order:
   - explicit-state and fixed-capacity follow-up
 - still required for this exhaustive pass:
   - explicit performance-focused review
+  - explicit API consistency / determinism review
+  - explicit docs/examples/discoverability review
   - explicit final residual-risk and blocker summary
 
 ### Standards
@@ -271,6 +275,17 @@ Rewrite-pressure interpretation:
     remediation posture
   - reversal trigger:
     - any lifecycle-state spread beyond the current isolated seam
+- Zig engineering quality
+  - accepted the one-file-per-feature posture even where `NIP-46` and `NIP-47` remain dense at the
+    module level after hotspot refactors
+  - reversal trigger:
+    - any later angle showing repeated mistakes caused by module density rather than isolated
+      review cost
+  - accepted the literal Tiger-style two-assertions-per-function rule as a strong heuristic rather
+    than a mechanically universal codebase invariant
+  - reversal trigger:
+    - any later docs/control-surface review concluding the current rule wording is materially
+      misleading
 
 ### Open Blockers
 
@@ -290,8 +305,8 @@ Rewrite-pressure interpretation:
 
 ## Next Step
 
-1. close `no-dwu` with the cryptographic-correctness report and matrix updates
-2. execute crypto/backend-wrapper quality as `no-ys3`
+1. close `no-5a7o` with the Zig engineering report and matrix updates
+2. execute performance / memory posture as `no-jacg`
 3. keep `docs/plans/exhaustive-pre-freeze-audit-matrix.md` current as the hard coverage ledger
 4. write each remaining angle report against `docs/plans/audit-angle-report-template.md`
 5. record findings in this draft instead of fixing them
