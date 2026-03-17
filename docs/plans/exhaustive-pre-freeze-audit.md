@@ -129,15 +129,17 @@ Why this order:
     `docs/research/exhaustive-audit-angle-2-parity-interoperability-report.md`
   - security / misuse resistance:
     `docs/research/exhaustive-audit-angle-3-security-misuse-report.md`
+  - cryptographic correctness / secret handling:
+    `docs/research/exhaustive-audit-angle-4-cryptographic-correctness-report.md`
+  - crypto/backend-wrapper quality:
+    `docs/research/exhaustive-audit-angle-5-crypto-backend-wrapper-report.md`
 - completed in prior targeted lanes:
   - `libnostr-z` report-only comparison
   - TigerBeetle Zig-quality report-only comparison
   - structural hotspot follow-up
   - explicit-state and fixed-capacity follow-up
 - still required for this exhaustive pass:
-  - explicit cryptographic-correctness review lane output
   - explicit performance-focused review
-  - explicit crypto/backend-wrapper review
   - explicit final residual-risk and blocker summary
 
 ### Standards
@@ -214,9 +216,17 @@ Rewrite-pressure interpretation:
 - medium
   - `NIP-46` direct public token helpers `method_parse(...)` and `permission_parse(...)` still rely
     on size assertions for caller-controlled input
+  - older crypto-bearing leaves still collapse backend outage into the wrong public errors:
+    - `NIP-44` maps backend ECDH failure to `EntropyUnavailable`
+    - `NIP-26` maps backend outage to `InvalidSignature` or `InvalidSecretKey`
+  - the `libwally` boundary is still fragmented across `NIP-06` and `BIP-85`, and
+    `bip85_derivation.ensure_backend()` bootstraps readiness indirectly through
+    `nip06_mnemonic.mnemonic_validate(...)`
 - low
   - `NIP-25` exposes a misuse-prone public classifier that asserts UTF-8 instead of handling direct
     malformed input safely
+  - `secp256k1_backend` still carries mutable verify-counter helpers in the production wrapper
+    module
 
 ### Accepted Exceptions Ledger
 
@@ -242,6 +252,25 @@ Rewrite-pressure interpretation:
     primitive because current public callers already map failure to typed public errors
   - reversal trigger:
     - any future public surface that leaks that collapsed `null` behavior directly
+- cryptographic correctness / secret handling
+  - accepted deterministic fixed-input helper paths in `NIP-44`, `NIP-49`, and `NIP-59` as
+    intentional vector and bounded-construction surfaces rather than accidental live-path defaults
+  - reversal trigger:
+    - any docs/examples drift that starts teaching those deterministic helper paths as default
+      operational usage
+  - accepted backend primitive correctness as external trust for this angle; local framing was
+    reviewed directly, backend internals were not
+  - reversal trigger:
+    - any later backend-quality or external evidence that invalidates the local framing conclusions
+- crypto/backend-wrapper quality
+  - accepted commit-plus-hash pinning in `build.zig.zon` as sufficient provenance discipline for
+    the approved backend exceptions
+  - reversal trigger:
+    - any dependency drift away from commit-plus-hash locking
+  - accepted the isolated `NIP-06` backend-state cell as a bounded exception pending later
+    remediation posture
+  - reversal trigger:
+    - any lifecycle-state spread beyond the current isolated seam
 
 ### Open Blockers
 
@@ -253,11 +282,16 @@ Rewrite-pressure interpretation:
   - `NIP-86` public-path assertion leaks
   - `NIP-46` direct helper assertion leaks
   - `NIP-25` misuse-prone public classifier semantics
+  - crypto leaf backend-outage misclassification in `NIP-44` and `NIP-26`
+- bounded redesign candidate for:
+  - fragmented `libwally` readiness and derivation seam across `NIP-06` and `BIP-85`
+- targeted fix candidate for:
+  - test-oriented verify-counter helpers living in `secp256k1_backend`
 
 ## Next Step
 
-1. close `no-odj` with the security / misuse report and matrix updates
-2. execute cryptographic correctness / secret handling as `no-dwu`
+1. close `no-dwu` with the cryptographic-correctness report and matrix updates
+2. execute crypto/backend-wrapper quality as `no-ys3`
 3. keep `docs/plans/exhaustive-pre-freeze-audit-matrix.md` current as the hard coverage ledger
 4. write each remaining angle report against `docs/plans/audit-angle-report-template.md`
 5. record findings in this draft instead of fixing them
