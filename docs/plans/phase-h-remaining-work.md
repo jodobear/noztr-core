@@ -67,13 +67,14 @@ the `OQ-E-006` usability pass.
   - backfill hostile examples on `NIP-03`, `NIP-17`, `NIP-37`, `NIP-42`, and `NIP-59`
   - close the report-only `libnostr-z` comparison lane with no immediate kernel correction required;
     keep `libnostr-z` as behavior evidence, not as a runtime or memory-model authority
+  - close `no-ow4` with structural refactors across `NIP-22`, `NIP-46`, and `NIP-47`, plus
+    local public assertion-density fixes on `NIP-49`, with no protocol contract change
 
 ## Next Step
 
 1. execute the SDK-informed boundary-validation slice through
    `docs/guides/IMPLEMENTATION_QUALITY_GATE.md`
 2. execute `docs/plans/post-audit-improvement-plan.md` in order:
-   - `no-ow4`
    - `no-3jb`
 3. if the validation finds a real compatibility or ergonomics blocker that does not belong in
    Layer 1, create one explicit Layer 2 adapter-boundary packet instead of widening the kernel by

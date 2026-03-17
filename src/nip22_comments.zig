@@ -464,82 +464,193 @@ fn finalize_target(
     std.debug.assert(std.unicode.utf8ValidateSlice(kind_token));
 
     switch (parsed_target) {
-        .event => |event_target| {
-            const kind = parse_nostr_kind(kind_token) catch return invalid_kind_error;
-            if (kind == 1) {
-                return text_note_error;
-            }
-            if (companion_event != null) {
-                return kind_mismatch_error;
-            }
-            const parsed_author = try select_author(
-                tags,
-                uppercase_author,
-                event_target.event_author_pubkey,
-                missing_author_error,
-                author_mismatch_error,
-                uppercase_author,
-            );
-            if (event_target.event_author_pubkey) |tag_pubkey| {
-                if (!std.mem.eql(u8, &tag_pubkey, &parsed_author.pubkey)) {
-                    return author_mismatch_error;
-                }
-            }
-            return .{
-                .event = .{
-                    .event_id = event_target.event_id,
-                    .relay_hint = event_target.relay_hint,
-                    .event_author_pubkey = event_target.event_author_pubkey,
-                    .author_pubkey = parsed_author.pubkey,
-                    .author_hint = parsed_author.hint,
-                    .kind = kind,
-                },
-            };
+        .event => |event_target| return finalize_event_target(
+            tags,
+            event_target,
+            companion_event,
+            kind_token,
+            uppercase_author,
+            invalid_kind_error,
+            missing_author_error,
+            author_mismatch_error,
+            kind_mismatch_error,
+            text_note_error,
+        ),
+        .coordinate => |coordinate| return finalize_coordinate_target(
+            tags,
+            coordinate,
+            companion_event,
+            kind_token,
+            uppercase_author,
+            invalid_kind_error,
+            missing_author_error,
+            author_mismatch_error,
+            kind_mismatch_error,
+            text_note_error,
+        ),
+        .external => |external_target| return finalize_external_target(
+            external_target,
+            kind_token,
+            kind_mismatch_error,
+        ),
+    }
+}
+
+fn finalize_event_target(
+    tags: []const nip01_event.EventTag,
+    event_target: ParsedEventTarget,
+    companion_event: ?ParsedEventTarget,
+    kind_token: []const u8,
+    uppercase_author: bool,
+    invalid_kind_error: CommentError,
+    missing_author_error: CommentError,
+    author_mismatch_error: CommentError,
+    kind_mismatch_error: CommentError,
+    text_note_error: CommentError,
+) CommentError!CommentTarget {
+    std.debug.assert(tags.len <= limits.tags_max);
+    std.debug.assert(kind_token.len > 0);
+
+    const kind = parse_non_text_note_kind(
+        kind_token,
+        invalid_kind_error,
+        text_note_error,
+    ) catch |err| return err;
+    if (companion_event != null) return kind_mismatch_error;
+
+    const parsed_author = try select_author(
+        tags,
+        uppercase_author,
+        event_target.event_author_pubkey,
+        missing_author_error,
+        author_mismatch_error,
+        uppercase_author,
+    );
+    try require_matching_optional_author(
+        event_target.event_author_pubkey,
+        parsed_author.pubkey,
+        author_mismatch_error,
+    );
+    return .{
+        .event = .{
+            .event_id = event_target.event_id,
+            .relay_hint = event_target.relay_hint,
+            .event_author_pubkey = event_target.event_author_pubkey,
+            .author_pubkey = parsed_author.pubkey,
+            .author_hint = parsed_author.hint,
+            .kind = kind,
         },
-        .coordinate => |coordinate| {
-            const kind = parse_nostr_kind(kind_token) catch return invalid_kind_error;
-            if (kind == 1) {
-                return text_note_error;
-            }
-            if (kind != coordinate.kind) {
-                return kind_mismatch_error;
-            }
-            const parsed_author = try select_author(
-                tags,
-                uppercase_author,
-                coordinate.pubkey,
-                missing_author_error,
-                author_mismatch_error,
-                false,
-            );
-            if (!std.mem.eql(u8, &coordinate.pubkey, &parsed_author.pubkey)) {
-                return author_mismatch_error;
-            }
-            var finalized = coordinate;
-            if (companion_event) |event_target| {
-                finalized.event_id = event_target.event_id;
-                finalized.event_hint = event_target.relay_hint;
-                if (event_target.event_author_pubkey) |tag_pubkey| {
-                    if (!std.mem.eql(u8, &tag_pubkey, &coordinate.pubkey)) {
-                        return author_mismatch_error;
-                    }
-                }
-            }
-            finalized.author_hint = parsed_author.hint;
-            return .{ .coordinate = finalized };
+    };
+}
+
+fn finalize_coordinate_target(
+    tags: []const nip01_event.EventTag,
+    coordinate: CoordinateTarget,
+    companion_event: ?ParsedEventTarget,
+    kind_token: []const u8,
+    uppercase_author: bool,
+    invalid_kind_error: CommentError,
+    missing_author_error: CommentError,
+    author_mismatch_error: CommentError,
+    kind_mismatch_error: CommentError,
+    text_note_error: CommentError,
+) CommentError!CommentTarget {
+    std.debug.assert(tags.len <= limits.tags_max);
+    std.debug.assert(kind_token.len > 0);
+
+    const kind = parse_non_text_note_kind(
+        kind_token,
+        invalid_kind_error,
+        text_note_error,
+    ) catch |err| return err;
+    if (kind != coordinate.kind) return kind_mismatch_error;
+
+    const parsed_author = try select_author(
+        tags,
+        uppercase_author,
+        coordinate.pubkey,
+        missing_author_error,
+        author_mismatch_error,
+        false,
+    );
+    if (!std.mem.eql(u8, &coordinate.pubkey, &parsed_author.pubkey)) {
+        return author_mismatch_error;
+    }
+
+    var finalized = coordinate;
+    try apply_coordinate_companion_event(
+        &finalized,
+        companion_event,
+        author_mismatch_error,
+    );
+    finalized.author_hint = parsed_author.hint;
+    return .{ .coordinate = finalized };
+}
+
+fn finalize_external_target(
+    external_target: ParsedExternalTarget,
+    kind_token: []const u8,
+    kind_mismatch_error: CommentError,
+) CommentError!CommentTarget {
+    std.debug.assert(kind_token.len > 0);
+    std.debug.assert(std.unicode.utf8ValidateSlice(kind_token));
+
+    if (!external_kind_matches_value(kind_token, external_target.value)) {
+        return kind_mismatch_error;
+    }
+    return .{
+        .external = .{
+            .value = external_target.value,
+            .hint = external_target.hint,
+            .external_kind = kind_token,
         },
-        .external => |external_target| {
-            if (!external_kind_matches_value(kind_token, external_target.value)) {
-                return kind_mismatch_error;
-            }
-            return .{
-                .external = .{
-                    .value = external_target.value,
-                    .hint = external_target.hint,
-                    .external_kind = kind_token,
-                },
-            };
-        },
+    };
+}
+
+fn parse_non_text_note_kind(
+    kind_token: []const u8,
+    invalid_kind_error: CommentError,
+    text_note_error: CommentError,
+) CommentError!u32 {
+    std.debug.assert(kind_token.len > 0);
+    std.debug.assert(std.unicode.utf8ValidateSlice(kind_token));
+
+    const kind = parse_nostr_kind(kind_token) catch return invalid_kind_error;
+    if (kind == 1) return text_note_error;
+    return kind;
+}
+
+fn require_matching_optional_author(
+    expected: ?[32]u8,
+    actual: [32]u8,
+    author_mismatch_error: CommentError,
+) CommentError!void {
+    std.debug.assert(@typeInfo(CommentError) == .error_set);
+    std.debug.assert(limits.pubkey_hex_length == 64);
+
+    if (expected) |tag_pubkey| {
+        if (!std.mem.eql(u8, &tag_pubkey, &actual)) {
+            return author_mismatch_error;
+        }
+    }
+}
+
+fn apply_coordinate_companion_event(
+    coordinate: *CoordinateTarget,
+    companion_event: ?ParsedEventTarget,
+    author_mismatch_error: CommentError,
+) CommentError!void {
+    std.debug.assert(@intFromPtr(coordinate) != 0);
+    std.debug.assert(@typeInfo(CommentError) == .error_set);
+
+    if (companion_event) |event_target| {
+        coordinate.event_id = event_target.event_id;
+        coordinate.event_hint = event_target.relay_hint;
+        try require_matching_optional_author(
+            event_target.event_author_pubkey,
+            coordinate.pubkey,
+            author_mismatch_error,
+        );
     }
 }
 

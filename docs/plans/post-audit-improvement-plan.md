@@ -73,6 +73,9 @@ preserving the accepted `noztr` kernel posture.
 Tracker lane:
 - `no-ow4`
 
+Status:
+- complete
+
 Target surfaces:
 - `src/nip22_comments.zig`
 - `src/nip46_remote_signing.zig`
@@ -99,6 +102,9 @@ Closure bar:
 
 Tracker lane:
 - `no-3jb`
+
+Status:
+- next active slice
 
 Target surfaces:
 - `src/nip06_mnemonic.zig`

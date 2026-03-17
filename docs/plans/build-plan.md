@@ -169,7 +169,7 @@ This artifact is the lean active execution baseline and is aligned to:
 - execute `docs/plans/post-audit-improvement-plan.md` as the ordered response to the completed
   `libnostr-z` and TigerBeetle audits.
 - keep the completed TigerBeetle Zig-quality report as reference evidence; the current concrete
-  follow-up lanes remain `no-ow4` and `no-3jb`.
+  remaining follow-up lane is `no-3jb` after structural-hotspot slice `no-ow4` closed cleanly.
 - RC API-freeze remains deferred until the boundary-validation slice closes.
 - Layer 2 compatibility/ergonomic adapter work remains contingent; start it only if the
   boundary-validation pass finds a real blocker that belongs outside the kernel.

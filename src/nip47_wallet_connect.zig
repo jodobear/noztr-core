@@ -1873,80 +1873,100 @@ fn parse_transaction_value(
     var tx = Transaction{};
     var iterator = value.object.iterator();
     while (iterator.next()) |entry| {
-        const key = entry.key_ptr.*;
-        const field = entry.value_ptr.*;
-        if (std.mem.eql(u8, key, "type")) {
-            if (tx.tx_type != null) return error.InvalidTransaction;
-            tx.tx_type = try parse_transaction_type_value(field, error.InvalidTransaction);
-            continue;
-        }
-        if (std.mem.eql(u8, key, "state")) {
-            if (tx.state != null) return error.InvalidTransaction;
-            tx.state = try parse_transaction_state_value(field, error.InvalidTransaction);
-            continue;
-        }
-        if (std.mem.eql(u8, key, "invoice")) {
-            if (tx.invoice != null) return error.InvalidTransaction;
-            tx.invoice = try parse_optional_text(field, true, error.InvalidTransaction);
-            continue;
-        }
-        if (std.mem.eql(u8, key, "description")) {
-            if (tx.description != null) return error.InvalidTransaction;
-            tx.description = try parse_optional_text(field, true, error.InvalidTransaction);
-            continue;
-        }
-        if (std.mem.eql(u8, key, "description_hash")) {
-            if (tx.description_hash != null) return error.InvalidTransaction;
-            tx.description_hash = try parse_optional_text(field, true, error.InvalidTransaction);
-            continue;
-        }
-        if (std.mem.eql(u8, key, "preimage")) {
-            if (tx.preimage != null) return error.InvalidTransaction;
-            tx.preimage = try parse_optional_text(field, true, error.InvalidTransaction);
-            continue;
-        }
-        if (std.mem.eql(u8, key, "payment_hash")) {
-            if (tx.payment_hash != null) return error.InvalidTransaction;
-            tx.payment_hash = try parse_optional_text(field, true, error.InvalidTransaction);
-            continue;
-        }
-        if (std.mem.eql(u8, key, "amount")) {
-            if (tx.amount != null) return error.InvalidTransaction;
-            tx.amount = try parse_required_u64(field, error.InvalidTransaction);
-            continue;
-        }
-        if (std.mem.eql(u8, key, "fees_paid")) {
-            if (tx.fees_paid != null) return error.InvalidTransaction;
-            tx.fees_paid = try parse_required_u64(field, error.InvalidTransaction);
-            continue;
-        }
-        if (std.mem.eql(u8, key, "created_at")) {
-            if (tx.created_at != null) return error.InvalidTransaction;
-            tx.created_at = try parse_required_u64(field, error.InvalidTransaction);
-            continue;
-        }
-        if (std.mem.eql(u8, key, "expires_at")) {
-            if (tx.expires_at != null) return error.InvalidTransaction;
-            tx.expires_at = try parse_required_u64(field, error.InvalidTransaction);
-            continue;
-        }
-        if (std.mem.eql(u8, key, "settled_at")) {
-            if (tx.settled_at != null) return error.InvalidTransaction;
-            tx.settled_at = try parse_required_u64(field, error.InvalidTransaction);
-            continue;
-        }
-        if (std.mem.eql(u8, key, "settle_deadline")) {
-            if (tx.settle_deadline != null) return error.InvalidTransaction;
-            tx.settle_deadline = try parse_required_u32(field, error.InvalidTransaction);
-            continue;
-        }
-        if (std.mem.eql(u8, key, "metadata")) {
-            if (tx.metadata != null) return error.InvalidTransaction;
-            tx.metadata = try parse_metadata_value(field, error.InvalidTransaction);
-        }
+        try parse_transaction_field(&tx, entry.key_ptr.*, entry.value_ptr.*);
     }
     try validate_transaction_shape(tx, shape, invalid_err);
     return tx;
+}
+
+fn parse_transaction_field(
+    tx: *Transaction,
+    key: []const u8,
+    field: std.json.Value,
+) NwcError!void {
+    std.debug.assert(@intFromPtr(tx) != 0);
+    std.debug.assert(@sizeOf(std.json.Value) > 0);
+
+    if (std.mem.eql(u8, key, "type")) {
+        if (tx.tx_type != null) return error.InvalidTransaction;
+        tx.tx_type = try parse_transaction_type_value(field, error.InvalidTransaction);
+        return;
+    }
+    if (std.mem.eql(u8, key, "state")) {
+        if (tx.state != null) return error.InvalidTransaction;
+        tx.state = try parse_transaction_state_value(field, error.InvalidTransaction);
+        return;
+    }
+    if (std.mem.eql(u8, key, "invoice")) {
+        if (tx.invoice != null) return error.InvalidTransaction;
+        tx.invoice = try parse_optional_text(field, true, error.InvalidTransaction);
+        return;
+    }
+    if (std.mem.eql(u8, key, "description")) {
+        if (tx.description != null) return error.InvalidTransaction;
+        tx.description = try parse_optional_text(field, true, error.InvalidTransaction);
+        return;
+    }
+    if (std.mem.eql(u8, key, "description_hash")) {
+        if (tx.description_hash != null) return error.InvalidTransaction;
+        tx.description_hash = try parse_optional_text(field, true, error.InvalidTransaction);
+        return;
+    }
+    if (std.mem.eql(u8, key, "preimage")) {
+        if (tx.preimage != null) return error.InvalidTransaction;
+        tx.preimage = try parse_optional_text(field, true, error.InvalidTransaction);
+        return;
+    }
+    if (std.mem.eql(u8, key, "payment_hash")) {
+        if (tx.payment_hash != null) return error.InvalidTransaction;
+        tx.payment_hash = try parse_optional_text(field, true, error.InvalidTransaction);
+        return;
+    }
+    try parse_transaction_numeric_field(tx, key, field);
+}
+
+fn parse_transaction_numeric_field(
+    tx: *Transaction,
+    key: []const u8,
+    field: std.json.Value,
+) NwcError!void {
+    std.debug.assert(@intFromPtr(tx) != 0);
+    std.debug.assert(@sizeOf(std.json.Value) > 0);
+
+    if (std.mem.eql(u8, key, "amount")) {
+        if (tx.amount != null) return error.InvalidTransaction;
+        tx.amount = try parse_required_u64(field, error.InvalidTransaction);
+        return;
+    }
+    if (std.mem.eql(u8, key, "fees_paid")) {
+        if (tx.fees_paid != null) return error.InvalidTransaction;
+        tx.fees_paid = try parse_required_u64(field, error.InvalidTransaction);
+        return;
+    }
+    if (std.mem.eql(u8, key, "created_at")) {
+        if (tx.created_at != null) return error.InvalidTransaction;
+        tx.created_at = try parse_required_u64(field, error.InvalidTransaction);
+        return;
+    }
+    if (std.mem.eql(u8, key, "expires_at")) {
+        if (tx.expires_at != null) return error.InvalidTransaction;
+        tx.expires_at = try parse_required_u64(field, error.InvalidTransaction);
+        return;
+    }
+    if (std.mem.eql(u8, key, "settled_at")) {
+        if (tx.settled_at != null) return error.InvalidTransaction;
+        tx.settled_at = try parse_required_u64(field, error.InvalidTransaction);
+        return;
+    }
+    if (std.mem.eql(u8, key, "settle_deadline")) {
+        if (tx.settle_deadline != null) return error.InvalidTransaction;
+        tx.settle_deadline = try parse_required_u32(field, error.InvalidTransaction);
+        return;
+    }
+    if (std.mem.eql(u8, key, "metadata")) {
+        if (tx.metadata != null) return error.InvalidTransaction;
+        tx.metadata = try parse_metadata_value(field, error.InvalidTransaction);
+    }
 }
 
 fn validate_transaction_shape(
@@ -2558,17 +2578,10 @@ fn write_response_result_json(
     std.debug.assert(@sizeOf(Response) > 0);
 
     switch (response) {
-        .pay_invoice => |outcome| try write_result_or_null_json(
+        .pay_invoice, .pay_keysend => |outcome| try write_payment_response_result(
             output,
             index,
             outcome,
-            write_payment_result_payload,
-        ),
-        .pay_keysend => |outcome| try write_result_or_null_json(
-            output,
-            index,
-            outcome,
-            write_payment_result_payload,
         ),
         .make_invoice => |outcome| try write_result_or_null_json(
             output,
@@ -2606,19 +2619,32 @@ fn write_response_result_json(
             outcome,
             write_make_hold_payload,
         ),
-        .cancel_hold_invoice => |outcome| try write_result_or_null_json(
-            output,
-            index,
-            outcome,
-            write_empty_payload,
-        ),
-        .settle_hold_invoice => |outcome| try write_result_or_null_json(
-            output,
-            index,
-            outcome,
-            write_empty_payload,
-        ),
+        .cancel_hold_invoice, .settle_hold_invoice => |outcome| {
+            try write_empty_response_result(output, index, outcome);
+        },
     }
+}
+
+fn write_payment_response_result(
+    output: []u8,
+    index: *u32,
+    outcome: Outcome(PaymentResult),
+) NwcError!void {
+    std.debug.assert(@intFromPtr(index) != 0);
+    std.debug.assert(@sizeOf(PaymentResult) > 0);
+
+    try write_result_or_null_json(output, index, outcome, write_payment_result_payload);
+}
+
+fn write_empty_response_result(
+    output: []u8,
+    index: *u32,
+    outcome: Outcome(void),
+) NwcError!void {
+    std.debug.assert(@intFromPtr(index) != 0);
+    std.debug.assert(@sizeOf(void) == 0);
+
+    try write_result_or_null_json(output, index, outcome, write_empty_payload);
 }
 
 fn write_notification_result_json(
@@ -2868,55 +2894,64 @@ fn write_transaction_json(
             invalid_err,
         );
     }
+    try write_transaction_string_fields(output, index, &first, tx, invalid_err);
+    try write_transaction_numeric_fields(output, index, &first, tx);
+    try write_bytes(output, index, "}");
+}
+
+fn write_transaction_string_fields(
+    output: []u8,
+    index: *u32,
+    first: *bool,
+    tx: Transaction,
+    invalid_err: NwcError,
+) NwcError!void {
+    std.debug.assert(@intFromPtr(index) != 0);
+    std.debug.assert(@intFromPtr(first) != 0);
+
     if (tx.invoice) |invoice| {
-        try write_string_field(output, index, &first, "invoice", invoice, invalid_err);
+        try write_string_field(output, index, first, "invoice", invoice, invalid_err);
     }
     if (tx.description) |description| {
-        try write_string_field(output, index, &first, "description", description, invalid_err);
+        try write_string_field(output, index, first, "description", description, invalid_err);
     }
     if (tx.description_hash) |description_hash| {
-        try write_string_field(
-            output,
-            index,
-            &first,
-            "description_hash",
-            description_hash,
-            invalid_err,
-        );
+        try write_string_field(output, index, first, "description_hash", description_hash, invalid_err);
     }
     if (tx.preimage) |preimage| {
-        try write_string_field(output, index, &first, "preimage", preimage, invalid_err);
+        try write_string_field(output, index, first, "preimage", preimage, invalid_err);
     }
     if (tx.payment_hash) |payment_hash| {
-        try write_string_field(
-            output,
-            index,
-            &first,
-            "payment_hash",
-            payment_hash,
-            invalid_err,
-        );
+        try write_string_field(output, index, first, "payment_hash", payment_hash, invalid_err);
     }
-    if (tx.amount) |amount| try write_u64_field(output, index, &first, "amount", amount);
-    if (tx.fees_paid) |fees_paid| {
-        try write_u64_field(output, index, &first, "fees_paid", fees_paid);
-    }
+}
+
+fn write_transaction_numeric_fields(
+    output: []u8,
+    index: *u32,
+    first: *bool,
+    tx: Transaction,
+) NwcError!void {
+    std.debug.assert(@intFromPtr(index) != 0);
+    std.debug.assert(@intFromPtr(first) != 0);
+
+    if (tx.amount) |amount| try write_u64_field(output, index, first, "amount", amount);
+    if (tx.fees_paid) |fees_paid| try write_u64_field(output, index, first, "fees_paid", fees_paid);
     if (tx.created_at) |created_at| {
-        try write_u64_field(output, index, &first, "created_at", created_at);
+        try write_u64_field(output, index, first, "created_at", created_at);
     }
     if (tx.expires_at) |expires_at| {
-        try write_u64_field(output, index, &first, "expires_at", expires_at);
+        try write_u64_field(output, index, first, "expires_at", expires_at);
     }
     if (tx.settled_at) |settled_at| {
-        try write_u64_field(output, index, &first, "settled_at", settled_at);
+        try write_u64_field(output, index, first, "settled_at", settled_at);
     }
     if (tx.settle_deadline) |settle_deadline| {
-        try write_u32_field(output, index, &first, "settle_deadline", settle_deadline);
+        try write_u32_field(output, index, first, "settle_deadline", settle_deadline);
     }
     if (tx.metadata) |metadata| {
-        try write_json_value_field(output, index, &first, "metadata", metadata);
+        try write_json_value_field(output, index, first, "metadata", metadata);
     }
-    try write_bytes(output, index, "}");
 }
 
 fn write_tlv_records_field(

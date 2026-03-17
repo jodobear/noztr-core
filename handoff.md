@@ -46,6 +46,7 @@ Current execution state for `noztr`.
     `NIP-05`, `NIP-17`, `NIP-37`, `NIP-46`, `NIP-47`, `NIP-94`, and `NIP-99`
   - report-only `libnostr-z` comparison closure with no immediate kernel correction required
   - report-only TigerBeetle Zig-quality comparison closure with targeted follow-up tasks
+  - structural-hotspot follow-up closure across `NIP-22`, `NIP-46`, `NIP-47`, and `NIP-49`
 - Only expected untracked local artifact:
   - `tools/interop/rust-nostr-parity-all/target/`
 
@@ -89,7 +90,6 @@ Current execution state for `noztr`.
 
 - execute the SDK-informed boundary-validation packet in `docs/plans/phase-h-remaining-work.md`
 - execute `docs/plans/post-audit-improvement-plan.md` in order:
-  - `no-ow4`
   - `no-3jb`
 - keep the completed audit reports as reference evidence and reopen them only on new contrary
   evidence

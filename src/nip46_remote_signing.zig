@@ -697,6 +697,16 @@ const WellKnownPartial = struct {
     nostrconnect_url: ?[]const u8 = null,
 };
 
+const MessageParseState = struct {
+    id: ?[]const u8 = null,
+    method: ?RemoteSigningMethod = null,
+    params: ?[]const []const u8 = null,
+    result: ResponsePayload = .absent,
+    error_text: ?[]const u8 = null,
+    saw_result: bool = false,
+    saw_error: bool = false,
+};
+
 fn parse_message_object(
     object: std.json.ObjectMap,
     scratch: std.mem.Allocator,
@@ -704,73 +714,100 @@ fn parse_message_object(
     std.debug.assert(@sizeOf(std.json.ObjectMap) > 0);
     std.debug.assert(@intFromPtr(scratch.ptr) != 0);
 
-    var id: ?[]const u8 = null;
-    var method: ?RemoteSigningMethod = null;
-    var params: ?[]const []const u8 = null;
-    var result: ResponsePayload = .absent;
-    var error_text: ?[]const u8 = null;
-    var saw_result = false;
-    var saw_error = false;
-
+    var state = MessageParseState{};
     var iterator = object.iterator();
     while (iterator.next()) |entry| {
-        const key = entry.key_ptr.*;
-        const value = entry.value_ptr.*;
-        if (std.mem.eql(u8, key, "id")) {
-            if (id != null) return error.InvalidMessage;
-            id = try parse_id_value(value, scratch);
-            continue;
-        }
-        if (std.mem.eql(u8, key, "method")) {
-            if (method != null) return error.InvalidMessage;
-            method = try parse_method_value(value);
-            continue;
-        }
-        if (std.mem.eql(u8, key, "params")) {
-            if (params != null) return error.InvalidMessage;
-            params = try parse_string_array_value(
-                value,
-                limits.nip46_message_params_max,
-                limits.nip46_message_json_bytes_max,
-                scratch,
-            );
-            continue;
-        }
-        if (std.mem.eql(u8, key, "result")) {
-            if (saw_result) return error.InvalidMessage;
-            result = try parse_result_value(value, scratch);
-            saw_result = true;
-            continue;
-        }
-        if (std.mem.eql(u8, key, "error")) {
-            if (saw_error) return error.InvalidMessage;
-            error_text = try parse_optional_string_value(
-                value,
-                limits.nip46_message_json_bytes_max,
-                scratch,
-            );
-            saw_error = true;
-        }
+        try parse_message_field(&state, entry.key_ptr.*, entry.value_ptr.*, scratch);
     }
+    return build_message_from_state(state, scratch);
+}
 
-    if (id == null) {
-        return error.InvalidMessage;
+fn parse_message_field(
+    state: *MessageParseState,
+    key: []const u8,
+    value: std.json.Value,
+    scratch: std.mem.Allocator,
+) Nip46Error!void {
+    std.debug.assert(@intFromPtr(state) != 0);
+    std.debug.assert(@intFromPtr(scratch.ptr) != 0);
+
+    if (std.mem.eql(u8, key, "id")) {
+        if (state.id != null) return error.InvalidMessage;
+        state.id = try parse_id_value(value, scratch);
+        return;
     }
-    if (method != null or params != null) {
-        if (saw_result or saw_error) return error.InvalidMessage;
-        const request = Request{
-            .id = id.?,
-            .method = method orelse return error.InvalidRequest,
-            .params = params orelse return error.InvalidRequest,
-        };
-        try request_validate(&request, scratch);
-        return .{ .request = request };
+    if (std.mem.eql(u8, key, "method")) {
+        if (state.method != null) return error.InvalidMessage;
+        state.method = try parse_method_value(value);
+        return;
     }
+    if (std.mem.eql(u8, key, "params")) {
+        if (state.params != null) return error.InvalidMessage;
+        state.params = try parse_string_array_value(
+            value,
+            limits.nip46_message_params_max,
+            limits.nip46_message_json_bytes_max,
+            scratch,
+        );
+        return;
+    }
+    if (std.mem.eql(u8, key, "result")) {
+        if (state.saw_result) return error.InvalidMessage;
+        state.result = try parse_result_value(value, scratch);
+        state.saw_result = true;
+        return;
+    }
+    if (std.mem.eql(u8, key, "error")) {
+        if (state.saw_error) return error.InvalidMessage;
+        state.error_text = try parse_optional_string_value(
+            value,
+            limits.nip46_message_json_bytes_max,
+            scratch,
+        );
+        state.saw_error = true;
+    }
+}
+
+fn build_message_from_state(
+    state: MessageParseState,
+    scratch: std.mem.Allocator,
+) Nip46Error!Message {
+    std.debug.assert(@intFromPtr(scratch.ptr) != 0);
+    std.debug.assert(@sizeOf(MessageParseState) > 0);
+
+    const id = state.id orelse return error.InvalidMessage;
+    if (state.method != null or state.params != null) {
+        return build_request_message(id, state, scratch);
+    }
+    return build_response_message(id, state);
+}
+
+fn build_request_message(
+    id: []const u8,
+    state: MessageParseState,
+    scratch: std.mem.Allocator,
+) Nip46Error!Message {
+    std.debug.assert(id.len > 0);
+    std.debug.assert(@intFromPtr(scratch.ptr) != 0);
+
+    if (state.saw_result or state.saw_error) return error.InvalidMessage;
+    const request = Request{
+        .id = id,
+        .method = state.method orelse return error.InvalidRequest,
+        .params = state.params orelse return error.InvalidRequest,
+    };
+    try request_validate(&request, scratch);
+    return .{ .request = request };
+}
+
+fn build_response_message(id: []const u8, state: MessageParseState) Nip46Error!Message {
+    std.debug.assert(id.len > 0);
+    std.debug.assert(@sizeOf(MessageParseState) > 0);
 
     const response = Response{
-        .id = id.?,
-        .result = if (saw_result) result else .absent,
-        .error_text = if (saw_error) error_text else null,
+        .id = id,
+        .result = if (state.saw_result) state.result else .absent,
+        .error_text = if (state.saw_error) state.error_text else null,
     };
     return .{ .response = response };
 }
