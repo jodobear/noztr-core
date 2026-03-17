@@ -96,6 +96,8 @@ Run tests after every code change.
   - do not return capacity errors for invalid input or invalid-input errors for capacity failures
   - freeze an explicit invalid-vs-capacity matrix before coding every new builder or validator
   - no user-controlled invalid input may rely on debug assertions for rejection in the public path
+  - run one targeted public-path assertion-leak scan on touched parser/builder/validator chains
+  - ask explicitly whether any public invalid input still reaches an internal helper invariant
 - When reference libraries are `LIB_UNSUPPORTED` or only weak evidence exists, require one extra
   spec-first challenge pass before closure.
   - that extra pass must include a pre-code reject corpus, not only additional happy-path evidence
@@ -106,10 +108,14 @@ Run tests after every code change.
     - contradictory optional metadata where applicable
     - debug-vs-release equivalent failure checks for public invalid-input paths
 - Keep canonical audit and status artifacts current as part of closure, not as later cleanup.
+- Add at least one representative overlong-input test for each public builder/parser family touched
+  by the slice.
 - If the review process gets stricter mid-stream, run a short retroactive backfill pass on all
   recently closed or newly expanded NIPs before claiming the stronger standard is in force.
 - For boundary-heavy SDK-facing surfaces, require at least one consumer-facing hostile or invalid
   example fixture in addition to module tests so callers can see the intended failure contract.
+- Treat audit-report synchronization as same-slice work when an audit or robustness pass changes
+  the accepted contract or closes live findings.
 
 ## Coding Standards
 

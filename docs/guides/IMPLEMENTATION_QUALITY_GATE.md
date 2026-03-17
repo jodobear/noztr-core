@@ -38,6 +38,7 @@ Specialized references:
      - invalid-vs-capacity matrix
      - reject corpus where needed
      - sync touchpoints
+     - representative overlong-input cases for each public builder/parser family touched
    - stop if the slice requires a frozen-default change
 
 2. Implement the accepted slice
@@ -52,8 +53,10 @@ Specialized references:
 
 3. Review A
    - validate correctness, trust-boundary behavior, and parity/evidence posture
+   - run one targeted assertion-leak scan on touched public parser/builder/validator chains
    - minimum prompts for parser/builder trust boundaries:
      - can invalid input still panic or hit a debug assertion
+     - can public invalid input still reach an internal helper invariant before typed validation
      - can invalid input still leak as a capacity error
      - can capacity failure still leak as an invalid-input error
      - does any scan escape the intended syntactic region
@@ -77,6 +80,8 @@ Specialized references:
    - force public error variants directly
    - run builder/parser symmetry where both surfaces exist
    - run hostile and contradictory inputs where the surface warrants them
+   - for each touched public builder/parser family, include at least one representative overlong
+     input case that proves typed invalid-input handling on the public path
    - for tokenized or sectioned grammars, challenge nonsense tokens and separator discipline
    - when reference evidence is weak or `LIB_UNSUPPORTED`, rerun the spec-first challenge pass
    - for example-bearing slices, verify that any claimed parse/serialize round-trip stays within one
@@ -94,6 +99,8 @@ Specialized references:
      - teaching surface
      - audit state
      - startup and discovery docs
+   - if the slice is an audit or robustness pass, update the canonical audit/report artifact in the
+     same slice when accepted behavior or live findings changed
    - update canonical docs only where policy, accepted behavior, or current state changed
    - if no canonical doc changed, record that explicitly in tracker evidence
 

@@ -3028,3 +3028,38 @@ payload is needed for the current task.
 - Reversal Trigger: the helper starts attracting recipient fanout, relay policy, or session-shaped
   logic, or real SDK evidence shows that the one-recipient seam is too narrow to be reusable.
 - Supersedes: none
+
+## D-121: Codify generalized audit-hardening checks instead of pass-specific incident rules
+
+- Date: 2026-03-17
+- Status: accepted
+- Decision: promote the reusable failure classes from the second full implemented-surface audit into
+  the repo-wide process, while keeping pass-specific details in tests and audit records.
+  - accepted behavior:
+    - process refinements should codify generalized failure patterns, not the exact NIP/module that
+      triggered them
+    - Review A for public trust-boundary slices now includes one targeted public-path
+      assertion-leak scan on touched parser/builder/validator chains
+    - freezes and adversarial audits must include representative overlong-input cases for each
+      touched public builder/parser family
+    - SDK-facing split surfaces require hostile examples as a default rule, not only when someone
+      remembers they are boundary-heavy
+    - audit and robustness slices must update canonical audit/report artifacts in the same slice
+      when accepted behavior or live findings changed
+    - review language should explicitly ask whether public invalid input still reaches an internal
+      helper invariant before typed validation
+  - accepted non-goals:
+    - turning incident-specific checks into permanent repo-wide doctrine
+    - requiring repo-wide grep rituals on untouched code
+    - duplicating detailed audit history in the process docs
+- Why: the latest audit found a recurring generic bug class: public invalid input reaching helper
+  assertions or helper-shaped assumptions before typed validation. It also reconfirmed two general
+  closure risks: hostile examples lagging behind SDK-facing surfaces and canonical audit artifacts
+  drifting behind accepted implementation state. These are reusable process lessons, not one-off
+  facts about a particular NIP set.
+- Tradeoff: slightly more explicit freeze/review/audit work on public trust-boundary slices versus
+  lower risk of assertion leaks, weaker hostile coverage, and stale canonical audit docs.
+- Related Tradeoff: T-0-004.
+- Reversal Trigger: the generalized checks stop catching real trust-boundary or closeout drift
+  issues, or they create enough routine overhead that a narrower formulation is clearly better.
+- Supersedes: none

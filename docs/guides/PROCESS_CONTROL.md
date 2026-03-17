@@ -201,6 +201,11 @@ When the refinement comes from a real escaped bug class:
 - record the lesson in `docs/guides/PROCESS_REFINEMENT_PLAYBOOK.md` if it is worth sharing across
   repos or future slices
 
+When the escaped bug class is pass-specific:
+- codify the generalized failure pattern, not the exact module or NIP
+- keep incident-specific details in audits, tests, or decision records instead of promoting them
+  into repo-wide doctrine
+
 ## Micro-Freeze Rule
 
 For new or materially expanded trust-boundary surfaces, the freeze note should cover:
@@ -216,6 +221,10 @@ For new or materially expanded trust-boundary surfaces, the freeze note should c
 The freeze note can live in a packet, handoff, or decision entry, but it should be explicit enough
 that Review A validates a known contract rather than discovering one from code alone.
 
+For public parser/builder/validator families, the freeze should also identify:
+- which representative overlong-input cases must stay on typed invalid-input errors
+- which helper chains are expected to reject before any internal invariant or assertion matters
+
 ## Review Prompt Rule
 
 When a slice has public parser or builder trust boundaries, Review A and Review B should use
@@ -223,10 +232,17 @@ explicit prompts instead of generic “correctness” language.
 
 Minimum Review A prompts:
 - can any user-controlled invalid input still panic or trip a debug assertion?
+- can any public invalid input still reach an internal helper invariant before typed validation?
 - can invalid input still leak as a capacity error?
 - can capacity failure still leak as an invalid-input error?
 - does any scan escape the intended syntactic region?
 - does the parser accept nonsense just because delimiters balance?
+
+Required pre-Review-A check for public trust-boundary slices:
+- run one targeted assertion-leak scan on the touched parser/builder/validator chains
+  - the point is not to remove all assertions
+  - the point is to confirm that caller-controlled invalid input is rejected on typed public paths
+    before helper invariants matter
 
 Minimum Review B prompts:
 - did canonicalization become over-strict input validation?
@@ -254,6 +270,11 @@ If an example claims parse/serialize round-trip:
 - say when a serializer is only for id-preimage or envelope output rather than full object parsing
 - do not let a plausible-looking example become the first place a semantic contract bug hides
 
+For SDK-facing split surfaces:
+- hostile examples are mandatory, not discretionary polish
+- the hostile example should show at least one caller-visible typed rejection that a consumer is
+  likely to hit in practice
+
 ## Synchronization Rule
 
 When a packet or refinement slice is created, declare the closeout touchpoints early enough that
@@ -278,7 +299,9 @@ Required closeout steps:
 1. update the targeted audit findings immediately
 2. update examples or discovery catalogs if the public teaching surface changed
 3. remove temporary packet or startup emphasis if the slice is no longer active
-4. make handoff point at the new next work instead of the slice that just closed
+4. update canonical audit/report artifacts in the same slice when accepted behavior or live
+   findings changed
+5. make handoff point at the new next work instead of the slice that just closed
 
 ## Archive Rule
 

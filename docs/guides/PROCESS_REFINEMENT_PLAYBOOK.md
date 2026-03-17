@@ -110,6 +110,11 @@ What helped:
 - one hostile example
 - README or discovery-surface updates in the same closeout pass
 
+Generalization:
+- this is not specific to one NIP
+- any SDK-facing split surface should assume that callers need at least one hostile example to
+  learn the public failure contract correctly
+
 ### 6a. Example layers can be semantically wrong while still looking plausible
 
 One recent failure was not in kernel code. It was in the teaching surface: an example used a
@@ -147,6 +152,28 @@ Important caveat:
 - this should not become a waterfall that lets examples, audits, or docs slip into “later cleanup”
 - the ordered micro-loop works only if later stages remain mandatory for done
 
+### 7a. Public-path assertion leaks are a reusable bug class
+
+One recurring failure mode was not “wrong protocol logic.”
+It was:
+- public API accepts caller input
+- helper deeper in the chain was written with bounded internal assumptions
+- invalid caller input reached the helper before typed validation
+- debug assertions or helper-shaped error mismatches leaked into the public contract
+
+What helped:
+- scan touched public parser/builder/validator chains for assertion leaks
+- freeze one representative overlong-input case per public surface family
+- ask whether public invalid input still reaches an internal helper invariant
+
+Generalization:
+- this applies broadly to protocol libraries, not just this audit pass
+- builders, parsers, URI/query handling, JSON validation, and metadata helpers are all susceptible
+
+What not to do:
+- do not codify the exact module or NIP that failed
+- codify the failure class and keep the incident-specific details in tests and audit records
+
 ### 8. Closeout must restore steady-state routing
 
 A process change is not complete if the startup path still acts like the temporary packet is active.
@@ -155,6 +182,11 @@ What helped:
 - mark finished packets as reference when the lane closes
 - shrink handoff back to steady-state next-work form
 - update routing docs during closeout, not later
+
+Related refinement:
+- audit and robustness passes need the same discipline on canonical report artifacts
+- if the accepted implementation state changed, the canonical audit/report surface must change in
+  the same slice or the repo starts lying about what has actually been hardened
 
 ## Useful Review Prompts
 
