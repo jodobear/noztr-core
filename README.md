@@ -11,6 +11,10 @@ backend exceptions.
 - Keeps non-crypto surfaces stdlib-first and isolates approved crypto backends behind narrow boundary
   modules.
 
+For the release-facing explanation of what `noztr` is trying to do, why it exists, its benefits
+and limitations, and how it compares to more mature libraries, start with
+[`docs/release/noztr-positioning.md`](/workspace/projects/noztr/docs/release/noztr-positioning.md).
+
 ## Current status
 
 - Current baseline: Phase H RC API-freeze review on top of a completed local-only Phase G
@@ -63,6 +67,18 @@ zig build rc-stress-throughput-soak -Doptimize=ReleaseFast
 zig build rc-stress-throughput-csv -Doptimize=ReleaseFast
 zig build rc-stress-throughput-markdown -Doptimize=ReleaseFast
 ```
+
+## Why noztr
+
+Short version:
+
+- `noztr` is trying to be a Zig-native protocol kernel, not a batteries-included Nostr app stack
+- it favors deterministic, bounded, typed trust-boundary behavior over permissive convenience
+- it is a better fit when you want to build your own SDK or app architecture on top of a narrow
+  core
+
+For the full positioning and comparison note, read
+[`docs/release/noztr-positioning.md`](/workspace/projects/noztr/docs/release/noztr-positioning.md).
 
 ## RC quick start
 

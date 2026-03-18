@@ -74,6 +74,9 @@ These docs control active work and should stay lean.
     canonical payload
 - Ownership and kernel-vs-SDK questions:
   - `docs/plans/noztr-sdk-ownership-matrix.md`
+- Understanding what `noztr` is, why it exists, and how it compares to mature libraries:
+  - `docs/release/noztr-positioning.md`
+  - `docs/release/intentional-divergences.md`
 - Reviewing the completed exhaustive audit:
   - `docs/research/exhaustive-audit-meta-analysis-report.md`
   - `docs/research/llm-structured-usability-audit-report.md`
@@ -140,6 +143,7 @@ These are active references, not startup defaults.
 - `docs/plans/packet-template.md`
 - `docs/research/`
 - `docs/release/intentional-divergences.md`
+- `docs/release/noztr-positioning.md`
 - `examples/README.md`
 
 ## Packet Docs

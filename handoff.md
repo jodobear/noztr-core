@@ -53,6 +53,8 @@ Current execution state for `noztr`.
   - root `README.md` now has a short RC quick-start route
   - `docs/plans/post-core-contract-map.md` is easier to scan for common jobs
   - the stress harness now supports soak plus CSV/Markdown output steps
+- release-facing positioning now has one canonical explanation in:
+  - `docs/release/noztr-positioning.md`
 - Local RC review evidence remains positive after the supplement, but final closure remains pending
   `nzdk` implementation feedback.
 - The next active Phase H slice remains the RC API-freeze review.
