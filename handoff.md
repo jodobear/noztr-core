@@ -64,9 +64,11 @@ Current execution state for `noztr`.
   - `docs/release/performance.md`
   - `docs/release/stability-and-versioning.md`
   - `docs/release/compatibility-and-support.md`
+  - `docs/release/release-notes-template.md`
   - `docs/release/api-reference.md`
   - `docs/release/nip-coverage.md`
   - `CONTRIBUTING.md`
+  - `CHANGELOG.md`
 - Local RC review evidence remains positive after the supplement, but final closure remains pending
   `nzdk` implementation feedback.
 - The next active Phase H slice remains the RC API-freeze review.

@@ -149,6 +149,8 @@ Current public versioning posture is conservative.
 See:
 
 - [docs/release/stability-and-versioning.md](/workspace/projects/noztr/docs/release/stability-and-versioning.md)
+- [docs/release/release-notes-template.md](/workspace/projects/noztr/docs/release/release-notes-template.md)
+- [CHANGELOG.md](/workspace/projects/noztr/CHANGELOG.md)
 
 Short version:
 

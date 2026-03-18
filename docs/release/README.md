@@ -42,6 +42,8 @@ to understand the current release-facing contract at a high level.
   - public stability posture, versioning policy, and release expectations
 - `docs/release/compatibility-and-support.md`
   - Zig floor, optional/split surfaces, backend posture, and support expectations
+- `docs/release/release-notes-template.md`
+  - template for future public release notes
 - `examples/README.md`
   - task-oriented example routing
 - `docs/release/core-api-contracts.md`
