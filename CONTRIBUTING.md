@@ -13,6 +13,9 @@ Read these first:
 - [README.md](/workspace/projects/noztr/README.md)
 - [AGENTS.md](/workspace/projects/noztr/AGENTS.md)
 - [handoff.md](/workspace/projects/noztr/handoff.md)
+- [docs/release/noztr-style.md](/workspace/projects/noztr/docs/release/noztr-style.md)
+- [docs/release/zig-patterns.md](/workspace/projects/noztr/docs/release/zig-patterns.md)
+- [docs/release/zig-anti-patterns.md](/workspace/projects/noztr/docs/release/zig-anti-patterns.md)
 
 If you are working as a maintainer or automation agent, follow the startup routing in
 [AGENTS.md](/workspace/projects/noztr/AGENTS.md). Internal working material now lives in local-only
@@ -112,6 +115,9 @@ Do not create parallel markdown TODO systems.
 If you touch public docs, prefer improving:
 
 - `docs/release/getting-started.md`
+- `docs/release/noztr-style.md`
+- `docs/release/zig-patterns.md`
+- `docs/release/zig-anti-patterns.md`
 - `docs/release/technical-guides.md`
 - `docs/release/core-api-contracts.md`
 - `docs/release/contract-map.md`
@@ -134,6 +140,12 @@ For code work:
 - prefer typed trust-boundary failures
 - do not add broad dependencies
 - do not widen kernel scope casually
+
+Public style references:
+
+- [docs/release/noztr-style.md](/workspace/projects/noztr/docs/release/noztr-style.md)
+- [docs/release/zig-patterns.md](/workspace/projects/noztr/docs/release/zig-patterns.md)
+- [docs/release/zig-anti-patterns.md](/workspace/projects/noztr/docs/release/zig-anti-patterns.md)
 
 Before closing a protocol slice, make sure the work includes:
 

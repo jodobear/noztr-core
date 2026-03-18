@@ -38,6 +38,7 @@ Current execution state for `noztr`.
 - `no-6e6p` remains open because final RC closure still depends on downstream `nzdk` feedback.
 - Public tracked docs now live in `docs/release/` plus `examples/`; internal planning, audit, and
   process docs live in local-only `.private-docs/`.
+- Public contributor style guides now exist in `docs/release/` for external contributors.
 - Remote readiness remains deferred-by-operator, and no git remote is configured in this repo.
 - Only expected untracked local artifact:
   - `tools/interop/rust-nostr-parity-all/target/`

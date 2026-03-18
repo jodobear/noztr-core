@@ -32,6 +32,12 @@ to understand the current release-facing contract at a high level.
 
 - `docs/release/getting-started.md`
   - install/import path and first examples
+- `docs/release/noztr-style.md`
+  - public contributor-facing style guide for protocol-kernel work
+- `docs/release/zig-patterns.md`
+  - preferred Zig implementation patterns for contributors
+- `docs/release/zig-anti-patterns.md`
+  - common contributor footguns and what to avoid
 - `docs/release/technical-guides.md`
   - narrative job-oriented routes through the library
 - `docs/release/errors-and-ownership.md`
