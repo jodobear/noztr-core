@@ -17,6 +17,9 @@ These are the common implementation shapes contributors should avoid in `noztr`.
 The issue is not “style preference.” These patterns usually make the public contract less bounded,
 less auditable, or less deterministic.
 
+Several of these are not hypothetical. They are generalized from real audit findings and cleanup
+work in `noztr`.
+
 ## Avoid These Patterns
 
 ### 1. Broad error funnels
@@ -108,7 +111,53 @@ Why:
 - aliasing and stale-state bugs become easier to introduce
 - explicit ownership is lost
 
-### 9. Contract-layer confusion in examples
+### 9. Hidden mutable backend state
+
+Avoid:
+
+- backend assumptions that live implicitly across unrelated helpers
+
+Why:
+
+- outage and readiness behavior becomes harder to classify correctly
+- review cannot see the true seam clearly
+
+### 10. Whole-string opportunistic scans
+
+Avoid:
+
+- searching more text than the contract actually permits
+
+Why:
+
+- lookalike tokens outside the intended region can become false positives
+- extractors become harder to reason about
+
+### 11. Public-path assertion leaks
+
+Avoid:
+
+- allowing malformed caller input to reach internal invariants or debug assertions before typed
+  validation
+
+Why:
+
+- the public contract changes between “real error” and “debug-only panic”
+- invalid input can be misclassified or crash in ways callers should never rely on
+
+### 12. Invalid-vs-capacity confusion
+
+Avoid:
+
+- returning capacity errors for invalid input
+- returning invalid-input errors for too-small caller buffers
+
+Why:
+
+- downstream callers lose the real contract
+- tests stop proving the right thing
+
+### 13. Contract-layer confusion in examples
 
 Avoid:
 
@@ -129,6 +178,8 @@ If you see these, stop and challenge the change:
 - “the exact error probably doesn’t matter”
 - “the helper scans the whole string, but it’s fine”
 - “the example is close enough”
+- “the state can just live here for now”
+- “it only asserts in debug mode”
 
 Those are the kinds of shortcuts that create drift later.
 

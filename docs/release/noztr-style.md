@@ -19,6 +19,29 @@ not.
 
 For contribution workflow, start with [CONTRIBUTING.md](/workspace/projects/noztr/CONTRIBUTING.md).
 
+## Integration Rule
+
+`NOZTR Style` is not separate from Tiger-style engineering discipline.
+
+For public contributors, the right mental model is:
+
+- Tiger provides the engineering pressure:
+  - simple control flow
+  - explicit state
+  - strong invariants
+  - bounded behavior
+  - code that is hard to misunderstand
+- `noztr` adds the protocol-kernel posture:
+  - strict trust boundaries
+  - explicit ownership
+  - compatibility without hidden permissiveness
+  - kernel-vs-SDK scope discipline
+
+So the intended style is:
+
+- Tiger-style engineering discipline
+- applied to a narrow Nostr protocol kernel
+
 ## What This Library Optimizes For
 
 `noztr` is trying to be:
@@ -50,6 +73,27 @@ It should avoid:
 - keep runtime work bounded
 - keep kernel logic separate from SDK, transport, storage, and UI policy
 - prefer the simplest behavior that is correct, bounded, and ecosystem-compatible
+- prefer explicit state over hidden mutable state
+- prefer simple branch structure over clever compactness
+- make invariants obvious in code, not only in comments
+
+## Tiger-Style Engineering Defaults
+
+Contributors should assume these defaults unless a specific change clearly justifies an exception:
+
+- small functions with one clear job
+- explicit state transitions
+- explicit preconditions and postconditions
+- straightforward control flow
+- no hidden resource growth
+- code that makes the negative space obvious, not just the happy path
+
+In practice this means:
+
+- avoid sprawling coordinator functions
+- split boundary stages so review can see where shape checking ends and semantic checking begins
+- keep state cells and backend seams explicit instead of ambient
+- make failure reasons visible at the public boundary
 
 ## Scope Discipline
 
@@ -89,6 +133,12 @@ See also:
 
 - [errors-and-ownership.md](/workspace/projects/noztr/docs/release/errors-and-ownership.md)
 
+One important lesson from the audit work:
+
+- explicit state beats hidden mutable state, especially around backend seams
+
+If a helper quietly depends on ambient mutable state, challenge it.
+
 ## Error Style
 
 `noztr` prefers typed boundary errors over vague failure funnels.
@@ -102,6 +152,13 @@ Public callers should be able to tell the difference between:
 
 Do not collapse those into one generic error unless the surface truly has no more precise public
 contract.
+
+Another audit lesson:
+
+- invalid input should not reach deeper helper invariants before typed validation
+
+That means contributors should treat public-path assertion leaks as real design bugs, not as debug
+mode trivia.
 
 ## Strictness Without Fussiness
 
@@ -120,6 +177,12 @@ Bad fussiness:
 - widening the typed error surface when one existing error already says enough
 
 The goal is an auditable kernel, not a performative one.
+
+One practical test:
+
+- if a rule makes the contract safer, clearer, or more deterministic, it is probably justified
+- if it mainly makes the code “feel stricter” while reducing compatibility and adding complexity, it
+  probably is not
 
 ## Compatibility Model
 
@@ -140,6 +203,18 @@ Before landing a change, ask:
 - does it improve correctness, determinism, or downstream usability?
 - does it add complexity that the trust boundary does not justify?
 - does it belong in `noztr`, or in a higher layer?
+- does it keep the code simple in the Tiger sense, or does it only make it more ornate?
+
+## Audit-Learned Heuristics
+
+These came out of the repo’s major audit and remediation work and should guide contributor review:
+
+- watch for public-path assertion leaks
+- keep invalid-input and capacity-failure handling distinct
+- keep scan regions explicit and bounded
+- do not let canonicalization quietly become over-strict input rejection
+- treat examples as contract-bearing artifacts, not presentation extras
+- prefer explicit backend seams over hidden mutable cross-cutting state
 
 ## Next Pages
 
