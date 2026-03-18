@@ -50,6 +50,38 @@ Structured downstream handoff surface for `nzdk` as the post-audit remediation p
 - the current surface looks acceptable locally, but final RC closure remains pending `nzdk`
   implementation feedback
 
+## Downstream Read Set
+
+- minimum current read set for `nzdk` review/update:
+  - `docs/plans/noztr-sdk-remediation-brief.md`
+  - `docs/research/post-remediation-freeze-recheck-report.md`
+  - `docs/research/rc-api-freeze-review-report.md`
+  - `docs/plans/post-core-contract-map.md`
+  - `examples/README.md`
+- load specific `src/*` files only for the symbols touched by the lane being rechecked
+
+## Breaking Changes Summary
+
+- breaking or potentially breaking downstream-facing changes from remediation:
+  - `no-65ev.1`
+    - `nip44_get_conversation_key(...)` now returns `BackendUnavailable` distinctly
+    - `delegation_signature_sign(...)` and `delegation_signature_verify(...)` now return
+      `BackendUnavailable` distinctly
+  - `no-65ev.2`
+    - `nip25_reactions.reaction_classify_content(...)` changed from a plain classifier return to
+      `ReactionError!ReactionType`
+    - direct helper misuse on `NIP-86` and `NIP-46` now returns typed invalid-input errors where
+      assertion-like behavior may previously have been assumed in tests or wrappers
+- non-breaking remediation lanes:
+  - `no-65ev.3`
+    - docs/examples/discovery only
+  - `no-65ev.4`
+    - bounded local performance cleanup only; no intended semantic change
+  - `no-65ev.5`
+    - freeze recheck only
+  - `no-6e6p`
+    - RC-facing contract review only; no runtime change
+
 ## Landed Remediation Updates
 
 ### `no-65ev.1`
