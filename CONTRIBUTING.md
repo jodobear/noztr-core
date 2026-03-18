@@ -14,6 +14,7 @@ Read these first:
 - [AGENTS.md](/workspace/projects/noztr/AGENTS.md)
 - [handoff.md](/workspace/projects/noztr/handoff.md)
 - [docs/release/noztr-style.md](/workspace/projects/noztr/docs/release/noztr-style.md)
+- [docs/release/docs-style-guide.md](/workspace/projects/noztr/docs/release/docs-style-guide.md)
 - [docs/release/zig-patterns.md](/workspace/projects/noztr/docs/release/zig-patterns.md)
 - [docs/release/zig-anti-patterns.md](/workspace/projects/noztr/docs/release/zig-anti-patterns.md)
 
@@ -144,6 +145,7 @@ For code work:
 Public style references:
 
 - [docs/release/noztr-style.md](/workspace/projects/noztr/docs/release/noztr-style.md)
+- [docs/release/docs-style-guide.md](/workspace/projects/noztr/docs/release/docs-style-guide.md)
 - [docs/release/zig-patterns.md](/workspace/projects/noztr/docs/release/zig-patterns.md)
 - [docs/release/zig-anti-patterns.md](/workspace/projects/noztr/docs/release/zig-anti-patterns.md)
 

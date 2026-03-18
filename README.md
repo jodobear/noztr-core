@@ -19,6 +19,7 @@ For the public docs route as a whole, start with
 For the technical public docs set, continue with:
 - [`docs/release/getting-started.md`](/workspace/projects/noztr/docs/release/getting-started.md)
 - [`docs/release/noztr-style.md`](/workspace/projects/noztr/docs/release/noztr-style.md)
+- [`docs/release/docs-style-guide.md`](/workspace/projects/noztr/docs/release/docs-style-guide.md)
 - [`docs/release/zig-patterns.md`](/workspace/projects/noztr/docs/release/zig-patterns.md)
 - [`docs/release/zig-anti-patterns.md`](/workspace/projects/noztr/docs/release/zig-anti-patterns.md)
 - [`docs/release/technical-guides.md`](/workspace/projects/noztr/docs/release/technical-guides.md)
@@ -112,6 +113,7 @@ This repo contains both public-facing release docs and extensive internal workin
   - [`docs/release/README.md`](/workspace/projects/noztr/docs/release/README.md)
   - [`docs/release/getting-started.md`](/workspace/projects/noztr/docs/release/getting-started.md)
   - [`docs/release/noztr-style.md`](/workspace/projects/noztr/docs/release/noztr-style.md)
+  - [`docs/release/docs-style-guide.md`](/workspace/projects/noztr/docs/release/docs-style-guide.md)
   - [`docs/release/zig-patterns.md`](/workspace/projects/noztr/docs/release/zig-patterns.md)
   - [`docs/release/zig-anti-patterns.md`](/workspace/projects/noztr/docs/release/zig-anti-patterns.md)
   - [`docs/release/noztr-positioning.md`](/workspace/projects/noztr/docs/release/noztr-positioning.md)

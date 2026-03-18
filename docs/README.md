@@ -18,6 +18,7 @@ Start here:
 - [release docs index](/workspace/projects/noztr/docs/release/README.md)
 - [getting started](/workspace/projects/noztr/docs/release/getting-started.md)
 - [NOZTR Style](/workspace/projects/noztr/docs/release/noztr-style.md)
+- [Docs style guide](/workspace/projects/noztr/docs/release/docs-style-guide.md)
 - [Zig patterns](/workspace/projects/noztr/docs/release/zig-patterns.md)
 - [Zig anti-patterns](/workspace/projects/noztr/docs/release/zig-anti-patterns.md)
 - [positioning](/workspace/projects/noztr/docs/release/noztr-positioning.md)
