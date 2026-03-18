@@ -513,6 +513,21 @@ test "root exports limits and error namespaces" {
                 [][]const u8,
             ) nip17_private_messages.Nip17RelayListError!u16,
     );
+    try std.testing.expect(@TypeOf(nip17_private_messages.BuiltFileMetadataTag) == type);
+    try std.testing.expect(
+        @TypeOf(nip17_private_messages.nip17_build_file_type_tag) ==
+            fn (
+                *nip17_private_messages.BuiltFileMetadataTag,
+                []const u8,
+            ) nip17_private_messages.Nip17Error!nip01_event.EventTag,
+    );
+    try std.testing.expect(
+        @TypeOf(nip17_private_messages.nip17_build_file_size_tag) ==
+            fn (
+                *nip17_private_messages.BuiltFileMetadataTag,
+                u64,
+            ) nip17_private_messages.Nip17Error!nip01_event.EventTag,
+    );
     try std.testing.expect(
         @TypeOf(nip39_external_identities.identity_claims_extract) ==
             fn (

@@ -70,6 +70,10 @@ Cross-cutting public notes:
   - route: [contract-map.md](/workspace/projects/noztr/docs/release/contract-map.md)
   - example: [nip17_wrap_recipe.zig](/workspace/projects/noztr/examples/nip17_wrap_recipe.zig)
   - hostile example: [nip59_adversarial_example.zig](/workspace/projects/noztr/examples/nip59_adversarial_example.zig)
+- NIP-17 direct-message and file-message boundaries
+  - route: [contract-map.md](/workspace/projects/noztr/docs/release/contract-map.md)
+  - example: [nip17_example.zig](/workspace/projects/noztr/examples/nip17_example.zig)
+  - hostile example: [nip17_adversarial_example.zig](/workspace/projects/noztr/examples/nip17_adversarial_example.zig)
 
 ## Remote Signing And Wallet Connect
 

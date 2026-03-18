@@ -112,6 +112,27 @@ These are the quickest symbol-level routes into the modules most downstream user
 - broader route:
   - [contract-map.md](/workspace/projects/noztr/docs/release/contract-map.md)
 
+### `nip17_private_messages`
+
+- `nip17_message_parse`
+  - parse kind-14 direct-message rumors
+- `nip17_file_message_parse`
+  - parse kind-15 file-message rumors and required file metadata
+- `nip17_unwrap_message` / `nip17_unwrap_file_message`
+  - unwrap a gift wrap and parse the inner direct-message or file-message rumor
+- `nip17_build_recipient_tag` / `nip17_build_relay_tag`
+  - build canonical recipient and relay tags
+- `nip17_build_file_*_tag`
+  - build canonical file-message metadata tags for required and optional kind-15 file metadata
+- start example:
+  - [nip17_example.zig](/workspace/projects/noztr/examples/nip17_example.zig)
+  - [nip17_wrap_recipe.zig](/workspace/projects/noztr/examples/nip17_wrap_recipe.zig)
+- hostile example:
+  - [nip17_adversarial_example.zig](/workspace/projects/noztr/examples/nip17_adversarial_example.zig)
+  - [nip59_adversarial_example.zig](/workspace/projects/noztr/examples/nip59_adversarial_example.zig)
+- broader route:
+  - [contract-map.md](/workspace/projects/noztr/docs/release/contract-map.md)
+
 ### `nip98_http_auth`
 
 - `http_auth_extract`

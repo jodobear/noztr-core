@@ -39,6 +39,10 @@ Current execution state for `noztr`.
 - Public tracked docs now live in `docs/release/` plus `examples/`; internal planning, audit, and
   process docs live in local-only `.private-docs/`.
 - Public contributor style guides now exist in `docs/release/` for external contributors.
+- Latest downstream feedback addressed:
+  - the public `NIP-29` contract map now matches `noztr.nip29_relay_groups`
+  - `NIP-17` now exposes deterministic file-message tag builders without widening into full
+    file-message workflow ownership
 - Remote readiness remains deferred-by-operator, and no git remote is configured in this repo.
 - Only expected untracked local artifact:
   - `tools/interop/rust-nostr-parity-all/target/`

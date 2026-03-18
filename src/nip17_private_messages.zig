@@ -95,6 +95,19 @@ pub const BuiltTag = struct {
     }
 };
 
+pub const BuiltFileMetadataTag = struct {
+    value_storage: [limits.tag_item_bytes_max]u8 = undefined,
+    items: [2][]const u8 = undefined,
+    item_count: u8 = 0,
+
+    pub fn as_event_tag(self: *const BuiltFileMetadataTag) nip01_event.EventTag {
+        std.debug.assert(self.item_count == 2);
+        std.debug.assert(self.items[0].len > 0);
+
+        return .{ .items = self.items[0..self.item_count] };
+    }
+};
+
 /// Parse a kind-14 NIP-17 direct message event.
 pub fn nip17_message_parse(
     event: *const nip01_event.Event,
@@ -252,6 +265,107 @@ pub fn nip17_build_relay_tag(
     return output.as_event_tag();
 }
 
+/// Build a canonical `file-type` tag for a kind-15 file message.
+pub fn nip17_build_file_type_tag(
+    output: *BuiltFileMetadataTag,
+    file_type: []const u8,
+) Nip17Error!nip01_event.EventTag {
+    return build_file_text_tag(output, "file-type", file_type);
+}
+
+/// Build a canonical `encryption-algorithm` tag for a kind-15 file message.
+pub fn nip17_build_file_encryption_algorithm_tag(
+    output: *BuiltFileMetadataTag,
+    algorithm: FileEncryptionAlgorithm,
+) Nip17Error!nip01_event.EventTag {
+    return build_file_text_tag(output, "encryption-algorithm", algorithm.as_text());
+}
+
+/// Build a canonical `decryption-key` tag for a kind-15 file message.
+pub fn nip17_build_file_decryption_key_tag(
+    output: *BuiltFileMetadataTag,
+    decryption_key: []const u8,
+) Nip17Error!nip01_event.EventTag {
+    return build_file_text_tag(output, "decryption-key", decryption_key);
+}
+
+/// Build a canonical `decryption-nonce` tag for a kind-15 file message.
+pub fn nip17_build_file_decryption_nonce_tag(
+    output: *BuiltFileMetadataTag,
+    decryption_nonce: []const u8,
+) Nip17Error!nip01_event.EventTag {
+    return build_file_text_tag(output, "decryption-nonce", decryption_nonce);
+}
+
+/// Build a canonical `x` tag for the encrypted file hash on a kind-15 file message.
+pub fn nip17_build_file_hash_tag(
+    output: *BuiltFileMetadataTag,
+    encrypted_file_hash_hex: []const u8,
+) Nip17Error!nip01_event.EventTag {
+    return build_file_hash_tag(output, "x", encrypted_file_hash_hex);
+}
+
+/// Build a canonical `ox` tag for the original file hash on a kind-15 file message.
+pub fn nip17_build_file_original_hash_tag(
+    output: *BuiltFileMetadataTag,
+    original_file_hash_hex: []const u8,
+) Nip17Error!nip01_event.EventTag {
+    return build_file_hash_tag(output, "ox", original_file_hash_hex);
+}
+
+/// Build a canonical `size` tag for a kind-15 file message.
+pub fn nip17_build_file_size_tag(
+    output: *BuiltFileMetadataTag,
+    size: u64,
+) Nip17Error!nip01_event.EventTag {
+    std.debug.assert(@intFromPtr(output) != 0);
+    std.debug.assert(limits.tag_item_bytes_max >= 20);
+
+    const rendered = std.fmt.bufPrint(output.value_storage[0..], "{d}", .{size}) catch unreachable;
+    return build_file_value_tag(output, "size", rendered);
+}
+
+/// Build a canonical `dim` tag for a kind-15 file message.
+pub fn nip17_build_file_dimensions_tag(
+    output: *BuiltFileMetadataTag,
+    dimensions: FileDimensions,
+) Nip17Error!nip01_event.EventTag {
+    std.debug.assert(@intFromPtr(output) != 0);
+    std.debug.assert(limits.tag_item_bytes_max >= 21);
+
+    if (dimensions.width == 0 or dimensions.height == 0) return error.InvalidFileMetadataTag;
+    const rendered = std.fmt.bufPrint(
+        output.value_storage[0..],
+        "{d}x{d}",
+        .{ dimensions.width, dimensions.height },
+    ) catch unreachable;
+    return build_file_value_tag(output, "dim", rendered);
+}
+
+/// Build a canonical `blurhash` tag for a kind-15 file message.
+pub fn nip17_build_file_blurhash_tag(
+    output: *BuiltFileMetadataTag,
+    blurhash: []const u8,
+) Nip17Error!nip01_event.EventTag {
+    return build_file_text_tag(output, "blurhash", blurhash);
+}
+
+/// Build a canonical `thumb` tag for a kind-15 file message.
+pub fn nip17_build_file_thumb_tag(
+    output: *BuiltFileMetadataTag,
+    thumb_url: []const u8,
+) Nip17Error!nip01_event.EventTag {
+    return build_file_url_tag(output, "thumb", thumb_url);
+}
+
+/// Build a canonical `fallback` tag for a kind-15 file message.
+pub fn nip17_build_file_fallback_tag(
+    output: *BuiltFileMetadataTag,
+    fallback_url: []const u8,
+) Nip17Error!nip01_event.EventTag {
+    return build_file_url_tag(output, "fallback", fallback_url);
+}
+
 fn parse_message_tag(
     tag: nip01_event.EventTag,
     info: *DmMessageInfo,
@@ -265,6 +379,62 @@ fn parse_message_tag(
     if (std.mem.eql(u8, tag.items[0], "p")) return parse_recipient_tag(tag, recipients_out, count);
     if (std.mem.eql(u8, tag.items[0], "e")) return parse_reply_tag(tag, info);
     if (std.mem.eql(u8, tag.items[0], "subject")) return parse_subject_tag(tag, info);
+}
+
+fn build_file_text_tag(
+    output: *BuiltFileMetadataTag,
+    key: []const u8,
+    value: []const u8,
+) Nip17Error!nip01_event.EventTag {
+    std.debug.assert(@intFromPtr(output) != 0);
+    std.debug.assert(key.len > 0);
+
+    _ = parse_nonempty_utf8(value) catch return error.InvalidFileMetadataTag;
+    return build_file_value_tag(output, key, value);
+}
+
+fn build_file_hash_tag(
+    output: *BuiltFileMetadataTag,
+    key: []const u8,
+    value: []const u8,
+) Nip17Error!nip01_event.EventTag {
+    std.debug.assert(@intFromPtr(output) != 0);
+    std.debug.assert(key.len > 0);
+
+    _ = parse_lower_hex_32(value) catch return error.InvalidFileMetadataTag;
+    return build_file_value_tag(output, key, value);
+}
+
+fn build_file_url_tag(
+    output: *BuiltFileMetadataTag,
+    key: []const u8,
+    value: []const u8,
+) Nip17Error!nip01_event.EventTag {
+    std.debug.assert(@intFromPtr(output) != 0);
+    std.debug.assert(key.len > 0);
+
+    _ = parse_url(value) catch return error.InvalidFileMetadataTag;
+    return build_file_value_tag(output, key, value);
+}
+
+fn build_file_value_tag(
+    output: *BuiltFileMetadataTag,
+    key: []const u8,
+    value: []const u8,
+) Nip17Error!nip01_event.EventTag {
+    std.debug.assert(@intFromPtr(output) != 0);
+    std.debug.assert(key.len > 0);
+
+    if (value.len == 0) return error.InvalidFileMetadataTag;
+    if (value.len > output.value_storage.len) return error.InvalidFileMetadataTag;
+    const output_value = output.value_storage[0..value.len];
+    if (output_value.ptr != value.ptr) {
+        @memcpy(output_value, value);
+    }
+    output.items[0] = key;
+    output.items[1] = output_value;
+    output.item_count = 2;
+    return output.as_event_tag();
 }
 
 const FileMetadataState = struct {
@@ -808,6 +978,42 @@ test "nip17 builders emit canonical recipient and relay tags" {
     try std.testing.expectEqualStrings("wss://relay.example", built_relay.items[1]);
 }
 
+test "nip17 file metadata builders emit canonical tags" {
+    var file_type_tag: BuiltFileMetadataTag = .{};
+    var algorithm_tag: BuiltFileMetadataTag = .{};
+    var size_tag: BuiltFileMetadataTag = .{};
+    var dimensions_tag: BuiltFileMetadataTag = .{};
+    var thumb_tag: BuiltFileMetadataTag = .{};
+    var hash_tag: BuiltFileMetadataTag = .{};
+
+    const built_file_type = try nip17_build_file_type_tag(&file_type_tag, "image/jpeg");
+    const built_algorithm =
+        try nip17_build_file_encryption_algorithm_tag(&algorithm_tag, .aes_gcm);
+    const built_size = try nip17_build_file_size_tag(&size_tag, 42);
+    const built_dimensions = try nip17_build_file_dimensions_tag(
+        &dimensions_tag,
+        .{ .width = 800, .height = 600 },
+    );
+    const built_thumb =
+        try nip17_build_file_thumb_tag(&thumb_tag, "https://cdn.example/thumb.jpg");
+    const built_hash = try nip17_build_file_hash_tag(
+        &hash_tag,
+        "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+    );
+
+    try std.testing.expectEqualStrings("file-type", built_file_type.items[0]);
+    try std.testing.expectEqualStrings("image/jpeg", built_file_type.items[1]);
+    try std.testing.expectEqualStrings("encryption-algorithm", built_algorithm.items[0]);
+    try std.testing.expectEqualStrings("aes-gcm", built_algorithm.items[1]);
+    try std.testing.expectEqualStrings("size", built_size.items[0]);
+    try std.testing.expectEqualStrings("42", built_size.items[1]);
+    try std.testing.expectEqualStrings("dim", built_dimensions.items[0]);
+    try std.testing.expectEqualStrings("800x600", built_dimensions.items[1]);
+    try std.testing.expectEqualStrings("thumb", built_thumb.items[0]);
+    try std.testing.expectEqualStrings("https://cdn.example/thumb.jpg", built_thumb.items[1]);
+    try std.testing.expectEqualStrings("x", built_hash.items[0]);
+}
+
 test "nip17 builders reject overlong caller input with typed errors" {
     var recipient_tag: BuiltTag = .{};
     var relay_tag: BuiltTag = .{};
@@ -822,6 +1028,34 @@ test "nip17 builders reject overlong caller input with typed errors" {
     try std.testing.expectError(
         error.InvalidRelayUrl,
         nip17_build_relay_tag(&relay_tag, overlong_relay),
+    );
+}
+
+test "nip17 file metadata builders reject malformed caller input with typed errors" {
+    var file_type_tag: BuiltFileMetadataTag = .{};
+    var hash_tag: BuiltFileMetadataTag = .{};
+    var dimensions_tag: BuiltFileMetadataTag = .{};
+    var thumb_tag: BuiltFileMetadataTag = .{};
+    const overlong_text = "x" ** (limits.tag_item_bytes_max + 1);
+
+    try std.testing.expectError(
+        error.InvalidFileMetadataTag,
+        nip17_build_file_type_tag(&file_type_tag, overlong_text),
+    );
+    try std.testing.expectError(
+        error.InvalidFileMetadataTag,
+        nip17_build_file_hash_tag(&hash_tag, "bad"),
+    );
+    try std.testing.expectError(
+        error.InvalidFileMetadataTag,
+        nip17_build_file_dimensions_tag(
+            &dimensions_tag,
+            .{ .width = 0, .height = 600 },
+        ),
+    );
+    try std.testing.expectError(
+        error.InvalidFileMetadataTag,
+        nip17_build_file_thumb_tag(&thumb_tag, "bad-url"),
     );
 }
 
