@@ -197,6 +197,26 @@ What `noztr` explicitly did not copy:
 - do not adopt their scope, dependency, or ownership choices by default
 - ask which differences are real improvements versus just different repo goals
 
+### Parity targets must match the repo layer
+
+`noztr` ran parity and comparison work mainly against core/protocol libraries and references
+because it is a protocol-kernel library.
+
+`nzdk` should not inherit that parity set blindly.
+Its parity and comparison targets should match SDK work, for example:
+- other Nostr SDKs
+- client-facing helper libraries
+- workflow or integration libraries
+- libraries that expose similar convenience, transport, or signing/session surfaces
+
+The important rule is:
+- keep the parity method
+- change the parity targets to match the repo layer
+
+So for `nzdk`:
+- reuse the explicit parity/interoperability audit angle
+- but choose SDK-relevant peers, not just core protocol libraries
+
 ## What `nzdk` Should Adapt, Not Copy Blindly
 
 ### 1. Keep the audit structure, but change the angles to fit an SDK
@@ -207,6 +227,7 @@ Recommended SDK audit angles:
 - public API consistency and naming
 - misuse resistance on convenience helpers
 - workflow ownership and boundary sharpness
+- ecosystem parity / interoperability against SDK-relevant peers
 - docs/examples/LLM task routing
 - performance on real SDK flows
 - dependency and backend-wrapper quality
@@ -218,6 +239,8 @@ Suggested SDK-specific reference-lens mapping:
   - use the TigerBeetle-style lens
 - ecosystem/API-shape comparison:
   - use existing SDK/library comparisons the way `noztr` used `libnostr-z`
+  - prefer SDK-relevant libraries over protocol-kernel libraries when the question is SDK UX,
+    workflow shape, or helper ergonomics
 - docs/examples/LLM routing:
   - reuse the `noztr` LLM supplement pattern directly
 
