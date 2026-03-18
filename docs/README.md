@@ -50,6 +50,13 @@ These docs control active work and should stay lean.
 
 ## Read Paths
 
+- Public release-facing evaluation:
+  - `README.md`
+  - `docs/release/README.md`
+  - `docs/release/noztr-positioning.md`
+  - `docs/release/intentional-divergences.md`
+  - `examples/README.md`
+
 - Startup:
   - `AGENTS.md`
   - `handoff.md`
@@ -144,6 +151,7 @@ These are active references, not startup defaults.
 - `docs/research/`
 - `docs/release/intentional-divergences.md`
 - `docs/release/noztr-positioning.md`
+- `docs/release/README.md`
 - `examples/README.md`
 
 ## Packet Docs

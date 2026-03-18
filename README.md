@@ -14,6 +14,8 @@ backend exceptions.
 For the release-facing explanation of what `noztr` is trying to do, why it exists, its benefits
 and limitations, and how it compares to more mature libraries, start with
 [`docs/release/noztr-positioning.md`](/workspace/projects/noztr/docs/release/noztr-positioning.md).
+For the public docs route as a whole, start with
+[`docs/release/README.md`](/workspace/projects/noztr/docs/release/README.md).
 
 ## Current status
 
@@ -92,6 +94,22 @@ Use this route if you want the shortest path into the current public surface.
      [`docs/plans/post-core-contract-map.md`](/workspace/projects/noztr/docs/plans/post-core-contract-map.md)
 3. Start from one direct example and, when available, one hostile example in
    [`examples/README.md`](/workspace/projects/noztr/examples/README.md).
+
+## Public docs vs internal docs
+
+This repo contains both public-facing release docs and extensive internal working docs.
+
+- Public-facing docs:
+  - [`docs/release/README.md`](/workspace/projects/noztr/docs/release/README.md)
+  - [`docs/release/noztr-positioning.md`](/workspace/projects/noztr/docs/release/noztr-positioning.md)
+  - [`docs/release/intentional-divergences.md`](/workspace/projects/noztr/docs/release/intentional-divergences.md)
+  - [`examples/README.md`](/workspace/projects/noztr/examples/README.md)
+- Internal working docs:
+  - most of [`docs/plans/`](/workspace/projects/noztr/docs/plans/)
+  - most of [`docs/research/`](/workspace/projects/noztr/docs/research/)
+
+The internal docs are kept in-repo for provenance and engineering rigor, but they are not the main
+public documentation surface.
 
 ## Common jobs
 

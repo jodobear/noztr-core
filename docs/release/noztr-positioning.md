@@ -36,6 +36,24 @@ That means:
 `noztr` is not trying to be an all-in-one Nostr application stack, relay runtime, or opinionated
 client SDK.
 
+## Key assumptions and decisions
+
+These are the main release-facing assumptions and decisions behind the library:
+
+- `noztr` assumes the right job for this repo is a protocol kernel, not a full SDK or runtime
+- Layer 1 is intentionally deterministic-and-compatible at the trust boundary, not maximally
+  permissive
+- workflow, transport, storage, retries, UI policy, and orchestration are intentionally kept out of
+  the kernel by default
+- some deterministic glue that materially improves reuse is accepted in the kernel, but only when
+  it stays bounded and transport-free
+- approved crypto backend exceptions are accepted today, but kept narrow and explicit instead of
+  being allowed to spread through the whole library
+- the current RC-facing posture is locally positive, but still provisional until downstream `nzdk`
+  feedback is complete
+
+These decisions explain both the strengths and the limits of `noztr`.
+
 ## How noztr does it
 
 `noztr` takes a protocol-kernel approach.
@@ -218,3 +236,18 @@ systems runtime.
 Its main cost is that it is intentionally narrower, stricter, and younger than the most widely
 used Nostr libraries. If that tradeoff matches your architecture, `noztr` is what it is trying to
 be.
+
+## Documentation note
+
+`noztr` has extensive internal engineering docs. They exist for auditability, planning, and
+release rigor.
+
+They are not all meant to be read as public product documentation.
+
+If you are evaluating or adopting the library, use this route first:
+
+- `README.md`
+- `docs/release/README.md`
+- `docs/release/noztr-positioning.md`
+- `docs/release/intentional-divergences.md`
+- `examples/README.md`
