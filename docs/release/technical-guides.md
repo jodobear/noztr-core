@@ -97,6 +97,10 @@ Cross-cutting public notes:
   - route: [api-reference.md](/workspace/projects/noztr/docs/release/api-reference.md)
   - example: [relay_admin_recipe.zig](/workspace/projects/noztr/examples/relay_admin_recipe.zig)
   - hostile example: [relay_admin_adversarial_example.zig](/workspace/projects/noztr/examples/relay_admin_adversarial_example.zig)
+- NIP-66 relay discovery metadata and relay monitor announcements
+  - route: [contract-map.md](/workspace/projects/noztr/docs/release/contract-map.md)
+  - example: [nip66_example.zig](/workspace/projects/noztr/examples/nip66_example.zig)
+  - hostile example: [nip66_adversarial_example.zig](/workspace/projects/noztr/examples/nip66_adversarial_example.zig)
 
 ## Structured Metadata And Coordination Surfaces
 

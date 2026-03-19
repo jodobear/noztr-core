@@ -82,6 +82,8 @@ comptime {
     _ = @import("http_auth_adversarial_example.zig");
     _ = @import("blossom_adversarial_example.zig");
     _ = @import("nip65_example.zig");
+    _ = @import("nip66_example.zig");
+    _ = @import("nip66_adversarial_example.zig");
     _ = @import("nip70_example.zig");
     _ = @import("nip71_example.zig");
     _ = @import("nip72_example.zig");

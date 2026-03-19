@@ -81,6 +81,9 @@ pub const nip02_contacts = @import("nip02_contacts.zig");
 /// Phase I4 concrete export for the NIP-65 relay metadata module.
 pub const nip65_relays = @import("nip65_relays.zig");
 
+/// Phase H split concrete export for the NIP-66 relay discovery module.
+pub const nip66_relay_discovery = @import("nip66_relay_discovery.zig");
+
 /// Phase H concrete export for the NIP-10 thread/reply helper module.
 pub const nip10_threads = @import("nip10_threads.zig");
 

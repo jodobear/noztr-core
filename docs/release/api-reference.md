@@ -444,6 +444,19 @@ These are the quickest symbol-level routes into the modules most downstream user
 - hostile example:
   - [nip89_adversarial_example.zig](/workspace/projects/noztr/examples/nip89_adversarial_example.zig)
 
+### `nip66_relay_discovery`
+
+- `relay_discovery_extract`
+  - extract bounded kind-`30166` relay discovery metadata and repeated tags
+- `relay_monitor_extract`
+  - extract bounded kind-`10166` relay monitor announcement metadata
+- `relay_discovery_build_*` / `relay_monitor_build_*`
+  - build canonical relay discovery and monitor tags without relay policy
+- start example:
+  - [nip66_example.zig](/workspace/projects/noztr/examples/nip66_example.zig)
+- hostile example:
+  - [nip66_adversarial_example.zig](/workspace/projects/noztr/examples/nip66_adversarial_example.zig)
+
 ## Core Event, Filter, Message, And Boundary Helpers
 
 | Export | Purpose | Start example |
@@ -496,6 +509,7 @@ These are the quickest symbol-level routes into the modules most downstream user
 | --- | --- | --- |
 | `nip11` | relay-info parse helpers | [nip11_example.zig](/workspace/projects/noztr/examples/nip11_example.zig) |
 | `nip65_relays` | relay metadata helpers | [nip65_example.zig](/workspace/projects/noztr/examples/nip65_example.zig) |
+| `nip66_relay_discovery` | relay discovery and monitor metadata helpers | [nip66_example.zig](/workspace/projects/noztr/examples/nip66_example.zig) |
 | `nip86_relay_management` | relay-admin JSON-RPC helpers | [relay_admin_recipe.zig](/workspace/projects/noztr/examples/relay_admin_recipe.zig) |
 | `nip46_remote_signing` | remote-signing URI, request, and response helpers | [remote_signing_recipe.zig](/workspace/projects/noztr/examples/remote_signing_recipe.zig) |
 | `nip47_wallet_connect` | Wallet Connect URI, envelope, and JSON contract helpers | [nip47_example.zig](/workspace/projects/noztr/examples/nip47_example.zig) |

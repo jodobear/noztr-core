@@ -79,6 +79,7 @@ This page lists the public `noztr` support surface by NIP.
 | `NIP-61` | split | `nip61_nutzaps` | [nip61_example.zig](/workspace/projects/noztr/examples/nip61_example.zig) |
 | `NIP-64` | implemented | `nip64_chess_pgn` | [nip64_example.zig](/workspace/projects/noztr/examples/nip64_example.zig) |
 | `NIP-65` | implemented | `nip65_relays` | [nip65_example.zig](/workspace/projects/noztr/examples/nip65_example.zig) |
+| `NIP-66` | split | `nip66_relay_discovery` | [nip66_example.zig](/workspace/projects/noztr/examples/nip66_example.zig) |
 | `NIP-70` | implemented | `nip70_protected` | [nip70_example.zig](/workspace/projects/noztr/examples/nip70_example.zig) |
 | `NIP-71` | split | `nip71_video_events` | [nip71_example.zig](/workspace/projects/noztr/examples/nip71_example.zig) |
 | `NIP-72` | split | `nip72_moderated_communities` | [nip72_example.zig](/workspace/projects/noztr/examples/nip72_example.zig) |
