@@ -58,6 +58,8 @@ Current execution state for `noztr`.
   - landed:
     - bounded `NIP-71`
     - bounded `NIP-72`
+- An operator-directed `NIP-91` implementation plan is frozen in
+  `.private-docs/plans/nip91-and-filters-plan.md`.
 - The third-loop audit supplement and the targeted remediation packet are complete.
 - `no-6e6p` remains open pending downstream `nzdk` feedback.
 - Public tracked docs now live in `docs/release/` plus `examples/`; internal planning, audit, and
@@ -71,6 +73,9 @@ Current execution state for `noztr`.
   - `NIP-71` stops at deterministic video metadata, `imeta` field, and tag-contract helpers
   - `NIP-72` stops at deterministic community definition, post-linkage, and approval-contract
     helpers
+- frozen pending ownership call:
+  - `NIP-91` extends the existing strict filter family only and stays out of relay
+    signaling/fallback/workflow scope
 - Remote readiness remains deferred-by-operator, and no git remote is configured in this repo.
 - Only expected untracked local artifact:
   - `tools/interop/rust-nostr-parity-all/target/`
@@ -101,6 +106,7 @@ Current execution state for `noztr`.
   - `no-nrzk`
 - keep `.private-docs/plans/phase-h-rc-api-freeze.md` open until downstream `nzdk` feedback
   either confirms the current RC-facing surface or forces one explicit blocker packet
+- if `NIP-91` implementation is selected next, start from `.private-docs/plans/nip91-and-filters-plan.md`
 - use `.private-docs/plans/noztr-sdk-ownership-matrix.md` whenever downstream feedback pressures
   kernel-vs-SDK scope
 
