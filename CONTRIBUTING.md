@@ -8,6 +8,8 @@ docs, and downstream usability.
 
 ## Before You Start
 
+Run `./agent-brief` first if you want the public startup route in one place.
+
 Read these first:
 
 - [README.md](README.md)

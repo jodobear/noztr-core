@@ -7,6 +7,8 @@ complementary higher-level SDK layer built on top of it.
 
 ## Start Here
 
+Run `./agent-brief` first for the public routing snapshot.
+
 Read these first:
 
 - `README.md`
@@ -87,6 +89,8 @@ Do not route public readers into `.private-docs/`.
 
 If you are working in a local maintainer clone and `.private-docs/AGENTS.md` exists, continue
 there for the internal operator workflow, current phase routing, and local execution state.
+
+That maintainer-local route supersedes the public `./agent-brief` startup path for internal work.
 
 If local `.beads/` state exists in that maintainer clone, use `br` for local issue tracking and
 keep `.beads/` out of public commits.

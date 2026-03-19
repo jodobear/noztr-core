@@ -1,0 +1,141 @@
+#!/usr/bin/env bash
+set -u -o pipefail
+
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+repo_root="${script_dir}"
+
+now_utc="$(date -u +"%Y-%m-%d %H:%M:%SZ")"
+
+is_git_repo="no"
+if [[ -d "${repo_root}/.git" ]]; then
+    is_git_repo="yes"
+fi
+
+zig_version="not found"
+if command -v zig >/dev/null 2>&1; then
+    zig_version="$(zig version 2>/dev/null || true)"
+    if [[ -z "${zig_version}" ]]; then
+        zig_version="available (version lookup failed)"
+    fi
+fi
+
+zig_file_count=0
+if [[ -d "${repo_root}/src" ]]; then
+    shopt -s globstar nullglob
+    zig_files=("${repo_root}"/src/**/*.zig)
+    zig_file_count="${#zig_files[@]}"
+    shopt -u globstar nullglob
+fi
+
+example_file_count=0
+if [[ -d "${repo_root}/examples" ]]; then
+    shopt -s nullglob
+    example_files=("${repo_root}"/examples/*.zig)
+    example_file_count="${#example_files[@]}"
+    shopt -u nullglob
+fi
+
+report_file() {
+    local rel="$1"
+    if [[ -f "${repo_root}/${rel}" ]]; then
+        printf -- '- [x] `%s`\n' "${rel}"
+    else
+        printf -- '- [ ] `%s`\n' "${rel}"
+    fi
+}
+
+missing_artifacts=()
+collect_missing() {
+    local rel="$1"
+    if [[ ! -f "${repo_root}/${rel}" ]]; then
+        missing_artifacts+=("${rel}")
+    fi
+}
+
+startup_docs=(
+    "AGENTS.md"
+    "README.md"
+    "docs/INDEX.md"
+    "examples/README.md"
+    "CONTRIBUTING.md"
+)
+
+on_demand_docs=(
+    "docs/getting-started.md"
+    "docs/scope-and-tradeoffs.md"
+    "docs/intentional-divergences.md"
+    "docs/reference/core-api-contracts.md"
+    "docs/reference/contract-map.md"
+    "docs/reference/api-reference.md"
+    "docs/reference/nip-coverage.md"
+    "docs/guides/noztr-style.md"
+    "docs/guides/docs-style-guide.md"
+    "docs/guides/zig-patterns.md"
+    "docs/guides/zig-anti-patterns.md"
+    "docs/guides/technical-guides.md"
+    "docs/errors-and-ownership.md"
+    "docs/compatibility-and-support.md"
+    "docs/stability-and-versioning.md"
+    "docs/performance.md"
+)
+
+for rel in "${startup_docs[@]}"; do
+    collect_missing "${rel}"
+done
+for rel in "${on_demand_docs[@]}"; do
+    collect_missing "${rel}"
+done
+
+printf "# Agent Brief\n\n"
+printf "Routing-first public startup snapshot for agents and contributors.\n\n"
+printf "_Generated:_ %s\n\n" "${now_utc}"
+
+printf "## Repository\n\n"
+printf -- '- root: `%s`\n' "${repo_root}"
+printf -- '- git repo: `%s`\n' "${is_git_repo}"
+printf -- '- zig: `%s`\n' "${zig_version}"
+printf -- '- src zig files: `%s`\n' "${zig_file_count}"
+printf -- '- example zig files: `%s`\n\n' "${example_file_count}"
+
+printf "## Read Now\n\n"
+for rel in "${startup_docs[@]}"; do
+    report_file "${rel}"
+done
+printf "\n"
+
+printf "## Load On Demand\n\n"
+printf -- '- `docs/getting-started.md` for package setup and first-use flow\n'
+printf -- '- `docs/scope-and-tradeoffs.md` and `docs/intentional-divergences.md` for positioning and accepted strictness\n'
+printf -- '- `docs/reference/core-api-contracts.md`, `docs/reference/contract-map.md`, `docs/reference/api-reference.md`, and `docs/reference/nip-coverage.md` when you already know the job or symbol family\n'
+printf -- '- `docs/guides/noztr-style.md`, `docs/guides/zig-patterns.md`, and `docs/guides/zig-anti-patterns.md` for Zig implementation or review\n'
+printf -- '- `docs/guides/docs-style-guide.md` for public docs work\n'
+printf -- '- `docs/guides/technical-guides.md` for job-oriented routing\n'
+printf -- '- `docs/errors-and-ownership.md`, `docs/compatibility-and-support.md`, `docs/stability-and-versioning.md`, and `docs/performance.md` for cross-cutting contract expectations\n\n'
+
+printf "## Public Surface\n\n"
+printf -- '- library name: `noztr-core`\n'
+printf -- '- Zig import/package name in examples: `noztr`\n'
+printf -- '- issue tracking for local development: `br` is encouraged locally, but `.beads/` stays untracked in public git history\n'
+
+if [[ -f "${repo_root}/.private-docs/AGENTS.md" ]]; then
+    printf -- '- maintainer override: local `.private-docs/AGENTS.md` exists; maintainers should continue there for internal workflow\n'
+fi
+printf "\n"
+
+printf "## Next Missing Artifacts\n\n"
+if [[ "${#missing_artifacts[@]}" -eq 0 ]]; then
+    printf -- "- none\n\n"
+else
+    for rel in "${missing_artifacts[@]}"; do
+        printf -- '- `%s`\n' "${rel}"
+    done
+    printf "\n"
+fi
+
+printf "## Canonical Commands\n\n"
+printf '```bash\n'
+printf "./agent-brief\n"
+printf "zig build test --summary all\n"
+printf "zig build\n"
+printf "git diff --check\n"
+printf '```\n'
