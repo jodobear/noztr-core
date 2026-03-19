@@ -17,3 +17,4 @@ docs/release/noztr-process-slide.html
 docs/release/noztr-process-slide.md
 docs/release/noztr-process-slide.svg
 tools/interop/*/node_modules/
+tools/interop/*/target/
