@@ -10,7 +10,7 @@ complementary higher-level SDK layer built on top of it.
 Read these first:
 
 - `README.md`
-- `docs/index.md`
+- `docs/INDEX.md`
 - `examples/README.md`
 - `CONTRIBUTING.md`
 

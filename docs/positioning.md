@@ -22,7 +22,7 @@ This document answers the release-facing questions:
 
 ## What noztr-core is trying to do
 
-`noztr-core` is trying to be a strong Layer 1 Nostr protocol library for Zig.
+`noztr-core` is trying to be a strict, bounded Layer 1-oriented Nostr protocol library for Zig.
 
 That means:
 
@@ -106,29 +106,29 @@ optimize for a different center of gravity:
 
 ## Why choose noztr-core
 
-Choose `noztr` if you want:
+Choose `noztr-core` if you want:
 
 - a Zig-native Nostr library instead of binding through a larger runtime stack
 - a narrow protocol kernel, not a full relay/client framework
 - strict typed trust-boundary behavior
 - explicit kernel-vs-SDK boundaries
-- good local performance for bounded protocol work
+- measured good local performance for bounded protocol work
 - a library that is designed to compose into `noztr-sdk` or your own SDK/app architecture
 
 ## Benefits
 
 - narrow and coherent scope
   - easier to reason about than a library that mixes protocol helpers with runtime workflow
-- stronger trust-boundary posture
+- stricter trust-boundary posture
   - malformed or contradictory input is more likely to fail early and explicitly
 - bounded memory posture
   - avoids a heap-first public API style in most protocol paths
 - deterministic helper design
   - especially useful for SDKs, tooling, reducers, and controlled integration points
-- good Zig engineering discipline
-  - explicit widths, explicit boundaries, and strong control over the public surface
-- good local performance for a protocol kernel
-  - reducer and helper hotspots are comfortably in fast local-library territory
+- deliberate Zig engineering discipline
+  - explicit widths, explicit boundaries, and tight control over the public surface
+- measured good local performance for a protocol kernel
+  - the benchmarked reducer and helper hotspots are comfortably in fast local-library territory
 
 ## Limitations
 
@@ -142,6 +142,9 @@ Choose `noztr` if you want:
   - `noztr` is not literally stdlib-only today
 - newer and less battle-hardened than the oldest widely used Nostr libraries
   - the scope and quality bar are strong, but ecosystem tenure still matters
+- current RC review is still provisional
+  - local review is positive, but the release-facing contract is still waiting on downstream
+    `noztr-sdk` confirmation
 
 ## Tradeoffs
 
@@ -197,7 +200,7 @@ If you want mature, broad, batteries-included application ecosystems, those libr
 stronger choices.
 
 If you want a smaller Zig protocol kernel that can sit underneath `noztr-sdk` or your own
-controlled app architecture, `noztr-core` is the better fit.
+controlled app architecture, `noztr-core` may be the better fit.
 
 See also:
 
@@ -242,7 +245,7 @@ or systems runtime.
 - deterministic behavior
 - bounded and explicit trust-boundary surfaces
 - strong kernel-vs-SDK separation
-- good local performance
+- measured good local performance on bounded local workloads
 - fewer runtime assumptions than the more mature, broader libraries
 
 Its main cost is that it is intentionally narrower, stricter, and younger than the most widely
@@ -259,7 +262,7 @@ They are not all meant to be read as public product documentation.
 If you are evaluating or adopting the library, use this route first:
 
 - `README.md`
-- `docs/index.md`
+- `docs/INDEX.md`
 - `docs/positioning.md`
 - `docs/intentional-divergences.md`
 - `docs/reference/core-api-contracts.md`

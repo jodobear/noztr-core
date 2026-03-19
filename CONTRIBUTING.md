@@ -11,7 +11,7 @@ docs, and downstream usability.
 Read these first:
 
 - [README.md](/workspace/projects/noztr/README.md)
-- [docs/index.md](/workspace/projects/noztr/docs/index.md)
+- [docs/INDEX.md](/workspace/projects/noztr/docs/INDEX.md)
 - [AGENTS.md](/workspace/projects/noztr/AGENTS.md)
 - [docs/guides/noztr-style.md](/workspace/projects/noztr/docs/guides/noztr-style.md)
 - [docs/guides/docs-style-guide.md](/workspace/projects/noztr/docs/guides/docs-style-guide.md)

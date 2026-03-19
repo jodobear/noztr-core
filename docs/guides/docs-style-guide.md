@@ -20,7 +20,7 @@ Use it when writing or restructuring:
 - `CONTRIBUTING.md`
 - `CHANGELOG.md`
 - `docs/`
-- `docs/index.md`
+- `docs/INDEX.md`
 - `examples/README.md`
 
 The goal is simple:
@@ -47,7 +47,7 @@ The public docs surface is intentionally structured:
 
 - `README.md`
   - short repo entry point
-- `docs/index.md`
+- `docs/INDEX.md`
   - public docs router
 - `docs/getting-started.md`
   - first-use path
