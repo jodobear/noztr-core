@@ -64,6 +64,8 @@ Current execution state for `noztr`.
 - `no-6e6p` remains open pending downstream `nzdk` feedback.
 - Public tracked docs now live in `docs/release/` plus `examples/`; internal planning, audit, and
   process docs live in local-only `.private-docs/`.
+- `noztr` no longer carries a vendored `docs/nips` checkout; use the official upstream NIPs repo
+  for spec texts, with any standalone local clone kept outside this repo.
 - Public contributor style guides now exist in `docs/release/` for external contributors.
 - frozen bounded ownership calls carried through the third loop:
   - `NIP-28` stops at deterministic channel metadata/linkage/moderation-contract helpers

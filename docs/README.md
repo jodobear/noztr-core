@@ -35,7 +35,8 @@ Start here:
 - [NIP coverage](/workspace/projects/noztr/docs/release/nip-coverage.md)
 - [examples index](/workspace/projects/noztr/examples/README.md)
 
-Vendored NIP texts remain under [`docs/nips/`](/workspace/projects/noztr/docs/nips/).
+Use the official upstream NIPs repository for spec texts:
+<https://github.com/nostr-protocol/nips>
 
 The internal planning, audit, and process-control docs now live in local-only `.private-docs/` and
 are not part of the public docs route.
