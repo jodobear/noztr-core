@@ -9,13 +9,13 @@ Current release posture:
 - the first intentional public release should start at `0.1.0`
 
 For the public versioning policy, see
-[docs/release/stability-and-versioning.md](/workspace/projects/noztr/docs/release/stability-and-versioning.md).
+[docs/stability-and-versioning.md](docs/stability-and-versioning.md).
 
 ## [Unreleased]
 
 ### Added
 
-- public release docs surface under `docs/release/`
+- public docs surface under `docs/`
 - public task and example routing
 - public ownership, performance, compatibility, and versioning notes
 - public `CONTRIBUTING.md`

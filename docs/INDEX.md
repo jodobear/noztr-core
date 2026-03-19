@@ -18,33 +18,33 @@ layer built on top of it.
 
 Start here:
 
-- [getting started](/workspace/projects/noztr/docs/getting-started.md)
-- [positioning](/workspace/projects/noztr/docs/scope-and-tradeoffs.md)
-- [intentional divergences](/workspace/projects/noztr/docs/intentional-divergences.md)
-- [examples index](/workspace/projects/noztr/examples/README.md)
+- [getting started](getting-started.md)
+- [positioning](scope-and-tradeoffs.md)
+- [intentional divergences](intentional-divergences.md)
+- [examples index](../examples/README.md)
 
 Use the guides when you need narrative help:
 
-- [technical guides](/workspace/projects/noztr/docs/guides/technical-guides.md)
-- [NOZTR Style](/workspace/projects/noztr/docs/guides/noztr-style.md)
-- [Docs style guide](/workspace/projects/noztr/docs/guides/docs-style-guide.md)
-- [Zig patterns](/workspace/projects/noztr/docs/guides/zig-patterns.md)
-- [Zig anti-patterns](/workspace/projects/noztr/docs/guides/zig-anti-patterns.md)
+- [technical guides](guides/technical-guides.md)
+- [NOZTR Style](guides/noztr-style.md)
+- [Docs style guide](guides/docs-style-guide.md)
+- [Zig patterns](guides/zig-patterns.md)
+- [Zig anti-patterns](guides/zig-anti-patterns.md)
 
 Use the reference pages when you already know the surface:
 
-- [core API contracts](/workspace/projects/noztr/docs/reference/core-api-contracts.md)
-- [public contract map](/workspace/projects/noztr/docs/reference/contract-map.md)
-- [API reference](/workspace/projects/noztr/docs/reference/api-reference.md)
-- [NIP coverage](/workspace/projects/noztr/docs/reference/nip-coverage.md)
+- [core API contracts](reference/core-api-contracts.md)
+- [public contract map](reference/contract-map.md)
+- [API reference](reference/api-reference.md)
+- [NIP coverage](reference/nip-coverage.md)
 
 Use the support pages for cross-cutting expectations:
 
-- [errors and ownership](/workspace/projects/noztr/docs/errors-and-ownership.md)
-- [performance](/workspace/projects/noztr/docs/performance.md)
-- [stability and versioning](/workspace/projects/noztr/docs/stability-and-versioning.md)
-- [compatibility and support](/workspace/projects/noztr/docs/compatibility-and-support.md)
-- [release notes template](/workspace/projects/noztr/docs/release-notes-template.md)
+- [errors and ownership](errors-and-ownership.md)
+- [performance](performance.md)
+- [stability and versioning](stability-and-versioning.md)
+- [compatibility and support](compatibility-and-support.md)
+- [release notes template](release-notes-template.md)
 
 Use the official upstream NIPs repository for spec texts:
 <https://github.com/nostr-protocol/nips>

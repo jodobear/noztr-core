@@ -17,7 +17,7 @@ This is the public contributor-facing style guide for `noztr`.
 It explains how the library is supposed to feel and why some changes fit the repo while others do
 not.
 
-For contribution workflow, start with [CONTRIBUTING.md](/workspace/projects/noztr/CONTRIBUTING.md).
+For contribution workflow, start with [CONTRIBUTING.md](../../CONTRIBUTING.md).
 
 ## Integration Rule
 
@@ -131,7 +131,7 @@ worth the cost.
 
 See also:
 
-- [errors-and-ownership.md](/workspace/projects/noztr/docs/errors-and-ownership.md)
+- [errors-and-ownership.md](../errors-and-ownership.md)
 
 One important lesson from the audit work:
 
@@ -218,6 +218,6 @@ These came out of the repo’s major audit and remediation work and should guide
 
 ## Next Pages
 
-- [zig-patterns.md](/workspace/projects/noztr/docs/guides/zig-patterns.md)
-- [zig-anti-patterns.md](/workspace/projects/noztr/docs/guides/zig-anti-patterns.md)
-- [compatibility-and-support.md](/workspace/projects/noztr/docs/compatibility-and-support.md)
+- [zig-patterns.md](zig-patterns.md)
+- [zig-anti-patterns.md](zig-anti-patterns.md)
+- [compatibility-and-support.md](../compatibility-and-support.md)

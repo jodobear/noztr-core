@@ -113,6 +113,6 @@ Right now the best public reading is:
 
 ## Related Pages
 
-- [scope-and-tradeoffs.md](/workspace/projects/noztr/docs/scope-and-tradeoffs.md)
-- [errors-and-ownership.md](/workspace/projects/noztr/docs/errors-and-ownership.md)
-- [performance.md](/workspace/projects/noztr/docs/performance.md)
+- [scope-and-tradeoffs.md](scope-and-tradeoffs.md)
+- [errors-and-ownership.md](errors-and-ownership.md)
+- [performance.md](performance.md)

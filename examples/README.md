@@ -10,23 +10,23 @@ fixtures so SDK and app authors can see what `noztr-core` rejects and why.
 
 Use these docs when you need routing or contract context before opening a file:
 
-- [getting-started.md](/workspace/projects/noztr/docs/getting-started.md)
-- [technical-guides.md](/workspace/projects/noztr/docs/guides/technical-guides.md)
-- [core-api-contracts.md](/workspace/projects/noztr/docs/reference/core-api-contracts.md)
-- [contract-map.md](/workspace/projects/noztr/docs/reference/contract-map.md)
-- [api-reference.md](/workspace/projects/noztr/docs/reference/api-reference.md)
-- [docs-style-guide.md](/workspace/projects/noztr/docs/guides/docs-style-guide.md)
-- [nip-coverage.md](/workspace/projects/noztr/docs/reference/nip-coverage.md)
-- [errors-and-ownership.md](/workspace/projects/noztr/docs/errors-and-ownership.md)
-- [performance.md](/workspace/projects/noztr/docs/performance.md)
-- [stability-and-versioning.md](/workspace/projects/noztr/docs/stability-and-versioning.md)
-- [compatibility-and-support.md](/workspace/projects/noztr/docs/compatibility-and-support.md)
+- [getting-started.md](../docs/getting-started.md)
+- [technical-guides.md](../docs/guides/technical-guides.md)
+- [core-api-contracts.md](../docs/reference/core-api-contracts.md)
+- [contract-map.md](../docs/reference/contract-map.md)
+- [api-reference.md](../docs/reference/api-reference.md)
+- [docs-style-guide.md](../docs/guides/docs-style-guide.md)
+- [nip-coverage.md](../docs/reference/nip-coverage.md)
+- [errors-and-ownership.md](../docs/errors-and-ownership.md)
+- [performance.md](../docs/performance.md)
+- [stability-and-versioning.md](../docs/stability-and-versioning.md)
+- [compatibility-and-support.md](../docs/compatibility-and-support.md)
 
 If you know the job but not the symbol, start with
-[technical-guides.md](/workspace/projects/noztr/docs/guides/technical-guides.md) or
-[contract-map.md](/workspace/projects/noztr/docs/reference/contract-map.md).
+[technical-guides.md](../docs/guides/technical-guides.md) or
+[contract-map.md](../docs/reference/contract-map.md).
 If you already know the symbol family, use
-[api-reference.md](/workspace/projects/noztr/docs/reference/api-reference.md).
+[api-reference.md](../docs/reference/api-reference.md).
 
 ## Start Here
 

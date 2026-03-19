@@ -93,9 +93,9 @@ zig build rc-stress-throughput-markdown -Doptimize=ReleaseFast
 If you are deciding whether `noztr` fits your system:
 
 - use this page to understand local kernel expectations
-- use [scope-and-tradeoffs.md](/workspace/projects/noztr/docs/scope-and-tradeoffs.md) to
+- use [scope-and-tradeoffs.md](scope-and-tradeoffs.md) to
   confirm the library matches your architecture
-- use [examples/README.md](/workspace/projects/noztr/examples/README.md) to find the exact
+- use [examples/README.md](../examples/README.md) to find the exact
   high-value surface you care about
 
 If you want broad workflow or network throughput out of the box, `noztr` is the wrong layer to

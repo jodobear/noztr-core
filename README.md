@@ -17,23 +17,23 @@ The Zig package/import name in examples remains `noztr`.
 
 For the release-facing explanation of what `noztr-core` is trying to do, why it exists, its benefits
 and limitations, and how it compares to more mature libraries, start with
-[`docs/scope-and-tradeoffs.md`](/workspace/projects/noztr/docs/scope-and-tradeoffs.md).
+[`docs/scope-and-tradeoffs.md`](docs/scope-and-tradeoffs.md).
 For the public docs route as a whole, start with
-[`docs/INDEX.md`](/workspace/projects/noztr/docs/INDEX.md).
+[`docs/INDEX.md`](docs/INDEX.md).
 For the technical public docs set, continue with:
-- [`docs/getting-started.md`](/workspace/projects/noztr/docs/getting-started.md)
-- [`docs/guides/noztr-style.md`](/workspace/projects/noztr/docs/guides/noztr-style.md)
-- [`docs/guides/docs-style-guide.md`](/workspace/projects/noztr/docs/guides/docs-style-guide.md)
-- [`docs/guides/zig-patterns.md`](/workspace/projects/noztr/docs/guides/zig-patterns.md)
-- [`docs/guides/zig-anti-patterns.md`](/workspace/projects/noztr/docs/guides/zig-anti-patterns.md)
-- [`docs/guides/technical-guides.md`](/workspace/projects/noztr/docs/guides/technical-guides.md)
-- [`docs/errors-and-ownership.md`](/workspace/projects/noztr/docs/errors-and-ownership.md)
-- [`docs/performance.md`](/workspace/projects/noztr/docs/performance.md)
-- [`docs/stability-and-versioning.md`](/workspace/projects/noztr/docs/stability-and-versioning.md)
-- [`docs/compatibility-and-support.md`](/workspace/projects/noztr/docs/compatibility-and-support.md)
-- [`docs/release-notes-template.md`](/workspace/projects/noztr/docs/release-notes-template.md)
-- [`docs/reference/api-reference.md`](/workspace/projects/noztr/docs/reference/api-reference.md)
-- [`docs/reference/nip-coverage.md`](/workspace/projects/noztr/docs/reference/nip-coverage.md)
+- [`docs/getting-started.md`](docs/getting-started.md)
+- [`docs/guides/noztr-style.md`](docs/guides/noztr-style.md)
+- [`docs/guides/docs-style-guide.md`](docs/guides/docs-style-guide.md)
+- [`docs/guides/zig-patterns.md`](docs/guides/zig-patterns.md)
+- [`docs/guides/zig-anti-patterns.md`](docs/guides/zig-anti-patterns.md)
+- [`docs/guides/technical-guides.md`](docs/guides/technical-guides.md)
+- [`docs/errors-and-ownership.md`](docs/errors-and-ownership.md)
+- [`docs/performance.md`](docs/performance.md)
+- [`docs/stability-and-versioning.md`](docs/stability-and-versioning.md)
+- [`docs/compatibility-and-support.md`](docs/compatibility-and-support.md)
+- [`docs/release-notes-template.md`](docs/release-notes-template.md)
+- [`docs/reference/api-reference.md`](docs/reference/api-reference.md)
+- [`docs/reference/nip-coverage.md`](docs/reference/nip-coverage.md)
 
 ## Current status
 
@@ -52,20 +52,27 @@ For the technical public docs set, continue with:
   - empirical benchmark supplement
   - external crypto/backend assurance supplement
   - remediation and freeze recheck
-- Implemented NIPs from `src/root.zig` exports:
-  - `NIP-01` (event, filter, message)
-  - `NIP-02`, `NIP-03`, `NIP-05`, `NIP-06`, `NIP-09`, `NIP-10`, `NIP-11`, `NIP-13`
-- `NIP-17`, `NIP-18`, `NIP-19`, `NIP-21`, `NIP-22`, `NIP-23`, `NIP-24`, `NIP-25`, `NIP-27`
-- `NIP-26`, `NIP-29`, `NIP-32`, `NIP-36`, `NIP-37`, `NIP-39`, `NIP-40`, `NIP-42`, `NIP-44`,
-  `NIP-46`
-- `NIP-51` (bounded public/private list helpers)
-- `NIP-56`, `NIP-57`, `NIP-58`, `NIP-59`, `NIP-65`, `NIP-70`, `NIP-73`, `NIP-84`, `NIP-86`,
-  `NIP-92`, `NIP-94`, `NIP-99`, `NIP-B0`
-  - Optional I6 extension exports (build-flag gated): `NIP-45`, `NIP-50`, `NIP-77`
-  - Non-NIP bounded wallet helpers: Nostr-relevant `BIP-85` subset for lowercase-hex entropy text
-    and English BIP39 child mnemonic/entropy
+- Selected implemented surfaces:
+
+| Surface | Short scope |
+| --- | --- |
+| `NIP-01` | core events, filters, and relay message grammar |
+| `NIP-05`, `NIP-11`, `NIP-42`, `NIP-98` | identity lookup, relay info, auth, and HTTP auth helpers |
+| `NIP-06`, `NIP-49`, `BIP-85` subset | bounded wallet, mnemonic, and key-encryption helpers |
+| `NIP-17`, `NIP-44`, `NIP-59` | private-message unwrap, gift wrap, and one-recipient outbound helpers |
+| `NIP-46`, `NIP-47`, `NIP-86` | remote-signing, wallet-connect, and relay-admin typed contracts |
+| `NIP-29`, `NIP-72`, `NIP-88` | bounded reducers and community/group/poll helper flows |
+| `NIP-52`, `NIP-53`, `NIP-54`, `NIP-71` | calendar, live-activity, wiki, and video metadata helpers |
+| `NIP-61`, `NIP-66`, `NIP-75`, `NIP-89`, `NIP-91` | nutzap, relay-discovery, zap-goal, handler, and AND-filter helpers |
+
+For the full implemented surface, including narrower and optional/gated modules, see
+[`docs/reference/nip-coverage.md`](docs/reference/nip-coverage.md).
+
+- Optional I6 extension exports (build-flag gated): `NIP-45`, `NIP-50`, `NIP-77`
+- Non-NIP bounded wallet helpers: Nostr-relevant `BIP-85` subset for lowercase-hex entropy text
+  and English BIP39 child mnemonic/entropy
 - Public docs routing:
-  - docs router: [`docs/INDEX.md`](/workspace/projects/noztr/docs/INDEX.md)
+  - docs router: [`docs/INDEX.md`](docs/INDEX.md)
 
 ## Build and test
 
@@ -97,7 +104,7 @@ Short version:
   core
 
 For the full positioning and comparison note, read
-[`docs/scope-and-tradeoffs.md`](/workspace/projects/noztr/docs/scope-and-tradeoffs.md).
+[`docs/scope-and-tradeoffs.md`](docs/scope-and-tradeoffs.md).
 
 ## RC quick start
 
@@ -106,38 +113,38 @@ Use this route if you want the shortest path into the current public surface.
 1. Add the `noztr` Zig package dependency for `noztr-core`.
 2. Pick the right symbol family:
    - core event/filter/message work:
-     [`docs/reference/core-api-contracts.md`](/workspace/projects/noztr/docs/reference/core-api-contracts.md)
+     [`docs/reference/core-api-contracts.md`](docs/reference/core-api-contracts.md)
    - post-core jobs like `NIP-05`, `NIP-46`, `NIP-47`, `NIP-59`, `NIP-98`, `NIP-29`, `NIP-88`:
-     [`docs/reference/contract-map.md`](/workspace/projects/noztr/docs/reference/contract-map.md)
+     [`docs/reference/contract-map.md`](docs/reference/contract-map.md)
 3. Start from one direct example and, when available, one hostile example in
-   [`examples/README.md`](/workspace/projects/noztr/examples/README.md).
+   [`examples/README.md`](examples/README.md).
 
 ## Public docs vs internal docs
 
 This repo contains both public-facing docs and extensive internal working docs.
 
 - Public-facing docs:
-  - [`docs/INDEX.md`](/workspace/projects/noztr/docs/INDEX.md)
-  - [`docs/getting-started.md`](/workspace/projects/noztr/docs/getting-started.md)
-  - [`docs/guides/noztr-style.md`](/workspace/projects/noztr/docs/guides/noztr-style.md)
-  - [`docs/guides/docs-style-guide.md`](/workspace/projects/noztr/docs/guides/docs-style-guide.md)
-  - [`docs/guides/zig-patterns.md`](/workspace/projects/noztr/docs/guides/zig-patterns.md)
-  - [`docs/guides/zig-anti-patterns.md`](/workspace/projects/noztr/docs/guides/zig-anti-patterns.md)
-  - [`docs/scope-and-tradeoffs.md`](/workspace/projects/noztr/docs/scope-and-tradeoffs.md)
-  - [`docs/intentional-divergences.md`](/workspace/projects/noztr/docs/intentional-divergences.md)
-  - [`docs/guides/technical-guides.md`](/workspace/projects/noztr/docs/guides/technical-guides.md)
-  - [`docs/errors-and-ownership.md`](/workspace/projects/noztr/docs/errors-and-ownership.md)
-  - [`docs/performance.md`](/workspace/projects/noztr/docs/performance.md)
-  - [`docs/stability-and-versioning.md`](/workspace/projects/noztr/docs/stability-and-versioning.md)
-  - [`docs/compatibility-and-support.md`](/workspace/projects/noztr/docs/compatibility-and-support.md)
-  - [`docs/release-notes-template.md`](/workspace/projects/noztr/docs/release-notes-template.md)
-  - [`docs/reference/core-api-contracts.md`](/workspace/projects/noztr/docs/reference/core-api-contracts.md)
-  - [`docs/reference/contract-map.md`](/workspace/projects/noztr/docs/reference/contract-map.md)
-  - [`docs/reference/api-reference.md`](/workspace/projects/noztr/docs/reference/api-reference.md)
-  - [`docs/reference/nip-coverage.md`](/workspace/projects/noztr/docs/reference/nip-coverage.md)
-  - [`examples/README.md`](/workspace/projects/noztr/examples/README.md)
-  - [`CONTRIBUTING.md`](/workspace/projects/noztr/CONTRIBUTING.md)
-  - [`CHANGELOG.md`](/workspace/projects/noztr/CHANGELOG.md)
+  - [`docs/INDEX.md`](docs/INDEX.md)
+  - [`docs/getting-started.md`](docs/getting-started.md)
+  - [`docs/guides/noztr-style.md`](docs/guides/noztr-style.md)
+  - [`docs/guides/docs-style-guide.md`](docs/guides/docs-style-guide.md)
+  - [`docs/guides/zig-patterns.md`](docs/guides/zig-patterns.md)
+  - [`docs/guides/zig-anti-patterns.md`](docs/guides/zig-anti-patterns.md)
+  - [`docs/scope-and-tradeoffs.md`](docs/scope-and-tradeoffs.md)
+  - [`docs/intentional-divergences.md`](docs/intentional-divergences.md)
+  - [`docs/guides/technical-guides.md`](docs/guides/technical-guides.md)
+  - [`docs/errors-and-ownership.md`](docs/errors-and-ownership.md)
+  - [`docs/performance.md`](docs/performance.md)
+  - [`docs/stability-and-versioning.md`](docs/stability-and-versioning.md)
+  - [`docs/compatibility-and-support.md`](docs/compatibility-and-support.md)
+  - [`docs/release-notes-template.md`](docs/release-notes-template.md)
+  - [`docs/reference/core-api-contracts.md`](docs/reference/core-api-contracts.md)
+  - [`docs/reference/contract-map.md`](docs/reference/contract-map.md)
+  - [`docs/reference/api-reference.md`](docs/reference/api-reference.md)
+  - [`docs/reference/nip-coverage.md`](docs/reference/nip-coverage.md)
+  - [`examples/README.md`](examples/README.md)
+  - [`CONTRIBUTING.md`](CONTRIBUTING.md)
+  - [`CHANGELOG.md`](CHANGELOG.md)
 - Internal working docs:
   - local-only `.private-docs/`
 
@@ -148,12 +155,12 @@ public documentation surface and are not intended for remote publication.
 
 | Job | Start here | Example |
 | --- | --- | --- |
-| Parse, serialize, sign, or verify events | [`docs/reference/core-api-contracts.md`](/workspace/projects/noztr/docs/reference/core-api-contracts.md) | [`examples/nip01_example.zig`](/workspace/projects/noztr/examples/nip01_example.zig) |
-| Identity lookup and bunker discovery | [`docs/reference/contract-map.md`](/workspace/projects/noztr/docs/reference/contract-map.md) | [`examples/discovery_recipe.zig`](/workspace/projects/noztr/examples/discovery_recipe.zig) |
-| One-recipient gift wrap build and unwrap | [`docs/reference/contract-map.md`](/workspace/projects/noztr/docs/reference/contract-map.md) | [`examples/nip17_wrap_recipe.zig`](/workspace/projects/noztr/examples/nip17_wrap_recipe.zig) |
-| Wallet Connect parsing and typed JSON contracts | [`docs/reference/contract-map.md`](/workspace/projects/noztr/docs/reference/contract-map.md) | [`examples/nip47_example.zig`](/workspace/projects/noztr/examples/nip47_example.zig) |
-| HTTP auth event and header helpers | [`docs/reference/contract-map.md`](/workspace/projects/noztr/docs/reference/contract-map.md) | [`examples/nip98_example.zig`](/workspace/projects/noztr/examples/nip98_example.zig) |
-| Group replay and poll tally reduction | [`docs/reference/contract-map.md`](/workspace/projects/noztr/docs/reference/contract-map.md) | [`examples/nip29_reducer_recipe.zig`](/workspace/projects/noztr/examples/nip29_reducer_recipe.zig), [`examples/nip88_example.zig`](/workspace/projects/noztr/examples/nip88_example.zig) |
+| Parse, serialize, sign, or verify events | [`docs/reference/core-api-contracts.md`](docs/reference/core-api-contracts.md) | [`examples/nip01_example.zig`](examples/nip01_example.zig) |
+| Identity lookup and bunker discovery | [`docs/reference/contract-map.md`](docs/reference/contract-map.md) | [`examples/discovery_recipe.zig`](examples/discovery_recipe.zig) |
+| One-recipient gift wrap build and unwrap | [`docs/reference/contract-map.md`](docs/reference/contract-map.md) | [`examples/nip17_wrap_recipe.zig`](examples/nip17_wrap_recipe.zig) |
+| Wallet Connect parsing and typed JSON contracts | [`docs/reference/contract-map.md`](docs/reference/contract-map.md) | [`examples/nip47_example.zig`](examples/nip47_example.zig) |
+| HTTP auth event and header helpers | [`docs/reference/contract-map.md`](docs/reference/contract-map.md) | [`examples/nip98_example.zig`](examples/nip98_example.zig) |
+| Group replay and poll tally reduction | [`docs/reference/contract-map.md`](docs/reference/contract-map.md) | [`examples/nip29_reducer_recipe.zig`](examples/nip29_reducer_recipe.zig), [`examples/nip88_example.zig`](examples/nip88_example.zig) |
 
 ## Use as a local Zig dependency
 
@@ -183,15 +190,15 @@ exe.root_module.addImport("noztr", noztr_module);
 This repo now carries one downstream examples package and wires it into
 `zig build test --summary all` so SDK-style local consumption stays checked:
 
-- [`examples`](/workspace/projects/noztr/examples)
+- [`examples`](examples)
   - `consumer_smoke.zig` for the minimal dependency/import path
   - direct per-NIP reference examples across all implemented kernel NIPs
   - dedicated adversarial examples for the highest-risk SDK-facing boundaries
   - a small public `nostr_keys` helper surface for x-only pubkey derivation and event signing
   - scenario-oriented recipe files for `NIP-03`, `NIP-05`, `NIP-06`, `NIP-17`, `BIP-85`,
     `NIP-39`, `NIP-46`, `NIP-51`, and `NIP-86`
-  - open [`examples/README.md`](/workspace/projects/noztr/examples/README.md) for the SDK job map
-  - open [`docs/reference/contract-map.md`](/workspace/projects/noztr/docs/reference/contract-map.md) for a task-to-symbol route across the main post-core surfaces
+  - open [`examples/README.md`](examples/README.md) for the SDK job map
+  - open [`docs/reference/contract-map.md`](docs/reference/contract-map.md) for a task-to-symbol route across the main post-core surfaces
   - intended as the main downstream example surface for `noztr-sdk` and other SDK consumers
 
 ## Current Kernel Notes

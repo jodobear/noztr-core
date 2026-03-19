@@ -10,13 +10,13 @@ docs, and downstream usability.
 
 Read these first:
 
-- [README.md](/workspace/projects/noztr/README.md)
-- [docs/INDEX.md](/workspace/projects/noztr/docs/INDEX.md)
-- [AGENTS.md](/workspace/projects/noztr/AGENTS.md)
-- [docs/guides/noztr-style.md](/workspace/projects/noztr/docs/guides/noztr-style.md)
-- [docs/guides/docs-style-guide.md](/workspace/projects/noztr/docs/guides/docs-style-guide.md)
-- [docs/guides/zig-patterns.md](/workspace/projects/noztr/docs/guides/zig-patterns.md)
-- [docs/guides/zig-anti-patterns.md](/workspace/projects/noztr/docs/guides/zig-anti-patterns.md)
+- [README.md](README.md)
+- [docs/INDEX.md](docs/INDEX.md)
+- [AGENTS.md](AGENTS.md)
+- [docs/guides/noztr-style.md](docs/guides/noztr-style.md)
+- [docs/guides/docs-style-guide.md](docs/guides/docs-style-guide.md)
+- [docs/guides/zig-patterns.md](docs/guides/zig-patterns.md)
+- [docs/guides/zig-anti-patterns.md](docs/guides/zig-anti-patterns.md)
 
 If you are working as a maintainer or local automation agent and `.private-docs/AGENTS.md` exists,
 continue there for the internal operator workflow. Internal working material lives in local-only
@@ -143,10 +143,10 @@ For code work:
 
 Public style references:
 
-- [docs/guides/noztr-style.md](/workspace/projects/noztr/docs/guides/noztr-style.md)
-- [docs/guides/docs-style-guide.md](/workspace/projects/noztr/docs/guides/docs-style-guide.md)
-- [docs/guides/zig-patterns.md](/workspace/projects/noztr/docs/guides/zig-patterns.md)
-- [docs/guides/zig-anti-patterns.md](/workspace/projects/noztr/docs/guides/zig-anti-patterns.md)
+- [docs/guides/noztr-style.md](docs/guides/noztr-style.md)
+- [docs/guides/docs-style-guide.md](docs/guides/docs-style-guide.md)
+- [docs/guides/zig-patterns.md](docs/guides/zig-patterns.md)
+- [docs/guides/zig-anti-patterns.md](docs/guides/zig-anti-patterns.md)
 
 Before closing a protocol slice, make sure the work includes:
 
@@ -161,9 +161,9 @@ Current public versioning posture is conservative.
 
 See:
 
-- [docs/stability-and-versioning.md](/workspace/projects/noztr/docs/stability-and-versioning.md)
-- [docs/release-notes-template.md](/workspace/projects/noztr/docs/release-notes-template.md)
-- [CHANGELOG.md](/workspace/projects/noztr/CHANGELOG.md)
+- [docs/stability-and-versioning.md](docs/stability-and-versioning.md)
+- [docs/release-notes-template.md](docs/release-notes-template.md)
+- [CHANGELOG.md](CHANGELOG.md)
 
 Short version:
 

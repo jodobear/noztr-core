@@ -19,9 +19,9 @@ This page explains two public contracts that matter across almost every `noztr` 
 
 Use it alongside:
 
-- [core-api-contracts.md](/workspace/projects/noztr/docs/reference/core-api-contracts.md)
-- [contract-map.md](/workspace/projects/noztr/docs/reference/contract-map.md)
-- [examples/README.md](/workspace/projects/noztr/examples/README.md)
+- [core-api-contracts.md](reference/core-api-contracts.md)
+- [contract-map.md](reference/contract-map.md)
+- [examples/README.md](../examples/README.md)
 
 ## Ownership Model
 
@@ -46,8 +46,8 @@ Useful public starting points:
 
 - shared limits: `noztr.limits`
 - shared error namespace: `noztr.errors`
-- strict core example: [strict_core_recipe.zig](/workspace/projects/noztr/examples/strict_core_recipe.zig)
-- wallet/key example: [wallet_recipe.zig](/workspace/projects/noztr/examples/wallet_recipe.zig)
+- strict core example: [strict_core_recipe.zig](../examples/strict_core_recipe.zig)
+- wallet/key example: [wallet_recipe.zig](../examples/wallet_recipe.zig)
 
 ## Error Model
 
@@ -92,20 +92,20 @@ For boundary-heavy surfaces, read both.
 Good first pairs:
 
 - core checked flow:
-  - [strict_core_recipe.zig](/workspace/projects/noztr/examples/strict_core_recipe.zig)
-  - [nip42_adversarial_example.zig](/workspace/projects/noztr/examples/nip42_adversarial_example.zig)
+  - [strict_core_recipe.zig](../examples/strict_core_recipe.zig)
+  - [nip42_adversarial_example.zig](../examples/nip42_adversarial_example.zig)
 - remote signing:
-  - [remote_signing_recipe.zig](/workspace/projects/noztr/examples/remote_signing_recipe.zig)
-  - [remote_signing_adversarial_example.zig](/workspace/projects/noztr/examples/remote_signing_adversarial_example.zig)
+  - [remote_signing_recipe.zig](../examples/remote_signing_recipe.zig)
+  - [remote_signing_adversarial_example.zig](../examples/remote_signing_adversarial_example.zig)
 - gift wrap:
-  - [nip17_wrap_recipe.zig](/workspace/projects/noztr/examples/nip17_wrap_recipe.zig)
-  - [nip59_adversarial_example.zig](/workspace/projects/noztr/examples/nip59_adversarial_example.zig)
+  - [nip17_wrap_recipe.zig](../examples/nip17_wrap_recipe.zig)
+  - [nip59_adversarial_example.zig](../examples/nip59_adversarial_example.zig)
 - wallet connect:
-  - [nip47_example.zig](/workspace/projects/noztr/examples/nip47_example.zig)
-  - [wallet_connect_adversarial_example.zig](/workspace/projects/noztr/examples/wallet_connect_adversarial_example.zig)
+  - [nip47_example.zig](../examples/nip47_example.zig)
+  - [wallet_connect_adversarial_example.zig](../examples/wallet_connect_adversarial_example.zig)
 - HTTP auth:
-  - [nip98_example.zig](/workspace/projects/noztr/examples/nip98_example.zig)
-  - [http_auth_adversarial_example.zig](/workspace/projects/noztr/examples/http_auth_adversarial_example.zig)
+  - [nip98_example.zig](../examples/nip98_example.zig)
+  - [http_auth_adversarial_example.zig](../examples/http_auth_adversarial_example.zig)
 
 ## What This Does Not Mean
 
@@ -120,6 +120,6 @@ It does mean the library tries to preserve the same release-facing discipline:
 
 ## Next Step
 
-- for task routing, use [contract-map.md](/workspace/projects/noztr/docs/reference/contract-map.md)
-- for module browsing, use [api-reference.md](/workspace/projects/noztr/docs/reference/api-reference.md)
-- for example routing, use [examples/README.md](/workspace/projects/noztr/examples/README.md)
+- for task routing, use [contract-map.md](reference/contract-map.md)
+- for module browsing, use [api-reference.md](reference/api-reference.md)
+- for example routing, use [examples/README.md](../examples/README.md)

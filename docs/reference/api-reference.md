@@ -17,24 +17,24 @@ This is the public module-and-symbol reference for the exported `noztr` surface.
 Use it when you want to browse the library by module instead of by task.
 
 If you already know the task but not the module, start with
-[contract-map.md](/workspace/projects/noztr/docs/reference/contract-map.md) or
-[technical-guides.md](/workspace/projects/noztr/docs/guides/technical-guides.md) first.
+[contract-map.md](contract-map.md) or
+[technical-guides.md](../guides/technical-guides.md) first.
 
 Cross-cutting release notes:
 
-- [errors-and-ownership.md](/workspace/projects/noztr/docs/errors-and-ownership.md)
-- [performance.md](/workspace/projects/noztr/docs/performance.md)
-- [stability-and-versioning.md](/workspace/projects/noztr/docs/stability-and-versioning.md)
-- [examples/README.md](/workspace/projects/noztr/examples/README.md)
+- [errors-and-ownership.md](../errors-and-ownership.md)
+- [performance.md](../performance.md)
+- [stability-and-versioning.md](../stability-and-versioning.md)
+- [examples/README.md](../../examples/README.md)
 
 ## Shared Foundations
 
 | Export | Purpose | Start example |
 | --- | --- | --- |
-| `limits` | shared strict limits used across the library | [strict_core_recipe.zig](/workspace/projects/noztr/examples/strict_core_recipe.zig) |
-| `errors` | shared typed error namespace for common surfaces | [strict_core_recipe.zig](/workspace/projects/noztr/examples/strict_core_recipe.zig) |
-| `nostr_keys` | bounded key derivation and event-signing helpers | [nostr_keys_example.zig](/workspace/projects/noztr/examples/nostr_keys_example.zig) |
-| `bip85_derivation` | bounded Nostr-relevant BIP-85 helpers | [bip85_example.zig](/workspace/projects/noztr/examples/bip85_example.zig) |
+| `limits` | shared strict limits used across the library | [strict_core_recipe.zig](../../examples/strict_core_recipe.zig) |
+| `errors` | shared typed error namespace for common surfaces | [strict_core_recipe.zig](../../examples/strict_core_recipe.zig) |
+| `nostr_keys` | bounded key derivation and event-signing helpers | [nostr_keys_example.zig](../../examples/nostr_keys_example.zig) |
+| `bip85_derivation` | bounded Nostr-relevant BIP-85 helpers | [bip85_example.zig](../../examples/bip85_example.zig) |
 
 ## High-Value Symbol Starting Points
 
@@ -51,9 +51,9 @@ These are the quickest symbol-level routes into the modules most downstream user
 - `event_verify`
   - verify event integrity and signature assumptions
 - start example:
-  - [nip01_example.zig](/workspace/projects/noztr/examples/nip01_example.zig)
+  - [nip01_example.zig](../../examples/nip01_example.zig)
 - broader route:
-  - [core-api-contracts.md](/workspace/projects/noztr/docs/reference/core-api-contracts.md)
+  - [core-api-contracts.md](core-api-contracts.md)
 
 ### `nip46_remote_signing`
 
@@ -70,11 +70,11 @@ These are the quickest symbol-level routes into the modules most downstream user
 - `response_result_*`
   - build typed successful response payloads
 - start example:
-  - [remote_signing_recipe.zig](/workspace/projects/noztr/examples/remote_signing_recipe.zig)
+  - [remote_signing_recipe.zig](../../examples/remote_signing_recipe.zig)
 - hostile example:
-  - [remote_signing_adversarial_example.zig](/workspace/projects/noztr/examples/remote_signing_adversarial_example.zig)
+  - [remote_signing_adversarial_example.zig](../../examples/remote_signing_adversarial_example.zig)
 - broader route:
-  - [contract-map.md](/workspace/projects/noztr/docs/reference/contract-map.md)
+  - [contract-map.md](contract-map.md)
 
 ### `nip47_wallet_connect`
 
@@ -93,11 +93,11 @@ These are the quickest symbol-level routes into the modules most downstream user
 - `response_parse_json`
   - parse typed response JSON content
 - start example:
-  - [nip47_example.zig](/workspace/projects/noztr/examples/nip47_example.zig)
+  - [nip47_example.zig](../../examples/nip47_example.zig)
 - hostile example:
-  - [wallet_connect_adversarial_example.zig](/workspace/projects/noztr/examples/wallet_connect_adversarial_example.zig)
+  - [wallet_connect_adversarial_example.zig](../../examples/wallet_connect_adversarial_example.zig)
 - broader route:
-  - [contract-map.md](/workspace/projects/noztr/docs/reference/contract-map.md)
+  - [contract-map.md](contract-map.md)
 
 ### `nip59_wrap`
 
@@ -106,11 +106,11 @@ These are the quickest symbol-level routes into the modules most downstream user
 - `nip59_unwrap`
   - unwrap an inbound wrap into the typed kernel payload
 - start example:
-  - [nip17_wrap_recipe.zig](/workspace/projects/noztr/examples/nip17_wrap_recipe.zig)
+  - [nip17_wrap_recipe.zig](../../examples/nip17_wrap_recipe.zig)
 - hostile example:
-  - [nip59_adversarial_example.zig](/workspace/projects/noztr/examples/nip59_adversarial_example.zig)
+  - [nip59_adversarial_example.zig](../../examples/nip59_adversarial_example.zig)
 - broader route:
-  - [contract-map.md](/workspace/projects/noztr/docs/reference/contract-map.md)
+  - [contract-map.md](contract-map.md)
 
 ### `nip17_private_messages`
 
@@ -125,13 +125,13 @@ These are the quickest symbol-level routes into the modules most downstream user
 - `nip17_build_file_*_tag`
   - build canonical file-message metadata tags for required and optional kind-15 file metadata
 - start example:
-  - [nip17_example.zig](/workspace/projects/noztr/examples/nip17_example.zig)
-  - [nip17_wrap_recipe.zig](/workspace/projects/noztr/examples/nip17_wrap_recipe.zig)
+  - [nip17_example.zig](../../examples/nip17_example.zig)
+  - [nip17_wrap_recipe.zig](../../examples/nip17_wrap_recipe.zig)
 - hostile example:
-  - [nip17_adversarial_example.zig](/workspace/projects/noztr/examples/nip17_adversarial_example.zig)
-  - [nip59_adversarial_example.zig](/workspace/projects/noztr/examples/nip59_adversarial_example.zig)
+  - [nip17_adversarial_example.zig](../../examples/nip17_adversarial_example.zig)
+  - [nip59_adversarial_example.zig](../../examples/nip59_adversarial_example.zig)
 - broader route:
-  - [contract-map.md](/workspace/projects/noztr/docs/reference/contract-map.md)
+  - [contract-map.md](contract-map.md)
 
 ### `nip98_http_auth`
 
@@ -148,11 +148,11 @@ These are the quickest symbol-level routes into the modules most downstream user
 - `http_auth_build_*`
   - build typed auth tags and request-facing artifacts
 - start example:
-  - [nip98_example.zig](/workspace/projects/noztr/examples/nip98_example.zig)
+  - [nip98_example.zig](../../examples/nip98_example.zig)
 - hostile example:
-  - [http_auth_adversarial_example.zig](/workspace/projects/noztr/examples/http_auth_adversarial_example.zig)
+  - [http_auth_adversarial_example.zig](../../examples/http_auth_adversarial_example.zig)
 - broader route:
-  - [contract-map.md](/workspace/projects/noztr/docs/reference/contract-map.md)
+  - [contract-map.md](contract-map.md)
 
 ### `nip05_identity`
 
@@ -169,11 +169,11 @@ These are the quickest symbol-level routes into the modules most downstream user
 - `discovery_render_nostrconnect_url`
   - render a deterministic `nostrconnect:` URL from parsed discovery data
 - start example:
-  - [discovery_recipe.zig](/workspace/projects/noztr/examples/discovery_recipe.zig)
+  - [discovery_recipe.zig](../../examples/discovery_recipe.zig)
 - hostile example:
-  - [nip05_adversarial_example.zig](/workspace/projects/noztr/examples/nip05_adversarial_example.zig)
+  - [nip05_adversarial_example.zig](../../examples/nip05_adversarial_example.zig)
 - broader route:
-  - [contract-map.md](/workspace/projects/noztr/docs/reference/contract-map.md)
+  - [contract-map.md](contract-map.md)
 
 ### `nip06_mnemonic` and `nostr_keys`
 
@@ -186,10 +186,10 @@ These are the quickest symbol-level routes into the modules most downstream user
 - `nostr_sign_event`
   - sign a bounded event with explicit secret-key input
 - start examples:
-  - [wallet_recipe.zig](/workspace/projects/noztr/examples/wallet_recipe.zig)
-  - [nostr_keys_example.zig](/workspace/projects/noztr/examples/nostr_keys_example.zig)
+  - [wallet_recipe.zig](../../examples/wallet_recipe.zig)
+  - [nostr_keys_example.zig](../../examples/nostr_keys_example.zig)
 - broader route:
-  - [technical-guides.md](/workspace/projects/noztr/docs/guides/technical-guides.md)
+  - [technical-guides.md](../guides/technical-guides.md)
 
 ### `nip42_auth` and `nip70_protected`
 
@@ -204,12 +204,12 @@ These are the quickest symbol-level routes into the modules most downstream user
 - `protected_event_validate`
   - validate protected-event policy expectations
 - start examples:
-  - [nip42_example.zig](/workspace/projects/noztr/examples/nip42_example.zig)
-  - [nip70_example.zig](/workspace/projects/noztr/examples/nip70_example.zig)
+  - [nip42_example.zig](../../examples/nip42_example.zig)
+  - [nip70_example.zig](../../examples/nip70_example.zig)
 - hostile example:
-  - [nip42_adversarial_example.zig](/workspace/projects/noztr/examples/nip42_adversarial_example.zig)
+  - [nip42_adversarial_example.zig](../../examples/nip42_adversarial_example.zig)
 - broader route:
-  - [core-api-contracts.md](/workspace/projects/noztr/docs/reference/core-api-contracts.md)
+  - [core-api-contracts.md](core-api-contracts.md)
 
 ### `nip49_private_key_encryption`
 
@@ -222,11 +222,11 @@ These are the quickest symbol-level routes into the modules most downstream user
 - `nip49_encode_bech32` / `nip49_decode_bech32`
   - serialize and parse the canonical `ncryptsec` bech32 form
 - start example:
-  - [nip49_example.zig](/workspace/projects/noztr/examples/nip49_example.zig)
+  - [nip49_example.zig](../../examples/nip49_example.zig)
 - hostile example:
-  - [private_key_encryption_adversarial_example.zig](/workspace/projects/noztr/examples/private_key_encryption_adversarial_example.zig)
+  - [private_key_encryption_adversarial_example.zig](../../examples/private_key_encryption_adversarial_example.zig)
 - broader route:
-  - [technical-guides.md](/workspace/projects/noztr/docs/guides/technical-guides.md)
+  - [technical-guides.md](../guides/technical-guides.md)
 
 ### `nip11`
 
@@ -235,9 +235,9 @@ These are the quickest symbol-level routes into the modules most downstream user
 - `nip11_validate_known_fields`
   - validate parsed known fields and limitation ranges
 - start example:
-  - [nip11_example.zig](/workspace/projects/noztr/examples/nip11_example.zig)
+  - [nip11_example.zig](../../examples/nip11_example.zig)
 - broader route:
-  - [technical-guides.md](/workspace/projects/noztr/docs/guides/technical-guides.md)
+  - [technical-guides.md](../guides/technical-guides.md)
 
 ### `nip29_relay_groups`
 
@@ -245,9 +245,9 @@ These are the quickest symbol-level routes into the modules most downstream user
   - apply a bounded event batch into group state
 - reducer helpers around metadata, membership, moderation, and snapshot replay
 - start example:
-  - [nip29_reducer_recipe.zig](/workspace/projects/noztr/examples/nip29_reducer_recipe.zig)
+  - [nip29_reducer_recipe.zig](../../examples/nip29_reducer_recipe.zig)
 - hostile example:
-  - [nip29_adversarial_example.zig](/workspace/projects/noztr/examples/nip29_adversarial_example.zig)
+  - [nip29_adversarial_example.zig](../../examples/nip29_adversarial_example.zig)
 
 ### `nip14_subjects`
 
@@ -256,7 +256,7 @@ These are the quickest symbol-level routes into the modules most downstream user
 - `subject_build_tag`
   - build the canonical `subject` tag for a text note
 - start example:
-  - [nip14_example.zig](/workspace/projects/noztr/examples/nip14_example.zig)
+  - [nip14_example.zig](../../examples/nip14_example.zig)
 
 ### `nip28_public_chat`
 
@@ -269,9 +269,9 @@ These are the quickest symbol-level routes into the modules most downstream user
 - `channel_build_*`
   - build canonical event, pubkey, category, reason, and metadata helpers
 - start example:
-  - [nip28_example.zig](/workspace/projects/noztr/examples/nip28_example.zig)
+  - [nip28_example.zig](../../examples/nip28_example.zig)
 - hostile example:
-  - [nip28_adversarial_example.zig](/workspace/projects/noztr/examples/nip28_adversarial_example.zig)
+  - [nip28_adversarial_example.zig](../../examples/nip28_adversarial_example.zig)
 
 ### `nip30_custom_emoji`
 
@@ -282,7 +282,7 @@ These are the quickest symbol-level routes into the modules most downstream user
 - `emoji_build_tag`
   - build the canonical `emoji` tag with optional set coordinate
 - start example:
-  - [nip30_example.zig](/workspace/projects/noztr/examples/nip30_example.zig)
+  - [nip30_example.zig](../../examples/nip30_example.zig)
 
 ### `nip31_alt_tags`
 
@@ -291,7 +291,7 @@ These are the quickest symbol-level routes into the modules most downstream user
 - `alt_build_tag`
   - build the canonical fallback-summary tag for unknown or custom kinds
 - start example:
-  - [nip31_example.zig](/workspace/projects/noztr/examples/nip31_example.zig)
+  - [nip31_example.zig](../../examples/nip31_example.zig)
 
 ### `nip38_user_status`
 
@@ -300,7 +300,7 @@ These are the quickest symbol-level routes into the modules most downstream user
 - `user_status_build_*`
   - build canonical identifier, url, pubkey, event, coordinate, and expiration tags
 - start example:
-  - [nip38_example.zig](/workspace/projects/noztr/examples/nip38_example.zig)
+  - [nip38_example.zig](../../examples/nip38_example.zig)
 
 ### `nip88_polls`
 
@@ -308,9 +308,9 @@ These are the quickest symbol-level routes into the modules most downstream user
 - response extraction helpers
 - tally reduction helpers
 - start example:
-  - [nip88_example.zig](/workspace/projects/noztr/examples/nip88_example.zig)
+  - [nip88_example.zig](../../examples/nip88_example.zig)
 - hostile example:
-  - [polls_adversarial_example.zig](/workspace/projects/noztr/examples/polls_adversarial_example.zig)
+  - [polls_adversarial_example.zig](../../examples/polls_adversarial_example.zig)
 
 ### `nip34_git`
 
@@ -323,7 +323,7 @@ These are the quickest symbol-level routes into the modules most downstream user
 - `repository_build_*`
   - build canonical repository announcement and state tags
 - start example:
-  - [nip34_example.zig](/workspace/projects/noztr/examples/nip34_example.zig)
+  - [nip34_example.zig](../../examples/nip34_example.zig)
 
 ### `nip52_calendar_events`
 
@@ -336,7 +336,7 @@ These are the quickest symbol-level routes into the modules most downstream user
 - `calendar_build_*`
   - build canonical calendar, participant, coordinate, and status tags
 - start example:
-  - [nip52_example.zig](/workspace/projects/noztr/examples/nip52_example.zig)
+  - [nip52_example.zig](../../examples/nip52_example.zig)
 
 ### `nip71_video_events`
 
@@ -347,7 +347,7 @@ These are the quickest symbol-level routes into the modules most downstream user
 - `video_build_duration_field` / `video_build_bitrate_field`
   - build the NIP-71-specific `imeta` field items for video duration and bitrate
 - start example:
-  - [nip71_example.zig](/workspace/projects/noztr/examples/nip71_example.zig)
+  - [nip71_example.zig](../../examples/nip71_example.zig)
 
 ### `nip72_moderated_communities`
 
@@ -360,9 +360,9 @@ These are the quickest symbol-level routes into the modules most downstream user
 - `community_*_build_*`
   - build canonical definition, post-linkage, and approval tags for the bounded kernel slice
 - start example:
-  - [nip72_example.zig](/workspace/projects/noztr/examples/nip72_example.zig)
+  - [nip72_example.zig](../../examples/nip72_example.zig)
 - hostile example:
-  - [nip72_adversarial_example.zig](/workspace/projects/noztr/examples/nip72_adversarial_example.zig)
+  - [nip72_adversarial_example.zig](../../examples/nip72_adversarial_example.zig)
 
 ### `nip53_live_activities`
 
@@ -375,7 +375,7 @@ These are the quickest symbol-level routes into the modules most downstream user
 - `live_chat_build_activity_tag`
   - build the required live-chat activity reference tag
 - start example:
-  - [nip53_example.zig](/workspace/projects/noztr/examples/nip53_example.zig)
+  - [nip53_example.zig](../../examples/nip53_example.zig)
 
 ### `nip54_wiki`
 
@@ -390,7 +390,7 @@ These are the quickest symbol-level routes into the modules most downstream user
 - `wiki_build_*`
   - build canonical wiki article, event, and destination tags
 - start example:
-  - [nip54_example.zig](/workspace/projects/noztr/examples/nip54_example.zig)
+  - [nip54_example.zig](../../examples/nip54_example.zig)
 
 ### `nip78_app_data`
 
@@ -401,7 +401,7 @@ These are the quickest symbol-level routes into the modules most downstream user
 - `app_data_build_identifier_tag`
   - build the required canonical identifier tag
 - start example:
-  - [nip78_example.zig](/workspace/projects/noztr/examples/nip78_example.zig)
+  - [nip78_example.zig](../../examples/nip78_example.zig)
 
 ### `nip61_nutzaps`
 
@@ -414,9 +414,9 @@ These are the quickest symbol-level routes into the modules most downstream user
 - `*_build_*`
   - build canonical informational, nutzap, and redemption tags
 - start example:
-  - [nip61_example.zig](/workspace/projects/noztr/examples/nip61_example.zig)
+  - [nip61_example.zig](../../examples/nip61_example.zig)
 - hostile example:
-  - [nip61_adversarial_example.zig](/workspace/projects/noztr/examples/nip61_adversarial_example.zig)
+  - [nip61_adversarial_example.zig](../../examples/nip61_adversarial_example.zig)
 
 ### `nip75_zap_goals`
 
@@ -427,7 +427,7 @@ These are the quickest symbol-level routes into the modules most downstream user
 - `goal_build_*`
   - build canonical goal metadata and reference tags
 - start example:
-  - [nip75_example.zig](/workspace/projects/noztr/examples/nip75_example.zig)
+  - [nip75_example.zig](../../examples/nip75_example.zig)
 
 ### `nip89_handlers`
 
@@ -440,9 +440,9 @@ These are the quickest symbol-level routes into the modules most downstream user
 - `recommendation_build_*`, `handler_build_*`, `client_build_tag`
   - build canonical handler recommendation, handler descriptor, and client tags
 - start example:
-  - [nip89_example.zig](/workspace/projects/noztr/examples/nip89_example.zig)
+  - [nip89_example.zig](../../examples/nip89_example.zig)
 - hostile example:
-  - [nip89_adversarial_example.zig](/workspace/projects/noztr/examples/nip89_adversarial_example.zig)
+  - [nip89_adversarial_example.zig](../../examples/nip89_adversarial_example.zig)
 
 ### `nip66_relay_discovery`
 
@@ -457,122 +457,122 @@ These are the quickest symbol-level routes into the modules most downstream user
   - the parser also accepts `["timeout", "<milliseconds>", "<check>"]` because the current `NIP-66`
     prose and example disagree on ordering
 - start example:
-  - [nip66_example.zig](/workspace/projects/noztr/examples/nip66_example.zig)
+  - [nip66_example.zig](../../examples/nip66_example.zig)
 - hostile example:
-  - [nip66_adversarial_example.zig](/workspace/projects/noztr/examples/nip66_adversarial_example.zig)
+  - [nip66_adversarial_example.zig](../../examples/nip66_adversarial_example.zig)
 
 ## Core Event, Filter, Message, And Boundary Helpers
 
 | Export | Purpose | Start example |
 | --- | --- | --- |
-| `nip01_event` | event parse/serialize/verify/id helpers | [nip01_example.zig](/workspace/projects/noztr/examples/nip01_example.zig) |
-| `nip01_filter` | filter parse, `#x` OR, `&x` AND, and event-matching helpers | [nip01_example.zig](/workspace/projects/noztr/examples/nip01_example.zig) |
-| `nip01_message` | client/relay message parse and serialization helpers | [strict_core_recipe.zig](/workspace/projects/noztr/examples/strict_core_recipe.zig) |
-| `nip42_auth` | auth-event validation helpers | [nip42_example.zig](/workspace/projects/noztr/examples/nip42_example.zig) |
-| `nip70_protected` | protected-event policy helpers | [nip70_example.zig](/workspace/projects/noztr/examples/nip70_example.zig) |
-| `nip09_delete` | deletion-target extraction and applicability helpers | [nip09_example.zig](/workspace/projects/noztr/examples/nip09_example.zig) |
-| `nip13_pow` | proof-of-work helpers | [nip13_example.zig](/workspace/projects/noztr/examples/nip13_example.zig) |
-| `pow_meets_difficulty_verified_id` | checked PoW boundary wrapper | [strict_core_recipe.zig](/workspace/projects/noztr/examples/strict_core_recipe.zig) |
-| `delete_extract_targets_checked` | checked delete extraction wrapper | [strict_core_recipe.zig](/workspace/projects/noztr/examples/strict_core_recipe.zig) |
-| `transcript_mark_client_req` | transcript state helper for strict relay/client flow | [strict_core_recipe.zig](/workspace/projects/noztr/examples/strict_core_recipe.zig) |
-| `transcript_apply_relay` | transcript relay-application helper | [strict_core_recipe.zig](/workspace/projects/noztr/examples/strict_core_recipe.zig) |
+| `nip01_event` | event parse/serialize/verify/id helpers | [nip01_example.zig](../../examples/nip01_example.zig) |
+| `nip01_filter` | filter parse, `#x` OR, `&x` AND, and event-matching helpers | [nip01_example.zig](../../examples/nip01_example.zig) |
+| `nip01_message` | client/relay message parse and serialization helpers | [strict_core_recipe.zig](../../examples/strict_core_recipe.zig) |
+| `nip42_auth` | auth-event validation helpers | [nip42_example.zig](../../examples/nip42_example.zig) |
+| `nip70_protected` | protected-event policy helpers | [nip70_example.zig](../../examples/nip70_example.zig) |
+| `nip09_delete` | deletion-target extraction and applicability helpers | [nip09_example.zig](../../examples/nip09_example.zig) |
+| `nip13_pow` | proof-of-work helpers | [nip13_example.zig](../../examples/nip13_example.zig) |
+| `pow_meets_difficulty_verified_id` | checked PoW boundary wrapper | [strict_core_recipe.zig](../../examples/strict_core_recipe.zig) |
+| `delete_extract_targets_checked` | checked delete extraction wrapper | [strict_core_recipe.zig](../../examples/strict_core_recipe.zig) |
+| `transcript_mark_client_req` | transcript state helper for strict relay/client flow | [strict_core_recipe.zig](../../examples/strict_core_recipe.zig) |
+| `transcript_apply_relay` | transcript relay-application helper | [strict_core_recipe.zig](../../examples/strict_core_recipe.zig) |
 
 ## Identity, Addressing, And Discovery
 
 | Export | Purpose | Start example |
 | --- | --- | --- |
-| `nip19_bech32` | bech32 entity encode/decode helpers | [nip19_example.zig](/workspace/projects/noztr/examples/nip19_example.zig) |
-| `nip21_uri` | `nostr:` URI parse/build helpers | [nip21_example.zig](/workspace/projects/noztr/examples/nip21_example.zig) |
-| `nip05_identity` | NIP-05 address and `nostr.json` verification helpers | [discovery_recipe.zig](/workspace/projects/noztr/examples/discovery_recipe.zig) |
-| `nip39_external_identities` | deterministic identity-proof helpers | [identity_proof_recipe.zig](/workspace/projects/noztr/examples/identity_proof_recipe.zig) |
-| `nip73_external_ids` | bounded external identifier helpers | [nip73_example.zig](/workspace/projects/noztr/examples/nip73_example.zig) |
+| `nip19_bech32` | bech32 entity encode/decode helpers | [nip19_example.zig](../../examples/nip19_example.zig) |
+| `nip21_uri` | `nostr:` URI parse/build helpers | [nip21_example.zig](../../examples/nip21_example.zig) |
+| `nip05_identity` | NIP-05 address and `nostr.json` verification helpers | [discovery_recipe.zig](../../examples/discovery_recipe.zig) |
+| `nip39_external_identities` | deterministic identity-proof helpers | [identity_proof_recipe.zig](../../examples/identity_proof_recipe.zig) |
+| `nip73_external_ids` | bounded external identifier helpers | [nip73_example.zig](../../examples/nip73_example.zig) |
 
 ## Lists, Tags, References, And Social Metadata
 
 | Export | Purpose | Start example |
 | --- | --- | --- |
-| `nip02_contacts` | contact tag extraction/build helpers | [nip02_example.zig](/workspace/projects/noztr/examples/nip02_example.zig) |
-| `nip10_threads` | thread/reply extraction helpers | [nip10_example.zig](/workspace/projects/noztr/examples/nip10_example.zig) |
-| `nip18_reposts` | repost extraction/build helpers | [nip18_example.zig](/workspace/projects/noztr/examples/nip18_example.zig) |
-| `nip22_comments` | comment target and linkage helpers | [nip22_example.zig](/workspace/projects/noztr/examples/nip22_example.zig) |
-| `nip23_long_form` | long-form metadata helpers | [nip23_example.zig](/workspace/projects/noztr/examples/nip23_example.zig) |
-| `nip24_extra_metadata` | extra metadata helpers | [nip24_example.zig](/workspace/projects/noztr/examples/nip24_example.zig) |
-| `nip25_reactions` | reaction extraction/build helpers | [nip25_example.zig](/workspace/projects/noztr/examples/nip25_example.zig) |
-| `nip27_references` | inline `nostr:` text reference extraction | [nip27_example.zig](/workspace/projects/noztr/examples/nip27_example.zig) |
-| `nip32_labeling` | labeling helpers | [nip32_example.zig](/workspace/projects/noztr/examples/nip32_example.zig) |
-| `nip36_content_warning` | content-warning helpers | [nip36_example.zig](/workspace/projects/noztr/examples/nip36_example.zig) |
-| `nip51_lists` | bounded public/private list helpers | [nip51_example.zig](/workspace/projects/noztr/examples/nip51_example.zig) |
-| `nip56_reporting` | reporting helpers | [nip56_example.zig](/workspace/projects/noztr/examples/nip56_example.zig) |
-| `nip58_badges` | badge helpers | [nip58_example.zig](/workspace/projects/noztr/examples/nip58_example.zig) |
-| `nip84_highlights` | highlight helpers | [nip84_example.zig](/workspace/projects/noztr/examples/nip84_example.zig) |
-| `nipb0_web_bookmarking` | web-bookmark metadata helpers | [nipb0_example.zig](/workspace/projects/noztr/examples/nipb0_example.zig) |
+| `nip02_contacts` | contact tag extraction/build helpers | [nip02_example.zig](../../examples/nip02_example.zig) |
+| `nip10_threads` | thread/reply extraction helpers | [nip10_example.zig](../../examples/nip10_example.zig) |
+| `nip18_reposts` | repost extraction/build helpers | [nip18_example.zig](../../examples/nip18_example.zig) |
+| `nip22_comments` | comment target and linkage helpers | [nip22_example.zig](../../examples/nip22_example.zig) |
+| `nip23_long_form` | long-form metadata helpers | [nip23_example.zig](../../examples/nip23_example.zig) |
+| `nip24_extra_metadata` | extra metadata helpers | [nip24_example.zig](../../examples/nip24_example.zig) |
+| `nip25_reactions` | reaction extraction/build helpers | [nip25_example.zig](../../examples/nip25_example.zig) |
+| `nip27_references` | inline `nostr:` text reference extraction | [nip27_example.zig](../../examples/nip27_example.zig) |
+| `nip32_labeling` | labeling helpers | [nip32_example.zig](../../examples/nip32_example.zig) |
+| `nip36_content_warning` | content-warning helpers | [nip36_example.zig](../../examples/nip36_example.zig) |
+| `nip51_lists` | bounded public/private list helpers | [nip51_example.zig](../../examples/nip51_example.zig) |
+| `nip56_reporting` | reporting helpers | [nip56_example.zig](../../examples/nip56_example.zig) |
+| `nip58_badges` | badge helpers | [nip58_example.zig](../../examples/nip58_example.zig) |
+| `nip84_highlights` | highlight helpers | [nip84_example.zig](../../examples/nip84_example.zig) |
+| `nipb0_web_bookmarking` | web-bookmark metadata helpers | [nipb0_example.zig](../../examples/nipb0_example.zig) |
 
 ## Relay, Admin, And Messaging-Oriented Surfaces
 
 | Export | Purpose | Start example |
 | --- | --- | --- |
-| `nip11` | relay-info parse helpers | [nip11_example.zig](/workspace/projects/noztr/examples/nip11_example.zig) |
-| `nip65_relays` | relay metadata helpers | [nip65_example.zig](/workspace/projects/noztr/examples/nip65_example.zig) |
-| `nip66_relay_discovery` | relay discovery and monitor metadata helpers | [nip66_example.zig](/workspace/projects/noztr/examples/nip66_example.zig) |
-| `nip86_relay_management` | relay-admin JSON-RPC helpers | [relay_admin_recipe.zig](/workspace/projects/noztr/examples/relay_admin_recipe.zig) |
-| `nip46_remote_signing` | remote-signing URI, request, and response helpers | [remote_signing_recipe.zig](/workspace/projects/noztr/examples/remote_signing_recipe.zig) |
-| `nip47_wallet_connect` | Wallet Connect URI, envelope, and JSON contract helpers | [nip47_example.zig](/workspace/projects/noztr/examples/nip47_example.zig) |
-| `nip98_http_auth` | HTTP-auth event and header helpers | [nip98_example.zig](/workspace/projects/noztr/examples/nip98_example.zig) |
+| `nip11` | relay-info parse helpers | [nip11_example.zig](../../examples/nip11_example.zig) |
+| `nip65_relays` | relay metadata helpers | [nip65_example.zig](../../examples/nip65_example.zig) |
+| `nip66_relay_discovery` | relay discovery and monitor metadata helpers | [nip66_example.zig](../../examples/nip66_example.zig) |
+| `nip86_relay_management` | relay-admin JSON-RPC helpers | [relay_admin_recipe.zig](../../examples/relay_admin_recipe.zig) |
+| `nip46_remote_signing` | remote-signing URI, request, and response helpers | [remote_signing_recipe.zig](../../examples/remote_signing_recipe.zig) |
+| `nip47_wallet_connect` | Wallet Connect URI, envelope, and JSON contract helpers | [nip47_example.zig](../../examples/nip47_example.zig) |
+| `nip98_http_auth` | HTTP-auth event and header helpers | [nip98_example.zig](../../examples/nip98_example.zig) |
 
 ## Privacy, Encryption, And Delegation
 
 | Export | Purpose | Start example |
 | --- | --- | --- |
-| `nip06_mnemonic` | mnemonic validation and derivation helpers | [wallet_recipe.zig](/workspace/projects/noztr/examples/wallet_recipe.zig) |
-| `nip44` | encrypted direct-message primitives | [nip44_example.zig](/workspace/projects/noztr/examples/nip44_example.zig) |
-| `nip49_private_key_encryption` | private-key encryption/decryption helpers | [nip49_example.zig](/workspace/projects/noztr/examples/nip49_example.zig) |
-| `nip59_wrap` | gift-wrap build/unwrap helpers | [nip17_wrap_recipe.zig](/workspace/projects/noztr/examples/nip17_wrap_recipe.zig) |
-| `nip17_private_messages` | private-message boundary helpers | [nip17_example.zig](/workspace/projects/noztr/examples/nip17_example.zig) |
-| `nip26_delegation` | delegation tag, signing, and verification helpers | [nip26_example.zig](/workspace/projects/noztr/examples/nip26_example.zig) |
+| `nip06_mnemonic` | mnemonic validation and derivation helpers | [wallet_recipe.zig](../../examples/wallet_recipe.zig) |
+| `nip44` | encrypted direct-message primitives | [nip44_example.zig](../../examples/nip44_example.zig) |
+| `nip49_private_key_encryption` | private-key encryption/decryption helpers | [nip49_example.zig](../../examples/nip49_example.zig) |
+| `nip59_wrap` | gift-wrap build/unwrap helpers | [nip17_wrap_recipe.zig](../../examples/nip17_wrap_recipe.zig) |
+| `nip17_private_messages` | private-message boundary helpers | [nip17_example.zig](../../examples/nip17_example.zig) |
+| `nip26_delegation` | delegation tag, signing, and verification helpers | [nip26_example.zig](../../examples/nip26_example.zig) |
 
 ## Reducers, Drafts, Search, And Optional Extensions
 
 | Export | Purpose | Start example |
 | --- | --- | --- |
-| `nip29_relay_groups` | pure relay-group reducer helpers | [nip29_reducer_recipe.zig](/workspace/projects/noztr/examples/nip29_reducer_recipe.zig) |
-| `nip14_subjects` | strict `subject` tag extract/build helpers | [nip14_example.zig](/workspace/projects/noztr/examples/nip14_example.zig) |
-| `nip28_public_chat` | bounded public-channel metadata, linkage, and moderation helpers | [nip28_example.zig](/workspace/projects/noztr/examples/nip28_example.zig) |
-| `nip30_custom_emoji` | strict custom-emoji shortcode and tag helpers | [nip30_example.zig](/workspace/projects/noztr/examples/nip30_example.zig) |
-| `nip31_alt_tags` | `alt` fallback-summary extraction and build helpers | [nip31_example.zig](/workspace/projects/noztr/examples/nip31_example.zig) |
-| `nip38_user_status` | bounded user-status metadata and linkage helpers | [nip38_example.zig](/workspace/projects/noztr/examples/nip38_example.zig) |
-| `nip71_video_events` | bounded video-event metadata and imported-origin helpers | [nip71_example.zig](/workspace/projects/noztr/examples/nip71_example.zig) |
-| `nip72_moderated_communities` | bounded moderated-community definitions, post linkage, and approval contracts | [nip72_example.zig](/workspace/projects/noztr/examples/nip72_example.zig) |
-| `nip37_drafts` | draft and private relay helpers | [nip37_example.zig](/workspace/projects/noztr/examples/nip37_example.zig) |
-| `nip40_expire` | expiration helpers | [nip40_example.zig](/workspace/projects/noztr/examples/nip40_example.zig) |
-| `nip45_count` | optional count helpers, build-flag gated | [nip45_example.zig](/workspace/projects/noztr/examples/nip45_example.zig) |
-| `nip50_search` | optional search helpers, build-flag gated | [nip50_example.zig](/workspace/projects/noztr/examples/nip50_example.zig) |
-| `nip77_negentropy` | optional negentropy helpers, build-flag gated | [nip77_example.zig](/workspace/projects/noztr/examples/nip77_example.zig) |
+| `nip29_relay_groups` | pure relay-group reducer helpers | [nip29_reducer_recipe.zig](../../examples/nip29_reducer_recipe.zig) |
+| `nip14_subjects` | strict `subject` tag extract/build helpers | [nip14_example.zig](../../examples/nip14_example.zig) |
+| `nip28_public_chat` | bounded public-channel metadata, linkage, and moderation helpers | [nip28_example.zig](../../examples/nip28_example.zig) |
+| `nip30_custom_emoji` | strict custom-emoji shortcode and tag helpers | [nip30_example.zig](../../examples/nip30_example.zig) |
+| `nip31_alt_tags` | `alt` fallback-summary extraction and build helpers | [nip31_example.zig](../../examples/nip31_example.zig) |
+| `nip38_user_status` | bounded user-status metadata and linkage helpers | [nip38_example.zig](../../examples/nip38_example.zig) |
+| `nip71_video_events` | bounded video-event metadata and imported-origin helpers | [nip71_example.zig](../../examples/nip71_example.zig) |
+| `nip72_moderated_communities` | bounded moderated-community definitions, post linkage, and approval contracts | [nip72_example.zig](../../examples/nip72_example.zig) |
+| `nip37_drafts` | draft and private relay helpers | [nip37_example.zig](../../examples/nip37_example.zig) |
+| `nip40_expire` | expiration helpers | [nip40_example.zig](../../examples/nip40_example.zig) |
+| `nip45_count` | optional count helpers, build-flag gated | [nip45_example.zig](../../examples/nip45_example.zig) |
+| `nip50_search` | optional search helpers, build-flag gated | [nip50_example.zig](../../examples/nip50_example.zig) |
+| `nip77_negentropy` | optional negentropy helpers, build-flag gated | [nip77_example.zig](../../examples/nip77_example.zig) |
 
 ## Media, Listings, Polls, Blossom, And Other Specialized Surfaces
 
 | Export | Purpose | Start example |
 | --- | --- | --- |
-| `nip03_opentimestamps` | bounded OpenTimestamps parsing and local verification floor | [nip03_example.zig](/workspace/projects/noztr/examples/nip03_example.zig) |
-| `nip57_zaps` | zap-related helpers | [nip57_example.zig](/workspace/projects/noztr/examples/nip57_example.zig) |
-| `nip64_chess_pgn` | chess PGN note helpers | [nip64_example.zig](/workspace/projects/noztr/examples/nip64_example.zig) |
-| `nip34_git` | bounded git repository metadata and state helpers | [nip34_example.zig](/workspace/projects/noztr/examples/nip34_example.zig) |
-| `nip52_calendar_events` | calendar event, calendar, and RSVP helpers | [nip52_example.zig](/workspace/projects/noztr/examples/nip52_example.zig) |
-| `nip53_live_activities` | bounded live-activity and live-chat helpers | [nip53_example.zig](/workspace/projects/noztr/examples/nip53_example.zig) |
-| `nip54_wiki` | wiki article, merge-request, and redirect helpers | [nip54_example.zig](/workspace/projects/noztr/examples/nip54_example.zig) |
-| `nip61_nutzaps` | bounded nutzap informational, event, and redemption-marker contracts | [nip61_example.zig](/workspace/projects/noztr/examples/nip61_example.zig) |
-| `nip75_zap_goals` | zap-goal metadata and goal-reference tags | [nip75_example.zig](/workspace/projects/noztr/examples/nip75_example.zig) |
-| `nip78_app_data` | narrow opaque app-data helpers for `kind:30078` | [nip78_example.zig](/workspace/projects/noztr/examples/nip78_example.zig) |
-| `nip89_handlers` | bounded handler recommendations, endpoints, and client tags | [nip89_example.zig](/workspace/projects/noztr/examples/nip89_example.zig) |
-| `nip88_polls` | poll parse/build/tally helpers | [nip88_example.zig](/workspace/projects/noztr/examples/nip88_example.zig) |
-| `nip92_media_attachments` | inline media metadata helpers | [nip92_example.zig](/workspace/projects/noztr/examples/nip92_example.zig) |
-| `nip94_file_metadata` | file metadata helpers | [nip94_example.zig](/workspace/projects/noztr/examples/nip94_example.zig) |
-| `nip99_classified_listings` | classified listing metadata helpers | [nip99_example.zig](/workspace/projects/noztr/examples/nip99_example.zig) |
-| `nipb7_blossom_servers` | deterministic Blossom server-list and fallback helpers | [nipb7_example.zig](/workspace/projects/noztr/examples/nipb7_example.zig) |
-| `nipc0_code_snippets` | code-snippet metadata helpers | [nipc0_example.zig](/workspace/projects/noztr/examples/nipc0_example.zig) |
+| `nip03_opentimestamps` | bounded OpenTimestamps parsing and local verification floor | [nip03_example.zig](../../examples/nip03_example.zig) |
+| `nip57_zaps` | zap-related helpers | [nip57_example.zig](../../examples/nip57_example.zig) |
+| `nip64_chess_pgn` | chess PGN note helpers | [nip64_example.zig](../../examples/nip64_example.zig) |
+| `nip34_git` | bounded git repository metadata and state helpers | [nip34_example.zig](../../examples/nip34_example.zig) |
+| `nip52_calendar_events` | calendar event, calendar, and RSVP helpers | [nip52_example.zig](../../examples/nip52_example.zig) |
+| `nip53_live_activities` | bounded live-activity and live-chat helpers | [nip53_example.zig](../../examples/nip53_example.zig) |
+| `nip54_wiki` | wiki article, merge-request, and redirect helpers | [nip54_example.zig](../../examples/nip54_example.zig) |
+| `nip61_nutzaps` | bounded nutzap informational, event, and redemption-marker contracts | [nip61_example.zig](../../examples/nip61_example.zig) |
+| `nip75_zap_goals` | zap-goal metadata and goal-reference tags | [nip75_example.zig](../../examples/nip75_example.zig) |
+| `nip78_app_data` | narrow opaque app-data helpers for `kind:30078` | [nip78_example.zig](../../examples/nip78_example.zig) |
+| `nip89_handlers` | bounded handler recommendations, endpoints, and client tags | [nip89_example.zig](../../examples/nip89_example.zig) |
+| `nip88_polls` | poll parse/build/tally helpers | [nip88_example.zig](../../examples/nip88_example.zig) |
+| `nip92_media_attachments` | inline media metadata helpers | [nip92_example.zig](../../examples/nip92_example.zig) |
+| `nip94_file_metadata` | file metadata helpers | [nip94_example.zig](../../examples/nip94_example.zig) |
+| `nip99_classified_listings` | classified listing metadata helpers | [nip99_example.zig](../../examples/nip99_example.zig) |
+| `nipb7_blossom_servers` | deterministic Blossom server-list and fallback helpers | [nipb7_example.zig](../../examples/nipb7_example.zig) |
+| `nipc0_code_snippets` | code-snippet metadata helpers | [nipc0_example.zig](../../examples/nipc0_example.zig) |
 
 ## Coverage Note
 
 For a NIP-by-NIP view of support, examples, and optional/gated surfaces, use
-[nip-coverage.md](/workspace/projects/noztr/docs/reference/nip-coverage.md).
+[nip-coverage.md](nip-coverage.md).
 
-For task-first routing, use [contract-map.md](/workspace/projects/noztr/docs/reference/contract-map.md).
+For task-first routing, use [contract-map.md](contract-map.md).
