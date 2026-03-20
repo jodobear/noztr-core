@@ -105,12 +105,6 @@ Use this route if you want the shortest path into the public surface.
 3. Start from one direct example and, when available, one hostile example in
    [`examples/README.md`](examples/README.md).
 
-## Public docs vs internal docs
-
-Public-facing docs live in [`docs/INDEX.md`](docs/INDEX.md), [`docs/`](docs), and
-[`examples/README.md`](examples/README.md). Internal working material lives in local-only
-`.private-docs/` and is not part of the public documentation route.
-
 ## Common jobs
 
 | Job | Start here | Example |
