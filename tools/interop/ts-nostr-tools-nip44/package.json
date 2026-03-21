@@ -2,6 +2,7 @@
   "name": "interop-ts-nostr-tools-nip44",
   "version": "0.1.0",
   "private": true,
+  "packageManager": "bun@1.3.3",
   "type": "module",
   "scripts": {
     "run": "tsx index.ts"

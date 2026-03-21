@@ -8,6 +8,7 @@ Governance status:
   preserved historical evidence and may be re-run as a secondary ecosystem audit signal.
 - Historical evidence is preserved; this scope change does not alter library defaults or strictness.
 - Use `bun` for local TypeScript harness install/run commands in this repo; do not use `npm`.
+- TypeScript interop harnesses are Bun-managed; track `bun.lock` and do not track `package-lock.json`.
 
 ## Parity Model v1 (taxonomy + depth)
 
