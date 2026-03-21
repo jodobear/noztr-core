@@ -77,3 +77,12 @@ test "json string writer escapes control bytes when configured" {
     try write_string_json(stream.writer(), &[_]u8{ 0x01 }, .escape);
     try std.testing.expectEqualStrings("\"\\u0001\"", buffer[0..stream.pos]);
 }
+
+test "json string writer escapes quotes backslashes and common whitespace" {
+    var buffer: [64]u8 = undefined;
+    var stream = std.io.fixedBufferStream(&buffer);
+    const value = [_]u8{ '"', '\\', '\n', '\r', '\t' };
+
+    try write_string_json(stream.writer(), value[0..], .escape);
+    try std.testing.expectEqualStrings("\"\\\"\\\\\\n\\r\\t\"", buffer[0..stream.pos]);
+}

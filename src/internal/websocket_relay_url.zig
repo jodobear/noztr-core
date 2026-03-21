@@ -26,6 +26,12 @@ test "websocket relay URL parser rejects whitespace and invalid scheme" {
     try std.testing.expectError(error.InvalidRelayUrl, parse_origin("https://relay.example.com", 128));
 }
 
+test "websocket relay URL parser rejects backslash port zero and overlong text" {
+    try std.testing.expectError(error.InvalidRelayUrl, parse_origin("wss://relay.example.com\\path", 128));
+    try std.testing.expectError(error.InvalidRelayUrl, parse_origin("wss://relay.example.com:0", 128));
+    try std.testing.expectError(error.InvalidRelayUrl, parse_origin("wss://relay.example.com", 4));
+}
+
 test "websocket relay URL parser accepts canonical relay origin" {
     const origin = try parse_origin("wss://relay.example.com/path", 128);
     try std.testing.expectEqualStrings("wss", origin.scheme);

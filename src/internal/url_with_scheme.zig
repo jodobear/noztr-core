@@ -21,3 +21,8 @@ test "scheme-only URL parser accepts mailto and custom schemes" {
     try std.testing.expectEqualStrings("mailto:test@example.com", try parse_utf8("mailto:test@example.com", 128));
     try std.testing.expectEqualStrings("nostr:note1xyz", try parse_utf8("nostr:note1xyz", 128));
 }
+
+test "scheme-only URL parser rejects invalid utf8 and overlong input" {
+    try std.testing.expectError(error.InvalidUrl, parse_utf8(&[_]u8{0xff}, 128));
+    try std.testing.expectError(error.InvalidUrl, parse_utf8("nostr:note1xyz", 4));
+}

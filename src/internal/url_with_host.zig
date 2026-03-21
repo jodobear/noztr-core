@@ -24,3 +24,7 @@ test "host-required URL parser rejects scheme-only inputs" {
 test "host-required URL parser accepts canonical https URL" {
     try std.testing.expectEqualStrings("https://example.com/a", try parse("https://example.com/a", 128));
 }
+
+test "host-required URL parser rejects overlong input" {
+    try std.testing.expectError(error.InvalidUrl, parse("https://example.com/a", 8));
+}

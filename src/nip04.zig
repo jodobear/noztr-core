@@ -644,6 +644,145 @@ test "nip04 message parse rejects malformed payloads and duplicate recipients" {
     try std.testing.expectError(error.DuplicateRecipientTag, nip04_message_parse(&duplicate_event));
 }
 
+test "nip04 message parse enforces recipient and reply tag boundaries" {
+    const content = "AAAAAAAAAAAAAAAAAAAAAA==?iv=AAAAAAAAAAAAAAAAAAAAAA==";
+
+    const missing_recipient_event = event_for_tags(4, &.{}, content);
+    try std.testing.expectError(error.MissingRecipientTag, nip04_message_parse(&missing_recipient_event));
+
+    const invalid_recipient_tags = [_]nip01_event.EventTag{
+        .{ .items = &.{
+            "p",
+            "not-hex",
+        } },
+    };
+    const invalid_recipient_event = event_for_tags(4, invalid_recipient_tags[0..], content);
+    try std.testing.expectError(error.InvalidRecipientTag, nip04_message_parse(&invalid_recipient_event));
+
+    const duplicate_reply_tags = [_]nip01_event.EventTag{
+        .{ .items = &.{
+            "p",
+            "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+        } },
+        .{ .items = &.{
+            "e",
+            "fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210",
+        } },
+        .{ .items = &.{
+            "e",
+            "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        } },
+    };
+    const duplicate_reply_event = event_for_tags(4, duplicate_reply_tags[0..], content);
+    try std.testing.expectError(error.DuplicateReplyTag, nip04_message_parse(&duplicate_reply_event));
+
+    const bad_reply_marker_tags = [_]nip01_event.EventTag{
+        .{ .items = &.{
+            "p",
+            "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+        } },
+        .{ .items = &.{
+            "e",
+            "fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210",
+            "wss://relay.example",
+            "root",
+        } },
+    };
+    const bad_reply_marker_event = event_for_tags(4, bad_reply_marker_tags[0..], content);
+    try std.testing.expectError(error.InvalidReplyTag, nip04_message_parse(&bad_reply_marker_event));
+
+    const bad_reply_author_tags = [_]nip01_event.EventTag{
+        .{ .items = &.{
+            "p",
+            "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+        } },
+        .{ .items = &.{
+            "e",
+            "fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210",
+            "wss://relay.example",
+            "reply",
+            "bad-author",
+        } },
+    };
+    const bad_reply_author_event = event_for_tags(4, bad_reply_author_tags[0..], content);
+    try std.testing.expectError(error.InvalidReplyTag, nip04_message_parse(&bad_reply_author_event));
+}
+
+test "nip04 payload parse distinguishes iv and ciphertext length failures" {
+    const valid_block = [_]u8{0} ** limits.nip04_iv_bytes;
+    var ciphertext_b64_storage: [24]u8 = undefined;
+    const valid_ciphertext_b64 = base64_standard.Encoder.encode(ciphertext_b64_storage[0..], valid_block[0..]);
+
+    const short_iv = [_]u8{0} ** 15;
+    var short_iv_b64_storage: [20]u8 = undefined;
+    const short_iv_b64 = base64_standard.Encoder.encode(short_iv_b64_storage[0..], short_iv[0..]);
+    var invalid_iv_payload: [64]u8 = undefined;
+    try std.testing.expectError(
+        error.InvalidIvLength,
+        nip04_payload_serialize(invalid_iv_payload[0..], valid_ciphertext_b64, short_iv_b64),
+    );
+
+    const short_ciphertext = [_]u8{0} ** 15;
+    var short_ciphertext_b64_storage: [20]u8 = undefined;
+    const short_ciphertext_b64 = base64_standard.Encoder.encode(
+        short_ciphertext_b64_storage[0..],
+        short_ciphertext[0..],
+    );
+    var iv_b64_storage: [limits.nip04_iv_base64_bytes]u8 = undefined;
+    const valid_iv_b64 = base64_standard.Encoder.encode(iv_b64_storage[0..], valid_block[0..]);
+    var payload_storage: [64]u8 = undefined;
+    const total_len = short_ciphertext_b64.len + "?iv=".len + valid_iv_b64.len;
+    std.mem.copyForwards(u8, payload_storage[0..short_ciphertext_b64.len], short_ciphertext_b64);
+    std.mem.copyForwards(
+        u8,
+        payload_storage[short_ciphertext_b64.len .. short_ciphertext_b64.len + "?iv=".len],
+        "?iv=",
+    );
+    std.mem.copyForwards(
+        u8,
+        payload_storage[short_ciphertext_b64.len + "?iv=".len .. total_len],
+        valid_iv_b64,
+    );
+    try std.testing.expectError(
+        error.InvalidCiphertextLength,
+        nip04_payload_parse(payload_storage[0..total_len]),
+    );
+}
+
+test "nip04 exported helpers return buffer too small for capacity failures" {
+    const sender_secret = [_]u8{0x11} ** 32;
+    const recipient_secret = [_]u8{0x22} ** 32;
+    const recipient_pubkey = try secp256k1_test_public_key(&recipient_secret);
+    const sender_pubkey = try secp256k1_test_public_key(&sender_secret);
+    const iv = [_]u8{0x44} ** limits.nip04_iv_bytes;
+
+    var tiny_payload: [8]u8 = undefined;
+    try std.testing.expectError(
+        error.BufferTooSmall,
+        nip04_encrypt_with_iv(tiny_payload[0..], &sender_secret, &recipient_pubkey, "hello nip04", &iv),
+    );
+
+    var encoded: [limits.content_bytes_max]u8 = undefined;
+    const payload = try nip04_encrypt_with_iv(
+        encoded[0..],
+        &sender_secret,
+        &recipient_pubkey,
+        "hello nip04",
+        &iv,
+    );
+
+    var tiny_plaintext: [5]u8 = undefined;
+    try std.testing.expectError(
+        error.BufferTooSmall,
+        nip04_decrypt(tiny_plaintext[0..], &recipient_secret, &sender_pubkey, payload),
+    );
+
+    try std.testing.expectError(
+        error.BufferTooSmall,
+        nip04_payload_serialize(tiny_payload[0..], "AAAAAAAAAAAAAAAAAAAAAA==", "AAAAAAAAAAAAAAAAAAAAAA=="),
+    );
+}
+
 test "nip04 decrypt rejects malformed padding" {
     const shared_secret = [_]u8{0x11} ** 32;
     const iv = [_]u8{0} ** limits.nip04_iv_bytes;
