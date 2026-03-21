@@ -90,6 +90,12 @@ Release-facing note for behavior differences that are intentional in `noztr` Lay
   as `+` that `nostr-tools` still accepts in `NIP05_REGEX`. `noztr` keeps bare-domain
   canonicalization to `_@domain` and shared `relays` / `nip46` extraction, but does not widen the
   identifier grammar beyond the NIP text just to match the JS helper regex.
+- **Strict legacy `NIP-04` DM-only boundary:**
+  `noztr` now exposes first-class legacy kind-4 DM helpers, but keeps the surface narrow:
+  canonical `ciphertext?iv=...` parsing/serialization, one-recipient event-shape validation,
+  caller-owned buffers, and DM-oriented UTF-8 decrypt semantics. This is intentionally not treated
+  as a generic deprecated private-content compatibility layer, so `NIP-04` private-list
+  compatibility remains out of scope while `NIP-51` private lists stay `NIP-44`-first.
 
 ## Interoperability impact and migration guidance
 

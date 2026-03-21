@@ -33,6 +33,7 @@ This page lists the public `noztr` support surface by NIP.
 | `NIP-91` AND filters | implemented | `nip01_filter` | [nip01_example.zig](../../examples/nip01_example.zig) |
 | `NIP-02` | implemented | `nip02_contacts` | [nip02_example.zig](../../examples/nip02_example.zig) |
 | `NIP-03` | implemented | `nip03_opentimestamps` | [nip03_example.zig](../../examples/nip03_example.zig) |
+| `NIP-04` | implemented | `nip04` | [nip04_example.zig](../../examples/nip04_example.zig) |
 | `NIP-05` | implemented | `nip05_identity` | [nip05_example.zig](../../examples/nip05_example.zig) |
 | `NIP-06` | implemented | `nip06_mnemonic` | [nip06_example.zig](../../examples/nip06_example.zig) |
 | `NIP-09` | implemented | `nip09_delete` | [nip09_example.zig](../../examples/nip09_example.zig) |

@@ -57,6 +57,15 @@ pub const Limits = struct {
     pub const nip65_relay_url_bytes_max: u16 = Limits.tag_item_bytes_max;
     pub const nip65_marker_bytes_max: u8 = 5;
 
+    pub const nip04_shared_secret_bytes: u8 = 32;
+    pub const nip04_iv_bytes: u8 = 16;
+    pub const nip04_plaintext_max_bytes: u32 = 49_119;
+    pub const nip04_ciphertext_min_bytes: u8 = 16;
+    pub const nip04_ciphertext_max_bytes: u32 = 49_120;
+    pub const nip04_iv_base64_bytes: u8 = 24;
+    pub const nip04_payload_min_bytes: u8 = 28 + 24;
+    pub const nip04_payload_max_bytes: u32 = 65_524;
+
     pub const nip44_version: u8 = 2;
     pub const nip44_conversation_key_bytes: u8 = 32;
     pub const nip44_nonce_bytes: u8 = 32;
@@ -175,6 +184,15 @@ pub const nip65_relays_max: u16 = Limits.nip65_relays_max;
 pub const nip65_relay_tag_items_max: u8 = Limits.nip65_relay_tag_items_max;
 pub const nip65_relay_url_bytes_max: u16 = Limits.nip65_relay_url_bytes_max;
 pub const nip65_marker_bytes_max: u8 = Limits.nip65_marker_bytes_max;
+
+pub const nip04_shared_secret_bytes: u8 = Limits.nip04_shared_secret_bytes;
+pub const nip04_iv_bytes: u8 = Limits.nip04_iv_bytes;
+pub const nip04_plaintext_max_bytes: u32 = Limits.nip04_plaintext_max_bytes;
+pub const nip04_ciphertext_min_bytes: u8 = Limits.nip04_ciphertext_min_bytes;
+pub const nip04_ciphertext_max_bytes: u32 = Limits.nip04_ciphertext_max_bytes;
+pub const nip04_iv_base64_bytes: u8 = Limits.nip04_iv_base64_bytes;
+pub const nip04_payload_min_bytes: u8 = Limits.nip04_payload_min_bytes;
+pub const nip04_payload_max_bytes: u32 = Limits.nip04_payload_max_bytes;
 
 pub const nip44_version: u8 = Limits.nip44_version;
 pub const nip44_conversation_key_bytes: u8 = Limits.nip44_conversation_key_bytes;

@@ -43,7 +43,7 @@ Key public entry points:
 | `NIP-01` | core events, filters, and relay message grammar |
 | `NIP-05`, `NIP-11`, `NIP-42`, `NIP-98` | identity lookup, relay info, auth, and HTTP auth helpers |
 | `NIP-06`, `NIP-49`, `BIP-85` subset | bounded wallet, mnemonic, and key-encryption helpers |
-| `NIP-17`, `NIP-44`, `NIP-59` | private-message unwrap, gift wrap, and one-recipient outbound helpers |
+| `NIP-04`, `NIP-17`, `NIP-44`, `NIP-59` | legacy direct-message, private-message unwrap, gift wrap, and one-recipient outbound helpers |
 | `NIP-46`, `NIP-47`, `NIP-86` | remote-signing, wallet-connect, and relay-admin typed contracts |
 | `NIP-29`, `NIP-72`, `NIP-88` | bounded reducers and community/group/poll helper flows |
 | `NIP-52`, `NIP-53`, `NIP-54`, `NIP-71` | calendar, live-activity, wiki, and video metadata helpers |
@@ -149,7 +149,7 @@ This repo now carries one downstream examples package and wires it into
   - reference examples covering the implemented kernel NIP surface
   - dedicated adversarial examples for the highest-risk SDK-facing boundaries
   - a small public `nostr_keys` helper surface for x-only pubkey derivation and event signing
-  - scenario-oriented recipe files for `NIP-03`, `NIP-05`, `NIP-06`, `NIP-17`, `BIP-85`,
+  - scenario-oriented recipe files for `NIP-03`, `NIP-04`, `NIP-05`, `NIP-06`, `NIP-17`, `BIP-85`,
     `NIP-39`, `NIP-46`, `NIP-51`, and `NIP-86`
   - open [`examples/README.md`](examples/README.md) for the SDK job map
   - open [`docs/reference/contract-map.md`](docs/reference/contract-map.md) for a task-to-symbol
@@ -160,8 +160,14 @@ This repo now carries one downstream examples package and wires it into
 
 - `NIP-06` now applies full BIP39-compatible `NFKD` normalization before mnemonic/passphrase seed
   derivation.
+- Legacy `NIP-04` kind-4 direct-message helpers are available for strict local crypto, payload,
+  and event-shape work.
+- The `NIP-04` surface is DM-focused:
+  - local encrypt/decrypt helpers target legacy kind-4 DM content
+  - decrypt is intended for DM plaintext and rejects non-UTF-8 output
+  - this does not widen `NIP-04` into a general raw-bytes or private-content compatibility layer
 - Deprecated `NIP-04` private-list compatibility remains intentionally deferred; current private
-  list support is `NIP-44`-first.
+  list support remains `NIP-44`-first.
 
 ## Repo layout
 

@@ -30,6 +30,8 @@ comptime {
     _ = @import("nip36_example.zig");
     _ = @import("nip03_example.zig");
     _ = @import("nip03_adversarial_example.zig");
+    _ = @import("nip04_example.zig");
+    _ = @import("nip04_adversarial_example.zig");
     _ = @import("nip17_example.zig");
     _ = @import("nip17_adversarial_example.zig");
     _ = @import("nip26_example.zig");
@@ -104,5 +106,6 @@ comptime {
     _ = @import("private_lists_recipe.zig");
     _ = @import("relay_admin_recipe.zig");
     _ = @import("nip03_verification_recipe.zig");
+    _ = @import("nip04_dm_recipe.zig");
     _ = @import("nip17_wrap_recipe.zig");
 }

@@ -112,6 +112,32 @@ These are the quickest symbol-level routes into the modules most downstream user
 - broader route:
   - [contract-map.md](contract-map.md)
 
+### `nip04`
+
+- `nip04_get_shared_secret`
+  - derive the legacy `NIP-04` shared secret from local secp256k1 key material
+- `nip04_encrypt` / `nip04_encrypt_with_iv`
+  - encrypt local plaintext into canonical `ciphertext?iv=...` content
+- `nip04_decrypt`
+  - decrypt canonical legacy DM content into caller-owned plaintext storage
+- `nip04_payload_parse` / `nip04_payload_serialize`
+  - validate and render the canonical legacy wire payload
+- `nip04_message_parse`
+  - parse strict kind-4 DM event shape and extract the canonical recipient tag
+- `nip04_build_recipient_tag`
+  - build a canonical legacy `p` tag
+- scope note:
+  - this surface is for legacy kind-4 DM crypto, payload, and event-shape work
+  - current decrypt helpers are DM-oriented and reject non-UTF-8 plaintext
+  - deprecated `NIP-04` private-list compatibility remains out of scope
+- start example:
+  - [nip04_example.zig](../../examples/nip04_example.zig)
+  - [nip04_dm_recipe.zig](../../examples/nip04_dm_recipe.zig)
+- hostile example:
+  - [nip04_adversarial_example.zig](../../examples/nip04_adversarial_example.zig)
+- broader route:
+  - [contract-map.md](contract-map.md)
+
 ### `nip17_private_messages`
 
 - `nip17_message_parse`
@@ -524,6 +550,7 @@ These are the quickest symbol-level routes into the modules most downstream user
 | Export | Purpose | Start example |
 | --- | --- | --- |
 | `nip06_mnemonic` | mnemonic validation and derivation helpers | [wallet_recipe.zig](../../examples/wallet_recipe.zig) |
+| `nip04` | legacy direct-message crypto, payload, and kind-4 helpers | [nip04_example.zig](../../examples/nip04_example.zig) |
 | `nip44` | encrypted direct-message primitives | [nip44_example.zig](../../examples/nip44_example.zig) |
 | `nip49_private_key_encryption` | private-key encryption/decryption helpers | [nip49_example.zig](../../examples/nip49_example.zig) |
 | `nip59_wrap` | gift-wrap build/unwrap helpers | [nip17_wrap_recipe.zig](../../examples/nip17_wrap_recipe.zig) |

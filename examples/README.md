@@ -50,6 +50,7 @@ opening a file.
 | --- | --- | --- | --- |
 | Identity lookup and bunker discovery | `address_parse`, `address_compose_well_known_url`, `profile_parse_json`, `profile_verify_json`, `discovery_parse_well_known`, `discovery_render_nostrconnect_url` | `discovery_recipe.zig` | `nip05_adversarial_example.zig` |
 | Remote-signing requests, URIs, and typed responses | `uri_parse`, `uri_serialize`, `message_parse_json`, `request_build_*`, `request_parse_typed`, `response_result_*`, `discovery_parse_*` | `remote_signing_recipe.zig` | `remote_signing_adversarial_example.zig` |
+| Legacy kind-4 DM crypto and event-shape validation | `nip04_get_shared_secret`, `nip04_encrypt`, `nip04_decrypt`, `nip04_payload_parse`, `nip04_message_parse`, `nip04_build_recipient_tag` | `nip04_dm_recipe.zig` | `nip04_adversarial_example.zig` |
 | One-recipient gift-wrap outbound build and unwrap | `nip59_build_outbound_for_recipient`, `nip59_unwrap`, `nip17_unwrap_message`, `nip17_build_recipient_tag`, `nip17_relay_list_extract` | `nip17_wrap_recipe.zig` | `nip59_adversarial_example.zig` |
 | File-message parse and deterministic tag building | `nip17_file_message_parse`, `nip17_unwrap_file_message`, `nip17_build_file_*_tag` | `nip17_example.zig` | `nip17_adversarial_example.zig` |
 | Wallet Connect envelope and JSON helpers | `connection_uri_parse`, `connection_uri_format`, `request_event_extract`, `response_event_extract`, `notification_event_extract`, `request_parse_json`, `response_parse_json` | `nip47_example.zig` | `wallet_connect_adversarial_example.zig` |
@@ -88,6 +89,10 @@ opening a file.
   - `nip13_example.zig`
   - `nip09_example.zig`
 - mailbox/private-message handoff:
+  - `nip04_dm_recipe.zig`
+    - symbols: `nip04_encrypt`, `nip04_decrypt`, `nip04_message_parse`
+  - `nip04_example.zig`
+  - `nip04_adversarial_example.zig`
   - `nip17_wrap_recipe.zig`
     - symbols: `nip59_build_outbound_for_recipient`, `nip17_unwrap_message`
   - `nip17_example.zig`
@@ -170,6 +175,7 @@ Each implemented kernel NIP now has a direct reference example.
 - `nip01_adversarial_example.zig`
 - `nip02_example.zig`
 - `nip03_example.zig`
+- `nip04_example.zig`
 - `nip05_example.zig`
 - `nip05_adversarial_example.zig`
 - `nip06_example.zig`
@@ -260,6 +266,8 @@ The recipe files are slightly higher-level, but still stay inside `noztr` bounda
   - NIP-46 request, URI, and template composition
 - `nip03_verification_recipe.zig`
   - NIP-03 extraction plus bounded local-proof verification
+- `nip04_dm_recipe.zig`
+  - `NIP-04` local encrypt/decrypt plus strict kind-4 event parse/verify flow
 - `nip17_wrap_recipe.zig`
   - NIP-17 rumor construction, deterministic one-recipient seal/wrap transcript building, and unwrap
 - `nip29_reducer_recipe.zig`
@@ -279,6 +287,8 @@ These are the first files to open when you need the failure contract for a bound
   - mismatched relay challenge stays on typed `NIP-42` auth failures
 - `nip03_adversarial_example.zig`
   - malformed OpenTimestamps proof payload stays on typed `InvalidBase64`
+- `nip04_adversarial_example.zig`
+  - malformed legacy payloads and duplicate recipient tags stay on typed `NIP-04` failures
 - `nip17_adversarial_example.zig`
   - overlong recipient and relay builder input stays on typed `NIP-17` failures
 - `nip37_adversarial_example.zig`

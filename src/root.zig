@@ -141,6 +141,9 @@ pub const nip03_opentimestamps = @import("nip03_opentimestamps.zig");
 /// Phase H deferred-backlog concrete export for the NIP-17 private direct-message module.
 pub const nip17_private_messages = @import("nip17_private_messages.zig");
 
+/// Phase H deferred-backlog concrete export for the NIP-04 legacy direct-message module.
+pub const nip04 = @import("nip04.zig");
+
 /// Phase H deferred-backlog concrete export for the NIP-39 external-identity module.
 pub const nip39_external_identities = @import("nip39_external_identities.zig");
 
