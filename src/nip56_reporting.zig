@@ -181,18 +181,6 @@ pub fn report_build_server_tag(
     return output.as_event_tag();
 }
 
-/// Compatibility alias for older NIP-56 `p` report tag builder naming.
-pub const build_pubkey_report_tag = report_build_pubkey_tag;
-
-/// Compatibility alias for older NIP-56 `e` report tag builder naming.
-pub const build_event_report_tag = report_build_event_tag;
-
-/// Compatibility alias for older NIP-56 `x` report tag builder naming.
-pub const build_blob_report_tag = report_build_blob_tag;
-
-/// Compatibility alias for older NIP-56 `server` tag builder naming.
-pub const build_server_tag = report_build_server_tag;
-
 fn apply_report_tag(
     tag: nip01_event.EventTag,
     pubkey_target: *?PubkeyReportTarget,

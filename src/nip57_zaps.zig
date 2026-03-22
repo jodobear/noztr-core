@@ -323,18 +323,6 @@ pub fn zap_build_kind_tag(
     return output.as_event_tag();
 }
 
-/// Compatibility alias for older NIP-57 target `p` tag builder naming.
-pub const build_pubkey_tag = zap_build_pubkey_tag;
-
-/// Compatibility alias for older NIP-57 target `e` tag builder naming.
-pub const build_event_tag = zap_build_event_tag;
-
-/// Compatibility alias for older NIP-57 target `a` tag builder naming.
-pub const build_coordinate_tag = zap_build_coordinate_tag;
-
-/// Compatibility alias for older NIP-57 target `k` tag builder naming.
-pub const build_kind_tag = zap_build_kind_tag;
-
 /// Builds a bounded `bolt11` tag for NIP-57 receipts.
 pub fn receipt_build_bolt11_tag(
     output: *BuiltTag,

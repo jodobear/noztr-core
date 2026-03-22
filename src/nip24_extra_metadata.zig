@@ -189,15 +189,6 @@ pub fn common_tags_build_hashtag_tag(
     return output.as_event_tag();
 }
 
-/// Compatibility alias for older generic NIP-24 `r` tag builder naming.
-pub const build_reference_tag = common_tags_build_reference_tag;
-
-/// Compatibility alias for older generic NIP-24 `title` tag builder naming.
-pub const build_title_tag = common_tags_build_title_tag;
-
-/// Compatibility alias for older generic NIP-24 `t` hashtag tag builder naming.
-pub const build_hashtag_tag = common_tags_build_hashtag_tag;
-
 fn parse_known_extra_field(
     extras: *MetadataExtras,
     key: []const u8,

@@ -13,6 +13,13 @@ For the public versioning policy, see
 
 ## [Unreleased]
 
+### Breaking Changes
+
+- removed temporary public naming aliases introduced during the API-naming normalization pass
+- downstream callers should now use the canonical symbol names only
+- migration guide:
+  - [docs/guides/migrating-from-0.1.0-rc.1.md](docs/guides/migrating-from-0.1.0-rc.1.md)
+
 ## [0.1.0-rc.1] - 2026-03-21
 
 Release type: rc

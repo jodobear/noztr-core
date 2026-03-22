@@ -78,12 +78,6 @@ pub fn uri_is_valid(input: []const u8, tlv_scratch: []u8) bool {
     return true;
 }
 
-/// Compatibility alias for older NIP-21 parser naming.
-pub const nip21_parse = uri_parse;
-
-/// Compatibility alias for older NIP-21 validator naming.
-pub const nip21_is_valid = uri_is_valid;
-
 fn has_forbidden_separator(identifier: []const u8) bool {
     std.debug.assert(identifier.len <= limits.nip19_bech32_identifier_bytes_max);
     std.debug.assert(limits.nip21_scheme_prefix_bytes == 6);

@@ -118,6 +118,11 @@ Practical support expectations:
 - release-facing changes should be documented
 - downstream feedback still matters before claiming a fully settled compatibility story
 
+If you are updating from an older pre-`1.0` public line and a release note or changelog entry marks
+the change as breaking, use the relevant migration guide first:
+
+- [guides/migrating-from-0.1.0-rc.1.md](guides/migrating-from-0.1.0-rc.1.md)
+
 ## What `noztr` Does Not Support
 
 By default, `noztr` does not try to support:

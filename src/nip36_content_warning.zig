@@ -86,15 +86,6 @@ pub fn content_warning_build_label_tag(
     };
 }
 
-/// Compatibility alias for older NIP-36 content-warning tag builder naming.
-pub const build_content_warning_tag = content_warning_build_tag;
-
-/// Compatibility alias for older NIP-36 namespace tag builder naming.
-pub const build_content_warning_namespace_tag = content_warning_build_namespace_tag;
-
-/// Compatibility alias for older NIP-36 label tag builder naming.
-pub const build_content_warning_label_tag = content_warning_build_label_tag;
-
 /// Returns whether a parsed NIP-32 namespace is the NIP-36 content-warning namespace.
 pub fn namespace_is_content_warning(namespace: nip32_labeling.LabelNamespace) bool {
     std.debug.assert(namespace.value.len <= limits.tag_item_bytes_max);

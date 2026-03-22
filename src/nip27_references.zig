@@ -46,7 +46,7 @@ pub fn reference_extract(
 
         const uri = content[index..end_index];
         const scratch = scratch_slot(tlv_scratch, count);
-        const parsed = nip21_uri.nip21_parse(uri, scratch) catch {
+        const parsed = nip21_uri.uri_parse(uri, scratch) catch {
             index += next_char_len(content[index..]);
             continue;
         };

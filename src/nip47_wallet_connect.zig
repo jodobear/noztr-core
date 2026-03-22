@@ -363,9 +363,6 @@ pub fn connection_uri_serialize(
     return output[0..@intCast(index)];
 }
 
-/// Compatibility alias for older Wallet Connect URI formatter naming.
-pub const connection_uri_format = connection_uri_serialize;
-
 pub fn info_event_extract(
     event: *const nip01_event.Event,
     out_capabilities: [][]const u8,
