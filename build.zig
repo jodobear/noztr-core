@@ -59,8 +59,36 @@ pub fn build(builder: *std.Build) void {
     test_step.dependOn(&run_unit_tests.step);
     test_step.dependOn(&run_unit_tests_core_only.step);
     add_example_test_step(builder, test_step, "examples");
+    add_lint_steps(builder);
     add_empirical_benchmark_step(builder, target, optimize, root_module);
     add_rc_stress_throughput_step(builder, target, optimize, root_module);
+}
+
+fn add_lint_steps(builder: *std.Build) void {
+    std.debug.assert(@sizeOf(std.Build.Step) > 0);
+    std.debug.assert(!@inComptime());
+
+    const fmt_check = builder.addSystemCommand(&.{
+        "zig",
+        "fmt",
+        "--check",
+        "build.zig",
+        "build.zig.zon",
+        "src",
+        "examples",
+        "tools",
+    });
+    const fmt_check_step = builder.step(
+        "fmt-check",
+        "Check Zig and ZON formatting with zig fmt --check",
+    );
+    fmt_check_step.dependOn(&fmt_check.step);
+
+    const lint_step = builder.step(
+        "lint",
+        "Run the minimal noztr lint gate",
+    );
+    lint_step.dependOn(&fmt_check.step);
 }
 
 fn add_empirical_benchmark_step(

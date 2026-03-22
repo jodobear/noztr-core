@@ -630,7 +630,7 @@ test "NIP-61 extracts nutzaps and redemption markers" {
 test "NIP-61 builds canonical tags" {
     var tag: BuiltTag = .{};
 
-    const mint = try informational_build_mint_tag(&tag, "https://mint.example", &.{ "sat" });
+    const mint = try informational_build_mint_tag(&tag, "https://mint.example", &.{"sat"});
     try std.testing.expectEqualStrings("mint", mint.items[0]);
     try std.testing.expectEqualStrings("sat", mint.items[2]);
 

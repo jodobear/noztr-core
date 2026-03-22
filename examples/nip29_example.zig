@@ -9,7 +9,7 @@ test "NIP-29 example: parse group references and metadata snapshots" {
     const tags = [_]noztr.nip01_event.EventTag{
         .{ .items = &.{ "d", "my-group" } },
         .{ .items = &.{ "name", "Example Group" } },
-        .{ .items = &.{ "public" } },
+        .{ .items = &.{"public"} },
     };
     const event = common.simple_event(39000, [_]u8{0x29} ** 32, "", tags[0..]);
     const metadata = try noztr.nip29_relay_groups.group_metadata_extract(&event);

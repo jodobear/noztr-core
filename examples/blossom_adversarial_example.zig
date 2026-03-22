@@ -32,9 +32,7 @@ test "NIP-B7 adversarial example: malformed server urls and blob urls stay typed
         noztr.nipb7_blossom_servers.blossom_build_fallback_url_for_blob(
             url_output[0..],
             "https://blossom.example.com",
-            "https://cdn.example.com/"
-            ++ "b1674191a88ec5cdd733e4240a81803105dc412d6c6708d53ab94fc248f4f553.pdf"
-            ++ "?download=1",
+            "https://cdn.example.com/" ++ "b1674191a88ec5cdd733e4240a81803105dc412d6c6708d53ab94fc248f4f553.pdf" ++ "?download=1",
         ),
     );
 }

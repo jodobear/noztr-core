@@ -642,8 +642,7 @@ test "NIP-28 extracts channel create metadata" {
         .created_at = 1,
         .kind = channel_create_kind,
         .tags = &.{},
-        .content =
-            "{\"name\":\"Demo\",\"about\":\"A room\",\"picture\":\"https://img.example/p.png\",\"relays\":[\"wss://relay.one\"]}",
+        .content = "{\"name\":\"Demo\",\"about\":\"A room\",\"picture\":\"https://img.example/p.png\",\"relays\":[\"wss://relay.one\"]}",
         .sig = [_]u8{0x22} ** 64,
     };
     var relays: [1][]const u8 = undefined;

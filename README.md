@@ -59,6 +59,7 @@ For the full implemented surface, including narrower and optional/gated modules,
 ## Build and test
 
 ```bash
+zig build lint
 zig build test --summary all
 zig build
 ```
@@ -66,6 +67,11 @@ zig build
 The test gate currently includes the full root-module suite, a core-only root-module suite, and
 the downstream `examples/` suite. Those counts overlap across configurations, so they should be
 read as execution totals rather than unique logical test cases.
+
+The lint gate is intentionally narrow and functional:
+
+- `zig build lint` runs `zig fmt --check` across the tracked Zig/ZON surface
+- build/test correctness remains enforced by `zig build test --summary all` and `zig build`
 
 ## Benchmark evidence
 

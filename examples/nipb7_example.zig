@@ -28,15 +28,13 @@ test "NIP-B7 example: extract servers and derive a fallback blob URL" {
     const fallback = try noztr.nipb7_blossom_servers.blossom_build_fallback_url_for_blob(
         url_output[0..],
         parsed.server_urls[0],
-        "https://cdn.broken-domain.com/"
-        ++ "b1674191a88ec5cdd733e4240a81803105dc412d6c6708d53ab94fc248f4f553.pdf",
+        "https://cdn.broken-domain.com/" ++ "b1674191a88ec5cdd733e4240a81803105dc412d6c6708d53ab94fc248f4f553.pdf",
     );
 
     try std.testing.expectEqual(@as(usize, 2), parsed.server_urls.len);
     try std.testing.expectEqualStrings("https://blossom.self.hosted", parsed.server_urls[0]);
     try std.testing.expectEqualStrings(
-        "https://blossom.self.hosted/"
-        ++ "b1674191a88ec5cdd733e4240a81803105dc412d6c6708d53ab94fc248f4f553.pdf",
+        "https://blossom.self.hosted/" ++ "b1674191a88ec5cdd733e4240a81803105dc412d6c6708d53ab94fc248f4f553.pdf",
         fallback,
     );
 }

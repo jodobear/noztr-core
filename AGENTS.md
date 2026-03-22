@@ -61,6 +61,7 @@ scope first.
 Run these after code changes:
 
 ```bash
+zig build lint
 zig build test --summary all
 zig build
 ```

@@ -536,7 +536,7 @@ test "private list JSON escapes control bytes in tag items" {
     var buffer: [32]u8 = undefined;
     var stream = std.io.fixedBufferStream(&buffer);
 
-    try write_private_string_json(stream.writer(), &[_]u8{ 0x01 });
+    try write_private_string_json(stream.writer(), &[_]u8{0x01});
     try std.testing.expectEqualStrings("\"\\u0001\"", buffer[0..stream.pos]);
 }
 

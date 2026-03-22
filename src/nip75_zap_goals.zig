@@ -363,7 +363,8 @@ test "NIP-75 extracts goal metadata and relays" {
 
 test "NIP-75 extracts goal references from other events" {
     const tags = [_]nip01_event.EventTag{
-        .{ .items = &.{ "goal",
+        .{ .items = &.{
+            "goal",
             "1111111111111111111111111111111111111111111111111111111111111111",
             "wss://relay.example.com",
         } },
@@ -406,7 +407,7 @@ test "NIP-75 builds canonical goal tags" {
     var relays_built: BuiltTag = .{};
     var amount_built: BuiltTag = .{};
 
-    const relays = try goal_build_relays_tag(&relays_built, &.{ "wss://relay.one" });
+    const relays = try goal_build_relays_tag(&relays_built, &.{"wss://relay.one"});
     const amount = try goal_build_amount_tag(&amount_built, 210000);
 
     try std.testing.expectEqualStrings("relays", relays.items[0]);

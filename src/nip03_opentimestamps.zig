@@ -356,8 +356,7 @@ fn proof_parse_operation(cursor: *ProofCursor, tag: u8) Nip03Error!void {
         ots_op_append, ots_op_prepend => {
             _ = try proof_read_varbytes(cursor, 4096, 1);
         },
-        ots_op_reverse, ots_op_hexlify, ots_op_sha1, ots_op_ripemd160, ots_op_sha256,
-        ots_op_keccak256 => {},
+        ots_op_reverse, ots_op_hexlify, ots_op_sha1, ots_op_ripemd160, ots_op_sha256, ots_op_keccak256 => {},
         else => return error.InvalidProofOperation,
     }
 }

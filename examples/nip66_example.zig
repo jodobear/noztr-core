@@ -98,4 +98,3 @@ test "NIP-66 example: extract relay discovery and monitor metadata" {
     try std.testing.expectEqualStrings("open", timeouts[0].check.?);
     try std.testing.expectEqualStrings("dns", checks[0]);
 }
-

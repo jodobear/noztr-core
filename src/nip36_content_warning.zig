@@ -149,7 +149,7 @@ test "content warning extract treats empty reason as absent" {
 
 test "content warning extract handles absent and reasonless tags" {
     const absent_tags = [_]nip01_event.EventTag{.{ .items = &.{ "t", "nostr" } }};
-    const reasonless_tags = [_]nip01_event.EventTag{.{ .items = &.{ tag_name } }};
+    const reasonless_tags = [_]nip01_event.EventTag{.{ .items = &.{tag_name} }};
 
     try std.testing.expect((try content_warning_extract(&test_event(absent_tags[0..]))) == null);
     const parsed = try content_warning_extract(&test_event(reasonless_tags[0..]));

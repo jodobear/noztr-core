@@ -10,7 +10,8 @@ test "NIP-34 example: extract repository announcement metadata" {
         .{ .items = &.{ "web", "https://example.com/noztr" } },
         .{ .items = &.{ "clone", "https://git.example.com/noztr.git" } },
         .{ .items = &.{ "relays", "wss://relay.example.com" } },
-        .{ .items = &.{ "maintainers",
+        .{ .items = &.{
+            "maintainers",
             "1111111111111111111111111111111111111111111111111111111111111111",
         } },
         .{ .items = &.{ "t", "nostr" } },

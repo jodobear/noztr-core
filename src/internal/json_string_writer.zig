@@ -9,7 +9,7 @@ pub fn write_string_json(
     writer: anytype,
     value: []const u8,
     control_bytes: ControlBytes,
-) error{BufferTooSmall, InvalidControlByte}!void {
+) error{ BufferTooSmall, InvalidControlByte }!void {
     try write_byte(writer, '"');
     for (value) |byte| {
         if (byte == '"' or byte == '\\') {
@@ -66,7 +66,7 @@ test "json string writer rejects control bytes when configured" {
 
     try std.testing.expectError(
         error.InvalidControlByte,
-        write_string_json(stream.writer(), &[_]u8{ 0x01 }, .reject),
+        write_string_json(stream.writer(), &[_]u8{0x01}, .reject),
     );
 }
 
@@ -74,7 +74,7 @@ test "json string writer escapes control bytes when configured" {
     var buffer: [32]u8 = undefined;
     var stream = std.io.fixedBufferStream(&buffer);
 
-    try write_string_json(stream.writer(), &[_]u8{ 0x01 }, .escape);
+    try write_string_json(stream.writer(), &[_]u8{0x01}, .escape);
     try std.testing.expectEqualStrings("\"\\u0001\"", buffer[0..stream.pos]);
 }
 

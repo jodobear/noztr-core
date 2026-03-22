@@ -7,7 +7,8 @@ test "NIP-54 example: extract wiki article metadata and normalize identifiers" {
         .{ .items = &.{ "d", "nostr-wiki" } },
         .{ .items = &.{ "title", "Nostr Wiki" } },
         .{ .items = &.{ "summary", "shared notes" } },
-        .{ .items = &.{ "a",
+        .{ .items = &.{
+            "a",
             "30818:1111111111111111111111111111111111111111111111111111111111111111:nostr-wiki",
             "wss://relay.example.com",
             "fork",

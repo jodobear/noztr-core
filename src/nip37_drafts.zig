@@ -555,7 +555,7 @@ test "draft private JSON rejects control bytes in tag items" {
 
     try std.testing.expectError(
         error.InvalidPrivateTagArray,
-        write_private_string_json(stream.writer(), &[_]u8{ 0x01 }),
+        write_private_string_json(stream.writer(), &[_]u8{0x01}),
     );
 }
 

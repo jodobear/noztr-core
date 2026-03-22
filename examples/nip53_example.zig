@@ -8,7 +8,8 @@ test "NIP-53 example: extract live activity metadata and build chat activity tag
         .{ .items = &.{ "title", "Zig Weekly" } },
         .{ .items = &.{ "streaming", "https://stream.example.com/live" } },
         .{ .items = &.{ "status", "live" } },
-        .{ .items = &.{ "p",
+        .{ .items = &.{
+            "p",
             "1111111111111111111111111111111111111111111111111111111111111111",
             "wss://relay.example.com",
             "host",

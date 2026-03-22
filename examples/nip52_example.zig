@@ -8,7 +8,8 @@ test "NIP-52 example: extract date calendar metadata and build participant tags"
         .{ .items = &.{ "title", "Nostr Zig Meetup" } },
         .{ .items = &.{ "location", "Lisbon" } },
         .{ .items = &.{ "start", "2026-04-12" } },
-        .{ .items = &.{ "p",
+        .{ .items = &.{
+            "p",
             "1111111111111111111111111111111111111111111111111111111111111111",
             "wss://relay.example.com",
             "speaker",

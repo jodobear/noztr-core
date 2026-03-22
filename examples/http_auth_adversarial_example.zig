@@ -8,8 +8,7 @@ test "NIP-98 adversarial example: malformed headers and payload tags stay typed"
     const tags = [_]noztr.nip01_event.EventTag{
         .{ .items = &.{ "u", "https://api.example.com/upload" } },
         .{ .items = &.{ "method", "POST" } },
-        .{ .items = &.{ "payload",
-            "ABCDEFabcdef0123456789abcdef0123456789abcdef0123456789abcdef01" } },
+        .{ .items = &.{ "payload", "ABCDEFabcdef0123456789abcdef0123456789abcdef0123456789abcdef01" } },
     };
     const event = common.simple_event(
         noztr.nip98_http_auth.http_auth_kind,

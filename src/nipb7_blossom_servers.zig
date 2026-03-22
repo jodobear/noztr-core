@@ -449,9 +449,7 @@ test "blossom server builder canonicalizes and round-trips" {
 
 test "blossom blob reference uses the last bounded hash occurrence" {
     const reference = try blossom_extract_blob_reference(
-        "https://cdn.example.com/user/"
-        ++ "ec4425ff5e9446080d2f70440188e3ca5d6da8713db7bdeef73d0ed54d9093f0/media/"
-        ++ "B1674191A88EC5CDD733E4240A81803105DC412D6C6708D53AB94FC248F4F553.PDF",
+        "https://cdn.example.com/user/" ++ "ec4425ff5e9446080d2f70440188e3ca5d6da8713db7bdeef73d0ed54d9093f0/media/" ++ "B1674191A88EC5CDD733E4240A81803105DC412D6C6708D53AB94FC248F4F553.PDF",
     );
     var path_output: [96]u8 = undefined;
     const path = try blossom_build_fallback_path(path_output[0..], reference);
@@ -465,8 +463,7 @@ test "blossom blob reference uses the last bounded hash occurrence" {
 
 test "blossom fallback url builder joins canonical server and blob path" {
     const reference = try blossom_extract_blob_reference(
-        "http://download.example.com/downloads/"
-        ++ "b1674191a88ec5cdd733e4240a81803105dc412d6c6708d53ab94fc248f4f553",
+        "http://download.example.com/downloads/" ++ "b1674191a88ec5cdd733e4240a81803105dc412d6c6708d53ab94fc248f4f553",
     );
     var url_output: [160]u8 = undefined;
     const fallback = try blossom_build_fallback_url(
@@ -476,8 +473,7 @@ test "blossom fallback url builder joins canonical server and blob path" {
     );
 
     try std.testing.expectEqualStrings(
-        "https://blossom.self.hosted/"
-        ++ "b1674191a88ec5cdd733e4240a81803105dc412d6c6708d53ab94fc248f4f553",
+        "https://blossom.self.hosted/" ++ "b1674191a88ec5cdd733e4240a81803105dc412d6c6708d53ab94fc248f4f553",
         fallback,
     );
 }
@@ -492,16 +488,13 @@ test "blossom fallback rejects malformed blob references and server urls" {
     try std.testing.expectError(
         error.InvalidBlobExtension,
         blossom_extract_blob_reference(
-            "https://cdn.example.com/"
-            ++ "b1674191a88ec5cdd733e4240a81803105dc412d6c6708d53ab94fc248f4f553.",
+            "https://cdn.example.com/" ++ "b1674191a88ec5cdd733e4240a81803105dc412d6c6708d53ab94fc248f4f553.",
         ),
     );
     try std.testing.expectError(
         error.InvalidBlobUrl,
         blossom_extract_blob_reference(
-            "https://cdn.example.com/"
-            ++ "b1674191a88ec5cdd733e4240a81803105dc412d6c6708d53ab94fc248f4f553"
-            ++ "?download=1",
+            "https://cdn.example.com/" ++ "b1674191a88ec5cdd733e4240a81803105dc412d6c6708d53ab94fc248f4f553" ++ "?download=1",
         ),
     );
     try std.testing.expectError(
@@ -509,16 +502,14 @@ test "blossom fallback rejects malformed blob references and server urls" {
         blossom_build_fallback_url_for_blob(
             url_output[0..],
             "https://blossom.example.com?x=1",
-            "https://cdn.example.com/"
-            ++ "b1674191a88ec5cdd733e4240a81803105dc412d6c6708d53ab94fc248f4f553.pdf",
+            "https://cdn.example.com/" ++ "b1674191a88ec5cdd733e4240a81803105dc412d6c6708d53ab94fc248f4f553.pdf",
         ),
     );
 }
 
 test "blossom fallback keeps capacity failures typed" {
     const reference = try blossom_extract_blob_reference(
-        "https://cdn.example.com/"
-        ++ "b1674191a88ec5cdd733e4240a81803105dc412d6c6708d53ab94fc248f4f553.pdf",
+        "https://cdn.example.com/" ++ "b1674191a88ec5cdd733e4240a81803105dc412d6c6708d53ab94fc248f4f553.pdf",
     );
     var tiny_output: [8]u8 = undefined;
 
@@ -540,8 +531,7 @@ test "blossom blob reference ignores hash-like host labels" {
     try std.testing.expectError(
         error.InvalidBlobHash,
         blossom_extract_blob_reference(
-            "https://b1674191a88ec5cdd733e4240a81803105dc412d6c6708d53ab94fc248f4f553"
-            ++ ".example.com/file.pdf",
+            "https://b1674191a88ec5cdd733e4240a81803105dc412d6c6708d53ab94fc248f4f553" ++ ".example.com/file.pdf",
         ),
     );
 }
@@ -570,8 +560,7 @@ test "blossom public boundaries keep oversized inputs typed" {
         blossom_build_fallback_url_for_blob(
             output[0..],
             overlong_server[0..],
-            "https://cdn.example.com/"
-            ++ "b1674191a88ec5cdd733e4240a81803105dc412d6c6708d53ab94fc248f4f553.pdf",
+            "https://cdn.example.com/" ++ "b1674191a88ec5cdd733e4240a81803105dc412d6c6708d53ab94fc248f4f553.pdf",
         ),
     );
 }

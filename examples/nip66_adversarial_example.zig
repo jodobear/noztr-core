@@ -48,4 +48,3 @@ test "NIP-66 adversarial example: reject malformed timeout tag" {
         noztr.nip66_relay_discovery.relay_monitor_extract(&event, timeouts[0..], checks[0..]),
     );
 }
-

@@ -56,6 +56,7 @@ Do not route external readers into `.private-docs/`.
 Run these after code changes:
 
 ```bash
+zig build lint
 zig build test --summary all
 zig build
 ```
@@ -68,6 +69,9 @@ zig build
 
 Those counts overlap across configurations, so treat them as execution totals rather than unique
 logical test cases.
+
+`zig build lint` is intentionally narrow. It currently enforces `zig fmt --check` for the tracked
+Zig/ZON source surface rather than introducing a broader ceremonial lint layer.
 
 For docs-only changes, at minimum run:
 

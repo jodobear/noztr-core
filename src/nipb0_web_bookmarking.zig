@@ -374,7 +374,7 @@ test "web bookmark builders emit canonical bounded tags" {
 test "web bookmark extract rejects unsupported kind and invalid content" {
     const tags = [_]nip01_event.EventTag{.{ .items = &.{ "d", "alice.blog/post" } }};
     var hashtags: [0][]const u8 = .{};
-    const invalid_content = [_]u8{ 0xff };
+    const invalid_content = [_]u8{0xff};
     const wrong_kind_event = nip01_event.Event{
         .id = [_]u8{0} ** 32,
         .pubkey = [_]u8{0} ** 32,
