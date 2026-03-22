@@ -18,10 +18,14 @@ it does, the change should be explicit and downstream callers should get one cle
 
 ## What Changed
 
-Temporary compatibility aliases introduced during the API-naming normalization pass were removed.
-The canonical names remain.
+Two public-surface normalization changes landed after `v0.1.0-rc.1`:
 
-This is a breaking change for code that adopted the temporary alias symbols.
+- temporary compatibility aliases introduced during the API-naming normalization pass were removed
+- the remaining older public NIP-module error type names were normalized to the same module-shaped
+  naming pattern used across the rest of the library
+
+These are breaking changes for downstream code that referenced the removed alias symbols or the old
+error type names.
 
 ## Renamed Symbols
 
@@ -60,6 +64,34 @@ Use these canonical names now:
 - `noztr.nip57_zaps.build_kind_tag` ->
   `noztr.nip57_zaps.zap_build_kind_tag`
 
+## Renamed Error Types
+
+Use these public error type names now:
+
+- `noztr.nip02_contacts.ContactsError` -> `noztr.nip02_contacts.Nip02Error`
+- `noztr.nip03_opentimestamps.OpenTimestampsError` -> `noztr.nip03_opentimestamps.Nip03Error`
+- `noztr.nip09_delete.DeleteError` -> `noztr.nip09_delete.Nip09Error`
+- `noztr.nip10_threads.ThreadError` -> `noztr.nip10_threads.Nip10Error`
+- `noztr.nip18_reposts.RepostError` -> `noztr.nip18_reposts.Nip18Error`
+- `noztr.nip22_comments.CommentError` -> `noztr.nip22_comments.Nip22Error`
+- `noztr.nip23_long_form.LongFormError` -> `noztr.nip23_long_form.Nip23Error`
+- `noztr.nip25_reactions.ReactionError` -> `noztr.nip25_reactions.Nip25Error`
+- `noztr.nip27_references.ReferencesError` -> `noztr.nip27_references.Nip27Error`
+- `noztr.nip40_expire.ExpirationError` -> `noztr.nip40_expire.Nip40Error`
+- `noztr.nip42_auth.AuthError` -> `noztr.nip42_auth.Nip42Error`
+- `noztr.nip45_count.CountError` -> `noztr.nip45_count.Nip45Error`
+- `noztr.nip47_wallet_connect.NwcError` -> `noztr.nip47_wallet_connect.Nip47Error`
+- `noztr.nip50_search.SearchError` -> `noztr.nip50_search.Nip50Error`
+- `noztr.nip51_lists.ListError` -> `noztr.nip51_lists.Nip51Error`
+- `noztr.nip51_lists.PrivateListError` -> `noztr.nip51_lists.Nip51PrivateListError`
+- `noztr.nip59_wrap.WrapError` -> `noztr.nip59_wrap.Nip59Error`
+- `noztr.nip59_wrap.WrapBuildError` -> `noztr.nip59_wrap.Nip59BuildError`
+- `noztr.nip65_relays.RelaysError` -> `noztr.nip65_relays.Nip65Error`
+- `noztr.nip70_protected.ProtectedError` -> `noztr.nip70_protected.Nip70Error`
+- `noztr.nip77_negentropy.NegentropyError` -> `noztr.nip77_negentropy.Nip77Error`
+- `noztr.nipb0_web_bookmarking.WebBookmarkError` -> `noztr.nipb0_web_bookmarking.NipB0Error`
+- `noztr.nipc0_code_snippets.CodeSnippetError` -> `noztr.nipc0_code_snippets.NipC0Error`
+
 ## Why
 
 The goal was to make the public surface more coherent:
@@ -73,16 +105,15 @@ The goal was to make the public surface more coherent:
 
 If your project depends on `noztr-core`:
 
-1. update imports and call sites to the canonical names above
+1. update imports, call sites, and any explicit error type references to the canonical names above
 2. rerun your normal build and example/test lanes
 3. if you publish wrappers around `noztr`, consider re-exporting only the canonical names
 
 ## Scope
 
-This change only removes temporary public naming aliases. It does not change:
+These changes only normalize public symbol and error type names. They do not change:
 
 - wire formats
 - ownership model
 - typed error intent
 - protocol/kernel versus SDK boundary
-

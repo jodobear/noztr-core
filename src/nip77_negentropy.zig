@@ -3,7 +3,7 @@ const limits = @import("limits.zig");
 const nip01_filter = @import("nip01_filter.zig");
 
 /// Typed strict errors for NIP-77 negentropy parsing, ordering, and state transitions.
-pub const NegentropyError = error{
+pub const Nip77Error = error{
     InvalidNegOpen,
     InvalidNegMsg,
     InvalidNegClose,
@@ -79,7 +79,7 @@ const ParseKind = enum {
 pub fn negentropy_open_parse(
     input: []const u8,
     scratch: std.mem.Allocator,
-) NegentropyError!NegOpenMessage {
+) Nip77Error!NegOpenMessage {
     std.debug.assert(@intFromPtr(scratch.ptr) != 0);
     std.debug.assert(limits.nip77_negentropy_protocol_version > 0);
 
@@ -108,7 +108,7 @@ pub fn negentropy_open_parse(
 pub fn negentropy_msg_parse(
     input: []const u8,
     scratch: std.mem.Allocator,
-) NegentropyError!NegMsgMessage {
+) Nip77Error!NegMsgMessage {
     std.debug.assert(@intFromPtr(scratch.ptr) != 0);
     std.debug.assert(limits.nip77_negentropy_protocol_version > 0);
 
@@ -135,7 +135,7 @@ pub fn negentropy_msg_parse(
 pub fn negentropy_close_parse(
     input: []const u8,
     scratch: std.mem.Allocator,
-) NegentropyError!NegCloseMessage {
+) Nip77Error!NegCloseMessage {
     std.debug.assert(@intFromPtr(scratch.ptr) != 0);
     std.debug.assert(limits.subscription_id_bytes_max > 0);
 
@@ -156,7 +156,7 @@ pub fn negentropy_close_parse(
 pub fn negentropy_err_parse(
     input: []const u8,
     scratch: std.mem.Allocator,
-) NegentropyError!NegErrMessage {
+) Nip77Error!NegErrMessage {
     std.debug.assert(@intFromPtr(scratch.ptr) != 0);
     std.debug.assert(limits.subscription_id_bytes_max > 0);
 
@@ -178,7 +178,7 @@ pub fn negentropy_err_parse(
 pub fn negentropy_state_apply(
     state: *NegentropyState,
     message: *const NegentropyMessage,
-) NegentropyError!void {
+) Nip77Error!void {
     std.debug.assert(@intFromPtr(state) != 0);
     std.debug.assert(@intFromPtr(message) != 0);
 
@@ -226,7 +226,7 @@ pub fn negentropy_state_apply(
 }
 
 /// Validate strict ordering (`timestamp` asc, then lexical `id` asc).
-pub fn negentropy_items_validate_order(items: []const NegentropyItem) NegentropyError!void {
+pub fn negentropy_items_validate_order(items: []const NegentropyItem) Nip77Error!void {
     std.debug.assert(items.len <= limits.nip77_negentropy_hex_payload_bytes_max);
     std.debug.assert(@sizeOf(NegentropyItem) > 0);
 
@@ -258,7 +258,7 @@ fn parse_neg_array(
     input: []const u8,
     parse_allocator: std.mem.Allocator,
     parse_kind: ParseKind,
-) NegentropyError![]const std.json.Value {
+) Nip77Error![]const std.json.Value {
     std.debug.assert(@intFromPtr(parse_allocator.ptr) != 0);
     std.debug.assert(limits.nip77_negentropy_hex_payload_bytes_max > 0);
 
@@ -282,7 +282,7 @@ fn parse_neg_array(
     return root.array.items;
 }
 
-fn parse_input_limit_error(parse_kind: ParseKind) NegentropyError {
+fn parse_input_limit_error(parse_kind: ParseKind) Nip77Error {
     std.debug.assert(@sizeOf(ParseKind) > 0);
     std.debug.assert(limits.relay_message_bytes_max > 0);
 
@@ -292,7 +292,7 @@ fn parse_input_limit_error(parse_kind: ParseKind) NegentropyError {
     return parse_kind_error(parse_kind);
 }
 
-fn parse_command(value: std.json.Value, parse_kind: ParseKind) NegentropyError!void {
+fn parse_command(value: std.json.Value, parse_kind: ParseKind) Nip77Error!void {
     std.debug.assert(@sizeOf(std.json.Value) > 0);
     std.debug.assert(limits.subscription_id_bytes_max > 0);
 
@@ -328,7 +328,7 @@ fn parse_subscription_id(
     value: std.json.Value,
     scratch: std.mem.Allocator,
     parse_kind: ParseKind,
-) NegentropyError![]const u8 {
+) Nip77Error![]const u8 {
     std.debug.assert(@intFromPtr(scratch.ptr) != 0);
     std.debug.assert(limits.subscription_id_bytes_max > 0);
 
@@ -350,7 +350,7 @@ fn parse_subscription_id(
 fn parse_filter(
     value: std.json.Value,
     scratch: std.mem.Allocator,
-) NegentropyError!nip01_filter.Filter {
+) Nip77Error!nip01_filter.Filter {
     std.debug.assert(@intFromPtr(scratch.ptr) != 0);
     std.debug.assert(@sizeOf(nip01_filter.Filter) > 0);
 
@@ -364,7 +364,7 @@ fn parse_payload_hex(
     value: std.json.Value,
     scratch: std.mem.Allocator,
     parse_kind: ParseKind,
-) NegentropyError![]const u8 {
+) Nip77Error![]const u8 {
     std.debug.assert(@intFromPtr(scratch.ptr) != 0);
     std.debug.assert(limits.nip77_negentropy_hex_payload_bytes_max > 0);
 
@@ -384,7 +384,7 @@ fn parse_reason(
     value: std.json.Value,
     scratch: std.mem.Allocator,
     parse_kind: ParseKind,
-) NegentropyError![]const u8 {
+) Nip77Error![]const u8 {
     std.debug.assert(@intFromPtr(scratch.ptr) != 0);
     std.debug.assert(limits.subscription_id_bytes_max > 0);
 
@@ -422,7 +422,7 @@ fn reason_has_prefix_message(reason: []const u8) bool {
     return true;
 }
 
-fn payload_hex_validate(payload_hex: []const u8) NegentropyError!void {
+fn payload_hex_validate(payload_hex: []const u8) Nip77Error!void {
     std.debug.assert(limits.nip77_negentropy_hex_payload_bytes_max > 0);
     std.debug.assert(limits.nip77_negentropy_protocol_version > 0);
 
@@ -451,7 +451,7 @@ fn payload_hex_validate(payload_hex: []const u8) NegentropyError!void {
     }
 }
 
-fn hex_nibble(character: u8) NegentropyError!u8 {
+fn hex_nibble(character: u8) Nip77Error!u8 {
     std.debug.assert(character <= 255);
     std.debug.assert(limits.id_hex_length > 0);
 
@@ -460,7 +460,7 @@ fn hex_nibble(character: u8) NegentropyError!u8 {
     };
 }
 
-fn parse_kind_error(parse_kind: ParseKind) NegentropyError {
+fn parse_kind_error(parse_kind: ParseKind) Nip77Error {
     std.debug.assert(@sizeOf(ParseKind) > 0);
     std.debug.assert(limits.nip77_negentropy_session_steps_max > 0);
 
@@ -483,7 +483,7 @@ fn parse_kind_error(parse_kind: ParseKind) NegentropyError {
 fn state_set_subscription(
     state: *NegentropyState,
     subscription_id: []const u8,
-) NegentropyError!void {
+) Nip77Error!void {
     std.debug.assert(@intFromPtr(state) != 0);
     std.debug.assert(limits.subscription_id_bytes_max > 0);
 

@@ -264,16 +264,16 @@ test "root exports limits and error namespaces" {
     try std.testing.expect(@TypeOf(nip01_event.EventParseError) == type);
     try std.testing.expect(@TypeOf(nip01_filter.FilterParseError) == type);
     try std.testing.expect(@TypeOf(nip01_message.MessageParseError) == type);
-    try std.testing.expect(@TypeOf(nip42_auth.AuthError) == type);
-    try std.testing.expect(@TypeOf(nip70_protected.ProtectedError) == type);
+    try std.testing.expect(@TypeOf(nip42_auth.Nip42Error) == type);
+    try std.testing.expect(@TypeOf(nip70_protected.Nip70Error) == type);
     try std.testing.expect(@TypeOf(nip11.Nip11Error) == type);
-    try std.testing.expect(@TypeOf(nip09_delete.DeleteError) == type);
-    try std.testing.expect(@TypeOf(nip40_expire.ExpirationError) == type);
+    try std.testing.expect(@TypeOf(nip09_delete.Nip09Error) == type);
+    try std.testing.expect(@TypeOf(nip40_expire.Nip40Error) == type);
     try std.testing.expect(@TypeOf(nip92_media_attachments.Nip92Error) == type);
     try std.testing.expect(@TypeOf(nip94_file_metadata.Nip94Error) == type);
     try std.testing.expect(@TypeOf(nip99_classified_listings.Nip99Error) == type);
-    try std.testing.expect(@TypeOf(nipb0_web_bookmarking.WebBookmarkError) == type);
-    try std.testing.expect(@TypeOf(nipc0_code_snippets.CodeSnippetError) == type);
+    try std.testing.expect(@TypeOf(nipb0_web_bookmarking.NipB0Error) == type);
+    try std.testing.expect(@TypeOf(nipc0_code_snippets.NipC0Error) == type);
     try std.testing.expect(@TypeOf(nip64_chess_pgn.Nip64Error) == type);
     try std.testing.expect(@TypeOf(nip88_polls.Nip88Error) == type);
     try std.testing.expect(@TypeOf(nip98_http_auth.Nip98Error) == type);
@@ -282,26 +282,26 @@ test "root exports limits and error namespaces" {
     try std.testing.expect(@TypeOf(nip14_subjects.Nip14Error) == type);
     try std.testing.expect(@TypeOf(nip19_bech32.Nip19Error) == type);
     try std.testing.expect(@TypeOf(nip21_uri.Nip21Error) == type);
-    try std.testing.expect(@TypeOf(nip02_contacts.ContactsError) == type);
-    try std.testing.expect(@TypeOf(nip65_relays.RelaysError) == type);
-    try std.testing.expect(@TypeOf(nip10_threads.ThreadError) == type);
+    try std.testing.expect(@TypeOf(nip02_contacts.Nip02Error) == type);
+    try std.testing.expect(@TypeOf(nip65_relays.Nip65Error) == type);
+    try std.testing.expect(@TypeOf(nip10_threads.Nip10Error) == type);
     try std.testing.expect(@TypeOf(nip28_public_chat.Nip28Error) == type);
     try std.testing.expect(@TypeOf(nip30_custom_emoji.Nip30Error) == type);
-    try std.testing.expect(@TypeOf(nip18_reposts.RepostError) == type);
-    try std.testing.expect(@TypeOf(nip22_comments.CommentError) == type);
-    try std.testing.expect(@TypeOf(nip27_references.ReferencesError) == type);
-    try std.testing.expect(@TypeOf(nip25_reactions.ReactionError) == type);
-    try std.testing.expect(@TypeOf(nip51_lists.ListError) == type);
-    try std.testing.expect(@TypeOf(nip51_lists.PrivateListError) == type);
+    try std.testing.expect(@TypeOf(nip18_reposts.Nip18Error) == type);
+    try std.testing.expect(@TypeOf(nip22_comments.Nip22Error) == type);
+    try std.testing.expect(@TypeOf(nip27_references.Nip27Error) == type);
+    try std.testing.expect(@TypeOf(nip25_reactions.Nip25Error) == type);
+    try std.testing.expect(@TypeOf(nip51_lists.Nip51Error) == type);
+    try std.testing.expect(@TypeOf(nip51_lists.Nip51PrivateListError) == type);
     try std.testing.expect(@TypeOf(nip46_remote_signing.Nip46Error) == type);
-    try std.testing.expect(@TypeOf(nip47_wallet_connect.NwcError) == type);
+    try std.testing.expect(@TypeOf(nip47_wallet_connect.Nip47Error) == type);
     try std.testing.expect(@TypeOf(nip49_private_key_encryption.Nip49Error) == type);
     try std.testing.expect(@TypeOf(nip06_mnemonic.Nip06Error) == type);
     try std.testing.expect(@TypeOf(bip85_derivation.Bip85Error) == type);
     try std.testing.expect(@TypeOf(nostr_keys.NostrKeysError) == type);
-    try std.testing.expect(@TypeOf(nip23_long_form.LongFormError) == type);
+    try std.testing.expect(@TypeOf(nip23_long_form.Nip23Error) == type);
     try std.testing.expect(@TypeOf(nip24_extra_metadata.Nip24Error) == type);
-    try std.testing.expect(@TypeOf(nip03_opentimestamps.OpenTimestampsError) == type);
+    try std.testing.expect(@TypeOf(nip03_opentimestamps.Nip03Error) == type);
     try std.testing.expect(@TypeOf(nip17_private_messages.Nip17Error) == type);
     try std.testing.expect(@TypeOf(nip17_private_messages.Nip17RelayListError) == type);
     try std.testing.expect(@TypeOf(nip39_external_identities.Nip39Error) == type);
@@ -323,14 +323,14 @@ test "root exports limits and error namespaces" {
     try std.testing.expect(@TypeOf(nip75_zap_goals.Nip75Error) == type);
     try std.testing.expect(@TypeOf(nip86_relay_management.Nip86Error) == type);
     try std.testing.expect(@TypeOf(nip44.Nip44Error) == type);
-    try std.testing.expect(@TypeOf(nip59_wrap.WrapError) == type);
+    try std.testing.expect(@TypeOf(nip59_wrap.Nip59Error) == type);
     try std.testing.expect(@TypeOf(nip78_app_data.Nip78Error) == type);
     try std.testing.expect(@TypeOf(nip89_handlers.Nip89Error) == type);
-    try std.testing.expectEqual(i6_extensions_enabled, @hasDecl(nip45_count, "CountError"));
-    try std.testing.expectEqual(i6_extensions_enabled, @hasDecl(nip50_search, "SearchError"));
+    try std.testing.expectEqual(i6_extensions_enabled, @hasDecl(nip45_count, "Nip45Error"));
+    try std.testing.expectEqual(i6_extensions_enabled, @hasDecl(nip50_search, "Nip50Error"));
     try std.testing.expectEqual(
         i6_extensions_enabled,
-        @hasDecl(nip77_negentropy, "NegentropyError"),
+        @hasDecl(nip77_negentropy, "Nip77Error"),
     );
     try std.testing.expect(@TypeOf(nip19_bech32.Nip19Entity) == type);
     try std.testing.expect(@TypeOf(nip21_uri.Nip21Reference) == type);
@@ -527,14 +527,14 @@ test "root exports limits and error namespaces" {
             fn (
                 *const nip01_event.Event,
                 [][]const u8,
-            ) nip23_long_form.LongFormError!nip23_long_form.LongFormMetadata,
+            ) nip23_long_form.Nip23Error!nip23_long_form.LongFormMetadata,
     );
     try std.testing.expect(
         @TypeOf(nip23_long_form.long_form_build_identifier_tag) ==
             fn (
                 *nip23_long_form.BuiltTag,
                 []const u8,
-            ) nip23_long_form.LongFormError!nip01_event.EventTag,
+            ) nip23_long_form.Nip23Error!nip01_event.EventTag,
     );
     try std.testing.expect(
         @TypeOf(nip24_extra_metadata.metadata_extras_parse_json) ==
@@ -548,14 +548,14 @@ test "root exports limits and error namespaces" {
             fn (
                 []u8,
                 *const nip01_event.Event,
-            ) nip03_opentimestamps.OpenTimestampsError!nip03_opentimestamps.OpenTimestampsAttestation,
+            ) nip03_opentimestamps.Nip03Error!nip03_opentimestamps.OpenTimestampsAttestation,
     );
     try std.testing.expect(
         @TypeOf(nip03_opentimestamps.opentimestamps_validate_local_proof) ==
             fn (
                 *const nip03_opentimestamps.OpenTimestampsAttestation,
                 []const u8,
-            ) nip03_opentimestamps.OpenTimestampsError!void,
+            ) nip03_opentimestamps.Nip03Error!void,
     );
     try std.testing.expect(
         @TypeOf(nip17_private_messages.nip17_file_message_parse) ==
@@ -595,7 +595,7 @@ test "root exports limits and error namespaces" {
                 *nip03_opentimestamps.BuiltTag,
                 []const u8,
                 ?[]const u8,
-            ) nip03_opentimestamps.OpenTimestampsError!nip01_event.EventTag,
+            ) nip03_opentimestamps.Nip03Error!nip01_event.EventTag,
     );
     try std.testing.expect(
         @TypeOf(nip17_private_messages.nip17_message_parse) ==
@@ -727,7 +727,7 @@ test "root exports limits and error namespaces" {
     try std.testing.expect(@TypeOf(DeleteExtractCheckedError) == type);
     try std.testing.expect(
         @TypeOf(nip51_lists.list_private_serialize_json) ==
-            fn ([]u8, []const nip01_event.EventTag) nip51_lists.PrivateListError![]const u8,
+            fn ([]u8, []const nip01_event.EventTag) nip51_lists.Nip51PrivateListError![]const u8,
     );
     try std.testing.expect(
         @TypeOf(nip51_lists.list_private_extract_json) ==
@@ -736,7 +736,7 @@ test "root exports limits and error namespaces" {
                 []const u8,
                 []nip51_lists.ListItem,
                 std.mem.Allocator,
-            ) nip51_lists.PrivateListError!nip51_lists.PrivateListInfo,
+            ) nip51_lists.Nip51PrivateListError!nip51_lists.PrivateListInfo,
     );
     try std.testing.expect(
         @TypeOf(nip51_lists.list_private_extract_nip44) ==
@@ -746,7 +746,7 @@ test "root exports limits and error namespaces" {
                 *const [32]u8,
                 []nip51_lists.ListItem,
                 std.mem.Allocator,
-            ) nip51_lists.PrivateListError!nip51_lists.PrivateListInfo,
+            ) nip51_lists.Nip51PrivateListError!nip51_lists.PrivateListInfo,
     );
     try std.testing.expect(
         @TypeOf(nip19_bech32.nip19_encode) ==
@@ -766,7 +766,7 @@ test "root exports limits and error namespaces" {
             fn (
                 *const nip01_event.Event,
                 []nip02_contacts.ContactEntry,
-            ) nip02_contacts.ContactsError!u16,
+            ) nip02_contacts.Nip02Error!u16,
     );
     try std.testing.expect(
         @TypeOf(nip65_relays.relay_marker_parse) ==
@@ -777,26 +777,26 @@ test "root exports limits and error namespaces" {
             fn (
                 *const nip01_event.Event,
                 []nip65_relays.RelayPermission,
-            ) nip65_relays.RelaysError!u16,
+            ) nip65_relays.Nip65Error!u16,
     );
     try std.testing.expect(
         @TypeOf(nip10_threads.thread_extract) ==
             fn (
                 *const nip01_event.Event,
                 []nip10_threads.ThreadReference,
-            ) nip10_threads.ThreadError!nip10_threads.ThreadInfo,
+            ) nip10_threads.Nip10Error!nip10_threads.ThreadInfo,
     );
     try std.testing.expect(
         @TypeOf(nip18_reposts.repost_parse) ==
             fn (
                 *const nip01_event.Event,
-            ) nip18_reposts.RepostError!nip18_reposts.RepostTarget,
+            ) nip18_reposts.Nip18Error!nip18_reposts.RepostTarget,
     );
     try std.testing.expect(
         @TypeOf(nip22_comments.comment_parse) ==
             fn (
                 *const nip01_event.Event,
-            ) nip22_comments.CommentError!nip22_comments.CommentInfo,
+            ) nip22_comments.Nip22Error!nip22_comments.CommentInfo,
     );
     try std.testing.expect(
         @TypeOf(nip27_references.reference_extract) ==
@@ -804,41 +804,41 @@ test "root exports limits and error namespaces" {
                 []const u8,
                 []nip27_references.ContentReference,
                 []u8,
-            ) nip27_references.ReferencesError!u16,
+            ) nip27_references.Nip27Error!u16,
     );
     try std.testing.expect(
         @TypeOf(nip25_reactions.reaction_parse) ==
             fn (
                 *const nip01_event.Event,
-            ) nip25_reactions.ReactionError!nip25_reactions.ReactionTarget,
+            ) nip25_reactions.Nip25Error!nip25_reactions.ReactionTarget,
     );
     try std.testing.expect(
         @TypeOf(nip51_lists.list_extract) ==
             fn (
                 *const nip01_event.Event,
                 []nip51_lists.ListItem,
-            ) nip51_lists.ListError!nip51_lists.ListInfo,
+            ) nip51_lists.Nip51Error!nip51_lists.ListInfo,
     );
     try std.testing.expect(
         @TypeOf(nip51_lists.list_build_identifier_tag) ==
             fn (
                 *nip51_lists.BuiltTag,
                 []const u8,
-            ) nip51_lists.ListError!nip01_event.EventTag,
+            ) nip51_lists.Nip51Error!nip01_event.EventTag,
     );
     try std.testing.expect(
         @TypeOf(nip51_lists.bookmark_build_tag) ==
             fn (
                 *nip51_lists.BuiltTag,
                 nip51_lists.BookmarkBuilderItem,
-            ) nip51_lists.ListError!nip01_event.EventTag,
+            ) nip51_lists.Nip51Error!nip01_event.EventTag,
     );
     try std.testing.expect(
         @TypeOf(nip51_lists.emoji_build_tag) ==
             fn (
                 *nip51_lists.BuiltTag,
                 *const nip51_lists.ListEmoji,
-            ) nip51_lists.ListError!nip01_event.EventTag,
+            ) nip51_lists.Nip51Error!nip01_event.EventTag,
     );
     try std.testing.expect(
         @TypeOf(nip05_identity.address_parse) ==
@@ -1236,7 +1236,7 @@ test "root exports limits and error namespaces" {
     );
     try std.testing.expect(
         @TypeOf(nip59_wrap.nip59_validate_wrap_structure) ==
-            fn (*const nip01_event.Event) nip59_wrap.WrapError!void,
+            fn (*const nip01_event.Event) nip59_wrap.Nip59Error!void,
     );
     try std.testing.expect(
         @TypeOf(nip59_wrap.nip59_unwrap) ==
@@ -1245,33 +1245,33 @@ test "root exports limits and error namespaces" {
                 *const [32]u8,
                 *const nip01_event.Event,
                 std.mem.Allocator,
-            ) nip59_wrap.WrapError!void,
+            ) nip59_wrap.Nip59Error!void,
     );
     if (i6_extensions_enabled) {
-        try std.testing.expect(@TypeOf(nip45_count.CountError) == type);
-        try std.testing.expect(@TypeOf(nip50_search.SearchError) == type);
-        try std.testing.expect(@TypeOf(nip77_negentropy.NegentropyError) == type);
+        try std.testing.expect(@TypeOf(nip45_count.Nip45Error) == type);
+        try std.testing.expect(@TypeOf(nip50_search.Nip50Error) == type);
+        try std.testing.expect(@TypeOf(nip77_negentropy.Nip77Error) == type);
         try std.testing.expect(
             @TypeOf(nip45_count.count_client_message_parse) ==
                 fn (
                     []const u8,
                     std.mem.Allocator,
-                ) nip45_count.CountError!nip45_count.CountClientMessage,
+                ) nip45_count.Nip45Error!nip45_count.CountClientMessage,
         );
         try std.testing.expect(
             @TypeOf(nip45_count.count_relay_message_parse) ==
                 fn (
                     []const u8,
                     std.mem.Allocator,
-                ) nip45_count.CountError!nip45_count.CountRelayMessage,
+                ) nip45_count.Nip45Error!nip45_count.CountRelayMessage,
         );
         try std.testing.expect(
             @TypeOf(nip45_count.count_metadata_validate) ==
-                fn (*const nip45_count.CountMetadata) nip45_count.CountError!void,
+                fn (*const nip45_count.CountMetadata) nip45_count.Nip45Error!void,
         );
         try std.testing.expect(
             @TypeOf(nip50_search.search_field_validate) ==
-                fn ([]const u8) nip50_search.SearchError!void,
+                fn ([]const u8) nip50_search.Nip50Error!void,
         );
         try std.testing.expect(
             @TypeOf(nip50_search.search_tokens_parse) ==
@@ -1285,25 +1285,25 @@ test "root exports limits and error namespaces" {
                 fn (
                     []const u8,
                     std.mem.Allocator,
-                ) nip77_negentropy.NegentropyError!nip77_negentropy.NegOpenMessage,
+                ) nip77_negentropy.Nip77Error!nip77_negentropy.NegOpenMessage,
         );
         try std.testing.expect(
             @TypeOf(nip77_negentropy.negentropy_msg_parse) ==
                 fn (
                     []const u8,
                     std.mem.Allocator,
-                ) nip77_negentropy.NegentropyError!nip77_negentropy.NegMsgMessage,
+                ) nip77_negentropy.Nip77Error!nip77_negentropy.NegMsgMessage,
         );
         try std.testing.expect(
             @TypeOf(nip77_negentropy.negentropy_state_apply) ==
                 fn (
                     *nip77_negentropy.NegentropyState,
                     *const nip77_negentropy.NegentropyMessage,
-                ) nip77_negentropy.NegentropyError!void,
+                ) nip77_negentropy.Nip77Error!void,
         );
         try std.testing.expect(
             @TypeOf(nip77_negentropy.negentropy_items_validate_order) ==
-                fn ([]const nip77_negentropy.NegentropyItem) nip77_negentropy.NegentropyError!void,
+                fn ([]const nip77_negentropy.NegentropyItem) nip77_negentropy.Nip77Error!void,
         );
     }
     try std.testing.expect(

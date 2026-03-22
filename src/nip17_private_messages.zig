@@ -16,7 +16,7 @@ pub const Nip17RelayListError = error{
     BufferTooSmall,
 };
 
-pub const Nip17Error = nip59_wrap.WrapError || error{
+pub const Nip17Error = nip59_wrap.Nip59Error || error{
     InvalidMessageKind,
     InvalidFileMessageKind,
     InvalidRecipientTag,
