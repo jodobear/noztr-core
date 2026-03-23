@@ -13,6 +13,18 @@ For the public versioning policy, see
 
 ## [Unreleased]
 
+## [0.1.0-rc.4] - 2026-03-23
+
+Release type: breaking rc
+
+### Summary
+
+Fourth public release candidate for `noztr-core`.
+
+This RC continues the pre-`1.0` public-surface cleanup: grouped routes now carry more of the
+context, route-local read models are shorter and easier to scan, and the downstream migration path
+is tighter. Wire behavior, ownership posture, and protocol scope remain stable.
+
 ### Breaking Changes
 
 - renamed caller-owned builder workspace types toward explicit role names:

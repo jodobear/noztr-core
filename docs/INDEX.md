@@ -52,6 +52,7 @@ Use the support pages for cross-cutting expectations:
 - [releases/0.1.0-rc.1](releases/0.1.0-rc.1.md)
 - [releases/0.1.0-rc.2](releases/0.1.0-rc.2.md)
 - [releases/0.1.0-rc.3](releases/0.1.0-rc.3.md)
+- [releases/0.1.0-rc.4](releases/0.1.0-rc.4.md)
 
 Use the official upstream NIPs repository for spec texts:
 <https://github.com/nostr-protocol/nips>
