@@ -3,7 +3,7 @@ const noztr = @import("noztr");
 
 test "consumer package imports noztr and uses stable helpers" {
     try std.testing.expect(@TypeOf(noztr.nip05_identity.Address) == type);
-    try std.testing.expect(@TypeOf(noztr.nip46_remote_signing.RemoteSigningMethod) == type);
+    try std.testing.expect(@TypeOf(noztr.nip46_remote_signing.Method) == type);
 
     var arena = std.heap.ArenaAllocator.init(std.testing.allocator);
     defer arena.deinit();

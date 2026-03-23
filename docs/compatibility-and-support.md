@@ -116,7 +116,14 @@ Practical support expectations:
 - public docs and examples should route you to the right surface
 - typed contracts should be explicit
 - release-facing changes should be documented
+- pre-`1.0.0` breaking cleanup should ship with a concrete migration guide when downstream callers
+  need to update symbol usage
 - downstream feedback still matters before claiming a fully settled compatibility story
+
+Current downstream migration notes:
+
+- [guides/migrating-from-0.1.0-rc.1.md](guides/migrating-from-0.1.0-rc.1.md)
+- [guides/migrating-from-0.1.0-rc.2.md](guides/migrating-from-0.1.0-rc.2.md)
 
 If you are updating from an older pre-`1.0` public line and a release note or changelog entry marks
 the change as breaking, use the relevant migration guide first:

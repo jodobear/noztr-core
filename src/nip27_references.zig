@@ -11,7 +11,7 @@ pub const ContentReference = struct {
     start: u32,
     end: u32,
     uri: []const u8,
-    reference: nip21_uri.Nip21Reference,
+    reference: nip21_uri.Reference,
 };
 
 /// Extracts strict inline `nostr:` URI references from readable event content.

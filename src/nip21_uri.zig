@@ -4,7 +4,7 @@ const nip19_bech32 = @import("nip19_bech32.zig");
 
 pub const UriError = error{ InvalidUri, InvalidScheme, ForbiddenEntity, InvalidEntityEncoding };
 
-pub const Nip21Reference = struct {
+pub const Reference = struct {
     identifier: []const u8,
     entity: nip19_bech32.Nip19Entity,
 };
@@ -12,12 +12,12 @@ pub const Nip21Reference = struct {
 /// Parses a strict `nostr:` URI containing exactly one NIP-19 entity identifier.
 ///
 /// Lifetime and ownership:
-/// - `Nip21Reference.identifier` always borrows from `input`.
-/// - `Nip21Reference.entity` may borrow from `tlv_scratch` for TLV-backed fields
+/// - `Reference.identifier` always borrows from `input`.
+/// - `Reference.entity` may borrow from `tlv_scratch` for TLV-backed fields
 ///   (for example `nprofile.relays`, `nevent.relays`, `naddr.identifier`,
 ///   `naddr.relays`, `nrelay.relay`).
 /// - Keep both `input` and `tlv_scratch` alive and unmodified while using borrowed fields.
-pub fn uri_parse(input: []const u8, tlv_scratch: []u8) UriError!Nip21Reference {
+pub fn uri_parse(input: []const u8, tlv_scratch: []u8) UriError!Reference {
     std.debug.assert(input.len <= std.math.maxInt(usize));
     std.debug.assert(tlv_scratch.len <= limits.nip19_tlv_scratch_bytes_max);
 

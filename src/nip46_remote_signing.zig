@@ -48,7 +48,7 @@ pub const RemoteSigningError = error{
     OutOfMemory,
 };
 
-pub const RemoteSigningMethod = enum {
+pub const Method = enum {
     connect,
     sign_event,
     ping,
@@ -60,33 +60,33 @@ pub const RemoteSigningMethod = enum {
     switch_relays,
 };
 
-pub const PermissionScope = union(enum) {
+pub const Scope = union(enum) {
     none,
     event_kind: u32,
     raw: []const u8,
 };
 
 pub const Permission = struct {
-    method: RemoteSigningMethod,
-    scope: PermissionScope = .none,
+    method: Method,
+    scope: Scope = .none,
 };
 
 /// Typed `connect` request parameters.
-pub const ConnectRequest = struct {
+pub const ConnectParams = struct {
     remote_signer_pubkey: [32]u8,
     secret: ?[]const u8 = null,
     requested_permissions: []const Permission = &.{},
 };
 
 /// Typed pubkey-plus-text request parameters.
-pub const PubkeyTextRequest = struct {
+pub const PubkeyTextParams = struct {
     pubkey: [32]u8,
     text: []const u8,
 };
 
 pub const Request = struct {
     id: []const u8,
-    method: RemoteSigningMethod,
+    method: Method,
     params: []const []const u8,
 };
 
@@ -97,7 +97,7 @@ pub const BuiltRequest = struct {
     param_count: u8 = 0,
 
     /// Returns the built request view backed by this buffer.
-    pub fn as_request(self: *const BuiltRequest, id: []const u8, method: RemoteSigningMethod) Request {
+    pub fn as_request(self: *const BuiltRequest, id: []const u8, method: Method) Request {
         std.debug.assert(self.param_count <= self.params.len);
         std.debug.assert(id.len <= limits.nip46_message_id_bytes_max);
 
@@ -134,14 +134,14 @@ pub const ConnectResult = union(enum) {
 
 /// Typed request view over the bounded NIP-46 method set.
 pub const ParsedRequest = union(enum) {
-    connect: ConnectRequest,
+    connect: ConnectParams,
     sign_event_json: []const u8,
     ping,
     get_public_key,
-    nip04_encrypt: PubkeyTextRequest,
-    nip04_decrypt: PubkeyTextRequest,
-    nip44_encrypt: PubkeyTextRequest,
-    nip44_decrypt: PubkeyTextRequest,
+    nip04_encrypt: PubkeyTextParams,
+    nip04_decrypt: PubkeyTextParams,
+    nip44_encrypt: PubkeyTextParams,
+    nip44_decrypt: PubkeyTextParams,
     switch_relays,
 };
 
@@ -150,13 +150,13 @@ pub const Message = union(enum) {
     response: Response,
 };
 
-pub const BunkerUri = struct {
+pub const Bunker = struct {
     remote_signer_pubkey: [32]u8,
     relays: []const []const u8,
     secret: ?[]const u8 = null,
 };
 
-pub const ClientUri = struct {
+pub const Client = struct {
     client_pubkey: [32]u8,
     relays: []const []const u8,
     secret: []const u8,
@@ -166,16 +166,16 @@ pub const ClientUri = struct {
     image: ?[]const u8 = null,
 };
 
-pub const ConnectionUri = union(enum) {
-    bunker: BunkerUri,
-    client: ClientUri,
+pub const Uri = union(enum) {
+    bunker: Bunker,
+    client: Client,
 };
 
 pub const Envelope = struct {
     target_pubkey: [32]u8,
 };
 
-pub const DiscoveryInfo = struct {
+pub const Discovery = struct {
     app_pubkey: [32]u8,
     relays: []const []const u8 = &.{},
     nostrconnect_url: ?[]const u8 = null,
@@ -183,8 +183,8 @@ pub const DiscoveryInfo = struct {
 
 const nostrconnect_url_placeholder = "<nostrconnect>";
 
-pub fn method_parse(text: []const u8) RemoteSigningError!RemoteSigningMethod {
-    std.debug.assert(@sizeOf(RemoteSigningMethod) > 0);
+pub fn method_parse(text: []const u8) RemoteSigningError!Method {
+    std.debug.assert(@sizeOf(Method) > 0);
     std.debug.assert(limits.tag_item_bytes_max > 0);
 
     if (text.len > limits.tag_item_bytes_max) return error.InvalidMethod;
@@ -201,8 +201,8 @@ pub fn method_parse(text: []const u8) RemoteSigningError!RemoteSigningMethod {
     return error.InvalidMethod;
 }
 
-pub fn method_text(method: RemoteSigningMethod) []const u8 {
-    std.debug.assert(@intFromEnum(method) <= @intFromEnum(RemoteSigningMethod.switch_relays));
+pub fn method_text(method: Method) []const u8 {
+    std.debug.assert(@intFromEnum(method) <= @intFromEnum(Method.switch_relays));
     std.debug.assert(!@inComptime());
 
     return switch (method) {
@@ -372,7 +372,7 @@ pub fn request_parse_typed(
 pub fn request_build_connect(
     output: *BuiltRequest,
     id: []const u8,
-    request: *const ConnectRequest,
+    request: *const ConnectParams,
     scratch: std.mem.Allocator,
 ) RemoteSigningError!Request {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -420,8 +420,8 @@ pub fn request_build_sign_event(
 pub fn request_build_pubkey_text(
     output: *BuiltRequest,
     id: []const u8,
-    method: RemoteSigningMethod,
-    request: *const PubkeyTextRequest,
+    method: Method,
+    request: *const PubkeyTextParams,
     scratch: std.mem.Allocator,
 ) RemoteSigningError!Request {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -444,12 +444,12 @@ pub fn request_build_pubkey_text(
 pub fn request_build_empty(
     output: *BuiltRequest,
     id: []const u8,
-    method: RemoteSigningMethod,
+    method: Method,
     scratch: std.mem.Allocator,
 ) RemoteSigningError!Request {
     std.debug.assert(@intFromPtr(output) != 0);
     std.debug.assert(@intFromPtr(scratch.ptr) != 0);
-    std.debug.assert(@intFromEnum(method) <= @intFromEnum(RemoteSigningMethod.switch_relays));
+    std.debug.assert(@intFromEnum(method) <= @intFromEnum(Method.switch_relays));
 
     if (!method_is_zero_param(method)) {
         return error.InvalidMethod;
@@ -462,7 +462,7 @@ pub fn request_build_empty(
 
 pub fn response_validate(
     response: *const Response,
-    method: RemoteSigningMethod,
+    method: Method,
     scratch: std.mem.Allocator,
 ) RemoteSigningError!void {
     std.debug.assert(@intFromPtr(response) != 0);
@@ -532,7 +532,7 @@ pub fn response_result_switch_relays(response: *const Response) RemoteSigningErr
     };
 }
 
-pub fn uri_parse(input: []const u8, scratch: std.mem.Allocator) RemoteSigningError!ConnectionUri {
+pub fn uri_parse(input: []const u8, scratch: std.mem.Allocator) RemoteSigningError!Uri {
     std.debug.assert(input.len <= std.math.maxInt(usize));
     std.debug.assert(@intFromPtr(scratch.ptr) != 0);
 
@@ -546,9 +546,9 @@ pub fn uri_parse(input: []const u8, scratch: std.mem.Allocator) RemoteSigningErr
     return error.InvalidScheme;
 }
 
-pub fn uri_serialize(output: []u8, uri: ConnectionUri) RemoteSigningError![]const u8 {
+pub fn uri_serialize(output: []u8, uri: Uri) RemoteSigningError![]const u8 {
     std.debug.assert(output.len <= limits.nip46_uri_bytes_max);
-    std.debug.assert(@sizeOf(ConnectionUri) > 0);
+    std.debug.assert(@sizeOf(Uri) > 0);
 
     var stream = std.io.fixedBufferStream(output);
     const writer = stream.writer();
@@ -602,7 +602,7 @@ pub fn envelope_validate(
 pub fn discovery_parse_well_known(
     input: []const u8,
     scratch: std.mem.Allocator,
-) RemoteSigningError!DiscoveryInfo {
+) RemoteSigningError!Discovery {
     std.debug.assert(input.len <= limits.relay_message_bytes_max);
     std.debug.assert(@intFromPtr(scratch.ptr) != 0);
 
@@ -629,7 +629,7 @@ pub fn discovery_parse_well_known(
 pub fn discovery_parse_nip89(
     event: *const nip01_event.Event,
     scratch: std.mem.Allocator,
-) RemoteSigningError!DiscoveryInfo {
+) RemoteSigningError!Discovery {
     std.debug.assert(@intFromPtr(event) != 0);
     std.debug.assert(@intFromPtr(scratch.ptr) != 0);
 
@@ -704,7 +704,7 @@ const WellKnownPartial = struct {
 
 const MessageParseState = struct {
     id: ?[]const u8 = null,
-    method: ?RemoteSigningMethod = null,
+    method: ?Method = null,
     params: ?[]const []const u8 = null,
     result: ResponsePayload = .absent,
     error_text: ?[]const u8 = null,
@@ -820,7 +820,7 @@ fn build_response_message(id: []const u8, state: MessageParseState) RemoteSignin
 fn parse_well_known_root(
     object: std.json.ObjectMap,
     scratch: std.mem.Allocator,
-) RemoteSigningError!DiscoveryInfo {
+) RemoteSigningError!Discovery {
     std.debug.assert(@sizeOf(std.json.ObjectMap) > 0);
     std.debug.assert(@intFromPtr(scratch.ptr) != 0);
 
@@ -1051,9 +1051,9 @@ fn parse_id_value(value: std.json.Value, scratch: std.mem.Allocator) RemoteSigni
     return id;
 }
 
-fn parse_method_value(value: std.json.Value) RemoteSigningError!RemoteSigningMethod {
+fn parse_method_value(value: std.json.Value) RemoteSigningError!Method {
     std.debug.assert(@typeInfo(std.json.Value) == .@"union");
-    std.debug.assert(@sizeOf(RemoteSigningMethod) > 0);
+    std.debug.assert(@sizeOf(Method) > 0);
 
     if (value != .string) {
         return error.InvalidMethod;
@@ -1241,9 +1241,9 @@ fn validate_connect_params(
     }
 }
 
-fn method_is_pubkey_text(method: RemoteSigningMethod) bool {
-    std.debug.assert(@intFromEnum(method) <= @intFromEnum(RemoteSigningMethod.switch_relays));
-    std.debug.assert(@sizeOf(RemoteSigningMethod) > 0);
+fn method_is_pubkey_text(method: Method) bool {
+    std.debug.assert(@intFromEnum(method) <= @intFromEnum(Method.switch_relays));
+    std.debug.assert(@sizeOf(Method) > 0);
 
     return switch (method) {
         .nip04_encrypt, .nip04_decrypt, .nip44_encrypt, .nip44_decrypt => true,
@@ -1251,9 +1251,9 @@ fn method_is_pubkey_text(method: RemoteSigningMethod) bool {
     };
 }
 
-fn method_is_zero_param(method: RemoteSigningMethod) bool {
-    std.debug.assert(@intFromEnum(method) <= @intFromEnum(RemoteSigningMethod.switch_relays));
-    std.debug.assert(@sizeOf(RemoteSigningMethod) > 0);
+fn method_is_zero_param(method: Method) bool {
+    std.debug.assert(@intFromEnum(method) <= @intFromEnum(Method.switch_relays));
+    std.debug.assert(@sizeOf(Method) > 0);
 
     return switch (method) {
         .ping, .get_public_key, .switch_relays => true,
@@ -1264,11 +1264,11 @@ fn method_is_zero_param(method: RemoteSigningMethod) bool {
 fn parse_typed_connect_request(
     params: []const []const u8,
     scratch: std.mem.Allocator,
-) RemoteSigningError!ConnectRequest {
+) RemoteSigningError!ConnectParams {
     std.debug.assert(params.len <= limits.nip46_message_params_max);
     std.debug.assert(@intFromPtr(scratch.ptr) != 0);
 
-    var parsed = ConnectRequest{
+    var parsed = ConnectParams{
         .remote_signer_pubkey = parse_lower_hex_32(params[0]) catch return error.InvalidPubkey,
     };
     if (params.len >= 2) {
@@ -1315,7 +1315,7 @@ fn validate_pubkey_text_params(params: []const []const u8) RemoteSigningError!vo
     }
 }
 
-fn parse_pubkey_text_request(params: []const []const u8) RemoteSigningError!PubkeyTextRequest {
+fn parse_pubkey_text_request(params: []const []const u8) RemoteSigningError!PubkeyTextParams {
     std.debug.assert(params.len <= limits.nip46_message_params_max);
     std.debug.assert(limits.pubkey_hex_length == 64);
 
@@ -1327,10 +1327,10 @@ fn parse_pubkey_text_request(params: []const []const u8) RemoteSigningError!Pubk
 
 fn validate_response_result(
     result: ResponseResult,
-    method: RemoteSigningMethod,
+    method: Method,
     scratch: std.mem.Allocator,
 ) RemoteSigningError!void {
-    std.debug.assert(@intFromEnum(method) <= @intFromEnum(RemoteSigningMethod.switch_relays));
+    std.debug.assert(@intFromEnum(method) <= @intFromEnum(Method.switch_relays));
     std.debug.assert(@intFromPtr(scratch.ptr) != 0);
 
     switch (method) {
@@ -1455,7 +1455,7 @@ fn parse_bunker_uri(
     authority: []const u8,
     query: ?[]const u8,
     scratch: std.mem.Allocator,
-) RemoteSigningError!BunkerUri {
+) RemoteSigningError!Bunker {
     std.debug.assert(authority.len <= std.math.maxInt(usize));
     std.debug.assert(@intFromPtr(scratch.ptr) != 0);
 
@@ -1478,7 +1478,7 @@ fn parse_client_uri(
     authority: []const u8,
     query: ?[]const u8,
     scratch: std.mem.Allocator,
-) RemoteSigningError!ClientUri {
+) RemoteSigningError!Client {
     std.debug.assert(authority.len <= std.math.maxInt(usize));
     std.debug.assert(@intFromPtr(scratch.ptr) != 0);
 
@@ -1896,16 +1896,16 @@ fn write_json_escaped_byte(writer: anytype, byte: u8) RemoteSigningError!void {
     }
 }
 
-fn write_bunker_uri(writer: anytype, bunker: BunkerUri) RemoteSigningError!void {
+fn write_bunker_uri(writer: anytype, bunker: Bunker) RemoteSigningError!void {
     std.debug.assert(bunker.relays.len <= limits.nip46_relays_max);
-    std.debug.assert(@sizeOf(BunkerUri) > 0);
+    std.debug.assert(@sizeOf(Bunker) > 0);
 
     const hex = std.fmt.bytesToHex(bunker.remote_signer_pubkey, .lower);
     try write_print(writer, "bunker://{s}", .{hex});
     try write_uri_query(writer, bunker.relays, bunker.secret, null);
 }
 
-fn write_client_uri(writer: anytype, client: ClientUri) RemoteSigningError!void {
+fn write_client_uri(writer: anytype, client: Client) RemoteSigningError!void {
     std.debug.assert(client.relays.len <= limits.nip46_relays_max);
     std.debug.assert(client.permissions.len <= limits.nip46_permissions_max);
 
@@ -2246,22 +2246,22 @@ fn parse_relay_url(text: []const u8) error{InvalidRelayUrl}!relay_origin.Websock
 }
 
 test "method and permission parsing cover current command set" {
-    try std.testing.expectEqual(RemoteSigningMethod.connect, try method_parse("connect"));
+    try std.testing.expectEqual(Method.connect, try method_parse("connect"));
     try std.testing.expectEqual(
-        RemoteSigningMethod.switch_relays,
+        Method.switch_relays,
         try method_parse("switch_relays"),
     );
 
     const connect_permission = try permission_parse("connect");
-    try std.testing.expectEqual(RemoteSigningMethod.connect, connect_permission.method);
+    try std.testing.expectEqual(Method.connect, connect_permission.method);
     try std.testing.expect(connect_permission.scope == .none);
 
     const sign_permission = try permission_parse("sign_event:13");
-    try std.testing.expectEqual(RemoteSigningMethod.sign_event, sign_permission.method);
+    try std.testing.expectEqual(Method.sign_event, sign_permission.method);
     try std.testing.expectEqual(@as(u32, 13), sign_permission.scope.event_kind);
 
     const raw_permission = try permission_parse("nip44_encrypt:dm");
-    try std.testing.expectEqual(RemoteSigningMethod.nip44_encrypt, raw_permission.method);
+    try std.testing.expectEqual(Method.nip44_encrypt, raw_permission.method);
     try std.testing.expectEqualStrings("dm", raw_permission.scope.raw);
 }
 
@@ -2393,7 +2393,7 @@ test "typed request builders produce validated current method shapes" {
         },
         arena.allocator(),
     );
-    try std.testing.expectEqual(RemoteSigningMethod.connect, connect_request.method);
+    try std.testing.expectEqual(Method.connect, connect_request.method);
     try std.testing.expectEqual(@as(usize, 3), connect_request.params.len);
 
     var sign_output: BuiltRequest = .{};
@@ -2403,7 +2403,7 @@ test "typed request builders produce validated current method shapes" {
         "{\"kind\":1,\"content\":\"hello\",\"tags\":[],\"created_at\":1}",
         arena.allocator(),
     );
-    try std.testing.expectEqual(RemoteSigningMethod.sign_event, sign_request.method);
+    try std.testing.expectEqual(Method.sign_event, sign_request.method);
     try std.testing.expectEqual(@as(usize, 1), sign_request.params.len);
 
     var dm_output: BuiltRequest = .{};
@@ -2417,7 +2417,7 @@ test "typed request builders produce validated current method shapes" {
         },
         arena.allocator(),
     );
-    try std.testing.expectEqual(RemoteSigningMethod.nip44_encrypt, dm_request.method);
+    try std.testing.expectEqual(Method.nip44_encrypt, dm_request.method);
     try std.testing.expectEqual(@as(usize, 2), dm_request.params.len);
 
     var empty_output: BuiltRequest = .{};
@@ -2427,7 +2427,7 @@ test "typed request builders produce validated current method shapes" {
         .switch_relays,
         arena.allocator(),
     );
-    try std.testing.expectEqual(RemoteSigningMethod.switch_relays, empty_request.method);
+    try std.testing.expectEqual(Method.switch_relays, empty_request.method);
     try std.testing.expectEqual(@as(usize, 0), empty_request.params.len);
 }
 

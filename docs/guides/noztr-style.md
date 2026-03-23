@@ -78,6 +78,15 @@ It should avoid:
 - make invariants obvious in code, not only in comments
 - inside module namespaces, prefer descriptive public names over repeating numeric NIP ids
 - apply consistency in the direction of clarity, not in the direction of mechanical numbering
+- let canonical grouped routes carry the main context
+- inside an already-canonical route, prefer shorter role-based public type names over restating the
+  full route in every symbol
+- remove thin wrappers, irrelevant fields, and adjacent helper types when they do not add real
+  semantic value
+- optimize public surfaces for one obvious safe path, human discoverability, and LLM usability
+  together
+- accept pre-`1.0` breaking cleanups when they materially improve clarity and reduce public-surface
+  noise
 
 ## Tiger-Style Engineering Defaults
 
@@ -206,6 +215,9 @@ Before landing a change, ask:
 - does it add complexity that the trust boundary does not justify?
 - does it belong in `noztr`, or in a higher layer?
 - does it keep the code simple in the Tiger sense, or does it only make it more ornate?
+- is the grouped route already carrying context that the public type name is repeating?
+- does this public wrapper or helper earn its existence, or is it just ceremony around existing
+  semantics?
 
 ## Review Heuristics
 
@@ -217,6 +229,8 @@ These heuristics should guide contributor review:
 - do not let canonicalization quietly become over-strict input rejection
 - treat examples as contract-bearing artifacts, not presentation extras
 - prefer explicit backend seams over hidden mutable cross-cutting state
+- prefer collated surface remediation plans over ad hoc broad renames when the issue spans many
+  modules
 
 ## Next Pages
 

@@ -15,7 +15,14 @@ For the public versioning policy, see
 
 ### Breaking Changes
 
-- none currently recorded
+- shortened route-internal public type names in the first surface-noise remediation lane:
+  - `nip04`
+  - `nip21_uri`
+  - `nip44`
+  - `nip46_remote_signing`
+- downstream callers that reference those public types directly need to update symbol names
+- migration guide:
+  - [docs/guides/migrating-from-0.1.0-rc.2.md](docs/guides/migrating-from-0.1.0-rc.2.md)
 
 ## [0.1.0-rc.2] - 2026-03-22
 

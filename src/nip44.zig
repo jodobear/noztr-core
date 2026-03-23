@@ -28,13 +28,13 @@ pub const ConversationEncryptionError = error{
 };
 
 /// Callback type for caller-provided nonce generation.
-pub const Nip44NonceProvider = *const fn (
+pub const NonceProvider = *const fn (
     ctx: ?*anyopaque,
     out_nonce: *[32]u8,
 ) ConversationEncryptionError!void;
 
 /// Decoded NIP-44 payload frame.
-pub const Nip44DecodedPayload = struct {
+pub const DecodedPayload = struct {
     version: u8,
     nonce: []const u8,
     ciphertext: []const u8,
@@ -93,7 +93,7 @@ pub fn nip44_encrypt_to_base64(
     conversation_key: *const [32]u8,
     plaintext: []const u8,
     nonce_ctx: ?*anyopaque,
-    nonce_provider: Nip44NonceProvider,
+    nonce_provider: NonceProvider,
 ) ConversationEncryptionError![]const u8 {
     std.debug.assert(@intFromPtr(conversation_key) != 0);
     std.debug.assert(@intFromPtr(nonce_provider) != 0);
@@ -153,7 +153,7 @@ pub fn nip44_encrypt_with_nonce_to_base64(
 pub fn nip44_decode_payload(
     payload_base64: []const u8,
     raw_output: []u8,
-) ConversationEncryptionError!Nip44DecodedPayload {
+) ConversationEncryptionError!DecodedPayload {
     std.debug.assert(payload_base64.len <= std.math.maxInt(usize));
     std.debug.assert(raw_output.len <= std.math.maxInt(usize));
 

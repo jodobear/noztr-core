@@ -32,26 +32,26 @@ pub const LegacyDmError = error{
 };
 
 /// Callback type for caller-provided IV generation.
-pub const Nip04IvProvider = *const fn (
+pub const IvProvider = *const fn (
     ctx: ?*anyopaque,
     out_iv: *[limits.nip04_iv_bytes]u8,
 ) LegacyDmError!void;
 
 /// Parsed legacy NIP-04 wire payload slices.
-pub const Nip04Payload = struct {
+pub const Payload = struct {
     ciphertext_base64: []const u8,
     iv_base64: []const u8,
 };
 
-pub const Nip04ReplyRef = struct {
+pub const ReplyRef = struct {
     event_id: [32]u8,
     relay_hint: ?[]const u8 = null,
 };
 
-pub const Nip04MessageInfo = struct {
+pub const MessageInfo = struct {
     recipient_pubkey: [32]u8,
     recipient_relay_hint: ?[]const u8 = null,
-    reply_to: ?Nip04ReplyRef = null,
+    reply_to: ?ReplyRef = null,
     content: []const u8,
 };
 
@@ -87,7 +87,7 @@ pub fn nip04_encrypt(
     public_key: *const [32]u8,
     plaintext: []const u8,
     iv_ctx: ?*anyopaque,
-    iv_provider: Nip04IvProvider,
+    iv_provider: IvProvider,
 ) LegacyDmError![]const u8 {
     std.debug.assert(@intFromPtr(iv_provider) != 0);
 
@@ -148,7 +148,7 @@ pub fn nip04_encrypt_with_shared_secret_and_iv(
 }
 
 /// Parse and validate the legacy NIP-04 `ciphertext?iv=...` wire format.
-pub fn nip04_payload_parse(payload: []const u8) LegacyDmError!Nip04Payload {
+pub fn nip04_payload_parse(payload: []const u8) LegacyDmError!Payload {
     if (payload.len < limits.nip04_payload_min_bytes) return error.InvalidPayloadFormat;
     if (payload.len > limits.nip04_payload_max_bytes) return error.InvalidPayloadFormat;
 
@@ -157,7 +157,7 @@ pub fn nip04_payload_parse(payload: []const u8) LegacyDmError!Nip04Payload {
     if (separator_index == 0 or separator_end >= payload.len) return error.InvalidPayloadFormat;
     if (std.mem.indexOfPos(u8, payload, separator_end, "?")) |_| return error.InvalidPayloadFormat;
 
-    const parsed = Nip04Payload{
+    const parsed = Payload{
         .ciphertext_base64 = payload[0..separator_index],
         .iv_base64 = payload[separator_end..],
     };
@@ -225,13 +225,13 @@ pub fn nip04_decrypt_with_shared_secret(
 }
 
 /// Parse a strict `kind:4` DM event shape.
-pub fn nip04_message_parse(event: *const nip01_event.Event) LegacyDmError!Nip04MessageInfo {
+pub fn nip04_message_parse(event: *const nip01_event.Event) LegacyDmError!MessageInfo {
     std.debug.assert(@intFromPtr(event) != 0);
 
     if (event.kind != dm_kind) return error.InvalidMessageKind;
     _ = try nip04_payload_parse(event.content);
 
-    var info = Nip04MessageInfo{
+    var info = MessageInfo{
         .recipient_pubkey = undefined,
         .content = event.content,
     };
@@ -402,7 +402,7 @@ fn remove_pkcs7_padding(output: []u8, padded_plaintext: []const u8) LegacyDmErro
 
 fn parse_message_tag(
     tag: nip01_event.EventTag,
-    info: *Nip04MessageInfo,
+    info: *MessageInfo,
     saw_recipient: *bool,
 ) LegacyDmError!void {
     if (tag.items.len == 0) return;
@@ -412,7 +412,7 @@ fn parse_message_tag(
 
 fn parse_recipient_tag(
     tag: nip01_event.EventTag,
-    info: *Nip04MessageInfo,
+    info: *MessageInfo,
     saw_recipient: *bool,
 ) LegacyDmError!void {
     if (saw_recipient.*) return error.DuplicateRecipientTag;
@@ -426,11 +426,11 @@ fn parse_recipient_tag(
     saw_recipient.* = true;
 }
 
-fn parse_reply_tag(tag: nip01_event.EventTag, info: *Nip04MessageInfo) LegacyDmError!void {
+fn parse_reply_tag(tag: nip01_event.EventTag, info: *MessageInfo) LegacyDmError!void {
     if (info.reply_to != null) return error.DuplicateReplyTag;
     if (tag.items.len < 2 or tag.items.len > 5) return error.InvalidReplyTag;
 
-    var reply = Nip04ReplyRef{
+    var reply = ReplyRef{
         .event_id = parse_lower_hex_32(tag.items[1]) catch return error.InvalidReplyTag,
     };
     if (tag.items.len >= 3) {
