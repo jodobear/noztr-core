@@ -16,11 +16,11 @@ pub const BlossomError = error{
     BufferTooSmall,
 };
 
-pub const BlossomServerListInfo = struct {
+pub const ServerList = struct {
     server_urls: [][]const u8,
 };
 
-pub const BlobReference = struct {
+pub const BlobRef = struct {
     sha256: [32]u8,
     extension: ?[]const u8 = null,
 };
@@ -42,7 +42,7 @@ pub const TagBuilder = struct {
 pub fn blossom_servers_extract(
     event: *const nip01_event.Event,
     out_server_urls: [][]const u8,
-) BlossomError!BlossomServerListInfo {
+) BlossomError!ServerList {
     std.debug.assert(@intFromPtr(event) != 0);
     std.debug.assert(out_server_urls.len <= limits.tags_max);
 
@@ -80,7 +80,7 @@ pub fn blossom_build_server_tag(
 }
 
 /// Extracts a deterministic blob hash and optional extension from a blob URL.
-pub fn blossom_extract_blob_reference(blob_url: []const u8) BlossomError!BlobReference {
+pub fn blossom_extract_blob_reference(blob_url: []const u8) BlossomError!BlobRef {
     if (blob_url.len > limits.content_bytes_max) return error.InvalidBlobUrl;
     std.debug.assert(blob_url.len <= limits.content_bytes_max);
     std.debug.assert(blob_sha256_hex_length == limits.id_hex_length);
@@ -98,7 +98,7 @@ pub fn blossom_extract_blob_reference(blob_url: []const u8) BlossomError!BlobRef
 /// Builds `<sha256>[.<ext>]` from a parsed blob reference.
 pub fn blossom_build_fallback_path(
     output: []u8,
-    reference: BlobReference,
+    reference: BlobRef,
 ) BlossomError![]const u8 {
     std.debug.assert(output.len <= std.math.maxInt(u16));
     std.debug.assert(reference.extension == null or reference.extension.?.len > 0);
@@ -110,7 +110,7 @@ pub fn blossom_build_fallback_path(
 pub fn blossom_build_fallback_url(
     output: []u8,
     server_url: []const u8,
-    reference: BlobReference,
+    reference: BlobRef,
 ) BlossomError![]const u8 {
     std.debug.assert(output.len <= std.math.maxInt(u16));
 
@@ -340,7 +340,7 @@ fn parse_hex_32(text: []const u8) error{InvalidHex}![32]u8 {
 
 fn write_blob_path(
     output: []u8,
-    reference: BlobReference,
+    reference: BlobRef,
 ) error{NoSpaceLeft}![]const u8 {
     std.debug.assert(output.len <= std.math.maxInt(u16));
     std.debug.assert(reference.extension == null or reference.extension.?.len > 0);

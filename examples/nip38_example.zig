@@ -17,7 +17,7 @@ test "NIP-38 example: extract and build user-status tags" {
     var empty_pubkeys: [0][32]u8 = .{};
     var empty_events: [0][32]u8 = .{};
     var empty_coords: [0][]const u8 = .{};
-    var empty_emojis: [0]noztr.nip30_custom_emoji.EmojiTagInfo = .{};
+    var empty_emojis: [0]noztr.nip30_custom_emoji.EmojiTag = .{};
 
     const info = try noztr.nip38_user_status.user_status_extract(
         &event,

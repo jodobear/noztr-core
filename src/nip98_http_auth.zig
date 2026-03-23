@@ -30,7 +30,7 @@ pub const HttpAuthError = nip01_event.EventParseError || nip01_event.EventShapeE
     BufferTooSmall,
 };
 
-pub const HttpAuthInfo = struct {
+pub const Auth = struct {
     url: []const u8,
     method: []const u8,
     payload_hex: ?[]const u8 = null,
@@ -38,7 +38,7 @@ pub const HttpAuthInfo = struct {
 
 pub const VerifiedAuthorization = struct {
     event: nip01_event.Event,
-    info: HttpAuthInfo,
+    info: Auth,
 };
 
 pub const TagBuilder = struct {
@@ -63,7 +63,7 @@ pub fn http_auth_is_supported(event: *const nip01_event.Event) bool {
 }
 
 /// Extracts the bounded NIP-98 request metadata from one event.
-pub fn http_auth_extract(event: *const nip01_event.Event) HttpAuthError!HttpAuthInfo {
+pub fn http_auth_extract(event: *const nip01_event.Event) HttpAuthError!Auth {
     std.debug.assert(@intFromPtr(event) != 0);
     std.debug.assert(event.tags.len <= limits.tags_max);
 
@@ -92,7 +92,7 @@ pub fn http_auth_validate_request(
     now: u64,
     max_past_seconds: u64,
     max_future_seconds: u64,
-) HttpAuthError!HttpAuthInfo {
+) HttpAuthError!Auth {
     std.debug.assert(@intFromPtr(event) != 0);
     std.debug.assert(now <= std.math.maxInt(u64));
 
@@ -119,7 +119,7 @@ pub fn http_auth_verify_request(
     now: u64,
     max_past_seconds: u64,
     max_future_seconds: u64,
-) HttpAuthError!HttpAuthInfo {
+) HttpAuthError!Auth {
     std.debug.assert(@intFromPtr(event) != 0);
     std.debug.assert(now <= std.math.maxInt(u64));
 

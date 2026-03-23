@@ -19,7 +19,7 @@ pub const WebBookmarkError = error{
     BufferTooSmall,
 };
 
-pub const WebBookmarkInfo = struct {
+pub const Bookmark = struct {
     identifier: []const u8,
     content: []const u8,
     title: ?[]const u8 = null,
@@ -53,7 +53,7 @@ pub fn web_bookmark_is_supported(event: *const nip01_event.Event) bool {
 pub fn web_bookmark_extract(
     event: *const nip01_event.Event,
     out_hashtags: [][]const u8,
-) WebBookmarkError!WebBookmarkInfo {
+) WebBookmarkError!Bookmark {
     std.debug.assert(@intFromPtr(event) != 0);
     std.debug.assert(out_hashtags.len <= std.math.maxInt(u16));
 
@@ -61,7 +61,7 @@ pub fn web_bookmark_extract(
     try validate_content(event.content);
 
     var identifier: ?[]const u8 = null;
-    var info = WebBookmarkInfo{
+    var info = Bookmark{
         .identifier = undefined,
         .content = event.content,
     };
@@ -133,7 +133,7 @@ pub fn web_bookmark_build_hashtag_tag(
 fn apply_tag(
     tag: nip01_event.EventTag,
     identifier: *?[]const u8,
-    info: *WebBookmarkInfo,
+    info: *Bookmark,
     out_hashtags: [][]const u8,
 ) WebBookmarkError!void {
     std.debug.assert(@intFromPtr(identifier) != 0);
@@ -155,7 +155,7 @@ fn apply_identifier_tag(tag: nip01_event.EventTag, identifier: *?[]const u8) Web
     identifier.* = parse_identifier_value(tag) catch return error.InvalidIdentifierTag;
 }
 
-fn apply_title_tag(tag: nip01_event.EventTag, info: *WebBookmarkInfo) WebBookmarkError!void {
+fn apply_title_tag(tag: nip01_event.EventTag, info: *Bookmark) WebBookmarkError!void {
     std.debug.assert(tag.items.len <= limits.tag_items_max);
     std.debug.assert(@intFromPtr(info) != 0);
 
@@ -165,7 +165,7 @@ fn apply_title_tag(tag: nip01_event.EventTag, info: *WebBookmarkInfo) WebBookmar
 
 fn apply_published_at_tag(
     tag: nip01_event.EventTag,
-    info: *WebBookmarkInfo,
+    info: *Bookmark,
 ) WebBookmarkError!void {
     std.debug.assert(tag.items.len <= limits.tag_items_max);
     std.debug.assert(@intFromPtr(info) != 0);
@@ -176,7 +176,7 @@ fn apply_published_at_tag(
 
 fn apply_hashtag_tag(
     tag: nip01_event.EventTag,
-    info: *WebBookmarkInfo,
+    info: *Bookmark,
     out_hashtags: [][]const u8,
 ) WebBookmarkError!void {
     std.debug.assert(tag.items.len <= limits.tag_items_max);

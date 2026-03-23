@@ -343,7 +343,8 @@ test "root exports limits and error namespaces" {
     try std.testing.expect(@TypeOf(nip28_public_chat.Message) == type);
     try std.testing.expect(@TypeOf(nip28_public_chat.HideMessage) == type);
     try std.testing.expect(@TypeOf(nip28_public_chat.MuteUser) == type);
-    try std.testing.expect(@TypeOf(nip30_custom_emoji.EmojiTagInfo) == type);
+    try std.testing.expect(@TypeOf(nip30_custom_emoji.EmojiTag) == type);
+    try std.testing.expect(@TypeOf(nipb0_web_bookmarking.Bookmark) == type);
     try std.testing.expect(@TypeOf(nip18_reposts.RepostTarget) == type);
     try std.testing.expect(@TypeOf(nip22_comments.CommentInfo) == type);
     try std.testing.expect(@TypeOf(nip27_references.ContentReference) == type);
@@ -390,8 +391,9 @@ test "root exports limits and error namespaces" {
     try std.testing.expect(@TypeOf(nip88_polls.Response) == type);
     try std.testing.expect(@TypeOf(nip88_polls.OptionTally) == type);
     try std.testing.expect(@TypeOf(nip88_polls.TagBuilder) == type);
-    try std.testing.expect(@TypeOf(nipb7_blossom_servers.BlossomServerListInfo) == type);
-    try std.testing.expect(@TypeOf(nipb7_blossom_servers.BlobReference) == type);
+    try std.testing.expect(@TypeOf(nip98_http_auth.Auth) == type);
+    try std.testing.expect(@TypeOf(nipb7_blossom_servers.ServerList) == type);
+    try std.testing.expect(@TypeOf(nipb7_blossom_servers.BlobRef) == type);
     try std.testing.expect(@TypeOf(nipb7_blossom_servers.TagBuilder) == type);
     try std.testing.expect(@TypeOf(nip24_extra_metadata.MetadataExtras) == type);
     try std.testing.expect(@TypeOf(nip24_extra_metadata.CommonTagInfo) == type);

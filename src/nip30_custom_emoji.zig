@@ -14,7 +14,7 @@ pub const EmojiError = error{
     InvalidEmojiSetAddress,
 };
 
-pub const EmojiTagInfo = struct {
+pub const EmojiTag = struct {
     shortcode: []const u8,
     image_url: []const u8,
     emoji_set_address: ?[]const u8 = null,
@@ -60,7 +60,7 @@ pub fn emoji_shortcode_from_token(token: []const u8) EmojiError![]const u8 {
 }
 
 /// Extracts a strict NIP-30 emoji tag.
-pub fn emoji_tag_extract(tag: nip01_event.EventTag) EmojiError!EmojiTagInfo {
+pub fn emoji_tag_extract(tag: nip01_event.EventTag) EmojiError!EmojiTag {
     std.debug.assert(tag.items.len <= limits.tag_items_max);
     std.debug.assert(limits.tag_items_max >= 4);
 

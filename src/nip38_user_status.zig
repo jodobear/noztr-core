@@ -53,7 +53,7 @@ pub fn user_status_extract(
     out_pubkeys: [][32]u8,
     out_event_ids: [][32]u8,
     out_coordinates: [][]const u8,
-    out_emojis: []nip30_custom_emoji.EmojiTagInfo,
+    out_emojis: []nip30_custom_emoji.EmojiTag,
 ) UserStatusError!Status {
     std.debug.assert(@intFromPtr(event) != 0);
     std.debug.assert(out_urls.len <= limits.tags_max);
@@ -169,7 +169,7 @@ fn apply_status_tag(
     out_pubkeys: [][32]u8,
     out_event_ids: [][32]u8,
     out_coordinates: [][]const u8,
-    out_emojis: []nip30_custom_emoji.EmojiTagInfo,
+    out_emojis: []nip30_custom_emoji.EmojiTag,
 ) UserStatusError!void {
     std.debug.assert(tag.items.len <= limits.tag_items_max);
     std.debug.assert(@intFromPtr(info) != 0);
@@ -269,7 +269,7 @@ fn append_coordinate(
 fn append_emoji(
     tag: nip01_event.EventTag,
     info: *Status,
-    out_emojis: []nip30_custom_emoji.EmojiTagInfo,
+    out_emojis: []nip30_custom_emoji.EmojiTag,
 ) UserStatusError!void {
     std.debug.assert(@intFromPtr(info) != 0);
     std.debug.assert(info.emoji_count <= out_emojis.len);
@@ -335,7 +335,7 @@ test "NIP-38 extracts status metadata and links" {
     var pubkeys: [0][32]u8 = .{};
     var events: [0][32]u8 = .{};
     var coords: [0][]const u8 = .{};
-    var emojis: [1]nip30_custom_emoji.EmojiTagInfo = undefined;
+    var emojis: [1]nip30_custom_emoji.EmojiTag = undefined;
 
     const info = try user_status_extract(&event, urls[0..], pubkeys[0..], events[0..], coords[0..], emojis[0..]);
 

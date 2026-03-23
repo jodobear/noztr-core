@@ -120,6 +120,7 @@ The current read-model cleanup also shortens several primary route-local extract
 - `noztr.nip17_private_messages.DmReplyRef` -> `noztr.nip17_private_messages.ReplyRef`
 - `noztr.nip17_private_messages.DmMessageInfo` -> `noztr.nip17_private_messages.Message`
 - `noztr.nip17_private_messages.FileMessageInfo` -> `noztr.nip17_private_messages.FileMessage`
+- `noztr.nip30_custom_emoji.EmojiTagInfo` -> `noztr.nip30_custom_emoji.EmojiTag`
 - `noztr.nip36_content_warning.ContentWarningInfo` -> `noztr.nip36_content_warning.ContentWarning`
 - `noztr.nip34_git.RepositoryAnnouncementInfo` -> `noztr.nip34_git.Announcement`
 - `noztr.nip34_git.RepositoryStateRef` -> `noztr.nip34_git.StateRef`
@@ -132,6 +133,7 @@ The current read-model cleanup also shortens several primary route-local extract
 - `noztr.nip56_reporting.ReportInfo` -> `noztr.nip56_reporting.Report`
 - `noztr.nip64_chess_pgn.ChessPgnInfo` -> `noztr.nip64_chess_pgn.Pgn`
 - `noztr.nip58_badges.ImageInfo` -> `noztr.nip58_badges.Image`
+- `noztr.nip98_http_auth.HttpAuthInfo` -> `noztr.nip98_http_auth.Auth`
 - `noztr.nip71_video_events.TextTrackInfo` -> `noztr.nip71_video_events.TextTrack`
 - `noztr.nip71_video_events.OriginInfo` -> `noztr.nip71_video_events.Origin`
 - `noztr.nip71_video_events.VideoInfo` -> `noztr.nip71_video_events.Video`
@@ -145,5 +147,8 @@ The current read-model cleanup also shortens several primary route-local extract
 - `noztr.nip94_file_metadata.FileMetadataInfo` -> `noztr.nip94_file_metadata.Metadata`
 - `noztr.nip66_relay_discovery.RelayDiscoveryInfo` -> `noztr.nip66_relay_discovery.Discovery`
 - `noztr.nip66_relay_discovery.RelayMonitorInfo` -> `noztr.nip66_relay_discovery.Monitor`
+- `noztr.nipb0_web_bookmarking.WebBookmarkInfo` -> `noztr.nipb0_web_bookmarking.Bookmark`
+- `noztr.nipb7_blossom_servers.BlossomServerListInfo` -> `noztr.nipb7_blossom_servers.ServerList`
+- `noztr.nipb7_blossom_servers.BlobReference` -> `noztr.nipb7_blossom_servers.BlobRef`
 
 These are naming cleanups only. They do not change parsing behavior, wire formats, or ownership.

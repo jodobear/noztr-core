@@ -23,6 +23,7 @@ For the public versioning policy, see
   - `DmReplyRef` -> `ReplyRef`
   - `DmMessageInfo` -> `Message`
   - `FileMessageInfo` -> `FileMessage`
+  - `EmojiTagInfo` -> `EmojiTag`
   - `ContentWarningInfo` -> `ContentWarning`
   - `RepositoryAnnouncementInfo` -> `Announcement`
   - `RepositoryStateRef` -> `StateRef`
@@ -35,6 +36,7 @@ For the public versioning policy, see
   - `ReportInfo` -> `Report`
   - `ChessPgnInfo` -> `Pgn`
   - `ImageInfo` -> `Image` in `nip58_badges`
+  - `HttpAuthInfo` -> `Auth`
   - `TextTrackInfo` -> `TextTrack`
   - `OriginInfo` -> `Origin`
   - `VideoInfo` -> `Video`
@@ -48,6 +50,9 @@ For the public versioning policy, see
   - `FileMetadataInfo` -> `Metadata`
   - `RelayDiscoveryInfo` -> `Discovery`
   - `RelayMonitorInfo` -> `Monitor`
+  - `WebBookmarkInfo` -> `Bookmark`
+  - `BlossomServerListInfo` -> `ServerList`
+  - `BlobReference` -> `BlobRef`
 - migration guide:
   - [docs/guides/migrating-from-0.1.0-rc.3.md](docs/guides/migrating-from-0.1.0-rc.3.md)
 
