@@ -117,6 +117,9 @@ If you are also updating from older release candidates, apply the earlier migrat
 
 The current read-model cleanup also shortens several primary route-local extract types:
 
+- `noztr.nip17_private_messages.DmReplyRef` -> `noztr.nip17_private_messages.ReplyRef`
+- `noztr.nip17_private_messages.DmMessageInfo` -> `noztr.nip17_private_messages.Message`
+- `noztr.nip17_private_messages.FileMessageInfo` -> `noztr.nip17_private_messages.FileMessage`
 - `noztr.nip64_chess_pgn.ChessPgnInfo` -> `noztr.nip64_chess_pgn.Pgn`
 - `noztr.nip78_app_data.AppDataInfo` -> `noztr.nip78_app_data.AppData`
 - `noztr.nip92_media_attachments.ImetaInfo` -> `noztr.nip92_media_attachments.Imeta`

@@ -399,11 +399,11 @@ test "root exports limits and error namespaces" {
     try std.testing.expect(@TypeOf(nip03_opentimestamps.OpenTimestampsAttestation) == type);
     try std.testing.expect(@TypeOf(nip03_opentimestamps.TagBuilder) == type);
     try std.testing.expect(@TypeOf(nip17_private_messages.DmRecipient) == type);
-    try std.testing.expect(@TypeOf(nip17_private_messages.DmReplyRef) == type);
-    try std.testing.expect(@TypeOf(nip17_private_messages.DmMessageInfo) == type);
+    try std.testing.expect(@TypeOf(nip17_private_messages.ReplyRef) == type);
+    try std.testing.expect(@TypeOf(nip17_private_messages.Message) == type);
     try std.testing.expect(@TypeOf(nip17_private_messages.FileEncryptionAlgorithm) == type);
     try std.testing.expect(@TypeOf(nip17_private_messages.FileDimensions) == type);
-    try std.testing.expect(@TypeOf(nip17_private_messages.FileMessageInfo) == type);
+    try std.testing.expect(@TypeOf(nip17_private_messages.FileMessage) == type);
     try std.testing.expect(@TypeOf(nip17_private_messages.TagBuilder) == type);
     try std.testing.expect(@TypeOf(nip14_subjects.TagBuilder) == type);
     try std.testing.expect(@TypeOf(nip31_alt_tags.TagBuilder) == type);
@@ -588,7 +588,7 @@ test "root exports limits and error namespaces" {
                 []nip17_private_messages.DmRecipient,
                 [][]const u8,
                 [][]const u8,
-            ) nip17_private_messages.PrivateMessageError!nip17_private_messages.FileMessageInfo,
+            ) nip17_private_messages.PrivateMessageError!nip17_private_messages.FileMessage,
     );
     try std.testing.expect(
         @TypeOf(nip17_private_messages.nip17_unwrap_file_message) ==
@@ -600,7 +600,7 @@ test "root exports limits and error namespaces" {
                 [][]const u8,
                 [][]const u8,
                 std.mem.Allocator,
-            ) nip17_private_messages.PrivateMessageError!nip17_private_messages.FileMessageInfo,
+            ) nip17_private_messages.PrivateMessageError!nip17_private_messages.FileMessage,
     );
     try std.testing.expect(
         @TypeOf(nip29_relay_groups.group_reference_parse) ==
@@ -626,7 +626,7 @@ test "root exports limits and error namespaces" {
             fn (
                 *const nip01_event.Event,
                 []nip17_private_messages.DmRecipient,
-            ) nip17_private_messages.PrivateMessageError!nip17_private_messages.DmMessageInfo,
+            ) nip17_private_messages.PrivateMessageError!nip17_private_messages.Message,
     );
     try std.testing.expect(
         @TypeOf(nip17_private_messages.nip17_unwrap_message) ==
@@ -636,7 +636,7 @@ test "root exports limits and error namespaces" {
                 *const nip01_event.Event,
                 []nip17_private_messages.DmRecipient,
                 std.mem.Allocator,
-            ) nip17_private_messages.PrivateMessageError!nip17_private_messages.DmMessageInfo,
+            ) nip17_private_messages.PrivateMessageError!nip17_private_messages.Message,
     );
     try std.testing.expect(
         @TypeOf(nip17_private_messages.nip17_relay_list_extract) ==

@@ -20,6 +20,9 @@ For the public versioning policy, see
   - `nip17_private_messages.BuiltFileMetadataTag` -> `FileTagBuilder`
   - `nip46_remote_signing.BuiltRequest` -> `RequestBuilder`
 - shortened several primary route-local read-model types:
+  - `DmReplyRef` -> `ReplyRef`
+  - `DmMessageInfo` -> `Message`
+  - `FileMessageInfo` -> `FileMessage`
   - `ChessPgnInfo` -> `Pgn`
   - `AppDataInfo` -> `AppData`
   - `ImetaInfo` -> `Imeta`

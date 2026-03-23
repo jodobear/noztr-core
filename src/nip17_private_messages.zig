@@ -37,15 +37,15 @@ pub const DmRecipient = struct {
     relay_hint: ?[]const u8 = null,
 };
 
-pub const DmReplyRef = struct {
+pub const ReplyRef = struct {
     event_id: [32]u8,
     relay_hint: ?[]const u8 = null,
 };
 
-pub const DmMessageInfo = struct {
+pub const Message = struct {
     recipients: []const DmRecipient,
     subject: ?[]const u8 = null,
-    reply_to: ?DmReplyRef = null,
+    reply_to: ?ReplyRef = null,
     content: []const u8,
 };
 
@@ -67,10 +67,10 @@ pub const FileDimensions = struct {
     height: u32,
 };
 
-pub const FileMessageInfo = struct {
+pub const FileMessage = struct {
     recipients: []const DmRecipient,
     subject: ?[]const u8 = null,
-    reply_to: ?DmReplyRef = null,
+    reply_to: ?ReplyRef = null,
     file_url: []const u8,
     file_type: []const u8,
     encryption_algorithm: FileEncryptionAlgorithm,
@@ -114,14 +114,14 @@ pub const FileTagBuilder = struct {
 pub fn nip17_message_parse(
     event: *const nip01_event.Event,
     recipients_out: []DmRecipient,
-) PrivateMessageError!DmMessageInfo {
+) PrivateMessageError!Message {
     std.debug.assert(@intFromPtr(event) != 0);
     std.debug.assert(recipients_out.len <= limits.tags_max);
 
     if (event.kind != dm_kind) return error.InvalidMessageKind;
     if (!std.unicode.utf8ValidateSlice(event.content)) return error.InvalidMessageKind;
 
-    var info = DmMessageInfo{
+    var info = Message{
         .recipients = recipients_out[0..0],
         .content = event.content,
     };
@@ -140,7 +140,7 @@ pub fn nip17_file_message_parse(
     recipients_out: []DmRecipient,
     thumbs_out: [][]const u8,
     fallbacks_out: [][]const u8,
-) PrivateMessageError!FileMessageInfo {
+) PrivateMessageError!FileMessage {
     std.debug.assert(@intFromPtr(event) != 0);
     std.debug.assert(recipients_out.len <= limits.tags_max);
 
@@ -150,7 +150,7 @@ pub fn nip17_file_message_parse(
     var recipient_count: u16 = 0;
     var thumb_count: u16 = 0;
     var fallback_count: u16 = 0;
-    var info = FileMessageInfo{
+    var info = FileMessage{
         .recipients = recipients_out[0..0],
         .file_url = state.file_url,
         .file_type = "",
@@ -186,7 +186,7 @@ pub fn nip17_unwrap_message(
     wrap_event: *const nip01_event.Event,
     recipients_out: []DmRecipient,
     scratch: std.mem.Allocator,
-) PrivateMessageError!DmMessageInfo {
+) PrivateMessageError!Message {
     std.debug.assert(@intFromPtr(output_rumor) != 0);
     std.debug.assert(@intFromPtr(recipient_private_key) != 0);
 
@@ -203,7 +203,7 @@ pub fn nip17_unwrap_file_message(
     thumbs_out: [][]const u8,
     fallbacks_out: [][]const u8,
     scratch: std.mem.Allocator,
-) PrivateMessageError!FileMessageInfo {
+) PrivateMessageError!FileMessage {
     std.debug.assert(@intFromPtr(output_rumor) != 0);
     std.debug.assert(@intFromPtr(recipient_private_key) != 0);
 
@@ -370,7 +370,7 @@ pub fn nip17_build_file_fallback_tag(
 
 fn parse_message_tag(
     tag: nip01_event.EventTag,
-    info: *DmMessageInfo,
+    info: *Message,
     recipients_out: []DmRecipient,
     count: *u16,
 ) PrivateMessageError!void {
@@ -454,7 +454,7 @@ const FileMetadataState = struct {
 
 fn parse_file_message_tag(
     tag: nip01_event.EventTag,
-    info: *FileMessageInfo,
+    info: *FileMessage,
     state: *FileMetadataState,
     recipients_out: []DmRecipient,
     recipient_count: *u16,
@@ -485,7 +485,7 @@ fn parse_file_message_tag(
 
 fn parse_file_metadata_tag(
     tag: nip01_event.EventTag,
-    info: *FileMessageInfo,
+    info: *FileMessage,
     state: *FileMetadataState,
     thumbs_out: [][]const u8,
     thumb_count: *u16,
@@ -536,7 +536,7 @@ fn parse_required_file_text_tag(
 
 fn parse_file_encryption_algorithm_tag(
     tag: nip01_event.EventTag,
-    info: *FileMessageInfo,
+    info: *FileMessage,
     state: *FileMetadataState,
 ) PrivateMessageError!void {
     std.debug.assert(@intFromPtr(info) != 0);
@@ -567,7 +567,7 @@ fn parse_required_file_hash_tag(
 
 fn parse_optional_original_hash_tag(
     tag: nip01_event.EventTag,
-    info: *FileMessageInfo,
+    info: *FileMessage,
     state: *FileMetadataState,
 ) PrivateMessageError!void {
     std.debug.assert(@intFromPtr(info) != 0);
@@ -581,7 +581,7 @@ fn parse_optional_original_hash_tag(
 
 fn parse_optional_file_size_tag(
     tag: nip01_event.EventTag,
-    info: *FileMessageInfo,
+    info: *FileMessage,
     state: *FileMetadataState,
 ) PrivateMessageError!void {
     std.debug.assert(@intFromPtr(info) != 0);
@@ -595,7 +595,7 @@ fn parse_optional_file_size_tag(
 
 fn parse_optional_dimensions_tag(
     tag: nip01_event.EventTag,
-    info: *FileMessageInfo,
+    info: *FileMessage,
     state: *FileMetadataState,
 ) PrivateMessageError!void {
     std.debug.assert(@intFromPtr(info) != 0);
@@ -609,7 +609,7 @@ fn parse_optional_dimensions_tag(
 
 fn parse_optional_blurhash_tag(
     tag: nip01_event.EventTag,
-    info: *FileMessageInfo,
+    info: *FileMessage,
     state: *FileMetadataState,
 ) PrivateMessageError!void {
     std.debug.assert(@intFromPtr(info) != 0);
@@ -636,7 +636,7 @@ fn parse_url_list_tag(
 }
 
 fn finalize_file_message_info(
-    info: *FileMessageInfo,
+    info: *FileMessage,
     state: *const FileMetadataState,
     recipient_count: u16,
     thumb_count: u16,
@@ -676,14 +676,14 @@ fn parse_recipient_tag(
     count.* += 1;
 }
 
-fn parse_reply_tag(tag: nip01_event.EventTag, info: *DmMessageInfo) PrivateMessageError!void {
+fn parse_reply_tag(tag: nip01_event.EventTag, info: *Message) PrivateMessageError!void {
     std.debug.assert(@intFromPtr(info) != 0);
     std.debug.assert(tag.items.len <= limits.tag_items_max);
 
     if (info.reply_to != null) return error.DuplicateReplyTag;
     if (tag.items.len < 2 or tag.items.len > 5) return error.InvalidReplyTag;
 
-    var reply = DmReplyRef{
+    var reply = ReplyRef{
         .event_id = parse_lower_hex_32(tag.items[1]) catch return error.InvalidReplyTag,
     };
     if (tag.items.len >= 3) {
@@ -704,14 +704,14 @@ fn parse_reply_tag(tag: nip01_event.EventTag, info: *DmMessageInfo) PrivateMessa
     info.reply_to = reply;
 }
 
-fn parse_file_reply_tag(tag: nip01_event.EventTag, info: *FileMessageInfo) PrivateMessageError!void {
+fn parse_file_reply_tag(tag: nip01_event.EventTag, info: *FileMessage) PrivateMessageError!void {
     std.debug.assert(@intFromPtr(info) != 0);
     std.debug.assert(tag.items.len <= limits.tag_items_max);
 
     if (info.reply_to != null) return error.DuplicateReplyTag;
     if (tag.items.len < 2 or tag.items.len > 5) return error.InvalidReplyTag;
 
-    var reply = DmReplyRef{
+    var reply = ReplyRef{
         .event_id = parse_lower_hex_32(tag.items[1]) catch return error.InvalidReplyTag,
     };
     if (tag.items.len >= 3) {
@@ -732,7 +732,7 @@ fn parse_file_reply_tag(tag: nip01_event.EventTag, info: *FileMessageInfo) Priva
     info.reply_to = reply;
 }
 
-fn parse_subject_tag(tag: nip01_event.EventTag, info: *DmMessageInfo) PrivateMessageError!void {
+fn parse_subject_tag(tag: nip01_event.EventTag, info: *Message) PrivateMessageError!void {
     std.debug.assert(@intFromPtr(info) != 0);
     std.debug.assert(tag.items.len <= limits.tag_items_max);
 
@@ -741,7 +741,7 @@ fn parse_subject_tag(tag: nip01_event.EventTag, info: *DmMessageInfo) PrivateMes
     info.subject = tag.items[1];
 }
 
-fn parse_file_subject_tag(tag: nip01_event.EventTag, info: *FileMessageInfo) PrivateMessageError!void {
+fn parse_file_subject_tag(tag: nip01_event.EventTag, info: *FileMessage) PrivateMessageError!void {
     std.debug.assert(@intFromPtr(info) != 0);
     std.debug.assert(tag.items.len <= limits.tag_items_max);
 
