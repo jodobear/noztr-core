@@ -87,12 +87,12 @@ pub const RelayMonitorInfo = struct {
     check_count: u16 = 0,
 };
 
-pub const BuiltTag = struct {
+pub const TagBuilder = struct {
     items: [3][]const u8 = undefined,
     text_storage: [3][limits.tag_item_bytes_max]u8 = undefined,
     item_count: u8 = 0,
 
-    pub fn as_event_tag(self: *const BuiltTag) nip01_event.EventTag {
+    pub fn as_event_tag(self: *const TagBuilder) nip01_event.EventTag {
         std.debug.assert(self.item_count > 0);
         std.debug.assert(self.item_count <= self.items.len);
 
@@ -157,7 +157,7 @@ pub fn relay_monitor_extract(
 }
 
 pub fn relay_discovery_build_url_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     relay_url: []const u8,
 ) RelayDiscoveryError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -173,7 +173,7 @@ pub fn relay_discovery_build_url_tag(
 }
 
 pub fn relay_discovery_build_pubkey_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     relay_pubkey: *const [32]u8,
 ) RelayDiscoveryError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -190,7 +190,7 @@ pub fn relay_discovery_build_pubkey_tag(
 }
 
 pub fn relay_discovery_build_rtt_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     metric: DiscoveryRttMetric,
     milliseconds: u32,
 ) RelayDiscoveryError!nip01_event.EventTag {
@@ -210,7 +210,7 @@ pub fn relay_discovery_build_rtt_tag(
 }
 
 pub fn relay_discovery_build_network_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     network_type: []const u8,
 ) RelayDiscoveryError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -223,7 +223,7 @@ pub fn relay_discovery_build_network_tag(
 }
 
 pub fn relay_discovery_build_relay_type_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     relay_type: []const u8,
 ) RelayDiscoveryError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -236,7 +236,7 @@ pub fn relay_discovery_build_relay_type_tag(
 }
 
 pub fn relay_discovery_build_supported_nip_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     nip_number: u16,
 ) RelayDiscoveryError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -252,7 +252,7 @@ pub fn relay_discovery_build_supported_nip_tag(
 }
 
 pub fn relay_discovery_build_requirement_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     requirement: []const u8,
     enabled: bool,
 ) RelayDiscoveryError!nip01_event.EventTag {
@@ -270,7 +270,7 @@ pub fn relay_discovery_build_requirement_tag(
 }
 
 pub fn relay_discovery_build_topic_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     topic: []const u8,
 ) RelayDiscoveryError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -283,7 +283,7 @@ pub fn relay_discovery_build_topic_tag(
 }
 
 pub fn relay_discovery_build_kind_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     kind: u32,
     accepted: bool,
 ) RelayDiscoveryError!nip01_event.EventTag {
@@ -299,7 +299,7 @@ pub fn relay_discovery_build_kind_tag(
 }
 
 pub fn relay_discovery_build_geohash_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     geohash: []const u8,
 ) RelayDiscoveryError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -312,7 +312,7 @@ pub fn relay_discovery_build_geohash_tag(
 }
 
 pub fn relay_monitor_build_frequency_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     frequency_seconds: u64,
 ) RelayDiscoveryError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -330,7 +330,7 @@ pub fn relay_monitor_build_frequency_tag(
 }
 
 pub fn relay_monitor_build_timeout_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     milliseconds: u32,
     check: ?[]const u8,
 ) RelayDiscoveryError!nip01_event.EventTag {
@@ -357,7 +357,7 @@ pub fn relay_monitor_build_timeout_tag(
 }
 
 pub fn relay_monitor_build_check_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     check: []const u8,
 ) RelayDiscoveryError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -370,7 +370,7 @@ pub fn relay_monitor_build_check_tag(
 }
 
 pub fn relay_monitor_build_geohash_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     geohash: []const u8,
 ) RelayDiscoveryError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -874,15 +874,15 @@ fn build_event(
 }
 
 test "relay discovery extract parses bounded metadata and normalized identity tags" {
-    var d_tag = BuiltTag{};
-    var rtt_tag = BuiltTag{};
-    var network_tag = BuiltTag{};
-    var type_tag = BuiltTag{};
-    var nip_tag = BuiltTag{};
-    var req_tag = BuiltTag{};
-    var topic_tag = BuiltTag{};
-    var kind_tag = BuiltTag{};
-    var geo_tag = BuiltTag{};
+    var d_tag = TagBuilder{};
+    var rtt_tag = TagBuilder{};
+    var network_tag = TagBuilder{};
+    var type_tag = TagBuilder{};
+    var nip_tag = TagBuilder{};
+    var req_tag = TagBuilder{};
+    var topic_tag = TagBuilder{};
+    var kind_tag = TagBuilder{};
+    var geo_tag = TagBuilder{};
 
     const tags = [_]nip01_event.EventTag{
         try relay_discovery_build_url_tag(&d_tag, "WSS://Relay.EXAMPLE:443/path?drop=1"),
@@ -933,7 +933,7 @@ test "relay discovery extract parses bounded metadata and normalized identity ta
 }
 
 test "relay discovery extract accepts relay pubkey identity" {
-    var id_tag = BuiltTag{};
+    var id_tag = TagBuilder{};
     const relay_pubkey = [_]u8{0xaa} ** 32;
     const tags = [_]nip01_event.EventTag{
         try relay_discovery_build_pubkey_tag(&id_tag, &relay_pubkey),
@@ -957,10 +957,10 @@ test "relay discovery extract accepts relay pubkey identity" {
 }
 
 test "relay monitor extract parses canonical and ambiguous timeout orders" {
-    var freq_tag = BuiltTag{};
-    var timeout_tag = BuiltTag{};
-    var check_tag = BuiltTag{};
-    var geo_tag = BuiltTag{};
+    var freq_tag = TagBuilder{};
+    var timeout_tag = TagBuilder{};
+    var check_tag = TagBuilder{};
+    var geo_tag = TagBuilder{};
     const tags = [_]nip01_event.EventTag{
         try relay_monitor_build_frequency_tag(&freq_tag, 3600),
         try relay_monitor_build_timeout_tag(&timeout_tag, 5000, "open"),
@@ -987,8 +987,8 @@ test "relay monitor extract parses canonical and ambiguous timeout orders" {
 
 test "relay discovery and monitor direct invalid input stays typed" {
     var overlong: [limits.tag_item_bytes_max + 2]u8 = undefined;
-    var topic_tag = BuiltTag{};
-    var timeout_tag = BuiltTag{};
+    var topic_tag = TagBuilder{};
+    var timeout_tag = TagBuilder{};
     @memset(overlong[0..], 'a');
 
     try std.testing.expectError(

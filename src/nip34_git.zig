@@ -60,12 +60,12 @@ pub const UserGraspListInfo = struct {
     server_count: u16 = 0,
 };
 
-pub const BuiltTag = struct {
+pub const TagBuilder = struct {
     items: [limits.tag_items_max][]const u8 = undefined,
     text_storage: [limits.tag_item_bytes_max]u8 = undefined,
     item_count: u8 = 0,
 
-    pub fn as_event_tag(self: *const BuiltTag) nip01_event.EventTag {
+    pub fn as_event_tag(self: *const TagBuilder) nip01_event.EventTag {
         std.debug.assert(self.item_count > 0);
         std.debug.assert(self.item_count <= self.items.len);
 
@@ -139,7 +139,7 @@ pub fn user_grasp_list_extract(
 
 /// Builds a repository `d` tag.
 pub fn repository_build_identifier_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     identifier: []const u8,
 ) GitError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -153,7 +153,7 @@ pub fn repository_build_identifier_tag(
 
 /// Builds a repository `name` tag.
 pub fn repository_build_name_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     name: []const u8,
 ) GitError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -167,7 +167,7 @@ pub fn repository_build_name_tag(
 
 /// Builds a repository `description` tag.
 pub fn repository_build_description_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     description: []const u8,
 ) GitError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -181,7 +181,7 @@ pub fn repository_build_description_tag(
 
 /// Builds a multi-value repository URL or relay tag (`web`, `clone`, or `relays`).
 pub fn repository_build_url_list_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     name: []const u8,
     values: []const []const u8,
 ) GitError!nip01_event.EventTag {
@@ -201,7 +201,7 @@ pub fn repository_build_url_list_tag(
 
 /// Builds the `r` earliest-unique-commit tag.
 pub fn repository_build_earliest_unique_commit_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     commit_id: []const u8,
 ) GitError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -216,7 +216,7 @@ pub fn repository_build_earliest_unique_commit_tag(
 
 /// Builds the multi-value `maintainers` tag.
 pub fn repository_build_maintainers_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     pubkeys: []const []const u8,
 ) GitError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -235,7 +235,7 @@ pub fn repository_build_maintainers_tag(
 
 /// Builds a repository `t` topic tag.
 pub fn repository_build_topic_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     topic: []const u8,
 ) GitError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -249,7 +249,7 @@ pub fn repository_build_topic_tag(
 
 /// Builds a repository-state `refs/...` tag.
 pub fn repository_build_ref_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     ref_name: []const u8,
     commit_id: []const u8,
 ) GitError!nip01_event.EventTag {
@@ -264,7 +264,7 @@ pub fn repository_build_ref_tag(
 
 /// Builds the repository-state `HEAD` tag.
 pub fn repository_build_head_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     ref_name: []const u8,
 ) GitError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -280,7 +280,7 @@ pub fn repository_build_head_tag(
 
 /// Builds the multi-value grasp-server `g` tag.
 pub fn repository_build_grasp_servers_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     urls: []const []const u8,
 ) GitError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -567,7 +567,7 @@ test "NIP-34 extracts repository state refs" {
 }
 
 test "NIP-34 builds maintainers tag" {
-    var built: BuiltTag = .{};
+    var built: TagBuilder = .{};
     const pubkeys = [_][]const u8{
         "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
     };

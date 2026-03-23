@@ -5,7 +5,7 @@ test "NIP-46 example: build and validate a connect request" {
     var arena = std.heap.ArenaAllocator.init(std.testing.allocator);
     defer arena.deinit();
 
-    var output: noztr.nip46_remote_signing.BuiltRequest = .{};
+    var output: noztr.nip46_remote_signing.RequestBuilder = .{};
     const request = try noztr.nip46_remote_signing.request_build_connect(
         &output,
         "sdk-connect",

@@ -90,14 +90,14 @@ pub const Request = struct {
     params: []const []const u8,
 };
 
-pub const BuiltRequest = struct {
+pub const RequestBuilder = struct {
     params: [3][]const u8 = undefined,
     pubkey_hex: [limits.pubkey_hex_length]u8 = undefined,
     text_storage: [limits.tag_item_bytes_max]u8 = undefined,
     param_count: u8 = 0,
 
     /// Returns the built request view backed by this buffer.
-    pub fn as_request(self: *const BuiltRequest, id: []const u8, method: Method) Request {
+    pub fn as_request(self: *const RequestBuilder, id: []const u8, method: Method) Request {
         std.debug.assert(self.param_count <= self.params.len);
         std.debug.assert(id.len <= limits.nip46_message_id_bytes_max);
 
@@ -366,7 +366,7 @@ pub fn request_parse_typed(
 /// Build a typed `connect` request using caller-provided id storage.
 /// See `examples/nip46_example.zig` and `examples/remote_signing_recipe.zig`.
 pub fn request_build_connect(
-    output: *BuiltRequest,
+    output: *RequestBuilder,
     id: []const u8,
     request: *const ConnectParams,
     scratch: std.mem.Allocator,
@@ -396,7 +396,7 @@ pub fn request_build_connect(
 
 /// Build a typed `sign_event` request using caller-provided unsigned event JSON.
 pub fn request_build_sign_event(
-    output: *BuiltRequest,
+    output: *RequestBuilder,
     id: []const u8,
     unsigned_event_json: []const u8,
     scratch: std.mem.Allocator,
@@ -414,7 +414,7 @@ pub fn request_build_sign_event(
 
 /// Build a typed pubkey-plus-text request for the current encrypt/decrypt methods.
 pub fn request_build_pubkey_text(
-    output: *BuiltRequest,
+    output: *RequestBuilder,
     id: []const u8,
     method: Method,
     request: *const PubkeyTextParams,
@@ -438,7 +438,7 @@ pub fn request_build_pubkey_text(
 
 /// Build a typed zero-param request for `ping`, `get_public_key`, or `switch_relays`.
 pub fn request_build_empty(
-    output: *BuiltRequest,
+    output: *RequestBuilder,
     id: []const u8,
     method: Method,
     scratch: std.mem.Allocator,
@@ -2369,7 +2369,7 @@ test "typed request builders produce validated current method shapes" {
     var arena = std.heap.ArenaAllocator.init(std.testing.allocator);
     defer arena.deinit();
 
-    var connect_output: BuiltRequest = .{};
+    var connect_output: RequestBuilder = .{};
     const connect_request = try request_build_connect(
         &connect_output,
         "build-1",
@@ -2386,7 +2386,7 @@ test "typed request builders produce validated current method shapes" {
     try std.testing.expectEqual(Method.connect, connect_request.method);
     try std.testing.expectEqual(@as(usize, 3), connect_request.params.len);
 
-    var sign_output: BuiltRequest = .{};
+    var sign_output: RequestBuilder = .{};
     const sign_request = try request_build_sign_event(
         &sign_output,
         "build-2",
@@ -2396,7 +2396,7 @@ test "typed request builders produce validated current method shapes" {
     try std.testing.expectEqual(Method.sign_event, sign_request.method);
     try std.testing.expectEqual(@as(usize, 1), sign_request.params.len);
 
-    var dm_output: BuiltRequest = .{};
+    var dm_output: RequestBuilder = .{};
     const dm_request = try request_build_pubkey_text(
         &dm_output,
         "build-3",
@@ -2410,7 +2410,7 @@ test "typed request builders produce validated current method shapes" {
     try std.testing.expectEqual(Method.nip44_encrypt, dm_request.method);
     try std.testing.expectEqual(@as(usize, 2), dm_request.params.len);
 
-    var empty_output: BuiltRequest = .{};
+    var empty_output: RequestBuilder = .{};
     const empty_request = try request_build_empty(
         &empty_output,
         "build-4",
@@ -2425,7 +2425,7 @@ test "typed request builders reject mismatched method families" {
     var arena = std.heap.ArenaAllocator.init(std.testing.allocator);
     defer arena.deinit();
 
-    var output: BuiltRequest = .{};
+    var output: RequestBuilder = .{};
     try std.testing.expectError(
         error.InvalidMethod,
         request_build_pubkey_text(
@@ -2820,7 +2820,7 @@ test "nip46 public uri and builder paths reject overlong caller input with typed
     var arena = std.heap.ArenaAllocator.init(std.testing.allocator);
     defer arena.deinit();
 
-    var request_output: BuiltRequest = .{};
+    var request_output: RequestBuilder = .{};
     try std.testing.expectError(
         error.InvalidUnsignedEvent,
         request_build_sign_event(

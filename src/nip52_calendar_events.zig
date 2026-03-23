@@ -130,12 +130,12 @@ pub const Rsvp = struct {
     content: []const u8,
 };
 
-pub const BuiltTag = struct {
+pub const TagBuilder = struct {
     items: [4][]const u8 = undefined,
     text_storage: [limits.tag_item_bytes_max]u8 = undefined,
     item_count: u8 = 0,
 
-    pub fn as_event_tag(self: *const BuiltTag) nip01_event.EventTag {
+    pub fn as_event_tag(self: *const TagBuilder) nip01_event.EventTag {
         std.debug.assert(self.item_count > 0);
         std.debug.assert(self.item_count <= self.items.len);
 
@@ -252,7 +252,7 @@ pub fn calendar_rsvp_extract(event: *const nip01_event.Event) CalendarError!Rsvp
 
 /// Builds a canonical calendar `d` tag.
 pub fn calendar_build_identifier_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     identifier: []const u8,
 ) CalendarError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -266,7 +266,7 @@ pub fn calendar_build_identifier_tag(
 
 /// Builds a canonical calendar `title` tag.
 pub fn calendar_build_title_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     title: []const u8,
 ) CalendarError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -280,7 +280,7 @@ pub fn calendar_build_title_tag(
 
 /// Builds a canonical location tag.
 pub fn calendar_build_location_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     location: []const u8,
 ) CalendarError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -294,7 +294,7 @@ pub fn calendar_build_location_tag(
 
 /// Builds a canonical participant `p` tag.
 pub fn calendar_build_participant_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     pubkey_hex: []const u8,
     relay_hint: ?[]const u8,
     role: ?[]const u8,
@@ -321,7 +321,7 @@ pub fn calendar_build_participant_tag(
 
 /// Builds a canonical event-reference `a` tag for a calendar or RSVP.
 pub fn calendar_build_coordinate_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     coordinate_text: []const u8,
     relay_hint: ?[]const u8,
 ) CalendarError!nip01_event.EventTag {
@@ -341,7 +341,7 @@ pub fn calendar_build_coordinate_tag(
 
 /// Builds a canonical `start` tag for a date-based event.
 pub fn calendar_build_date_start_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     date_text: []const u8,
 ) CalendarError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -355,7 +355,7 @@ pub fn calendar_build_date_start_tag(
 
 /// Builds a canonical `D` day tag for a time-based event.
 pub fn calendar_build_day_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     day_index: u64,
 ) CalendarError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -371,7 +371,7 @@ pub fn calendar_build_day_tag(
 
 /// Builds a canonical RSVP `status` tag.
 pub fn calendar_build_status_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     status: AttendanceStatus,
 ) CalendarError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -890,7 +890,7 @@ test "NIP-52 extracts calendar RSVP metadata" {
 }
 
 test "NIP-52 builds participant tag" {
-    var built: BuiltTag = .{};
+    var built: TagBuilder = .{};
 
     const tag = try calendar_build_participant_tag(
         &built,

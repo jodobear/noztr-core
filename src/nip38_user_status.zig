@@ -33,12 +33,12 @@ pub const Status = struct {
     emoji_count: u16 = 0,
 };
 
-pub const BuiltTag = struct {
+pub const TagBuilder = struct {
     items: [3][]const u8 = undefined,
     text_storage: [limits.tag_item_bytes_max]u8 = undefined,
     item_count: u8 = 0,
 
-    pub fn as_event_tag(self: *const BuiltTag) nip01_event.EventTag {
+    pub fn as_event_tag(self: *const TagBuilder) nip01_event.EventTag {
         std.debug.assert(self.item_count > 0);
         std.debug.assert(self.item_count <= self.items.len);
 
@@ -79,7 +79,7 @@ pub fn user_status_extract(
 }
 
 pub fn user_status_build_identifier_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     identifier: []const u8,
 ) UserStatusError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -92,7 +92,7 @@ pub fn user_status_build_identifier_tag(
 }
 
 pub fn user_status_build_url_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     url: []const u8,
 ) UserStatusError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -105,7 +105,7 @@ pub fn user_status_build_url_tag(
 }
 
 pub fn user_status_build_pubkey_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     pubkey_hex: []const u8,
 ) UserStatusError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -119,7 +119,7 @@ pub fn user_status_build_pubkey_tag(
 }
 
 pub fn user_status_build_event_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     event_id_hex: []const u8,
 ) UserStatusError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -133,7 +133,7 @@ pub fn user_status_build_event_tag(
 }
 
 pub fn user_status_build_coordinate_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     coordinate: []const u8,
 ) UserStatusError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -147,7 +147,7 @@ pub fn user_status_build_coordinate_tag(
 }
 
 pub fn user_status_build_expiration_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     unix_seconds: u64,
 ) UserStatusError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -368,8 +368,8 @@ test "NIP-38 rejects duplicate identifiers" {
 }
 
 test "NIP-38 builds identifier and expiration tags" {
-    var built: BuiltTag = .{};
-    var expiration_built: BuiltTag = .{};
+    var built: TagBuilder = .{};
+    var expiration_built: TagBuilder = .{};
 
     const identifier = try user_status_build_identifier_tag(&built, "general");
     const expiration = try user_status_build_expiration_tag(&expiration_built, 42);
@@ -381,7 +381,7 @@ test "NIP-38 builds identifier and expiration tags" {
 }
 
 test "NIP-38 rejects overlong pubkey builder input with typed error" {
-    var built: BuiltTag = .{};
+    var built: TagBuilder = .{};
     const overlong = [_]u8{'a'} ** (limits.tag_item_bytes_max + 1);
 
     try std.testing.expectError(

@@ -114,13 +114,13 @@ pub const PrivateListInfo = struct {
     plaintext_json: []const u8,
 };
 
-pub const BuiltTag = struct {
+pub const TagBuilder = struct {
     items: [4][]const u8 = undefined,
     text_storage: [limits.tag_item_bytes_max]u8 = undefined,
     item_count: u8 = 0,
 
     /// Returns the built tag view backed by this buffer.
-    pub fn as_event_tag(self: *const BuiltTag) nip01_event.EventTag {
+    pub fn as_event_tag(self: *const TagBuilder) nip01_event.EventTag {
         std.debug.assert(self.item_count > 0);
         std.debug.assert(self.item_count <= self.items.len);
 
@@ -223,7 +223,7 @@ pub fn list_extract(event: *const nip01_event.Event, out: []ListItem) ListError!
 
 /// Builds a `d` tag for addressable list kinds.
 pub fn list_build_identifier_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     identifier: []const u8,
 ) ListError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -237,7 +237,7 @@ pub fn list_build_identifier_tag(
 
 /// Builds a bookmark-family public item tag.
 pub fn bookmark_build_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     item: BookmarkBuilderItem,
 ) ListError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -253,7 +253,7 @@ pub fn bookmark_build_tag(
 
 /// Builds an `emoji` tag and includes the optional fourth-slot emoji-set coordinate when present.
 pub fn emoji_build_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     emoji: *const ListEmoji,
 ) ListError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -631,7 +631,7 @@ fn parse_item_tag(kind: ListKind, tag: nip01_event.EventTag) ListError!ListItem 
 }
 
 fn build_event_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     tag_name: []const u8,
     event: ListEvent,
 ) ListError!nip01_event.EventTag {
@@ -651,7 +651,7 @@ fn build_event_tag(
 }
 
 fn build_coordinate_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     tag_name: []const u8,
     coordinate: ListCoordinate,
     require_nonempty_identifier: bool,
@@ -675,7 +675,7 @@ fn build_coordinate_tag(
     return output.as_event_tag();
 }
 
-fn build_hashtag_tag(output: *BuiltTag, hashtag: []const u8) ListError!nip01_event.EventTag {
+fn build_hashtag_tag(output: *TagBuilder, hashtag: []const u8) ListError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
     std.debug.assert(hashtag.len <= limits.tag_item_bytes_max);
 
@@ -690,7 +690,7 @@ fn build_hashtag_tag(output: *BuiltTag, hashtag: []const u8) ListError!nip01_eve
     return output.as_event_tag();
 }
 
-fn build_url_tag(output: *BuiltTag, url: []const u8) ListError!nip01_event.EventTag {
+fn build_url_tag(output: *TagBuilder, url: []const u8) ListError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
     std.debug.assert(url.len <= limits.tag_item_bytes_max);
 
@@ -1183,9 +1183,9 @@ test "list extract valid mute list preserves item order" {
 }
 
 test "bookmark builders emit bounded identifier event and coordinate tags" {
-    var identifier_tag: BuiltTag = .{};
-    var event_tag: BuiltTag = .{};
-    var coordinate_tag: BuiltTag = .{};
+    var identifier_tag: TagBuilder = .{};
+    var event_tag: TagBuilder = .{};
+    var coordinate_tag: TagBuilder = .{};
 
     const built_identifier = try list_build_identifier_tag(&identifier_tag, "saved");
     const built_event = try bookmark_build_tag(&event_tag, .{
@@ -1223,9 +1223,9 @@ test "bookmark builders emit bounded identifier event and coordinate tags" {
 }
 
 test "bookmark and emoji builders widen emission and bookmark extraction accepts breadth" {
-    var hashtag_tag: BuiltTag = .{};
-    var url_tag: BuiltTag = .{};
-    var emoji_tag: BuiltTag = .{};
+    var hashtag_tag: TagBuilder = .{};
+    var url_tag: TagBuilder = .{};
+    var emoji_tag: TagBuilder = .{};
     var items: [2]ListItem = undefined;
 
     const built_hashtag = try bookmark_build_tag(&hashtag_tag, .{ .hashtag = "nostr" });
@@ -1262,10 +1262,10 @@ test "bookmark and emoji builders widen emission and bookmark extraction accepts
 }
 
 test "bookmark and emoji builders reject invalid inputs" {
-    var identifier_tag: BuiltTag = .{};
-    var hashtag_tag: BuiltTag = .{};
-    var url_tag: BuiltTag = .{};
-    var emoji_tag: BuiltTag = .{};
+    var identifier_tag: TagBuilder = .{};
+    var hashtag_tag: TagBuilder = .{};
+    var url_tag: TagBuilder = .{};
+    var emoji_tag: TagBuilder = .{};
 
     try std.testing.expectError(
         error.InvalidIdentifierTag,

@@ -39,12 +39,12 @@ pub const IdentityClaim = struct {
     proof: []const u8,
 };
 
-pub const BuiltTag = struct {
+pub const TagBuilder = struct {
     items: [3][]const u8 = undefined,
     item_count: u8 = 0,
     platform_identity: [limits.tag_item_bytes_max]u8 = undefined,
 
-    pub fn as_event_tag(self: *const BuiltTag) nip01_event.EventTag {
+    pub fn as_event_tag(self: *const TagBuilder) nip01_event.EventTag {
         std.debug.assert(self.item_count > 0);
         std.debug.assert(self.item_count <= self.items.len);
 
@@ -74,7 +74,7 @@ pub fn identity_claims_extract(
 
 /// Builds a canonical NIP-39 `i` tag.
 pub fn identity_claim_build_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     claim: *const IdentityClaim,
 ) ExternalIdentityError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -424,7 +424,7 @@ test "identity claim builders produce canonical tags urls and texts" {
         .identity = "1087295469",
         .proof = "nostrdirectory/770",
     };
-    var built_tag: BuiltTag = .{};
+    var built_tag: TagBuilder = .{};
     var url_buffer: [256]u8 = undefined;
     var text_buffer: [256]u8 = undefined;
     var npub_buffer: [limits.nip19_bech32_identifier_bytes_max]u8 = undefined;
@@ -456,7 +456,7 @@ test "identity claim builders produce canonical tags urls and texts" {
 }
 
 test "identity claim builders reject overlong identity and proof on typed paths" {
-    var built_tag: BuiltTag = .{};
+    var built_tag: TagBuilder = .{};
     var long_identity: [limits.tag_item_bytes_max + 1]u8 = undefined;
     var long_proof: [limits.tag_item_bytes_max + 1]u8 = undefined;
     var edge_identity: [limits.tag_item_bytes_max]u8 = undefined;

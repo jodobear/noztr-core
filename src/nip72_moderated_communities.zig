@@ -124,12 +124,12 @@ pub const CommunityApprovalInfo = struct {
     approved_kind: u32,
 };
 
-pub const BuiltTag = struct {
+pub const TagBuilder = struct {
     items: [5][]const u8 = undefined,
     text_storage: [2][limits.tag_item_bytes_max]u8 = undefined,
     item_count: u8 = 0,
 
-    pub fn as_event_tag(self: *const BuiltTag) nip01_event.EventTag {
+    pub fn as_event_tag(self: *const TagBuilder) nip01_event.EventTag {
         std.debug.assert(self.item_count > 0);
         std.debug.assert(self.item_count <= self.items.len);
 
@@ -261,7 +261,7 @@ pub fn community_approval_extract(
 }
 
 pub fn community_build_identifier_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     identifier: []const u8,
 ) CommunityError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -274,7 +274,7 @@ pub fn community_build_identifier_tag(
 }
 
 pub fn community_build_name_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     name: []const u8,
 ) CommunityError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -287,7 +287,7 @@ pub fn community_build_name_tag(
 }
 
 pub fn community_build_description_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     description: []const u8,
 ) CommunityError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -300,7 +300,7 @@ pub fn community_build_description_tag(
 }
 
 pub fn community_build_image_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     image_url: []const u8,
     dimensions: ?Dimensions,
 ) CommunityError!nip01_event.EventTag {
@@ -323,7 +323,7 @@ pub fn community_build_image_tag(
 }
 
 pub fn community_build_moderator_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     pubkey_hex: []const u8,
     relay_hint: ?[]const u8,
     role: ?[]const u8,
@@ -349,7 +349,7 @@ pub fn community_build_moderator_tag(
 }
 
 pub fn community_build_relay_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     relay_url: []const u8,
     marker: ?[]const u8,
 ) CommunityError!nip01_event.EventTag {
@@ -367,7 +367,7 @@ pub fn community_build_relay_tag(
 }
 
 pub fn community_post_build_uppercase_community_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     coordinate_text: []const u8,
     relay_hint: ?[]const u8,
 ) CommunityError!nip01_event.EventTag {
@@ -375,7 +375,7 @@ pub fn community_post_build_uppercase_community_tag(
 }
 
 pub fn community_post_build_lowercase_community_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     coordinate_text: []const u8,
     relay_hint: ?[]const u8,
 ) CommunityError!nip01_event.EventTag {
@@ -383,7 +383,7 @@ pub fn community_post_build_lowercase_community_tag(
 }
 
 pub fn community_post_build_lowercase_parent_event_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     event_id_hex: []const u8,
     relay_hint: ?[]const u8,
 ) CommunityError!nip01_event.EventTag {
@@ -402,7 +402,7 @@ pub fn community_post_build_lowercase_parent_event_tag(
 }
 
 pub fn community_post_build_uppercase_author_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     pubkey_hex: []const u8,
     relay_hint: ?[]const u8,
 ) CommunityError!nip01_event.EventTag {
@@ -410,7 +410,7 @@ pub fn community_post_build_uppercase_author_tag(
 }
 
 pub fn community_post_build_lowercase_author_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     pubkey_hex: []const u8,
     relay_hint: ?[]const u8,
 ) CommunityError!nip01_event.EventTag {
@@ -418,21 +418,21 @@ pub fn community_post_build_lowercase_author_tag(
 }
 
 pub fn community_post_build_uppercase_kind_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     kind: u32,
 ) CommunityError!nip01_event.EventTag {
     return build_case_kind_tag(output, "K", kind, error.InvalidCommunityKindTag);
 }
 
 pub fn community_post_build_lowercase_kind_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     kind: u32,
 ) CommunityError!nip01_event.EventTag {
     return build_case_kind_tag(output, "k", kind, error.InvalidParentKindTag);
 }
 
 pub fn community_approval_build_community_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     coordinate_text: []const u8,
     relay_hint: ?[]const u8,
 ) CommunityError!nip01_event.EventTag {
@@ -440,7 +440,7 @@ pub fn community_approval_build_community_tag(
 }
 
 pub fn community_approval_build_post_coordinate_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     coordinate_text: []const u8,
     relay_hint: ?[]const u8,
 ) CommunityError!nip01_event.EventTag {
@@ -448,7 +448,7 @@ pub fn community_approval_build_post_coordinate_tag(
 }
 
 pub fn community_approval_build_post_event_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     event_id_hex: []const u8,
     relay_hint: ?[]const u8,
 ) CommunityError!nip01_event.EventTag {
@@ -467,7 +467,7 @@ pub fn community_approval_build_post_event_tag(
 }
 
 pub fn community_approval_build_post_author_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     pubkey_hex: []const u8,
     relay_hint: ?[]const u8,
 ) CommunityError!nip01_event.EventTag {
@@ -475,7 +475,7 @@ pub fn community_approval_build_post_author_tag(
 }
 
 pub fn community_approval_build_post_kind_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     kind: u32,
 ) CommunityError!nip01_event.EventTag {
     return build_case_kind_tag(output, "k", kind, error.InvalidApprovedPostKindTag);
@@ -736,7 +736,7 @@ fn apply_approval_kind_tag(
 }
 
 fn build_case_coordinate_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     name: []const u8,
     coordinate_text: []const u8,
     relay_hint: ?[]const u8,
@@ -757,7 +757,7 @@ fn build_case_coordinate_tag(
 }
 
 fn build_case_pubkey_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     name: []const u8,
     pubkey_hex: []const u8,
     relay_hint: ?[]const u8,
@@ -778,7 +778,7 @@ fn build_case_pubkey_tag(
 }
 
 fn build_case_kind_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     name: []const u8,
     kind: u32,
     invalid_error: CommunityError,
@@ -1044,8 +1044,8 @@ test "NIP-72 extracts community approvals" {
 }
 
 test "NIP-72 builds community tags" {
-    var coord_built: BuiltTag = .{};
-    var kind_built: BuiltTag = .{};
+    var coord_built: TagBuilder = .{};
+    var kind_built: TagBuilder = .{};
 
     const a_tag = try community_post_build_uppercase_community_tag(
         &coord_built,
@@ -1060,7 +1060,7 @@ test "NIP-72 builds community tags" {
 }
 
 test "NIP-72 rejects overlong identifier builder input with typed error" {
-    var built: BuiltTag = .{};
+    var built: TagBuilder = .{};
     const overlong = [_]u8{'a'} ** (limits.tag_item_bytes_max + 1);
 
     try std.testing.expectError(

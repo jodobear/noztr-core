@@ -3,7 +3,7 @@ const noztr = @import("noztr");
 const common = @import("common.zig");
 
 test "NIP-98 adversarial example: malformed headers and payload tags stay typed" {
-    var payload_tag: noztr.nip98_http_auth.BuiltTag = .{};
+    var payload_tag: noztr.nip98_http_auth.TagBuilder = .{};
     var header_output: [128]u8 = undefined;
     const tags = [_]noztr.nip01_event.EventTag{
         .{ .items = &.{ "u", "https://api.example.com/upload" } },

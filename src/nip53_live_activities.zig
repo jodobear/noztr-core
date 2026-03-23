@@ -93,12 +93,12 @@ pub const LiveChatInfo = struct {
     content: []const u8,
 };
 
-pub const BuiltTag = struct {
+pub const TagBuilder = struct {
     items: [5][]const u8 = undefined,
     text_storage: [limits.tag_item_bytes_max]u8 = undefined,
     item_count: u8 = 0,
 
-    pub fn as_event_tag(self: *const BuiltTag) nip01_event.EventTag {
+    pub fn as_event_tag(self: *const TagBuilder) nip01_event.EventTag {
         std.debug.assert(self.item_count > 0);
         std.debug.assert(self.item_count <= self.items.len);
 
@@ -157,7 +157,7 @@ pub fn live_chat_extract(event: *const nip01_event.Event) LiveActivityError!Live
 
 /// Builds a canonical `d` identifier tag for a live activity.
 pub fn live_activity_build_identifier_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     identifier: []const u8,
 ) LiveActivityError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -171,7 +171,7 @@ pub fn live_activity_build_identifier_tag(
 
 /// Builds a canonical `title` tag for a live activity.
 pub fn live_activity_build_title_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     title: []const u8,
 ) LiveActivityError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -185,7 +185,7 @@ pub fn live_activity_build_title_tag(
 
 /// Builds a canonical `streaming` tag for a live activity.
 pub fn live_activity_build_streaming_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     url: []const u8,
 ) LiveActivityError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -199,7 +199,7 @@ pub fn live_activity_build_streaming_tag(
 
 /// Builds a canonical `status` tag for a live activity.
 pub fn live_activity_build_status_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     status: LiveActivityStatus,
 ) LiveActivityError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -217,7 +217,7 @@ pub fn live_activity_build_status_tag(
 
 /// Builds a canonical participant `p` tag for a live activity.
 pub fn live_activity_build_participant_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     pubkey_hex: []const u8,
     relay_hint: ?[]const u8,
     role: ?[]const u8,
@@ -251,7 +251,7 @@ pub fn live_activity_build_participant_tag(
 
 /// Builds the required activity `a` tag for a live-chat message.
 pub fn live_chat_build_activity_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     coordinate_text: []const u8,
     relay_hint: ?[]const u8,
 ) LiveActivityError!nip01_event.EventTag {
@@ -598,7 +598,7 @@ test "NIP-53 extracts live-chat activity reference" {
 }
 
 test "NIP-53 builds canonical live-activity participant tag" {
-    var built: BuiltTag = .{};
+    var built: TagBuilder = .{};
 
     const tag = try live_activity_build_participant_tag(
         &built,

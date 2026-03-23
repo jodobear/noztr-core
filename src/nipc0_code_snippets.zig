@@ -54,13 +54,13 @@ pub const CodeSnippetInfo = struct {
     dependency_count: u16 = 0,
 };
 
-pub const BuiltTag = struct {
+pub const TagBuilder = struct {
     items: [3][]const u8 = undefined,
     text_storage: [limits.tag_item_bytes_max]u8 = undefined,
     item_count: u8 = 0,
 
     /// Returns the built tag backed by this buffer.
-    pub fn as_event_tag(self: *const BuiltTag) nip01_event.EventTag {
+    pub fn as_event_tag(self: *const TagBuilder) nip01_event.EventTag {
         std.debug.assert(self.item_count > 0);
         std.debug.assert(self.item_count <= self.items.len);
 
@@ -98,7 +98,7 @@ pub fn code_snippet_extract(
 
 /// Builds a canonical `l` language tag.
 pub fn code_snippet_build_language_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     language: []const u8,
 ) CodeSnippetError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -114,7 +114,7 @@ pub fn code_snippet_build_language_tag(
 
 /// Builds a canonical `name` tag.
 pub fn code_snippet_build_name_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     name: []const u8,
 ) CodeSnippetError!nip01_event.EventTag {
     return build_text_tag(output, "name", name, error.InvalidNameTag);
@@ -122,7 +122,7 @@ pub fn code_snippet_build_name_tag(
 
 /// Builds a canonical `extension` tag.
 pub fn code_snippet_build_extension_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     extension: []const u8,
 ) CodeSnippetError!nip01_event.EventTag {
     return build_text_tag(output, "extension", extension, error.InvalidExtensionTag);
@@ -130,7 +130,7 @@ pub fn code_snippet_build_extension_tag(
 
 /// Builds a canonical `description` tag.
 pub fn code_snippet_build_description_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     description: []const u8,
 ) CodeSnippetError!nip01_event.EventTag {
     return build_text_tag(output, "description", description, error.InvalidDescriptionTag);
@@ -138,7 +138,7 @@ pub fn code_snippet_build_description_tag(
 
 /// Builds a canonical `runtime` tag.
 pub fn code_snippet_build_runtime_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     runtime: []const u8,
 ) CodeSnippetError!nip01_event.EventTag {
     return build_text_tag(output, "runtime", runtime, error.InvalidRuntimeTag);
@@ -146,7 +146,7 @@ pub fn code_snippet_build_runtime_tag(
 
 /// Builds a canonical `license` tag with an optional reference.
 pub fn code_snippet_build_license_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     license: LicenseInfo,
 ) CodeSnippetError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -166,7 +166,7 @@ pub fn code_snippet_build_license_tag(
 
 /// Builds a canonical `dep` tag.
 pub fn code_snippet_build_dependency_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     dependency: []const u8,
 ) CodeSnippetError!nip01_event.EventTag {
     return build_text_tag(output, "dep", dependency, error.InvalidDependencyTag);
@@ -174,7 +174,7 @@ pub fn code_snippet_build_dependency_tag(
 
 /// Builds a canonical `repo` tag from either a URL or a NIP-34 repository coordinate.
 pub fn code_snippet_build_repo_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     repo: RepoReference,
 ) CodeSnippetError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -306,7 +306,7 @@ fn apply_dependency_tag(
 }
 
 fn build_text_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     name: []const u8,
     value: []const u8,
     invalid_error: CodeSnippetError,
@@ -565,10 +565,10 @@ test "code snippet extract parses coordinate repo with optional relay hint" {
 }
 
 test "code snippet builders emit canonical tag shapes" {
-    var language_tag: BuiltTag = .{};
-    var license_tag: BuiltTag = .{};
-    var dependency_tag: BuiltTag = .{};
-    var repo_tag: BuiltTag = .{};
+    var language_tag: TagBuilder = .{};
+    var license_tag: TagBuilder = .{};
+    var dependency_tag: TagBuilder = .{};
+    var repo_tag: TagBuilder = .{};
     const repo = RepoReference{ .coordinate = .{
         .pubkey = [_]u8{0xbb} ** 32,
         .identifier = "nostr",
@@ -599,7 +599,7 @@ test "code snippet builders emit canonical tag shapes" {
 }
 
 test "code snippet language builder canonicalizes ascii uppercase" {
-    var language_tag: BuiltTag = .{};
+    var language_tag: TagBuilder = .{};
 
     const built_language = try code_snippet_build_language_tag(&language_tag, "Rust");
 
@@ -608,9 +608,9 @@ test "code snippet language builder canonicalizes ascii uppercase" {
 }
 
 test "code snippet builder and parser stay symmetric for canonical metadata" {
-    var name_tag: BuiltTag = .{};
-    var license_tag: BuiltTag = .{};
-    var repo_tag: BuiltTag = .{};
+    var name_tag: TagBuilder = .{};
+    var license_tag: TagBuilder = .{};
+    var repo_tag: TagBuilder = .{};
     const tags = [_]nip01_event.EventTag{
         try code_snippet_build_name_tag(&name_tag, "hello.zig"),
         try code_snippet_build_license_tag(&license_tag, .{ .identifier = "MIT" }),
@@ -743,9 +743,9 @@ test "code snippet extract separates invalid input from capacity failures" {
 }
 
 test "code snippet builders reject overlong metadata as invalid input" {
-    var name_tag: BuiltTag = .{};
-    var dependency_tag: BuiltTag = .{};
-    var repo_tag: BuiltTag = .{};
+    var name_tag: TagBuilder = .{};
+    var dependency_tag: TagBuilder = .{};
+    var repo_tag: TagBuilder = .{};
     var long_storage: [limits.tag_item_bytes_max + 1]u8 = undefined;
     @memset(long_storage[0..], 'a');
 

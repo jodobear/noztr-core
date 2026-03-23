@@ -11,11 +11,11 @@ pub const SubjectError = error{
     InvalidSubjectTag,
 };
 
-pub const BuiltTag = struct {
+pub const TagBuilder = struct {
     items: [2][]const u8 = undefined,
     item_count: u8 = 0,
 
-    pub fn as_event_tag(self: *const BuiltTag) nip01_event.EventTag {
+    pub fn as_event_tag(self: *const TagBuilder) nip01_event.EventTag {
         std.debug.assert(self.item_count > 0);
         std.debug.assert(self.item_count <= self.items.len);
 
@@ -40,7 +40,7 @@ pub fn subject_extract(event: *const nip01_event.Event) SubjectError!?[]const u8
 }
 
 /// Builds a canonical `subject` tag for a kind-1 text note.
-pub fn subject_build_tag(output: *BuiltTag, subject: []const u8) SubjectError!nip01_event.EventTag {
+pub fn subject_build_tag(output: *TagBuilder, subject: []const u8) SubjectError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
     std.debug.assert(output.items.len == 2);
 
@@ -114,7 +114,7 @@ test "NIP-14 rejects duplicate subject tags" {
 }
 
 test "NIP-14 builds canonical subject tags" {
-    var built: BuiltTag = .{};
+    var built: TagBuilder = .{};
 
     const tag = try subject_build_tag(&built, "Re: Release planning");
 
@@ -123,7 +123,7 @@ test "NIP-14 builds canonical subject tags" {
 }
 
 test "NIP-14 rejects overlong subject builder input with typed error" {
-    var built: BuiltTag = .{};
+    var built: TagBuilder = .{};
     const overlong = [_]u8{'a'} ** (limits.tag_item_bytes_max + 1);
 
     try std.testing.expectError(error.InvalidSubjectTag, subject_build_tag(&built, overlong[0..]));

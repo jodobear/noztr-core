@@ -8,7 +8,7 @@ test "recipe: build sign parse and verify a legacy kind-4 DM event" {
     const sender_pubkey = try common.derive_public_key(&sender_secret);
     const recipient_pubkey = try common.derive_public_key(&recipient_secret);
     const recipient_hex = std.fmt.bytesToHex(recipient_pubkey, .lower);
-    var recipient_tag: noztr.nip04.BuiltTag = .{};
+    var recipient_tag: noztr.nip04.TagBuilder = .{};
     const built_recipient = try noztr.nip04.nip04_build_recipient_tag(&recipient_tag, recipient_hex[0..]);
     const tags = [_]noztr.nip01_event.EventTag{built_recipient};
     const iv = [_]u8{0x55} ** noztr.limits.nip04_iv_bytes;

@@ -3,8 +3,8 @@ const noztr = @import("noztr");
 const common = @import("common.zig");
 
 test "NIP-B0 example: extract web bookmark metadata" {
-    var identifier_tag: noztr.nipb0_web_bookmarking.BuiltTag = .{};
-    var title_tag: noztr.nipb0_web_bookmarking.BuiltTag = .{};
+    var identifier_tag: noztr.nipb0_web_bookmarking.TagBuilder = .{};
+    var title_tag: noztr.nipb0_web_bookmarking.TagBuilder = .{};
     const built_identifier = try noztr.nipb0_web_bookmarking.web_bookmark_build_identifier_tag(
         &identifier_tag,
         "alice.blog/post",

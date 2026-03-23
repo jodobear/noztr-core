@@ -188,11 +188,11 @@ pub const GroupState = struct {
 const group_user_index_cache_capacity: usize = @as(usize, limits.tags_max) * 2;
 const group_user_index_cache_empty: u16 = std.math.maxInt(u16);
 
-pub const BuiltTag = struct {
+pub const TagBuilder = struct {
     items: [limits.tag_items_max][]const u8 = undefined,
     item_count: u8 = 0,
 
-    pub fn as_event_tag(self: *const BuiltTag) nip01_event.EventTag {
+    pub fn as_event_tag(self: *const TagBuilder) nip01_event.EventTag {
         std.debug.assert(self.item_count > 0);
         std.debug.assert(self.item_count <= self.items.len);
 
@@ -414,7 +414,7 @@ pub fn group_remove_user_extract(
 
 /// Builds a canonical NIP-29 `d` tag.
 pub fn group_build_identifier_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     group_id: []const u8,
 ) GroupError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -427,7 +427,7 @@ pub fn group_build_identifier_tag(
 }
 
 /// Builds a canonical NIP-29 `name` tag.
-pub fn group_build_name_tag(output: *BuiltTag, name: []const u8) GroupError!nip01_event.EventTag {
+pub fn group_build_name_tag(output: *TagBuilder, name: []const u8) GroupError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
     std.debug.assert(name.len <= limits.tag_item_bytes_max);
 
@@ -439,7 +439,7 @@ pub fn group_build_name_tag(output: *BuiltTag, name: []const u8) GroupError!nip0
 
 /// Builds a canonical NIP-29 `picture` tag.
 pub fn group_build_picture_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     picture_url: []const u8,
 ) GroupError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -453,7 +453,7 @@ pub fn group_build_picture_tag(
 
 /// Builds a canonical NIP-29 `about` tag.
 pub fn group_build_about_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     about: []const u8,
 ) GroupError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -467,7 +467,7 @@ pub fn group_build_about_tag(
 
 /// Builds a canonical NIP-29 metadata flag tag.
 pub fn group_build_flag_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     flag: GroupMetadataFlag,
 ) GroupError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -479,7 +479,7 @@ pub fn group_build_flag_tag(
 }
 
 /// Builds a canonical NIP-29 `h` tag for user or moderation events.
-pub fn group_build_group_tag(output: *BuiltTag, group_id: []const u8) GroupError!nip01_event.EventTag {
+pub fn group_build_group_tag(output: *TagBuilder, group_id: []const u8) GroupError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
     std.debug.assert(group_id.len <= limits.tag_item_bytes_max);
 
@@ -491,7 +491,7 @@ pub fn group_build_group_tag(output: *BuiltTag, group_id: []const u8) GroupError
 
 /// Builds a canonical NIP-29 `role` tag for kind-39003 events.
 pub fn group_build_role_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     role_name: []const u8,
     description: ?[]const u8,
 ) GroupError!nip01_event.EventTag {
@@ -509,7 +509,7 @@ pub fn group_build_role_tag(
 }
 
 /// Builds a canonical NIP-29 `code` tag for join requests.
-pub fn group_build_code_tag(output: *BuiltTag, code: []const u8) GroupError!nip01_event.EventTag {
+pub fn group_build_code_tag(output: *TagBuilder, code: []const u8) GroupError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
     std.debug.assert(code.len <= limits.tag_item_bytes_max);
 
@@ -521,7 +521,7 @@ pub fn group_build_code_tag(output: *BuiltTag, code: []const u8) GroupError!nip0
 
 /// Builds a canonical NIP-29 `previous` tag.
 pub fn group_build_previous_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     previous_ref: []const u8,
 ) GroupError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -535,7 +535,7 @@ pub fn group_build_previous_tag(
 
 /// Builds a canonical NIP-29 `p` tag for put/remove user moderation events.
 pub fn group_build_user_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     pubkey_hex: []const u8,
     roles: []const []const u8,
 ) GroupError!nip01_event.EventTag {
@@ -555,7 +555,7 @@ pub fn group_build_user_tag(
 
 /// Builds a canonical NIP-29 admin `p` tag with optional compatibility label.
 pub fn group_build_admin_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     pubkey_hex: []const u8,
     label: ?[]const u8,
     roles: []const []const u8,
@@ -583,7 +583,7 @@ pub fn group_build_admin_tag(
 
 /// Builds a bounded NIP-29 member `p` tag with optional compatibility label.
 pub fn group_build_member_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     pubkey_hex: []const u8,
     label: ?[]const u8,
 ) GroupError!nip01_event.EventTag {
@@ -1738,9 +1738,9 @@ test "group members extract accepts optional compatibility labels" {
 }
 
 test "group builders emit canonical metadata admin and member tags" {
-    var identifier_tag: BuiltTag = .{};
-    var admin_tag: BuiltTag = .{};
-    var member_tag: BuiltTag = .{};
+    var identifier_tag: TagBuilder = .{};
+    var admin_tag: TagBuilder = .{};
+    var member_tag: TagBuilder = .{};
 
     const identifier = try group_build_identifier_tag(&identifier_tag, "pizza-lovers");
     const admin = try group_build_admin_tag(
@@ -1765,8 +1765,8 @@ test "group builders emit canonical metadata admin and member tags" {
 }
 
 test "group builders reject empty optional role and label output" {
-    var admin_tag: BuiltTag = .{};
-    var member_tag: BuiltTag = .{};
+    var admin_tag: TagBuilder = .{};
+    var member_tag: TagBuilder = .{};
 
     try std.testing.expectError(
         error.InvalidAdminTag,
@@ -1816,11 +1816,11 @@ test "group roles extract and moderation builders are bounded" {
         .{ .items = &.{ "role", "moderator" } },
     };
     var roles: [2]GroupRole = undefined;
-    var role_tag: BuiltTag = .{};
-    var group_tag: BuiltTag = .{};
-    var previous_tag: BuiltTag = .{};
-    var user_tag: BuiltTag = .{};
-    var code_tag: BuiltTag = .{};
+    var role_tag: TagBuilder = .{};
+    var group_tag: TagBuilder = .{};
+    var previous_tag: TagBuilder = .{};
+    var user_tag: TagBuilder = .{};
+    var code_tag: TagBuilder = .{};
 
     const parsed = try group_roles_extract(&test_event(group_roles_kind, role_tags[0..]), roles[0..]);
     const built_role = try group_build_role_tag(&role_tag, "admin", "full access");

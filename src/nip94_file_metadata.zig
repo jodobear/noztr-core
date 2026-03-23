@@ -72,12 +72,12 @@ pub const FileMetadataInfo = struct {
     caption: []const u8,
 };
 
-pub const BuiltTag = struct {
+pub const TagBuilder = struct {
     items: [3][]const u8 = undefined,
     text_storage: [2][32]u8 = undefined,
     item_count: u8 = 0,
 
-    pub fn as_event_tag(self: *const BuiltTag) nip01_event.EventTag {
+    pub fn as_event_tag(self: *const TagBuilder) nip01_event.EventTag {
         std.debug.assert(self.item_count > 0);
         std.debug.assert(self.item_count <= self.items.len);
 
@@ -115,7 +115,7 @@ pub fn file_metadata_extract(
 
 /// Builds a canonical `url` tag.
 pub fn file_metadata_build_url_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     url: []const u8,
 ) FileMetadataError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -129,7 +129,7 @@ pub fn file_metadata_build_url_tag(
 
 /// Builds a canonical `m` mime-type tag.
 pub fn file_metadata_build_mime_type_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     mime_type: []const u8,
 ) FileMetadataError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -143,7 +143,7 @@ pub fn file_metadata_build_mime_type_tag(
 
 /// Builds a canonical `x` sha256 tag.
 pub fn file_metadata_build_hash_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     sha256_hex: []const u8,
 ) FileMetadataError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -158,7 +158,7 @@ pub fn file_metadata_build_hash_tag(
 
 /// Builds a canonical `ox` sha256 tag.
 pub fn file_metadata_build_original_hash_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     sha256_hex: []const u8,
 ) FileMetadataError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -173,7 +173,7 @@ pub fn file_metadata_build_original_hash_tag(
 
 /// Builds a canonical `size` tag.
 pub fn file_metadata_build_size_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     size: u64,
 ) FileMetadataError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -189,7 +189,7 @@ pub fn file_metadata_build_size_tag(
 
 /// Builds a canonical `dim` tag.
 pub fn file_metadata_build_dimensions_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     dimensions: Dimensions,
 ) FileMetadataError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -208,7 +208,7 @@ pub fn file_metadata_build_dimensions_tag(
 
 /// Builds a canonical `magnet` tag.
 pub fn file_metadata_build_magnet_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     magnet_uri: []const u8,
 ) FileMetadataError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -222,7 +222,7 @@ pub fn file_metadata_build_magnet_tag(
 
 /// Builds a canonical `i` infohash tag.
 pub fn file_metadata_build_infohash_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     infohash: []const u8,
 ) FileMetadataError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -236,7 +236,7 @@ pub fn file_metadata_build_infohash_tag(
 
 /// Builds a canonical `blurhash` tag.
 pub fn file_metadata_build_blurhash_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     blurhash: []const u8,
 ) FileMetadataError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -250,7 +250,7 @@ pub fn file_metadata_build_blurhash_tag(
 
 /// Builds a canonical `thumb` tag with optional sha256.
 pub fn file_metadata_build_thumb_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     url: []const u8,
     sha256_hex: ?[]const u8,
 ) FileMetadataError!nip01_event.EventTag {
@@ -270,7 +270,7 @@ pub fn file_metadata_build_thumb_tag(
 
 /// Builds a canonical `image` tag with optional sha256.
 pub fn file_metadata_build_image_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     url: []const u8,
     sha256_hex: ?[]const u8,
 ) FileMetadataError!nip01_event.EventTag {
@@ -290,7 +290,7 @@ pub fn file_metadata_build_image_tag(
 
 /// Builds a canonical `summary` tag.
 pub fn file_metadata_build_summary_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     summary: []const u8,
 ) FileMetadataError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -304,7 +304,7 @@ pub fn file_metadata_build_summary_tag(
 
 /// Builds a canonical `alt` tag.
 pub fn file_metadata_build_alt_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     alt: []const u8,
 ) FileMetadataError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -318,7 +318,7 @@ pub fn file_metadata_build_alt_tag(
 
 /// Builds a canonical `fallback` tag.
 pub fn file_metadata_build_fallback_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     url: []const u8,
 ) FileMetadataError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -332,7 +332,7 @@ pub fn file_metadata_build_fallback_tag(
 
 /// Builds a canonical `service` tag.
 pub fn file_metadata_build_service_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     service: []const u8,
 ) FileMetadataError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -880,10 +880,10 @@ test "file metadata extract rejects missing required or malformed supported tags
 }
 
 test "file metadata builders create canonical tags" {
-    var size_tag: BuiltTag = .{};
-    var dimensions_tag: BuiltTag = .{};
-    var image_tag: BuiltTag = .{};
-    var mime_tag: BuiltTag = .{};
+    var size_tag: TagBuilder = .{};
+    var dimensions_tag: TagBuilder = .{};
+    var image_tag: TagBuilder = .{};
+    var mime_tag: TagBuilder = .{};
 
     const built_size = try file_metadata_build_size_tag(&size_tag, 2048);
     const built_dimensions = try file_metadata_build_dimensions_tag(
@@ -911,7 +911,7 @@ test "file metadata builders create canonical tags" {
 }
 
 test "file metadata mime builder rejects non-canonical mime values" {
-    var mime_tag: BuiltTag = .{};
+    var mime_tag: TagBuilder = .{};
 
     try std.testing.expectError(
         error.InvalidMimeTypeTag,
@@ -924,7 +924,7 @@ test "file metadata mime builder rejects non-canonical mime values" {
 }
 
 test "file metadata builders reject overlong caller input with typed errors" {
-    var tag: BuiltTag = .{};
+    var tag: TagBuilder = .{};
     const overlong_url = "https://" ++ ("a" ** 5000) ++ ".example";
     const overlong_text = "x" ** 5000;
 

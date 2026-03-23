@@ -28,7 +28,7 @@ test "NIP-38 example: extract and build user-status tags" {
         empty_emojis[0..],
     );
 
-    var built: noztr.nip38_user_status.BuiltTag = .{};
+    var built: noztr.nip38_user_status.TagBuilder = .{};
     const expiration = try noztr.nip38_user_status.user_status_build_expiration_tag(
         &built,
         1_700_000_000,

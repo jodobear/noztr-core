@@ -15,11 +15,11 @@ pub const ContentWarningInfo = struct {
     reason: ?[]const u8 = null,
 };
 
-pub const BuiltTag = struct {
+pub const TagBuilder = struct {
     items: [2][]const u8 = undefined,
     item_count: u8 = 0,
 
-    pub fn as_event_tag(self: *const BuiltTag) nip01_event.EventTag {
+    pub fn as_event_tag(self: *const TagBuilder) nip01_event.EventTag {
         std.debug.assert(self.item_count > 0);
         std.debug.assert(self.item_count <= self.items.len);
 
@@ -44,7 +44,7 @@ pub fn content_warning_extract(
 
 /// Builds a canonical NIP-36 `content-warning` tag.
 pub fn content_warning_build_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     reason: ?[]const u8,
 ) ContentWarningError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -63,7 +63,7 @@ pub fn content_warning_build_tag(
 
 /// Builds the canonical NIP-32 `L` namespace tag for content-warning labels.
 pub fn content_warning_build_namespace_tag(
-    output: *nip32_labeling.BuiltTag,
+    output: *nip32_labeling.TagBuilder,
 ) ContentWarningError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
     std.debug.assert(label_namespace.len <= limits.tag_item_bytes_max);
@@ -75,7 +75,7 @@ pub fn content_warning_build_namespace_tag(
 
 /// Builds the canonical NIP-32 `l` tag for content-warning labels.
 pub fn content_warning_build_label_tag(
-    output: *nip32_labeling.BuiltTag,
+    output: *nip32_labeling.TagBuilder,
     label: []const u8,
 ) ContentWarningError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -173,10 +173,10 @@ test "content warning extract ignores extra items but rejects invalid utf8" {
 }
 
 test "content warning builders emit canonical tags" {
-    var warning_tag: BuiltTag = .{};
-    var empty_warning_tag: BuiltTag = .{};
-    var namespace_tag: nip32_labeling.BuiltTag = .{};
-    var label_tag: nip32_labeling.BuiltTag = .{};
+    var warning_tag: TagBuilder = .{};
+    var empty_warning_tag: TagBuilder = .{};
+    var namespace_tag: nip32_labeling.TagBuilder = .{};
+    var label_tag: nip32_labeling.TagBuilder = .{};
 
     const built_warning = try content_warning_build_tag(&warning_tag, "reason");
     try std.testing.expectEqualStrings(tag_name, built_warning.items[0]);

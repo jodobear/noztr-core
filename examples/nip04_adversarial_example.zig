@@ -2,7 +2,7 @@ const std = @import("std");
 const noztr = @import("noztr");
 
 test "NIP-04 adversarial example: malformed payloads and duplicate recipients stay typed" {
-    var recipient_tag: noztr.nip04.BuiltTag = .{};
+    var recipient_tag: noztr.nip04.TagBuilder = .{};
     const overlong_pubkey =
         "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefx";
 

@@ -20,7 +20,7 @@ test "NIP-28 example: channel metadata and linkage helpers" {
     );
     try std.testing.expectEqualStrings("Demo", metadata.name.?);
 
-    var built_tag: noztr.nip28_public_chat.BuiltTag = .{};
+    var built_tag: noztr.nip28_public_chat.TagBuilder = .{};
     const root_tag = try noztr.nip28_public_chat.channel_build_event_tag(
         &built_tag,
         "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",

@@ -81,6 +81,8 @@ It should avoid:
 - let canonical grouped routes carry the main context
 - inside an already-canonical route, prefer shorter role-based public type names over restating the
   full route in every symbol
+- for caller-owned builder workspaces, prefer `*Builder` role names over past-tense `Built*`
+  storage shells
 - remove thin wrappers, irrelevant fields, and adjacent helper types when they do not add real
   semantic value
 - optimize public surfaces for one obvious safe path, human discoverability, and LLM usability

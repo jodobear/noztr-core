@@ -7,7 +7,7 @@ test "NIP-14 example: extract and build subject tags" {
         .{ .items = &.{ "subject", "Release planning" } },
     };
     const event = common.simple_event(1, [_]u8{0x14} ** 32, "hello", tags[0..]);
-    var built: noztr.nip14_subjects.BuiltTag = .{};
+    var built: noztr.nip14_subjects.TagBuilder = .{};
 
     const subject = try noztr.nip14_subjects.subject_extract(&event);
     const tag = try noztr.nip14_subjects.subject_build_tag(&built, "Release planning");

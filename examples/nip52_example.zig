@@ -26,7 +26,7 @@ test "NIP-52 example: extract date calendar metadata and build participant tags"
     var hashtags: [0][]const u8 = .{};
     var references: [0][]const u8 = .{};
     var calendars: [0]noztr.nip52_calendar_events.CalendarCoordinate = .{};
-    var built: noztr.nip52_calendar_events.BuiltTag = .{};
+    var built: noztr.nip52_calendar_events.TagBuilder = .{};
 
     const info = try noztr.nip52_calendar_events.date_calendar_event_extract(
         &event,

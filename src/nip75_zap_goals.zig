@@ -45,12 +45,12 @@ pub const Reference = struct {
     relay_hint: ?[]const u8 = null,
 };
 
-pub const BuiltTag = struct {
+pub const TagBuilder = struct {
     items: [limits.tag_items_max][]const u8 = undefined,
     text_storage: [limits.tag_item_bytes_max]u8 = undefined,
     item_count: u8 = 0,
 
-    pub fn as_event_tag(self: *const BuiltTag) nip01_event.EventTag {
+    pub fn as_event_tag(self: *const TagBuilder) nip01_event.EventTag {
         std.debug.assert(self.item_count > 0);
         std.debug.assert(self.item_count <= self.items.len);
 
@@ -92,7 +92,7 @@ pub fn goal_reference_extract(event: *const nip01_event.Event) ZapGoalError!?Ref
 }
 
 pub fn goal_build_relays_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     relays: []const []const u8,
 ) ZapGoalError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -109,7 +109,7 @@ pub fn goal_build_relays_tag(
 }
 
 pub fn goal_build_amount_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     amount_msats: u64,
 ) ZapGoalError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -124,7 +124,7 @@ pub fn goal_build_amount_tag(
 }
 
 pub fn goal_build_closed_at_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     unix_seconds: u64,
 ) ZapGoalError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -139,7 +139,7 @@ pub fn goal_build_closed_at_tag(
 }
 
 pub fn goal_build_image_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     image_url: []const u8,
 ) ZapGoalError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -152,7 +152,7 @@ pub fn goal_build_image_tag(
 }
 
 pub fn goal_build_summary_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     summary: []const u8,
 ) ZapGoalError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -165,7 +165,7 @@ pub fn goal_build_summary_tag(
 }
 
 pub fn goal_build_reference_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     event_id_hex: []const u8,
     relay_hint: ?[]const u8,
 ) ZapGoalError!nip01_event.EventTag {
@@ -404,8 +404,8 @@ test "NIP-75 rejects duplicate goal references with typed goal error" {
 }
 
 test "NIP-75 builds canonical goal tags" {
-    var relays_built: BuiltTag = .{};
-    var amount_built: BuiltTag = .{};
+    var relays_built: TagBuilder = .{};
+    var amount_built: TagBuilder = .{};
 
     const relays = try goal_build_relays_tag(&relays_built, &.{"wss://relay.one"});
     const amount = try goal_build_amount_tag(&amount_built, 210000);
@@ -417,7 +417,7 @@ test "NIP-75 builds canonical goal tags" {
 }
 
 test "NIP-75 rejects overlong goal reference builder input with typed error" {
-    var built: BuiltTag = .{};
+    var built: TagBuilder = .{};
     const overlong = [_]u8{'a'} ** (limits.tag_item_bytes_max + 1);
 
     try std.testing.expectError(

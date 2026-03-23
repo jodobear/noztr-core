@@ -38,13 +38,13 @@ pub const LongFormMetadata = struct {
     hashtag_count: u16 = 0,
 };
 
-pub const BuiltTag = struct {
+pub const TagBuilder = struct {
     items: [3][]const u8 = undefined,
     text_storage: [limits.tag_item_bytes_max]u8 = undefined,
     item_count: u8 = 0,
 
     /// Returns the built tag backed by this buffer.
-    pub fn as_event_tag(self: *const BuiltTag) nip01_event.EventTag {
+    pub fn as_event_tag(self: *const TagBuilder) nip01_event.EventTag {
         std.debug.assert(self.item_count > 0);
         std.debug.assert(self.item_count <= self.items.len);
 
@@ -104,7 +104,7 @@ pub fn long_form_extract(
 
 /// Builds a `d` tag for long-form content.
 pub fn long_form_build_identifier_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     identifier: []const u8,
 ) LongFormError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -118,7 +118,7 @@ pub fn long_form_build_identifier_tag(
 
 /// Builds a `title` tag for long-form content.
 pub fn long_form_build_title_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     title: []const u8,
 ) LongFormError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -132,7 +132,7 @@ pub fn long_form_build_title_tag(
 
 /// Builds an `image` tag for long-form content.
 pub fn long_form_build_image_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     image_url: []const u8,
     image_dimensions: ?[]const u8,
 ) LongFormError!nip01_event.EventTag {
@@ -151,7 +151,7 @@ pub fn long_form_build_image_tag(
 
 /// Builds a `summary` tag for long-form content.
 pub fn long_form_build_summary_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     summary: []const u8,
 ) LongFormError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -165,7 +165,7 @@ pub fn long_form_build_summary_tag(
 
 /// Builds a `published_at` tag for long-form content.
 pub fn long_form_build_published_at_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     published_at: u64,
 ) LongFormError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -181,7 +181,7 @@ pub fn long_form_build_published_at_tag(
 
 /// Builds a `t` hashtag tag for long-form content.
 pub fn long_form_build_hashtag_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     hashtag: []const u8,
 ) LongFormError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -509,12 +509,12 @@ test "long form extract rejects missing or malformed metadata" {
 }
 
 test "long form builders emit bounded metadata tags" {
-    var identifier_tag: BuiltTag = .{};
-    var title_tag: BuiltTag = .{};
-    var image_tag: BuiltTag = .{};
-    var summary_tag: BuiltTag = .{};
-    var published_at_tag: BuiltTag = .{};
-    var hashtag_tag: BuiltTag = .{};
+    var identifier_tag: TagBuilder = .{};
+    var title_tag: TagBuilder = .{};
+    var image_tag: TagBuilder = .{};
+    var summary_tag: TagBuilder = .{};
+    var published_at_tag: TagBuilder = .{};
+    var hashtag_tag: TagBuilder = .{};
 
     try std.testing.expectEqualStrings(
         "d",

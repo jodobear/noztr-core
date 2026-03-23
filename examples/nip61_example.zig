@@ -19,7 +19,7 @@ test "NIP-61 example: informational and nutzap tag helpers" {
     const info = try noztr.nip61_nutzaps.informational_extract(&info_event, relays[0..], mints[0..]);
     try std.testing.expectEqual(@as(u16, 1), info.mint_count);
 
-    var built: noztr.nip61_nutzaps.BuiltTag = .{};
+    var built: noztr.nip61_nutzaps.TagBuilder = .{};
     const proof = try noztr.nip61_nutzaps.nutzap_build_proof_tag(&built, "{\"amount\":1}");
     try std.testing.expectEqualStrings("proof", proof.items[0]);
 }

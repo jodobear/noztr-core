@@ -36,12 +36,12 @@ pub const OpenTimestampsAttestation = struct {
     proof_len: u32,
 };
 
-pub const BuiltTag = struct {
+pub const TagBuilder = struct {
     items: [3][]const u8 = undefined,
     item_count: u8 = 0,
     kind_text: [10]u8 = undefined,
 
-    pub fn as_event_tag(self: *const BuiltTag) nip01_event.EventTag {
+    pub fn as_event_tag(self: *const TagBuilder) nip01_event.EventTag {
         std.debug.assert(self.item_count > 0);
         std.debug.assert(self.item_count <= self.items.len);
 
@@ -139,7 +139,7 @@ pub fn opentimestamps_validate_local_proof(
 
 /// Build the required `e` tag for a NIP-03 attestation target.
 pub fn opentimestamps_build_event_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     event_id_hex: []const u8,
     relay_url: ?[]const u8,
 ) OpenTimestampsError!nip01_event.EventTag {
@@ -159,7 +159,7 @@ pub fn opentimestamps_build_event_tag(
 
 /// Build the required `k` tag for a NIP-03 attestation target.
 pub fn opentimestamps_build_kind_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     target_kind: u32,
 ) OpenTimestampsError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -549,8 +549,8 @@ test "opentimestamps extract accepts long-form standard e tag variants" {
 }
 
 test "opentimestamps builders emit canonical e and k tags" {
-    var event_tag: BuiltTag = .{};
-    var kind_tag: BuiltTag = .{};
+    var event_tag: TagBuilder = .{};
+    var kind_tag: TagBuilder = .{};
 
     const built_event = try opentimestamps_build_event_tag(
         &event_tag,

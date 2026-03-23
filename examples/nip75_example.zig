@@ -16,7 +16,7 @@ test "NIP-75 example: extract and build zap-goal tags" {
     var relays: [1][]const u8 = undefined;
     const info = try noztr.nip75_zap_goals.goal_extract(&event, relays[0..]);
 
-    var built: noztr.nip75_zap_goals.BuiltTag = .{};
+    var built: noztr.nip75_zap_goals.TagBuilder = .{};
     const amount = try noztr.nip75_zap_goals.goal_build_amount_tag(&built, 21_000);
 
     try std.testing.expectEqual(@as(u64, 21_000), info.amount_msats);

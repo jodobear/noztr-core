@@ -55,11 +55,11 @@ pub const MessageInfo = struct {
     content: []const u8,
 };
 
-pub const BuiltTag = struct {
+pub const TagBuilder = struct {
     items: [2][]const u8 = undefined,
     item_count: u8 = 0,
 
-    pub fn as_event_tag(self: *const BuiltTag) nip01_event.EventTag {
+    pub fn as_event_tag(self: *const TagBuilder) nip01_event.EventTag {
         std.debug.assert(self.item_count == 2);
         return .{ .items = self.items[0..self.item_count] };
     }
@@ -245,7 +245,7 @@ pub fn nip04_message_parse(event: *const nip01_event.Event) LegacyDmError!Messag
 
 /// Build a canonical `p` tag for one legacy NIP-04 recipient.
 pub fn nip04_build_recipient_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     pubkey_hex: []const u8,
 ) LegacyDmError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);

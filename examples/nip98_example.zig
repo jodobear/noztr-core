@@ -5,9 +5,9 @@ const common = @import("common.zig");
 test "NIP-98 example: build and verify an authorization header" {
     const secret_key = [_]u8{0x11} ** 32;
     const pubkey = try common.derive_public_key(&secret_key);
-    var url_tag: noztr.nip98_http_auth.BuiltTag = .{};
-    var method_tag: noztr.nip98_http_auth.BuiltTag = .{};
-    var payload_tag: noztr.nip98_http_auth.BuiltTag = .{};
+    var url_tag: noztr.nip98_http_auth.TagBuilder = .{};
+    var method_tag: noztr.nip98_http_auth.TagBuilder = .{};
+    var payload_tag: noztr.nip98_http_auth.TagBuilder = .{};
     var payload_hex_output: [noztr.nip98_http_auth.payload_hash_hex_length]u8 = undefined;
     const payload_hex = try noztr.nip98_http_auth.http_auth_payload_sha256_hex(
         payload_hex_output[0..],

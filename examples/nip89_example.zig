@@ -16,7 +16,7 @@ test "NIP-89 example: recommendation and client tag helpers" {
     var handlers: [1]noztr.nip89_handlers.Reference = undefined;
     const info = try noztr.nip89_handlers.recommendation_extract(&recommendation, handlers[0..]);
 
-    var built: noztr.nip89_handlers.BuiltTag = .{};
+    var built: noztr.nip89_handlers.TagBuilder = .{};
     const client = try noztr.nip89_handlers.client_build_tag(
         &built,
         "My Client",

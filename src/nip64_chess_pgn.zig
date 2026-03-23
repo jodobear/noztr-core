@@ -18,11 +18,11 @@ pub const ChessPgnInfo = struct {
     game_count: u16 = 0,
 };
 
-pub const BuiltTag = struct {
+pub const TagBuilder = struct {
     items: [2][]const u8 = undefined,
     item_count: u8 = 0,
 
-    pub fn as_event_tag(self: *const BuiltTag) nip01_event.EventTag {
+    pub fn as_event_tag(self: *const TagBuilder) nip01_event.EventTag {
         std.debug.assert(self.item_count > 0);
         std.debug.assert(self.item_count <= self.items.len);
 
@@ -102,7 +102,7 @@ pub fn chess_pgn_validate(content: []const u8) ChessPgnError!u16 {
 
 /// Builds a canonical optional `alt` tag for chess PGN notes.
 pub fn chess_pgn_build_alt_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     alt: []const u8,
 ) ChessPgnError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -576,7 +576,7 @@ test "chess PGN validate accepts comments and variations in import format" {
 }
 
 test "chess PGN builder emits canonical alt tag" {
-    var alt_tag: BuiltTag = .{};
+    var alt_tag: TagBuilder = .{};
     const built = try chess_pgn_build_alt_tag(&alt_tag, "Fischer vs. Spassky");
 
     try std.testing.expectEqualStrings("alt", built.items[0]);
@@ -585,7 +585,7 @@ test "chess PGN builder emits canonical alt tag" {
 }
 
 test "chess PGN builder and parser stay symmetric for canonical alt metadata" {
-    var alt_tag: BuiltTag = .{};
+    var alt_tag: TagBuilder = .{};
     const tags = [_]nip01_event.EventTag{
         try chess_pgn_build_alt_tag(&alt_tag, "friendly match"),
     };

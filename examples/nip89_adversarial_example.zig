@@ -2,7 +2,7 @@ const std = @import("std");
 const noztr = @import("noztr");
 
 test "adversarial NIP-89 example: malformed client coordinate stays typed" {
-    var built: noztr.nip89_handlers.BuiltTag = .{};
+    var built: noztr.nip89_handlers.TagBuilder = .{};
 
     try std.testing.expectError(
         error.InvalidClientTag,

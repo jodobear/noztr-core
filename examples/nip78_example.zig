@@ -12,7 +12,7 @@ test "NIP-78 example: extract app-data identifier and build the d tag" {
         "{\"theme\":\"dark\"}",
         tags[0..],
     );
-    var built: noztr.nip78_app_data.BuiltTag = .{};
+    var built: noztr.nip78_app_data.TagBuilder = .{};
 
     const info = try noztr.nip78_app_data.app_data_extract(&event);
     const tag = try noztr.nip78_app_data.app_data_build_identifier_tag(&built, "user-settings");

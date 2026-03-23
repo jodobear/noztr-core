@@ -27,7 +27,7 @@ test "NIP-17 example: parse recipients and relay list boundaries" {
     try std.testing.expectEqual(@as(usize, 1), message.recipients.len);
     try std.testing.expectEqual(@as(u16, 1), relay_count);
 
-    var file_type_tag: noztr.nip17_private_messages.BuiltFileMetadataTag = .{};
+    var file_type_tag: noztr.nip17_private_messages.FileTagBuilder = .{};
     const built_file_type = try noztr.nip17_private_messages.nip17_build_file_type_tag(
         &file_type_tag,
         "image/jpeg",

@@ -53,12 +53,12 @@ pub const PrivateRelayListInfo = struct {
     plaintext_json: []const u8,
 };
 
-pub const BuiltTag = struct {
+pub const TagBuilder = struct {
     items: [2][]const u8 = undefined,
     text_storage: [limits.tag_item_bytes_max]u8 = undefined,
     item_count: u8 = 0,
 
-    pub fn as_event_tag(self: *const BuiltTag) nip01_event.EventTag {
+    pub fn as_event_tag(self: *const TagBuilder) nip01_event.EventTag {
         std.debug.assert(self.item_count > 0);
         std.debug.assert(self.item_count <= self.items.len);
 
@@ -147,7 +147,7 @@ pub fn draft_wrap_encrypt_json(
 
 /// Builds a canonical `d` tag for a NIP-37 draft wrap.
 pub fn draft_build_identifier_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     identifier: []const u8,
 ) DraftError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -160,7 +160,7 @@ pub fn draft_build_identifier_tag(
 
 /// Builds a canonical `k` tag for a NIP-37 draft wrap.
 pub fn draft_build_kind_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     kind: u32,
 ) DraftError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -177,7 +177,7 @@ pub fn draft_build_kind_tag(
 
 /// Builds a canonical `expiration` tag for a NIP-37 draft wrap.
 pub fn draft_build_expiration_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     unix_seconds: u64,
 ) DraftError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -193,7 +193,7 @@ pub fn draft_build_expiration_tag(
 
 /// Builds a canonical private `relay` tag for kind-10013 plaintext JSON.
 pub fn private_relay_build_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     relay_url: []const u8,
 ) DraftError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -743,8 +743,8 @@ test "draft wrap encrypt rejects non-event-shaped json objects" {
 }
 
 test "private relay list serialize and extract json" {
-    var builder_a = BuiltTag{};
-    var builder_b = BuiltTag{};
+    var builder_a = TagBuilder{};
+    var builder_b = TagBuilder{};
     const tag_a = try private_relay_build_tag(&builder_a, "wss://relay.one");
     const tag_b = try private_relay_build_tag(&builder_b, "wss://relay.two");
     const tags = [_]nip01_event.EventTag{ tag_a, tag_b };
@@ -811,7 +811,7 @@ test "private relay list rejects non-websocket relay urls" {
     var relay_urls: [1][]const u8 = undefined;
     var arena = std.heap.ArenaAllocator.init(std.testing.allocator);
     defer arena.deinit();
-    var built: BuiltTag = .{};
+    var built: TagBuilder = .{};
 
     try std.testing.expectError(
         error.InvalidPrivateRelayUrl,
@@ -828,7 +828,7 @@ test "private relay list rejects non-websocket relay urls" {
 }
 
 test "draft builders reject overlong caller input with typed errors" {
-    var built: BuiltTag = .{};
+    var built: TagBuilder = .{};
     const overlong_identifier = "x" ** (limits.tag_item_bytes_max + 1);
     const overlong_relay = "wss://" ++ ("a" ** 9000) ++ ".example";
 

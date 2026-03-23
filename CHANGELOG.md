@@ -15,7 +15,12 @@ For the public versioning policy, see
 
 ### Breaking Changes
 
-- none yet
+- renamed caller-owned builder workspace types toward explicit role names:
+  - `BuiltTag` -> `TagBuilder`
+  - `nip17_private_messages.BuiltFileMetadataTag` -> `FileTagBuilder`
+  - `nip46_remote_signing.BuiltRequest` -> `RequestBuilder`
+- migration guide:
+  - [docs/guides/migrating-from-0.1.0-rc.3.md](docs/guides/migrating-from-0.1.0-rc.3.md)
 
 ## [0.1.0-rc.3] - 2026-03-23
 

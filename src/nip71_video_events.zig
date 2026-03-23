@@ -114,12 +114,12 @@ pub const VideoInfo = struct {
     origin_count: u16 = 0,
 };
 
-pub const BuiltTag = struct {
+pub const TagBuilder = struct {
     items: [5][]const u8 = undefined,
     text_storage: [3][limits.tag_item_bytes_max]u8 = undefined,
     item_count: u8 = 0,
 
-    pub fn as_event_tag(self: *const BuiltTag) nip01_event.EventTag {
+    pub fn as_event_tag(self: *const TagBuilder) nip01_event.EventTag {
         std.debug.assert(self.item_count > 0);
         std.debug.assert(self.item_count <= self.items.len);
 
@@ -200,7 +200,7 @@ pub fn video_is_video_kind(kind: u32) bool {
 }
 
 pub fn video_build_identifier_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     identifier: []const u8,
 ) VideoEventError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -213,7 +213,7 @@ pub fn video_build_identifier_tag(
 }
 
 pub fn video_build_title_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     title: []const u8,
 ) VideoEventError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -226,7 +226,7 @@ pub fn video_build_title_tag(
 }
 
 pub fn video_build_published_at_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     unix_seconds: u64,
 ) VideoEventError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -241,7 +241,7 @@ pub fn video_build_published_at_tag(
 }
 
 pub fn video_build_text_track_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     value: []const u8,
     track_type: ?[]const u8,
     language_code: ?[]const u8,
@@ -266,7 +266,7 @@ pub fn video_build_text_track_tag(
 }
 
 pub fn video_build_segment_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     start_text: []const u8,
     end_text: []const u8,
     title: []const u8,
@@ -290,7 +290,7 @@ pub fn video_build_segment_tag(
 }
 
 pub fn video_build_participant_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     pubkey_hex: []const u8,
     relay_hint: ?[]const u8,
 ) VideoEventError!nip01_event.EventTag {
@@ -309,7 +309,7 @@ pub fn video_build_participant_tag(
 }
 
 pub fn video_build_origin_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     platform: []const u8,
     external_id: []const u8,
     original_url: []const u8,
@@ -979,7 +979,7 @@ test "NIP-71 rejects duplicate titles" {
 }
 
 test "NIP-71 builds title and duration helpers" {
-    var title_built: BuiltTag = .{};
+    var title_built: TagBuilder = .{};
     var field_built: [limits.tag_item_bytes_max]u8 = undefined;
 
     const title = try video_build_title_tag(&title_built, "Episode");
@@ -991,7 +991,7 @@ test "NIP-71 builds title and duration helpers" {
 }
 
 test "NIP-71 rejects overlong title builder input with typed error" {
-    var built: BuiltTag = .{};
+    var built: TagBuilder = .{};
     const overlong = [_]u8{'a'} ** (limits.tag_item_bytes_max + 1);
 
     try std.testing.expectError(

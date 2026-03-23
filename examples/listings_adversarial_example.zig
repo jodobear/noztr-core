@@ -3,7 +3,7 @@ const noztr = @import("noztr");
 const common = @import("common.zig");
 
 test "adversarial listing example: reject full url identifier on builder path" {
-    var built_tag: noztr.nip99_classified_listings.BuiltTag = .{};
+    var built_tag: noztr.nip99_classified_listings.TagBuilder = .{};
 
     try std.testing.expectError(
         error.InvalidIdentifierTag,

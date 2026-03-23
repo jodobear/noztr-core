@@ -26,7 +26,7 @@ test "NIP-53 example: extract live activity metadata and build chat activity tag
     var relays: [0][]const u8 = .{};
     var hashtags: [0][]const u8 = .{};
     var pinned: [0][32]u8 = .{};
-    var built: noztr.nip53_live_activities.BuiltTag = .{};
+    var built: noztr.nip53_live_activities.TagBuilder = .{};
 
     const info = try noztr.nip53_live_activities.live_activity_extract(
         &live_event,

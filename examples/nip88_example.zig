@@ -3,8 +3,8 @@ const noztr = @import("noztr");
 const common = @import("common.zig");
 
 test "NIP-88 example: extract poll metadata and tally latest votes" {
-    var option_tag: noztr.nip88_polls.BuiltTag = .{};
-    var response_tag: noztr.nip88_polls.BuiltTag = .{};
+    var option_tag: noztr.nip88_polls.TagBuilder = .{};
+    var response_tag: noztr.nip88_polls.TagBuilder = .{};
     const built_option = try noztr.nip88_polls.poll_build_option_tag(
         &option_tag,
         .{ .id = "opt1", .label = "Red" },

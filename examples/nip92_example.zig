@@ -5,7 +5,7 @@ test "NIP-92 example: extract imeta and match it against content" {
     var url_field: [128]u8 = undefined;
     var mime_field: [128]u8 = undefined;
     var hash_field: [128]u8 = undefined;
-    var built_tag_storage: noztr.nip92_media_attachments.BuiltTag = .{};
+    var built_tag_storage: noztr.nip92_media_attachments.TagBuilder = .{};
     const built_tag = try noztr.nip92_media_attachments.imeta_build_tag(
         &built_tag_storage,
         &.{

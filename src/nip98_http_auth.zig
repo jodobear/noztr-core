@@ -41,12 +41,12 @@ pub const VerifiedAuthorization = struct {
     info: HttpAuthInfo,
 };
 
-pub const BuiltTag = struct {
+pub const TagBuilder = struct {
     items: [2][]const u8 = undefined,
     text_storage: [limits.tag_item_bytes_max]u8 = undefined,
     item_count: u8 = 0,
 
-    pub fn as_event_tag(self: *const BuiltTag) nip01_event.EventTag {
+    pub fn as_event_tag(self: *const TagBuilder) nip01_event.EventTag {
         std.debug.assert(self.item_count > 0);
         std.debug.assert(self.item_count <= self.items.len);
 
@@ -229,7 +229,7 @@ pub fn http_auth_verify_authorization_header(
 
 /// Builds a strict `u` tag from one absolute URL.
 pub fn http_auth_build_url_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     url: []const u8,
 ) HttpAuthError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -243,7 +243,7 @@ pub fn http_auth_build_url_tag(
 
 /// Builds a strict `method` tag from one validated HTTP token.
 pub fn http_auth_build_method_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     method: []const u8,
 ) HttpAuthError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -257,7 +257,7 @@ pub fn http_auth_build_method_tag(
 
 /// Builds a strict lowercase-hex `payload` tag.
 pub fn http_auth_build_payload_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     payload_hex: []const u8,
 ) HttpAuthError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -799,9 +799,9 @@ test "http auth validate request enforces payload and time windows" {
 }
 
 test "http auth builders stay symmetric with extractors" {
-    var url_tag: BuiltTag = .{};
-    var method_tag: BuiltTag = .{};
-    var payload_tag: BuiltTag = .{};
+    var url_tag: TagBuilder = .{};
+    var method_tag: TagBuilder = .{};
+    var payload_tag: TagBuilder = .{};
     const tags = [_]nip01_event.EventTag{
         try http_auth_build_url_tag(&url_tag, "https://api.example.com/v1"),
         try http_auth_build_method_tag(&method_tag, "PATCH"),
@@ -821,9 +821,9 @@ test "http auth builders stay symmetric with extractors" {
 }
 
 test "http auth builders reject invalid tag values with typed errors" {
-    var url_tag: BuiltTag = .{};
-    var method_tag: BuiltTag = .{};
-    var payload_tag: BuiltTag = .{};
+    var url_tag: TagBuilder = .{};
+    var method_tag: TagBuilder = .{};
+    var payload_tag: TagBuilder = .{};
     var overlong_url = [_]u8{'a'} ** (limits.tag_item_bytes_max + 1);
     const overlong_method = [_]u8{'P'} ** (limits.tag_item_bytes_max + 1);
     const overlong_payload = [_]u8{'a'} ** (limits.tag_item_bytes_max + 1);
@@ -918,8 +918,8 @@ test "http auth header helpers enforce strict scheme and payload boundaries" {
 }
 
 test "http auth encode header and verify safe wrapper round trips canonical event json" {
-    var url_tag: BuiltTag = .{};
-    var method_tag: BuiltTag = .{};
+    var url_tag: TagBuilder = .{};
+    var method_tag: TagBuilder = .{};
     const tags = [_]nip01_event.EventTag{
         try http_auth_build_url_tag(&url_tag, "https://api.example.com/v1"),
         try http_auth_build_method_tag(&method_tag, "GET"),

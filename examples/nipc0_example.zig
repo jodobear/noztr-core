@@ -3,8 +3,8 @@ const noztr = @import("noztr");
 const common = @import("common.zig");
 
 test "NIP-C0 example: extract code snippet metadata" {
-    var name_tag: noztr.nipc0_code_snippets.BuiltTag = .{};
-    var repo_tag: noztr.nipc0_code_snippets.BuiltTag = .{};
+    var name_tag: noztr.nipc0_code_snippets.TagBuilder = .{};
+    var repo_tag: noztr.nipc0_code_snippets.TagBuilder = .{};
     const built_name = try noztr.nipc0_code_snippets.code_snippet_build_name_tag(
         &name_tag,
         "hello.zig",

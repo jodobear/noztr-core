@@ -68,12 +68,12 @@ pub const ZapReceipt = struct {
     request: nip01_event.Event,
 };
 
-pub const BuiltTag = struct {
+pub const TagBuilder = struct {
     items: [limits.tag_items_max][]const u8 = undefined,
     text_storage: [limits.tag_item_bytes_max]u8 = undefined,
     item_count: u8 = 0,
 
-    pub fn as_event_tag(self: *const BuiltTag) nip01_event.EventTag {
+    pub fn as_event_tag(self: *const TagBuilder) nip01_event.EventTag {
         std.debug.assert(self.item_count > 0);
         std.debug.assert(self.item_count <= self.items.len);
 
@@ -210,7 +210,7 @@ pub fn zap_receipt_validate(
 
 /// Builds a bounded `relays` tag for NIP-57 zap requests.
 pub fn request_build_relays_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     relays: []const []const u8,
 ) ZapError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -233,7 +233,7 @@ pub fn request_build_relays_tag(
 
 /// Builds a bounded `amount` tag for NIP-57 zap requests.
 pub fn request_build_amount_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     amount_msats: u64,
 ) ZapError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -249,7 +249,7 @@ pub fn request_build_amount_tag(
 
 /// Builds a bounded `lnurl` tag for NIP-57 zap requests.
 pub fn request_build_lnurl_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     lnurl: []const u8,
 ) ZapError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -263,7 +263,7 @@ pub fn request_build_lnurl_tag(
 
 /// Builds a bounded target `p` tag for NIP-57 requests and receipts.
 pub fn zap_build_pubkey_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     tag_name: []const u8,
     pubkey_hex: []const u8,
 ) ZapError!nip01_event.EventTag {
@@ -279,7 +279,7 @@ pub fn zap_build_pubkey_tag(
 
 /// Builds a bounded target `e` tag for NIP-57 requests and receipts.
 pub fn zap_build_event_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     event_id_hex: []const u8,
 ) ZapError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -294,7 +294,7 @@ pub fn zap_build_event_tag(
 
 /// Builds a bounded target `a` tag for NIP-57 requests and receipts.
 pub fn zap_build_coordinate_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     coordinate_text: []const u8,
 ) ZapError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -309,7 +309,7 @@ pub fn zap_build_coordinate_tag(
 
 /// Builds a bounded target `k` tag for NIP-57 requests and receipts.
 pub fn zap_build_kind_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     kind: u32,
 ) ZapError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -325,7 +325,7 @@ pub fn zap_build_kind_tag(
 
 /// Builds a bounded `bolt11` tag for NIP-57 receipts.
 pub fn receipt_build_bolt11_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     bolt11: []const u8,
 ) ZapError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -339,7 +339,7 @@ pub fn receipt_build_bolt11_tag(
 
 /// Builds a bounded `description` tag for NIP-57 receipts.
 pub fn receipt_build_description_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     zap_request_json: []const u8,
     scratch: std.mem.Allocator,
 ) ZapError!nip01_event.EventTag {
@@ -361,7 +361,7 @@ pub fn receipt_build_description_tag(
 
 /// Builds a bounded `preimage` tag for NIP-57 receipts.
 pub fn receipt_build_preimage_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     preimage_hex: []const u8,
 ) ZapError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -857,9 +857,9 @@ test "zap receipt extract rejects mismatched propagated target" {
 }
 
 test "zap builders emit bounded request and receipt tags" {
-    var relays_tag: BuiltTag = .{};
-    var amount_tag: BuiltTag = .{};
-    var description_tag: BuiltTag = .{};
+    var relays_tag: TagBuilder = .{};
+    var amount_tag: TagBuilder = .{};
+    var description_tag: TagBuilder = .{};
     var arena = std.heap.ArenaAllocator.init(std.testing.allocator);
     defer arena.deinit();
     var request_json_buffer: [1024]u8 = undefined;
@@ -921,7 +921,7 @@ test "zap receipt validate rejects invalid receipt signature" {
 }
 
 test "receipt description builder rejects non-zap events" {
-    var tag: BuiltTag = .{};
+    var tag: TagBuilder = .{};
     var arena = std.heap.ArenaAllocator.init(std.testing.allocator);
     defer arena.deinit();
     const invalid_description_json =

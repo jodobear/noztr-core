@@ -9,7 +9,7 @@ test "NIP-64 adversarial example: reject malformed PGN structure" {
         "[White \"Fischer\"]\n\n1. e4 {open *",
         &.{},
     );
-    var alt_tag: noztr.nip64_chess_pgn.BuiltTag = .{};
+    var alt_tag: noztr.nip64_chess_pgn.TagBuilder = .{};
 
     try std.testing.expectError(error.InvalidPgn, noztr.nip64_chess_pgn.chess_pgn_extract(&event));
     try std.testing.expectError(

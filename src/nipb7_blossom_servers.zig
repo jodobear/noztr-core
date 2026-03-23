@@ -25,12 +25,12 @@ pub const BlobReference = struct {
     extension: ?[]const u8 = null,
 };
 
-pub const BuiltTag = struct {
+pub const TagBuilder = struct {
     items: [2][]const u8 = undefined,
     text_storage: [limits.tag_item_bytes_max]u8 = undefined,
     item_count: u8 = 0,
 
-    pub fn as_event_tag(self: *const BuiltTag) nip01_event.EventTag {
+    pub fn as_event_tag(self: *const TagBuilder) nip01_event.EventTag {
         std.debug.assert(self.item_count > 0);
         std.debug.assert(self.item_count <= self.items.len);
 
@@ -60,7 +60,7 @@ pub fn blossom_servers_extract(
 
 /// Builds a canonical Blossom `server` tag.
 pub fn blossom_build_server_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     server_url: []const u8,
 ) BlossomError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -435,7 +435,7 @@ test "blossom server extract reports output capacity separately from invalid inp
 }
 
 test "blossom server builder canonicalizes and round-trips" {
-    var built_tag: BuiltTag = .{};
+    var built_tag: TagBuilder = .{};
     var servers: [1][]const u8 = undefined;
     const tag = try blossom_build_server_tag(&built_tag, "https://cdn.example.com/base/");
     const tags = [_]nip01_event.EventTag{tag};
@@ -544,7 +544,7 @@ test "blossom public boundaries keep oversized inputs typed" {
     @memcpy(overlong_server[0..8], "https://");
     @memcpy(overlong_blob[0..8], "https://");
 
-    var built_tag: BuiltTag = .{};
+    var built_tag: TagBuilder = .{};
     var output: [96]u8 = undefined;
 
     try std.testing.expectError(

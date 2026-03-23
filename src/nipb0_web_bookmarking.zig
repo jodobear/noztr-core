@@ -27,13 +27,13 @@ pub const WebBookmarkInfo = struct {
     hashtag_count: u16 = 0,
 };
 
-pub const BuiltTag = struct {
+pub const TagBuilder = struct {
     items: [2][]const u8 = undefined,
     text_storage: [limits.tag_item_bytes_max]u8 = undefined,
     item_count: u8 = 0,
 
     /// Returns the built tag backed by this buffer.
-    pub fn as_event_tag(self: *const BuiltTag) nip01_event.EventTag {
+    pub fn as_event_tag(self: *const TagBuilder) nip01_event.EventTag {
         std.debug.assert(self.item_count > 0);
         std.debug.assert(self.item_count <= self.items.len);
 
@@ -74,7 +74,7 @@ pub fn web_bookmark_extract(
 
 /// Builds a bookmark `d` tag with a scheme-less URL identifier.
 pub fn web_bookmark_build_identifier_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     identifier: []const u8,
 ) WebBookmarkError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -88,7 +88,7 @@ pub fn web_bookmark_build_identifier_tag(
 
 /// Builds a bookmark `title` tag.
 pub fn web_bookmark_build_title_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     title: []const u8,
 ) WebBookmarkError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -102,7 +102,7 @@ pub fn web_bookmark_build_title_tag(
 
 /// Builds a bookmark `published_at` tag.
 pub fn web_bookmark_build_published_at_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     published_at: u64,
 ) WebBookmarkError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -118,7 +118,7 @@ pub fn web_bookmark_build_published_at_tag(
 
 /// Builds a bookmark `t` hashtag tag.
 pub fn web_bookmark_build_hashtag_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     hashtag: []const u8,
 ) WebBookmarkError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -345,10 +345,10 @@ test "web bookmark extract rejects malformed required and supported tags" {
 }
 
 test "web bookmark builders emit canonical bounded tags" {
-    var identifier_tag: BuiltTag = .{};
-    var title_tag: BuiltTag = .{};
-    var published_at_tag: BuiltTag = .{};
-    var hashtag_tag: BuiltTag = .{};
+    var identifier_tag: TagBuilder = .{};
+    var title_tag: TagBuilder = .{};
+    var published_at_tag: TagBuilder = .{};
+    var hashtag_tag: TagBuilder = .{};
 
     const identifier = try web_bookmark_build_identifier_tag(&identifier_tag, "alice.blog/post");
     try std.testing.expectEqualStrings("d", identifier.items[0]);

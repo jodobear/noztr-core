@@ -7,7 +7,7 @@ test "NIP-31 example: extract and build alt tags" {
         .{ .items = &.{ "alt", "calendar reminder fallback" } },
     };
     const event = common.simple_event(30_001, [_]u8{0x31} ** 32, "", tags[0..]);
-    var built: noztr.nip31_alt_tags.BuiltTag = .{};
+    var built: noztr.nip31_alt_tags.TagBuilder = .{};
 
     const summary = try noztr.nip31_alt_tags.alt_extract(&event);
     const tag = try noztr.nip31_alt_tags.alt_build_tag(&built, "calendar reminder fallback");

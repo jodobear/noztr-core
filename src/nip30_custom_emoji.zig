@@ -20,11 +20,11 @@ pub const EmojiTagInfo = struct {
     emoji_set_address: ?[]const u8 = null,
 };
 
-pub const BuiltTag = struct {
+pub const TagBuilder = struct {
     items: [4][]const u8 = undefined,
     item_count: u8 = 0,
 
-    pub fn as_event_tag(self: *const BuiltTag) nip01_event.EventTag {
+    pub fn as_event_tag(self: *const TagBuilder) nip01_event.EventTag {
         std.debug.assert(self.item_count > 0);
         std.debug.assert(self.item_count <= self.items.len);
 
@@ -78,7 +78,7 @@ pub fn emoji_tag_extract(tag: nip01_event.EventTag) EmojiError!EmojiTagInfo {
 
 /// Builds a canonical NIP-30 emoji tag.
 pub fn emoji_build_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     shortcode: []const u8,
     image_url: []const u8,
     emoji_set_address: ?[]const u8,
@@ -158,7 +158,7 @@ test "NIP-30 extracts shortcode tokens and rejects malformed ones" {
 }
 
 test "NIP-30 builds canonical emoji tags" {
-    var built: BuiltTag = .{};
+    var built: TagBuilder = .{};
 
     const tag = try emoji_build_tag(&built, "wave", "https://cdn.example/wave.png", null);
 
@@ -168,7 +168,7 @@ test "NIP-30 builds canonical emoji tags" {
 }
 
 test "NIP-30 rejects overlong shortcode builder input with typed error" {
-    var built: BuiltTag = .{};
+    var built: TagBuilder = .{};
     const overlong = [_]u8{'a'} ** (limits.tag_item_bytes_max + 1);
 
     try std.testing.expectError(

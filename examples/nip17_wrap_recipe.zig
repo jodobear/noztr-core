@@ -9,7 +9,7 @@ test "recipe: build and unwrap a full signed NIP-17 gift wrap transcript" {
     const sender_pubkey = try common.derive_public_key(&sender_secret);
     const recipient_pubkey = try common.derive_public_key(&recipient_secret);
     const recipient_hex = std.fmt.bytesToHex(recipient_pubkey, .lower);
-    var recipient_tag: noztr.nip17_private_messages.BuiltTag = .{};
+    var recipient_tag: noztr.nip17_private_messages.TagBuilder = .{};
     const built_recipient = try noztr.nip17_private_messages.nip17_build_recipient_tag(
         &recipient_tag,
         recipient_hex[0..],

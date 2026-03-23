@@ -2,7 +2,7 @@ const std = @import("std");
 const noztr = @import("noztr");
 
 test "adversarial identity-proof example: reject platform identity overflow on typed path" {
-    var built_tag: noztr.nip39_external_identities.BuiltTag = .{};
+    var built_tag: noztr.nip39_external_identities.TagBuilder = .{};
     var edge_identity: [noztr.limits.tag_item_bytes_max]u8 = undefined;
     @memset(edge_identity[0..], 'a');
     const claim = noztr.nip39_external_identities.IdentityClaim{

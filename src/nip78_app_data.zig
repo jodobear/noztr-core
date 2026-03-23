@@ -16,11 +16,11 @@ pub const AppDataInfo = struct {
     content: []const u8,
 };
 
-pub const BuiltTag = struct {
+pub const TagBuilder = struct {
     items: [2][]const u8 = undefined,
     item_count: u8 = 0,
 
-    pub fn as_event_tag(self: *const BuiltTag) nip01_event.EventTag {
+    pub fn as_event_tag(self: *const TagBuilder) nip01_event.EventTag {
         std.debug.assert(self.item_count > 0);
         std.debug.assert(self.item_count <= self.items.len);
 
@@ -57,7 +57,7 @@ pub fn app_data_extract(event: *const nip01_event.Event) AppDataError!AppDataInf
 
 /// Builds the required `d` tag for `kind:30078` app-data events.
 pub fn app_data_build_identifier_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     identifier: []const u8,
 ) AppDataError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -133,7 +133,7 @@ test "NIP-78 rejects duplicate identifiers" {
 }
 
 test "NIP-78 builds canonical identifier tag" {
-    var built: BuiltTag = .{};
+    var built: TagBuilder = .{};
 
     const tag = try app_data_build_identifier_tag(&built, "profile-cache");
 

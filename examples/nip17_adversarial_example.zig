@@ -2,8 +2,8 @@ const std = @import("std");
 const noztr = @import("noztr");
 
 test "NIP-17 adversarial example: overlong builder input stays typed" {
-    var recipient_tag: noztr.nip17_private_messages.BuiltTag = .{};
-    var relay_tag: noztr.nip17_private_messages.BuiltTag = .{};
+    var recipient_tag: noztr.nip17_private_messages.TagBuilder = .{};
+    var relay_tag: noztr.nip17_private_messages.TagBuilder = .{};
     const overlong_pubkey =
         "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefx";
     const overlong_relay = "wss://" ++ ("a" ** 9000) ++ ".example";

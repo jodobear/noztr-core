@@ -136,12 +136,12 @@ pub const NotificationEvent = struct {
     encrypted_content: []const u8,
 };
 
-pub const BuiltTag = struct {
+pub const TagBuilder = struct {
     items: [2][]const u8 = undefined,
     text_storage: [limits.tag_item_bytes_max]u8 = undefined,
     item_count: u8 = 0,
 
-    pub fn as_event_tag(self: *const BuiltTag) nip01_event.EventTag {
+    pub fn as_event_tag(self: *const TagBuilder) nip01_event.EventTag {
         std.debug.assert(self.item_count > 0);
         std.debug.assert(self.item_count <= self.items.len);
 
@@ -501,7 +501,7 @@ pub fn notification_event_extract(event: *const nip01_event.Event) NwcError!Noti
 }
 
 pub fn nwc_build_pubkey_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     pubkey: *const [32]u8,
 ) NwcError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -515,7 +515,7 @@ pub fn nwc_build_pubkey_tag(
 }
 
 pub fn nwc_build_event_id_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     event_id: *const [32]u8,
 ) NwcError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -529,7 +529,7 @@ pub fn nwc_build_event_id_tag(
 }
 
 pub fn nwc_build_encryption_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     encryption: Encryption,
 ) NwcError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -542,7 +542,7 @@ pub fn nwc_build_encryption_tag(
 }
 
 pub fn nwc_build_expiration_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     expiration: u64,
 ) NwcError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -557,7 +557,7 @@ pub fn nwc_build_expiration_tag(
 }
 
 pub fn nwc_build_info_encryption_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     encryptions: []const Encryption,
 ) NwcError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -571,7 +571,7 @@ pub fn nwc_build_info_encryption_tag(
 }
 
 pub fn nwc_build_info_notifications_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     notifications: []const NotificationType,
 ) NwcError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);

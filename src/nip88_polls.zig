@@ -88,12 +88,12 @@ pub const PollTally = struct {
 const poll_index_cache_capacity: usize = @as(usize, limits.tags_max) * 2;
 const poll_index_cache_empty: u16 = std.math.maxInt(u16);
 
-pub const BuiltTag = struct {
+pub const TagBuilder = struct {
     items: [3][]const u8 = undefined,
     text_storage: [limits.tag_item_bytes_max]u8 = undefined,
     item_count: u8 = 0,
 
-    pub fn as_event_tag(self: *const BuiltTag) nip01_event.EventTag {
+    pub fn as_event_tag(self: *const TagBuilder) nip01_event.EventTag {
         std.debug.assert(self.item_count > 0);
         std.debug.assert(self.item_count <= self.items.len);
 
@@ -156,7 +156,7 @@ pub fn poll_response_extract(
 
 /// Builds a canonical poll `option` tag.
 pub fn poll_build_option_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     option: PollOption,
 ) PollError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -171,7 +171,7 @@ pub fn poll_build_option_tag(
 
 /// Builds a canonical poll `relay` tag.
 pub fn poll_build_relay_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     relay_url: []const u8,
 ) PollError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -185,7 +185,7 @@ pub fn poll_build_relay_tag(
 
 /// Builds a canonical poll `polltype` tag.
 pub fn poll_build_poll_type_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     poll_type: PollType,
 ) PollError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -199,7 +199,7 @@ pub fn poll_build_poll_type_tag(
 
 /// Builds a canonical poll `endsAt` tag.
 pub fn poll_build_ends_at_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     ends_at: u64,
 ) PollError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -215,7 +215,7 @@ pub fn poll_build_ends_at_tag(
 
 /// Builds a canonical poll-response `e` tag with an optional relay hint.
 pub fn poll_response_build_event_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     reference: EventRef,
 ) PollError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -236,7 +236,7 @@ pub fn poll_response_build_event_tag(
 
 /// Builds a canonical poll-response `response` tag.
 pub fn poll_response_build_response_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     option_id: []const u8,
 ) PollError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -982,12 +982,12 @@ test "poll response extract rejects malformed e and response tags" {
 }
 
 test "poll builders round-trip through extractors" {
-    var option_tag: BuiltTag = .{};
-    var relay_tag: BuiltTag = .{};
-    var poll_type_tag: BuiltTag = .{};
-    var ends_at_tag: BuiltTag = .{};
-    var event_tag: BuiltTag = .{};
-    var response_tag: BuiltTag = .{};
+    var option_tag: TagBuilder = .{};
+    var relay_tag: TagBuilder = .{};
+    var poll_type_tag: TagBuilder = .{};
+    var ends_at_tag: TagBuilder = .{};
+    var event_tag: TagBuilder = .{};
+    var response_tag: TagBuilder = .{};
 
     const built_option = try poll_build_option_tag(
         &option_tag,
@@ -1027,9 +1027,9 @@ test "poll builders round-trip through extractors" {
 }
 
 test "poll builders map invalid inputs to typed invalid errors" {
-    var option_tag: BuiltTag = .{};
-    var response_tag: BuiltTag = .{};
-    var relay_tag: BuiltTag = .{};
+    var option_tag: TagBuilder = .{};
+    var response_tag: TagBuilder = .{};
+    var relay_tag: TagBuilder = .{};
     var long_storage: [limits.tag_item_bytes_max + 1]u8 = [_]u8{'a'} **
         (limits.tag_item_bytes_max + 1);
 

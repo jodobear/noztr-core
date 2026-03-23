@@ -27,7 +27,7 @@ test "NIP-34 example: extract repository announcement metadata" {
     var relays: [1][]const u8 = undefined;
     var maintainers: [1][32]u8 = undefined;
     var topics: [1][]const u8 = undefined;
-    var built: noztr.nip34_git.BuiltTag = .{};
+    var built: noztr.nip34_git.TagBuilder = .{};
 
     const info = try noztr.nip34_git.repository_announcement_extract(
         &event,

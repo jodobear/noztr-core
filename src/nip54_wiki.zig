@@ -70,12 +70,12 @@ pub const Redirect = struct {
     target_article: ArticleRef,
 };
 
-pub const BuiltTag = struct {
+pub const TagBuilder = struct {
     items: [4][]const u8 = undefined,
     text_storage: [limits.tag_item_bytes_max]u8 = undefined,
     item_count: u8 = 0,
 
-    pub fn as_event_tag(self: *const BuiltTag) nip01_event.EventTag {
+    pub fn as_event_tag(self: *const TagBuilder) nip01_event.EventTag {
         std.debug.assert(self.item_count > 0);
         std.debug.assert(self.item_count <= self.items.len);
 
@@ -177,7 +177,7 @@ pub fn wiki_normalize_identifier_ascii(output: []u8, title: []const u8) WikiErro
 
 /// Builds a canonical wiki `d` tag.
 pub fn wiki_build_identifier_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     identifier: []const u8,
 ) WikiError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -191,7 +191,7 @@ pub fn wiki_build_identifier_tag(
 
 /// Builds a canonical wiki `title` tag.
 pub fn wiki_build_title_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     title: []const u8,
 ) WikiError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -205,7 +205,7 @@ pub fn wiki_build_title_tag(
 
 /// Builds a canonical wiki `summary` tag.
 pub fn wiki_build_summary_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     summary: []const u8,
 ) WikiError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -219,7 +219,7 @@ pub fn wiki_build_summary_tag(
 
 /// Builds a canonical wiki article reference `a` tag with optional marker.
 pub fn wiki_build_article_reference_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     coordinate_text: []const u8,
     relay_hint: ?[]const u8,
     marker: ?[]const u8,
@@ -244,7 +244,7 @@ pub fn wiki_build_article_reference_tag(
 
 /// Builds a canonical wiki event reference `e` tag with optional marker.
 pub fn wiki_build_event_reference_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     event_id_hex: []const u8,
     relay_hint: ?[]const u8,
     marker: ?[]const u8,
@@ -269,7 +269,7 @@ pub fn wiki_build_event_reference_tag(
 
 /// Builds a canonical merge-request destination `p` tag.
 pub fn wiki_build_destination_pubkey_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     pubkey_hex: []const u8,
 ) WikiError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);

@@ -65,12 +65,12 @@ pub const ListingMetadata = struct {
     hashtag_count: u16 = 0,
 };
 
-pub const BuiltTag = struct {
+pub const TagBuilder = struct {
     items: [4][]const u8 = undefined,
     text_storage: [limits.tag_item_bytes_max]u8 = undefined,
     item_count: u8 = 0,
 
-    pub fn as_event_tag(self: *const BuiltTag) nip01_event.EventTag {
+    pub fn as_event_tag(self: *const TagBuilder) nip01_event.EventTag {
         std.debug.assert(self.item_count > 0);
         std.debug.assert(self.item_count <= self.items.len);
 
@@ -117,7 +117,7 @@ pub fn listing_extract(
 
 /// Builds a listing `d` tag.
 pub fn listing_build_identifier_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     identifier: []const u8,
 ) ClassifiedListingError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -130,7 +130,7 @@ pub fn listing_build_identifier_tag(
 
 /// Builds a listing `title` tag.
 pub fn listing_build_title_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     title: []const u8,
 ) ClassifiedListingError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -143,7 +143,7 @@ pub fn listing_build_title_tag(
 
 /// Builds a listing `summary` tag.
 pub fn listing_build_summary_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     summary: []const u8,
 ) ClassifiedListingError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -156,7 +156,7 @@ pub fn listing_build_summary_tag(
 
 /// Builds a listing `published_at` tag.
 pub fn listing_build_published_at_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     published_at: u64,
 ) ClassifiedListingError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -172,7 +172,7 @@ pub fn listing_build_published_at_tag(
 
 /// Builds a listing `location` tag.
 pub fn listing_build_location_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     location: []const u8,
 ) ClassifiedListingError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -185,7 +185,7 @@ pub fn listing_build_location_tag(
 
 /// Builds a listing `price` tag.
 pub fn listing_build_price_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     price: *const PriceInfo,
 ) ClassifiedListingError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -205,7 +205,7 @@ pub fn listing_build_price_tag(
 
 /// Builds a listing `status` tag.
 pub fn listing_build_status_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     status: ListingStatus,
 ) ClassifiedListingError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -223,7 +223,7 @@ pub fn listing_build_status_tag(
 
 /// Builds a listing geohash `g` tag.
 pub fn listing_build_geohash_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     geohash: []const u8,
 ) ClassifiedListingError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -236,7 +236,7 @@ pub fn listing_build_geohash_tag(
 
 /// Builds a listing `image` tag.
 pub fn listing_build_image_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     image_url: []const u8,
     dimensions: ?[]const u8,
 ) ClassifiedListingError!nip01_event.EventTag {
@@ -254,7 +254,7 @@ pub fn listing_build_image_tag(
 
 /// Builds a listing `t` hashtag tag.
 pub fn listing_build_hashtag_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     hashtag: []const u8,
 ) ClassifiedListingError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -660,10 +660,10 @@ test "listing extract rejects malformed required and supported tags" {
 }
 
 test "listing builders create canonical tags" {
-    var identifier_tag: BuiltTag = .{};
-    var price_tag: BuiltTag = .{};
-    var image_tag: BuiltTag = .{};
-    var status_tag: BuiltTag = .{};
+    var identifier_tag: TagBuilder = .{};
+    var price_tag: TagBuilder = .{};
+    var image_tag: TagBuilder = .{};
+    var status_tag: TagBuilder = .{};
 
     const identifier = try listing_build_identifier_tag(&identifier_tag, "alice.blog/post");
     const price = try listing_build_price_tag(
@@ -689,8 +689,8 @@ test "listing builders create canonical tags" {
 }
 
 test "listing builders reject overlong caller input with typed errors" {
-    var title_tag: BuiltTag = .{};
-    var image_tag: BuiltTag = .{};
+    var title_tag: TagBuilder = .{};
+    var image_tag: TagBuilder = .{};
     const overlong_text = "x" ** (limits.tag_item_bytes_max + 1);
     const overlong_url = "https://" ++ ("a" ** limits.tag_item_bytes_max) ++ ".example";
 

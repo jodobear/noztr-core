@@ -41,12 +41,12 @@ pub const CommonTagInfo = struct {
     hashtag_count: u16 = 0,
 };
 
-pub const BuiltTag = struct {
+pub const TagBuilder = struct {
     items: [2][]const u8 = undefined,
     item_count: u8 = 0,
 
     /// Returns the built tag backed by this buffer.
-    pub fn as_event_tag(self: *const BuiltTag) nip01_event.EventTag {
+    pub fn as_event_tag(self: *const TagBuilder) nip01_event.EventTag {
         std.debug.assert(self.item_count > 0);
         std.debug.assert(self.item_count <= self.items.len);
 
@@ -149,7 +149,7 @@ pub fn common_tags_extract_with_external_ids(
 
 /// Builds a generic NIP-24 `r` tag.
 pub fn common_tags_build_reference_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     reference_url: []const u8,
 ) ExtraMetadataError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -163,7 +163,7 @@ pub fn common_tags_build_reference_tag(
 
 /// Builds a generic NIP-24 `title` tag.
 pub fn common_tags_build_title_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     title: []const u8,
 ) ExtraMetadataError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -177,7 +177,7 @@ pub fn common_tags_build_title_tag(
 
 /// Builds a generic NIP-24 lowercase `t` hashtag tag.
 pub fn common_tags_build_hashtag_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     hashtag: []const u8,
 ) ExtraMetadataError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -744,9 +744,9 @@ test "common tags extract rejects malformed supported tags and duplicate titles"
 }
 
 test "builders emit canonical generic tags" {
-    var reference_tag: BuiltTag = .{};
-    var title_tag: BuiltTag = .{};
-    var hashtag_tag: BuiltTag = .{};
+    var reference_tag: TagBuilder = .{};
+    var title_tag: TagBuilder = .{};
+    var hashtag_tag: TagBuilder = .{};
 
     try std.testing.expectEqualStrings(
         "r",

@@ -60,11 +60,11 @@ pub const ImetaInfo = struct {
     fallback_count: u16 = 0,
 };
 
-pub const BuiltTag = struct {
+pub const TagBuilder = struct {
     items: [limits.tag_items_max][]const u8 = undefined,
     item_count: u8 = 0,
 
-    pub fn as_event_tag(self: *const BuiltTag) nip01_event.EventTag {
+    pub fn as_event_tag(self: *const TagBuilder) nip01_event.EventTag {
         std.debug.assert(self.item_count > 0);
         std.debug.assert(self.item_count <= self.items.len);
 
@@ -167,7 +167,7 @@ pub fn imeta_build_field(
 
 /// Builds one canonical `imeta` tag from caller-owned field items.
 pub fn imeta_build_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     fields: []const []const u8,
 ) MediaAttachmentError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -617,7 +617,7 @@ test "imeta builders create canonical fields and tags" {
     var url_field: [limits.tag_item_bytes_max]u8 = undefined;
     var mime_field: [limits.tag_item_bytes_max]u8 = undefined;
     var hash_field: [limits.tag_item_bytes_max]u8 = undefined;
-    var built_tag: BuiltTag = .{};
+    var built_tag: TagBuilder = .{};
 
     const url = try imeta_build_field(url_field[0..], "url", "https://example.com/cat.jpg");
     const mime = try imeta_build_field(mime_field[0..], "m", "image/jpeg");

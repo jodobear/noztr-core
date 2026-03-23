@@ -3,7 +3,7 @@ const noztr = @import("noztr");
 const common = @import("common.zig");
 
 test "NIP-64 example: validate and extract chess PGN note" {
-    var alt_tag: noztr.nip64_chess_pgn.BuiltTag = .{};
+    var alt_tag: noztr.nip64_chess_pgn.TagBuilder = .{};
     const built_alt = try noztr.nip64_chess_pgn.chess_pgn_build_alt_tag(
         &alt_tag,
         "Fischer vs. Spassky",

@@ -9,11 +9,11 @@ pub const AltTagError = error{
     InvalidAltTag,
 };
 
-pub const BuiltTag = struct {
+pub const TagBuilder = struct {
     items: [2][]const u8 = undefined,
     item_count: u8 = 0,
 
-    pub fn as_event_tag(self: *const BuiltTag) nip01_event.EventTag {
+    pub fn as_event_tag(self: *const TagBuilder) nip01_event.EventTag {
         std.debug.assert(self.item_count > 0);
         std.debug.assert(self.item_count <= self.items.len);
 
@@ -36,7 +36,7 @@ pub fn alt_extract(event: *const nip01_event.Event) AltTagError!?[]const u8 {
 }
 
 /// Builds a canonical `alt` tag for unknown or custom event kinds.
-pub fn alt_build_tag(output: *BuiltTag, summary: []const u8) AltTagError!nip01_event.EventTag {
+pub fn alt_build_tag(output: *TagBuilder, summary: []const u8) AltTagError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
     std.debug.assert(summary.len <= limits.tag_item_bytes_max);
 
@@ -109,7 +109,7 @@ test "NIP-31 rejects duplicate alt tags" {
 }
 
 test "NIP-31 builds canonical alt tag" {
-    var built: BuiltTag = .{};
+    var built: TagBuilder = .{};
 
     const tag = try alt_build_tag(&built, "short fallback");
 

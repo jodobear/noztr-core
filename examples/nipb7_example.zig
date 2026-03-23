@@ -3,7 +3,7 @@ const noztr = @import("noztr");
 const common = @import("common.zig");
 
 test "NIP-B7 example: extract servers and derive a fallback blob URL" {
-    var built_tag: noztr.nipb7_blossom_servers.BuiltTag = .{};
+    var built_tag: noztr.nipb7_blossom_servers.TagBuilder = .{};
     const tag = try noztr.nipb7_blossom_servers.blossom_build_server_tag(
         &built_tag,
         "https://blossom.self.hosted/",

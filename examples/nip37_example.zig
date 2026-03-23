@@ -45,8 +45,8 @@ test "NIP-37 example: encrypt validated draft JSON and parse the wrap metadata" 
 }
 
 test "NIP-37 example: parse private relay list plaintext" {
-    var builder_a: noztr.nip37_drafts.BuiltTag = .{};
-    var builder_b: noztr.nip37_drafts.BuiltTag = .{};
+    var builder_a: noztr.nip37_drafts.TagBuilder = .{};
+    var builder_b: noztr.nip37_drafts.TagBuilder = .{};
     const tag_a = try noztr.nip37_drafts.private_relay_build_tag(&builder_a, "wss://relay.one");
     const tag_b = try noztr.nip37_drafts.private_relay_build_tag(&builder_b, "wss://relay.two");
     const tags = [_]noztr.nip01_event.EventTag{ tag_a, tag_b };

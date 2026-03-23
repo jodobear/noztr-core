@@ -75,12 +75,12 @@ pub const Redemption = struct {
     sender_pubkey: [32]u8,
 };
 
-pub const BuiltTag = struct {
+pub const TagBuilder = struct {
     items: [limits.tag_items_max][]const u8 = undefined,
     text_storage: [limits.tag_item_bytes_max]u8 = undefined,
     item_count: u8 = 0,
 
-    pub fn as_event_tag(self: *const BuiltTag) nip01_event.EventTag {
+    pub fn as_event_tag(self: *const TagBuilder) nip01_event.EventTag {
         std.debug.assert(self.item_count > 0);
         std.debug.assert(self.item_count <= self.items.len);
 
@@ -154,7 +154,7 @@ pub fn redemption_extract(
 
 /// Builds a canonical informational `relay` tag.
 pub fn informational_build_relay_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     relay_url: []const u8,
 ) NutzapError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -168,7 +168,7 @@ pub fn informational_build_relay_tag(
 
 /// Builds a canonical informational `mint` tag.
 pub fn informational_build_mint_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     mint_url: []const u8,
     units: []const []const u8,
 ) NutzapError!nip01_event.EventTag {
@@ -187,7 +187,7 @@ pub fn informational_build_mint_tag(
 
 /// Builds a canonical informational `pubkey` tag.
 pub fn informational_build_pubkey_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     pubkey_hex: []const u8,
 ) NutzapError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -202,7 +202,7 @@ pub fn informational_build_pubkey_tag(
 
 /// Builds a canonical nutzap `proof` tag.
 pub fn nutzap_build_proof_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     proof_json: []const u8,
 ) NutzapError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -216,7 +216,7 @@ pub fn nutzap_build_proof_tag(
 
 /// Builds a canonical nutzap `unit` tag.
 pub fn nutzap_build_unit_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     unit: []const u8,
 ) NutzapError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -230,7 +230,7 @@ pub fn nutzap_build_unit_tag(
 
 /// Builds a canonical nutzap mint-URL `u` tag.
 pub fn nutzap_build_mint_url_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     mint_url: []const u8,
 ) NutzapError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -244,7 +244,7 @@ pub fn nutzap_build_mint_url_tag(
 
 /// Builds a canonical nutzap recipient `p` tag.
 pub fn nutzap_build_recipient_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     pubkey_hex: []const u8,
 ) NutzapError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -259,7 +259,7 @@ pub fn nutzap_build_recipient_tag(
 
 /// Builds a canonical nutzap target-event `e` tag.
 pub fn nutzap_build_target_event_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     event_id_hex: []const u8,
     relay_hint: ?[]const u8,
 ) NutzapError!nip01_event.EventTag {
@@ -279,7 +279,7 @@ pub fn nutzap_build_target_event_tag(
 
 /// Builds a canonical nutzap target-kind `k` tag.
 pub fn nutzap_build_target_kind_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     event_kind: u32,
 ) NutzapError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -295,7 +295,7 @@ pub fn nutzap_build_target_kind_tag(
 
 /// Builds a canonical redemption-marker `e` tag for a redeemed nutzap.
 pub fn redemption_build_redeemed_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     event_id_hex: []const u8,
     relay_hint: ?[]const u8,
 ) NutzapError!nip01_event.EventTag {
@@ -317,7 +317,7 @@ pub fn redemption_build_redeemed_tag(
 
 /// Builds a canonical redemption-marker sender `p` tag.
 pub fn redemption_build_sender_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     pubkey_hex: []const u8,
 ) NutzapError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -628,7 +628,7 @@ test "NIP-61 extracts nutzaps and redemption markers" {
 }
 
 test "NIP-61 builds canonical tags" {
-    var tag: BuiltTag = .{};
+    var tag: TagBuilder = .{};
 
     const mint = try informational_build_mint_tag(&tag, "https://mint.example", &.{"sat"});
     try std.testing.expectEqualStrings("mint", mint.items[0]);
@@ -643,7 +643,7 @@ test "NIP-61 builds canonical tags" {
 }
 
 test "NIP-61 rejects overlong recipient builder input with typed error" {
-    var built: BuiltTag = .{};
+    var built: TagBuilder = .{};
     const overlong = [_]u8{'a'} ** (limits.tag_item_bytes_max + 1);
 
     try std.testing.expectError(

@@ -71,11 +71,11 @@ pub const SelfLabelInfo = struct {
     labels: []const Label,
 };
 
-pub const BuiltTag = struct {
+pub const TagBuilder = struct {
     items: [3][]const u8 = undefined,
     item_count: u8 = 0,
 
-    pub fn as_event_tag(self: *const BuiltTag) nip01_event.EventTag {
+    pub fn as_event_tag(self: *const TagBuilder) nip01_event.EventTag {
         std.debug.assert(self.item_count > 0);
         std.debug.assert(self.item_count <= self.items.len);
 
@@ -153,7 +153,7 @@ pub fn self_labels_extract(
 
 /// Builds a canonical NIP-32 `L` tag.
 pub fn label_build_namespace_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     namespace: []const u8,
 ) LabelingError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -167,7 +167,7 @@ pub fn label_build_namespace_tag(
 
 /// Builds a canonical NIP-32 `l` tag.
 pub fn label_build_label_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     value: []const u8,
     namespace: ?[]const u8,
 ) LabelingError!nip01_event.EventTag {
@@ -186,7 +186,7 @@ pub fn label_build_label_tag(
 
 /// Builds a canonical NIP-32 event target `e` tag.
 pub fn label_build_event_target_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     event_id_hex: []const u8,
     relay_hint: ?[]const u8,
 ) LabelingError!nip01_event.EventTag {
@@ -206,7 +206,7 @@ pub fn label_build_event_target_tag(
 
 /// Builds a canonical NIP-32 pubkey target `p` tag.
 pub fn label_build_pubkey_target_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     pubkey_hex: []const u8,
     relay_hint: ?[]const u8,
 ) LabelingError!nip01_event.EventTag {
@@ -226,7 +226,7 @@ pub fn label_build_pubkey_target_tag(
 
 /// Builds a canonical NIP-32 coordinate target `a` tag.
 pub fn label_build_coordinate_target_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     coordinate_text: []const u8,
     relay_hint: ?[]const u8,
 ) LabelingError!nip01_event.EventTag {
@@ -246,7 +246,7 @@ pub fn label_build_coordinate_target_tag(
 
 /// Builds a canonical NIP-32 relay target `r` tag.
 pub fn label_build_relay_target_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     relay_url: []const u8,
 ) LabelingError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -260,7 +260,7 @@ pub fn label_build_relay_target_tag(
 
 /// Builds a canonical NIP-32 hashtag target `t` tag.
 pub fn label_build_hashtag_target_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     hashtag: []const u8,
 ) LabelingError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -640,13 +640,13 @@ test "label event extract rejects invalid namespace use and missing targets" {
 }
 
 test "label event builders emit canonical tags" {
-    var namespace_tag: BuiltTag = .{};
-    var label_tag: BuiltTag = .{};
-    var event_tag: BuiltTag = .{};
-    var pubkey_tag: BuiltTag = .{};
-    var coordinate_tag: BuiltTag = .{};
-    var relay_tag: BuiltTag = .{};
-    var hashtag_tag: BuiltTag = .{};
+    var namespace_tag: TagBuilder = .{};
+    var label_tag: TagBuilder = .{};
+    var event_tag: TagBuilder = .{};
+    var pubkey_tag: TagBuilder = .{};
+    var coordinate_tag: TagBuilder = .{};
+    var relay_tag: TagBuilder = .{};
+    var hashtag_tag: TagBuilder = .{};
 
     try std.testing.expectEqualStrings(
         "L",

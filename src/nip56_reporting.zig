@@ -64,11 +64,11 @@ pub const ReportInfo = struct {
     server_urls: [][]const u8,
 };
 
-pub const BuiltTag = struct {
+pub const TagBuilder = struct {
     items: [3][]const u8 = undefined,
     item_count: u8 = 0,
 
-    pub fn as_event_tag(self: *const BuiltTag) nip01_event.EventTag {
+    pub fn as_event_tag(self: *const TagBuilder) nip01_event.EventTag {
         std.debug.assert(self.item_count > 0);
         std.debug.assert(self.item_count <= self.items.len);
 
@@ -115,7 +115,7 @@ pub fn report_extract(
 
 /// Builds a NIP-56 `p` tag with optional report type.
 pub fn report_build_pubkey_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     pubkey_hex: []const u8,
     report_type: ?ReportType,
 ) ReportError!nip01_event.EventTag {
@@ -135,7 +135,7 @@ pub fn report_build_pubkey_tag(
 
 /// Builds a NIP-56 `e` report tag.
 pub fn report_build_event_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     event_id_hex: []const u8,
     report_type: ReportType,
 ) ReportError!nip01_event.EventTag {
@@ -152,7 +152,7 @@ pub fn report_build_event_tag(
 
 /// Builds a NIP-56 `x` blob report tag.
 pub fn report_build_blob_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     hash_hex: []const u8,
     report_type: ReportType,
 ) ReportError!nip01_event.EventTag {
@@ -169,7 +169,7 @@ pub fn report_build_blob_tag(
 
 /// Builds a NIP-56 `server` tag.
 pub fn report_build_server_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     server_url: []const u8,
 ) ReportError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -409,7 +409,7 @@ test "report extract rejects malformed required report state" {
 }
 
 test "report hex policy keeps nostr ids strict and blob hashes compatible" {
-    var built: BuiltTag = .{};
+    var built: TagBuilder = .{};
 
     try std.testing.expectError(
         error.InvalidPubkeyReportTag,
@@ -430,10 +430,10 @@ test "report hex policy keeps nostr ids strict and blob hashes compatible" {
 }
 
 test "report builders emit canonical tags" {
-    var pubkey_tag: BuiltTag = .{};
-    var event_tag: BuiltTag = .{};
-    var blob_tag: BuiltTag = .{};
-    var server_tag: BuiltTag = .{};
+    var pubkey_tag: TagBuilder = .{};
+    var event_tag: TagBuilder = .{};
+    var blob_tag: TagBuilder = .{};
+    var server_tag: TagBuilder = .{};
 
     try std.testing.expectEqualStrings(
         "p",

@@ -348,13 +348,13 @@ test "root exports limits and error namespaces" {
     try std.testing.expect(@TypeOf(nip22_comments.CommentInfo) == type);
     try std.testing.expect(@TypeOf(nip27_references.ContentReference) == type);
     try std.testing.expect(@TypeOf(nip25_reactions.ReactionTarget) == type);
-    try std.testing.expect(@TypeOf(nip51_lists.BuiltTag) == type);
+    try std.testing.expect(@TypeOf(nip51_lists.TagBuilder) == type);
     try std.testing.expect(@TypeOf(nip51_lists.BookmarkBuilderItem) == type);
     try std.testing.expect(@TypeOf(nip51_lists.ListItem) == type);
     try std.testing.expect(@TypeOf(nip51_lists.PrivateListInfo) == type);
     try std.testing.expect(@TypeOf(nip46_remote_signing.ConnectParams) == type);
     try std.testing.expect(@TypeOf(nip46_remote_signing.PubkeyTextParams) == type);
-    try std.testing.expect(@TypeOf(nip46_remote_signing.BuiltRequest) == type);
+    try std.testing.expect(@TypeOf(nip46_remote_signing.RequestBuilder) == type);
     try std.testing.expect(@TypeOf(nip46_remote_signing.Result) == type);
     try std.testing.expect(@TypeOf(nip46_remote_signing.ConnectResult) == type);
     try std.testing.expect(@TypeOf(nip46_remote_signing.ParsedRequest) == type);
@@ -377,73 +377,73 @@ test "root exports limits and error namespaces" {
     try std.testing.expect(@TypeOf(nip47_wallet_connect.Response) == type);
     try std.testing.expect(@TypeOf(nip47_wallet_connect.Notification) == type);
     try std.testing.expect(@TypeOf(nip23_long_form.LongFormMetadata) == type);
-    try std.testing.expect(@TypeOf(nip23_long_form.BuiltTag) == type);
+    try std.testing.expect(@TypeOf(nip23_long_form.TagBuilder) == type);
     try std.testing.expect(@TypeOf(nipc0_code_snippets.LicenseInfo) == type);
     try std.testing.expect(@TypeOf(nipc0_code_snippets.RepoReference) == type);
     try std.testing.expect(@TypeOf(nipc0_code_snippets.CodeSnippetInfo) == type);
-    try std.testing.expect(@TypeOf(nipc0_code_snippets.BuiltTag) == type);
+    try std.testing.expect(@TypeOf(nipc0_code_snippets.TagBuilder) == type);
     try std.testing.expect(@TypeOf(nip64_chess_pgn.ChessPgnInfo) == type);
-    try std.testing.expect(@TypeOf(nip64_chess_pgn.BuiltTag) == type);
+    try std.testing.expect(@TypeOf(nip64_chess_pgn.TagBuilder) == type);
     try std.testing.expect(@TypeOf(nip88_polls.PollType) == type);
     try std.testing.expect(@TypeOf(nip88_polls.Poll) == type);
     try std.testing.expect(@TypeOf(nip88_polls.EventRef) == type);
     try std.testing.expect(@TypeOf(nip88_polls.Response) == type);
     try std.testing.expect(@TypeOf(nip88_polls.OptionTally) == type);
-    try std.testing.expect(@TypeOf(nip88_polls.BuiltTag) == type);
+    try std.testing.expect(@TypeOf(nip88_polls.TagBuilder) == type);
     try std.testing.expect(@TypeOf(nipb7_blossom_servers.BlossomServerListInfo) == type);
     try std.testing.expect(@TypeOf(nipb7_blossom_servers.BlobReference) == type);
-    try std.testing.expect(@TypeOf(nipb7_blossom_servers.BuiltTag) == type);
+    try std.testing.expect(@TypeOf(nipb7_blossom_servers.TagBuilder) == type);
     try std.testing.expect(@TypeOf(nip24_extra_metadata.MetadataExtras) == type);
     try std.testing.expect(@TypeOf(nip24_extra_metadata.CommonTagInfo) == type);
-    try std.testing.expect(@TypeOf(nip24_extra_metadata.BuiltTag) == type);
+    try std.testing.expect(@TypeOf(nip24_extra_metadata.TagBuilder) == type);
     try std.testing.expect(@TypeOf(nip03_opentimestamps.OpenTimestampsAttestation) == type);
-    try std.testing.expect(@TypeOf(nip03_opentimestamps.BuiltTag) == type);
+    try std.testing.expect(@TypeOf(nip03_opentimestamps.TagBuilder) == type);
     try std.testing.expect(@TypeOf(nip17_private_messages.DmRecipient) == type);
     try std.testing.expect(@TypeOf(nip17_private_messages.DmReplyRef) == type);
     try std.testing.expect(@TypeOf(nip17_private_messages.DmMessageInfo) == type);
     try std.testing.expect(@TypeOf(nip17_private_messages.FileEncryptionAlgorithm) == type);
     try std.testing.expect(@TypeOf(nip17_private_messages.FileDimensions) == type);
     try std.testing.expect(@TypeOf(nip17_private_messages.FileMessageInfo) == type);
-    try std.testing.expect(@TypeOf(nip17_private_messages.BuiltTag) == type);
-    try std.testing.expect(@TypeOf(nip14_subjects.BuiltTag) == type);
-    try std.testing.expect(@TypeOf(nip31_alt_tags.BuiltTag) == type);
+    try std.testing.expect(@TypeOf(nip17_private_messages.TagBuilder) == type);
+    try std.testing.expect(@TypeOf(nip14_subjects.TagBuilder) == type);
+    try std.testing.expect(@TypeOf(nip31_alt_tags.TagBuilder) == type);
     try std.testing.expect(@TypeOf(nip39_external_identities.IdentityProvider) == type);
     try std.testing.expect(@TypeOf(nip39_external_identities.IdentityClaim) == type);
-    try std.testing.expect(@TypeOf(nip39_external_identities.BuiltTag) == type);
+    try std.testing.expect(@TypeOf(nip39_external_identities.TagBuilder) == type);
     try std.testing.expect(@TypeOf(nip29_relay_groups.GroupMetadataFlag) == type);
     try std.testing.expect(@TypeOf(nip29_relay_groups.GroupStateUser) == type);
     try std.testing.expect(@TypeOf(nip29_relay_groups.GroupState) == type);
     try std.testing.expect(@TypeOf(nip73_external_ids.ExternalIdKind) == type);
     try std.testing.expect(@TypeOf(nip73_external_ids.ExternalId) == type);
-    try std.testing.expect(@TypeOf(nip73_external_ids.BuiltTag) == type);
+    try std.testing.expect(@TypeOf(nip73_external_ids.TagBuilder) == type);
     try std.testing.expect(@TypeOf(nip32_labeling.LabelNamespace) == type);
     try std.testing.expect(@TypeOf(nip32_labeling.Label) == type);
     try std.testing.expect(@TypeOf(nip32_labeling.LabelTarget) == type);
     try std.testing.expect(@TypeOf(nip32_labeling.LabelEventInfo) == type);
     try std.testing.expect(@TypeOf(nip32_labeling.SelfLabelInfo) == type);
-    try std.testing.expect(@TypeOf(nip32_labeling.BuiltTag) == type);
+    try std.testing.expect(@TypeOf(nip32_labeling.TagBuilder) == type);
     try std.testing.expect(@TypeOf(nip34_git.RepositoryAnnouncementInfo) == type);
     try std.testing.expect(@TypeOf(nip34_git.RepositoryStateRef) == type);
     try std.testing.expect(@TypeOf(nip34_git.RepositoryStateInfo) == type);
     try std.testing.expect(@TypeOf(nip34_git.UserGraspListInfo) == type);
-    try std.testing.expect(@TypeOf(nip34_git.BuiltTag) == type);
+    try std.testing.expect(@TypeOf(nip34_git.TagBuilder) == type);
     try std.testing.expect(@TypeOf(nip36_content_warning.ContentWarningInfo) == type);
-    try std.testing.expect(@TypeOf(nip36_content_warning.BuiltTag) == type);
+    try std.testing.expect(@TypeOf(nip36_content_warning.TagBuilder) == type);
     try std.testing.expect(@TypeOf(nip38_user_status.Status) == type);
-    try std.testing.expect(@TypeOf(nip38_user_status.BuiltTag) == type);
+    try std.testing.expect(@TypeOf(nip38_user_status.TagBuilder) == type);
     try std.testing.expect(@TypeOf(nip56_reporting.ReportType) == type);
     try std.testing.expect(@TypeOf(nip56_reporting.ReportInfo) == type);
-    try std.testing.expect(@TypeOf(nip56_reporting.BuiltTag) == type);
+    try std.testing.expect(@TypeOf(nip56_reporting.TagBuilder) == type);
     try std.testing.expect(@TypeOf(nip05_identity.Address) == type);
     try std.testing.expect(@TypeOf(nip05_identity.Profile) == type);
     try std.testing.expect(@TypeOf(nip26_delegation.DelegationTag) == type);
     try std.testing.expect(@TypeOf(nip26_delegation.DelegationCondition) == type);
     try std.testing.expect(@TypeOf(nip26_delegation.DelegationConditions) == type);
-    try std.testing.expect(@TypeOf(nip26_delegation.BuiltTag) == type);
+    try std.testing.expect(@TypeOf(nip26_delegation.TagBuilder) == type);
     try std.testing.expect(@TypeOf(nip57_zaps.ZapError) == type);
     try std.testing.expect(@TypeOf(nip57_zaps.ZapRequest) == type);
     try std.testing.expect(@TypeOf(nip57_zaps.ZapReceipt) == type);
-    try std.testing.expect(@TypeOf(nip57_zaps.BuiltTag) == type);
+    try std.testing.expect(@TypeOf(nip57_zaps.TagBuilder) == type);
     try std.testing.expect(@TypeOf(nip86_relay_management.RelayManagementError) == type);
     try std.testing.expect(@TypeOf(nip86_relay_management.PubkeyReason) == type);
     try std.testing.expect(@TypeOf(nip86_relay_management.EventIdReason) == type);
@@ -454,7 +454,7 @@ test "root exports limits and error namespaces" {
     try std.testing.expect(@TypeOf(nip37_drafts.DraftWrapInfo) == type);
     try std.testing.expect(@TypeOf(nip37_drafts.DraftWrapPlaintextInfo) == type);
     try std.testing.expect(@TypeOf(nip37_drafts.PrivateRelayListInfo) == type);
-    try std.testing.expect(@TypeOf(nip37_drafts.BuiltTag) == type);
+    try std.testing.expect(@TypeOf(nip37_drafts.TagBuilder) == type);
     try std.testing.expect(@TypeOf(nip58_badges.ImageInfo) == type);
     try std.testing.expect(@TypeOf(nip58_badges.DefinitionRef) == type);
     try std.testing.expect(@TypeOf(nip58_badges.Definition) == type);
@@ -463,7 +463,7 @@ test "root exports limits and error namespaces" {
     try std.testing.expect(@TypeOf(nip58_badges.AwardEventRef) == type);
     try std.testing.expect(@TypeOf(nip58_badges.ProfileBadgePair) == type);
     try std.testing.expect(@TypeOf(nip58_badges.ProfileBadges) == type);
-    try std.testing.expect(@TypeOf(nip58_badges.BuiltTag) == type);
+    try std.testing.expect(@TypeOf(nip58_badges.TagBuilder) == type);
     try std.testing.expect(@TypeOf(nip52_calendar_events.CalendarParticipant) == type);
     try std.testing.expect(@TypeOf(nip52_calendar_events.CalendarCoordinate) == type);
     try std.testing.expect(@TypeOf(nip52_calendar_events.Common) == type);
@@ -471,40 +471,40 @@ test "root exports limits and error namespaces" {
     try std.testing.expect(@TypeOf(nip52_calendar_events.TimeEvent) == type);
     try std.testing.expect(@TypeOf(nip52_calendar_events.Calendar) == type);
     try std.testing.expect(@TypeOf(nip52_calendar_events.Rsvp) == type);
-    try std.testing.expect(@TypeOf(nip52_calendar_events.BuiltTag) == type);
+    try std.testing.expect(@TypeOf(nip52_calendar_events.TagBuilder) == type);
     try std.testing.expect(@TypeOf(nip53_live_activities.LiveActivityParticipant) == type);
     try std.testing.expect(@TypeOf(nip53_live_activities.LiveActivityCoordinate) == type);
     try std.testing.expect(@TypeOf(nip53_live_activities.LiveChatReply) == type);
     try std.testing.expect(@TypeOf(nip53_live_activities.LiveActivityInfo) == type);
     try std.testing.expect(@TypeOf(nip53_live_activities.LiveChatInfo) == type);
-    try std.testing.expect(@TypeOf(nip53_live_activities.BuiltTag) == type);
+    try std.testing.expect(@TypeOf(nip53_live_activities.TagBuilder) == type);
     try std.testing.expect(@TypeOf(nip54_wiki.ArticleRef) == type);
     try std.testing.expect(@TypeOf(nip54_wiki.EventRef) == type);
     try std.testing.expect(@TypeOf(nip54_wiki.Article) == type);
     try std.testing.expect(@TypeOf(nip54_wiki.MergeRequest) == type);
     try std.testing.expect(@TypeOf(nip54_wiki.Redirect) == type);
-    try std.testing.expect(@TypeOf(nip54_wiki.BuiltTag) == type);
+    try std.testing.expect(@TypeOf(nip54_wiki.TagBuilder) == type);
     try std.testing.expect(@TypeOf(nip61_nutzaps.Informational) == type);
     try std.testing.expect(@TypeOf(nip61_nutzaps.Nutzap) == type);
     try std.testing.expect(@TypeOf(nip61_nutzaps.Redemption) == type);
-    try std.testing.expect(@TypeOf(nip61_nutzaps.BuiltTag) == type);
+    try std.testing.expect(@TypeOf(nip61_nutzaps.TagBuilder) == type);
     try std.testing.expect(@TypeOf(nip75_zap_goals.Goal) == type);
     try std.testing.expect(@TypeOf(nip75_zap_goals.Reference) == type);
-    try std.testing.expect(@TypeOf(nip75_zap_goals.BuiltTag) == type);
+    try std.testing.expect(@TypeOf(nip75_zap_goals.TagBuilder) == type);
     try std.testing.expect(@TypeOf(nip78_app_data.AppDataInfo) == type);
-    try std.testing.expect(@TypeOf(nip78_app_data.BuiltTag) == type);
+    try std.testing.expect(@TypeOf(nip78_app_data.TagBuilder) == type);
     try std.testing.expect(@TypeOf(nip89_handlers.Reference) == type);
     try std.testing.expect(@TypeOf(nip89_handlers.Recommendation) == type);
     try std.testing.expect(@TypeOf(nip89_handlers.Handler) == type);
     try std.testing.expect(@TypeOf(nip89_handlers.ClientTag) == type);
-    try std.testing.expect(@TypeOf(nip89_handlers.BuiltTag) == type);
+    try std.testing.expect(@TypeOf(nip89_handlers.TagBuilder) == type);
     try std.testing.expect(@TypeOf(nip84_highlights.EventSource) == type);
     try std.testing.expect(@TypeOf(nip84_highlights.AddressSource) == type);
     try std.testing.expect(@TypeOf(nip84_highlights.UrlReference) == type);
     try std.testing.expect(@TypeOf(nip84_highlights.HighlightSource) == type);
     try std.testing.expect(@TypeOf(nip84_highlights.HighlightAttribution) == type);
     try std.testing.expect(@TypeOf(nip84_highlights.HighlightInfo) == type);
-    try std.testing.expect(@TypeOf(nip84_highlights.BuiltTag) == type);
+    try std.testing.expect(@TypeOf(nip84_highlights.TagBuilder) == type);
     try std.testing.expect(@TypeOf(nip29_relay_groups.GroupMetadata) == type);
     try std.testing.expect(@TypeOf(nip29_relay_groups.GroupAdmin) == type);
     try std.testing.expect(@TypeOf(nip29_relay_groups.GroupReference) == type);
@@ -517,9 +517,9 @@ test "root exports limits and error namespaces" {
     try std.testing.expect(@TypeOf(nip29_relay_groups.GroupLeaveRequestInfo) == type);
     try std.testing.expect(@TypeOf(nip29_relay_groups.GroupPutUserInfo) == type);
     try std.testing.expect(@TypeOf(nip29_relay_groups.GroupRemoveUserInfo) == type);
-    try std.testing.expect(@TypeOf(nip29_relay_groups.BuiltTag) == type);
+    try std.testing.expect(@TypeOf(nip29_relay_groups.TagBuilder) == type);
     try std.testing.expect(@TypeOf(nip78_app_data.AppDataInfo) == type);
-    try std.testing.expect(@TypeOf(nip78_app_data.BuiltTag) == type);
+    try std.testing.expect(@TypeOf(nip78_app_data.TagBuilder) == type);
     try std.testing.expect(
         @TypeOf(nip06_mnemonic.mnemonic_validate) ==
             fn ([]const u8) nip06_mnemonic.MnemonicError!void,
@@ -556,7 +556,7 @@ test "root exports limits and error namespaces" {
     try std.testing.expect(
         @TypeOf(nip23_long_form.long_form_build_identifier_tag) ==
             fn (
-                *nip23_long_form.BuiltTag,
+                *nip23_long_form.TagBuilder,
                 []const u8,
             ) nip23_long_form.LongFormError!nip01_event.EventTag,
     );
@@ -616,7 +616,7 @@ test "root exports limits and error namespaces" {
     try std.testing.expect(
         @TypeOf(nip03_opentimestamps.opentimestamps_build_event_tag) ==
             fn (
-                *nip03_opentimestamps.BuiltTag,
+                *nip03_opentimestamps.TagBuilder,
                 []const u8,
                 ?[]const u8,
             ) nip03_opentimestamps.OpenTimestampsError!nip01_event.EventTag,
@@ -645,18 +645,18 @@ test "root exports limits and error namespaces" {
                 [][]const u8,
             ) nip17_private_messages.RelayListError!u16,
     );
-    try std.testing.expect(@TypeOf(nip17_private_messages.BuiltFileMetadataTag) == type);
+    try std.testing.expect(@TypeOf(nip17_private_messages.FileTagBuilder) == type);
     try std.testing.expect(
         @TypeOf(nip17_private_messages.nip17_build_file_type_tag) ==
             fn (
-                *nip17_private_messages.BuiltFileMetadataTag,
+                *nip17_private_messages.FileTagBuilder,
                 []const u8,
             ) nip17_private_messages.PrivateMessageError!nip01_event.EventTag,
     );
     try std.testing.expect(
         @TypeOf(nip17_private_messages.nip17_build_file_size_tag) ==
             fn (
-                *nip17_private_messages.BuiltFileMetadataTag,
+                *nip17_private_messages.FileTagBuilder,
                 u64,
             ) nip17_private_messages.PrivateMessageError!nip01_event.EventTag,
     );
@@ -670,7 +670,7 @@ test "root exports limits and error namespaces" {
     try std.testing.expect(
         @TypeOf(nip39_external_identities.identity_claim_build_tag) ==
             fn (
-                *nip39_external_identities.BuiltTag,
+                *nip39_external_identities.TagBuilder,
                 *const nip39_external_identities.IdentityClaim,
             ) nip39_external_identities.ExternalIdentityError!nip01_event.EventTag,
     );
@@ -741,7 +741,7 @@ test "root exports limits and error namespaces" {
     try std.testing.expect(
         @TypeOf(nip73_external_ids.external_id_build_i_tag) ==
             fn (
-                *nip73_external_ids.BuiltTag,
+                *nip73_external_ids.TagBuilder,
                 *const nip73_external_ids.ExternalId,
             ) nip73_external_ids.ExternalIdError!nip01_event.EventTag,
     );
@@ -846,21 +846,21 @@ test "root exports limits and error namespaces" {
     try std.testing.expect(
         @TypeOf(nip51_lists.list_build_identifier_tag) ==
             fn (
-                *nip51_lists.BuiltTag,
+                *nip51_lists.TagBuilder,
                 []const u8,
             ) nip51_lists.ListError!nip01_event.EventTag,
     );
     try std.testing.expect(
         @TypeOf(nip51_lists.bookmark_build_tag) ==
             fn (
-                *nip51_lists.BuiltTag,
+                *nip51_lists.TagBuilder,
                 nip51_lists.BookmarkBuilderItem,
             ) nip51_lists.ListError!nip01_event.EventTag,
     );
     try std.testing.expect(
         @TypeOf(nip51_lists.emoji_build_tag) ==
             fn (
-                *nip51_lists.BuiltTag,
+                *nip51_lists.TagBuilder,
                 *const nip51_lists.ListEmoji,
             ) nip51_lists.ListError!nip01_event.EventTag,
     );
@@ -949,7 +949,7 @@ test "root exports limits and error namespaces" {
     try std.testing.expect(
         @TypeOf(nip26_delegation.delegation_tag_build) ==
             fn (
-                *nip26_delegation.BuiltTag,
+                *nip26_delegation.TagBuilder,
                 *const nip26_delegation.DelegationTag,
             ) nip26_delegation.DelegationError!nip01_event.EventTag,
     );
@@ -982,7 +982,7 @@ test "root exports limits and error namespaces" {
     );
     try std.testing.expect(
         @TypeOf(nip37_drafts.private_relay_build_tag) ==
-            fn (*nip37_drafts.BuiltTag, []const u8) nip37_drafts.DraftError!nip01_event.EventTag,
+            fn (*nip37_drafts.TagBuilder, []const u8) nip37_drafts.DraftError!nip01_event.EventTag,
     );
     try std.testing.expect(
         @TypeOf(nip37_drafts.private_relay_list_serialize_json) ==
@@ -1046,12 +1046,12 @@ test "root exports limits and error namespaces" {
     );
     try std.testing.expect(
         @TypeOf(nip58_badges.badge_build_identifier_tag) ==
-            fn (*nip58_badges.BuiltTag, []const u8) nip58_badges.BadgeError!nip01_event.EventTag,
+            fn (*nip58_badges.TagBuilder, []const u8) nip58_badges.BadgeError!nip01_event.EventTag,
     );
     try std.testing.expect(
         @TypeOf(nip58_badges.badge_build_image_tag) ==
             fn (
-                *nip58_badges.BuiltTag,
+                *nip58_badges.TagBuilder,
                 []const u8,
                 ?[]const u8,
             ) nip58_badges.BadgeError!nip01_event.EventTag,
@@ -1059,14 +1059,14 @@ test "root exports limits and error namespaces" {
     try std.testing.expect(
         @TypeOf(nip58_badges.badge_build_definition_tag) ==
             fn (
-                *nip58_badges.BuiltTag,
+                *nip58_badges.TagBuilder,
                 *const nip58_badges.DefinitionRef,
             ) nip58_badges.BadgeError!nip01_event.EventTag,
     );
     try std.testing.expect(
         @TypeOf(nip58_badges.profile_badges_build_award_tag) ==
             fn (
-                *nip58_badges.BuiltTag,
+                *nip58_badges.TagBuilder,
                 []const u8,
                 ?[]const u8,
             ) nip58_badges.BadgeError!nip01_event.EventTag,
@@ -1082,7 +1082,7 @@ test "root exports limits and error namespaces" {
     try std.testing.expect(
         @TypeOf(nip84_highlights.highlight_build_event_source_tag) ==
             fn (
-                *nip84_highlights.BuiltTag,
+                *nip84_highlights.TagBuilder,
                 []const u8,
                 ?[]const u8,
             ) nip84_highlights.HighlightError!nip01_event.EventTag,
@@ -1090,7 +1090,7 @@ test "root exports limits and error namespaces" {
     try std.testing.expect(
         @TypeOf(nip84_highlights.highlight_build_author_tag) ==
             fn (
-                *nip84_highlights.BuiltTag,
+                *nip84_highlights.TagBuilder,
                 []const u8,
                 ?[]const u8,
                 ?[]const u8,
@@ -1099,7 +1099,7 @@ test "root exports limits and error namespaces" {
     try std.testing.expect(
         @TypeOf(nip84_highlights.highlight_build_comment_tag) ==
             fn (
-                *nip84_highlights.BuiltTag,
+                *nip84_highlights.TagBuilder,
                 []const u8,
             ) nip84_highlights.HighlightError!nip01_event.EventTag,
     );
@@ -1121,7 +1121,7 @@ test "root exports limits and error namespaces" {
     try std.testing.expect(
         @TypeOf(nip57_zaps.request_build_relays_tag) ==
             fn (
-                *nip57_zaps.BuiltTag,
+                *nip57_zaps.TagBuilder,
                 []const []const u8,
             ) nip57_zaps.ZapError!nip01_event.EventTag,
     );
@@ -1159,7 +1159,7 @@ test "root exports limits and error namespaces" {
     try std.testing.expect(
         @TypeOf(nip46_remote_signing.request_build_connect) ==
             fn (
-                *nip46_remote_signing.BuiltRequest,
+                *nip46_remote_signing.RequestBuilder,
                 []const u8,
                 *const nip46_remote_signing.ConnectParams,
                 std.mem.Allocator,
@@ -1168,7 +1168,7 @@ test "root exports limits and error namespaces" {
     try std.testing.expect(
         @TypeOf(nip46_remote_signing.request_build_sign_event) ==
             fn (
-                *nip46_remote_signing.BuiltRequest,
+                *nip46_remote_signing.RequestBuilder,
                 []const u8,
                 []const u8,
                 std.mem.Allocator,
@@ -1177,7 +1177,7 @@ test "root exports limits and error namespaces" {
     try std.testing.expect(
         @TypeOf(nip46_remote_signing.request_build_pubkey_text) ==
             fn (
-                *nip46_remote_signing.BuiltRequest,
+                *nip46_remote_signing.RequestBuilder,
                 []const u8,
                 nip46_remote_signing.Method,
                 *const nip46_remote_signing.PubkeyTextParams,
@@ -1187,7 +1187,7 @@ test "root exports limits and error namespaces" {
     try std.testing.expect(
         @TypeOf(nip46_remote_signing.request_build_empty) ==
             fn (
-                *nip46_remote_signing.BuiltRequest,
+                *nip46_remote_signing.RequestBuilder,
                 []const u8,
                 nip46_remote_signing.Method,
                 std.mem.Allocator,
@@ -1426,7 +1426,7 @@ test "I4 optional paths do not interfere with strict core defaults" {
     try std.testing.expectEqualStrings("team", list_info.metadata.identifier.?);
     try std.testing.expect(list_output[0] == .pubkey);
 
-    var built_tag: nip51_lists.BuiltTag = .{};
+    var built_tag: nip51_lists.TagBuilder = .{};
     const emoji_tag = try nip51_lists.emoji_build_tag(&built_tag, &.{
         .shortcode = "soapbox",
         .image_url = "https://cdn.example/soapbox.png",

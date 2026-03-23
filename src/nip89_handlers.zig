@@ -55,12 +55,12 @@ pub const ClientTag = struct {
     relay_hint: ?[]const u8 = null,
 };
 
-pub const BuiltTag = struct {
+pub const TagBuilder = struct {
     items: [4][]const u8 = undefined,
     text_storage: [limits.tag_item_bytes_max]u8 = undefined,
     item_count: u8 = 0,
 
-    pub fn as_event_tag(self: *const BuiltTag) nip01_event.EventTag {
+    pub fn as_event_tag(self: *const TagBuilder) nip01_event.EventTag {
         std.debug.assert(self.item_count > 0);
         std.debug.assert(self.item_count <= self.items.len);
 
@@ -122,7 +122,7 @@ pub fn client_extract(event: *const nip01_event.Event) HandlerError!?ClientTag {
 
 /// Builds a canonical recommendation `d` tag naming the supported event kind.
 pub fn recommendation_build_supported_kind_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     supported_kind: u32,
 ) HandlerError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -138,7 +138,7 @@ pub fn recommendation_build_supported_kind_tag(
 
 /// Builds a canonical recommendation `a` tag referencing a kind-31990 handler.
 pub fn recommendation_build_handler_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     coordinate_text: []const u8,
     relay_hint: ?[]const u8,
     platform: ?[]const u8,
@@ -165,7 +165,7 @@ pub fn recommendation_build_handler_tag(
 
 /// Builds a canonical handler `d` tag.
 pub fn handler_build_identifier_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     identifier: []const u8,
 ) HandlerError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -179,7 +179,7 @@ pub fn handler_build_identifier_tag(
 
 /// Builds a canonical handler `k` tag.
 pub fn handler_build_supported_kind_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     supported_kind: u32,
 ) HandlerError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -195,7 +195,7 @@ pub fn handler_build_supported_kind_tag(
 
 /// Builds a canonical handler endpoint tag such as `web`, `ios`, or `android`.
 pub fn handler_build_endpoint_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     platform: []const u8,
     url_template: []const u8,
     entity_name: ?[]const u8,
@@ -215,7 +215,7 @@ pub fn handler_build_endpoint_tag(
 
 /// Builds a canonical `client` tag for arbitrary published events.
 pub fn client_build_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     name: []const u8,
     coordinate_text: []const u8,
     relay_hint: ?[]const u8,
@@ -473,7 +473,7 @@ test "NIP-89 extracts and builds client tags" {
     const client = (try client_extract(&event)).?;
     try std.testing.expectEqualStrings("My Client", client.name);
 
-    var built: BuiltTag = .{};
+    var built: TagBuilder = .{};
     const tag = try client_build_tag(
         &built,
         "My Client",
@@ -484,7 +484,7 @@ test "NIP-89 extracts and builds client tags" {
 }
 
 test "NIP-89 rejects overlong client coordinate input with typed error" {
-    var built: BuiltTag = .{};
+    var built: TagBuilder = .{};
     const overlong = [_]u8{'a'} ** (limits.tag_item_bytes_max + 1);
 
     try std.testing.expectError(

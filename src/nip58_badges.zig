@@ -82,12 +82,12 @@ pub const ProfileBadges = struct {
     pair_count: u16,
 };
 
-pub const BuiltTag = struct {
+pub const TagBuilder = struct {
     items: [3][]const u8 = undefined,
     text_storage: [limits.tag_item_bytes_max]u8 = undefined,
     item_count: u8 = 0,
 
-    pub fn as_event_tag(self: *const BuiltTag) nip01_event.EventTag {
+    pub fn as_event_tag(self: *const TagBuilder) nip01_event.EventTag {
         std.debug.assert(self.item_count > 0);
         std.debug.assert(self.item_count <= self.items.len);
 
@@ -208,7 +208,7 @@ pub fn profile_badge_pair_validate(
 
 /// Builds a badge-definition `d` tag.
 pub fn badge_build_identifier_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     identifier: []const u8,
 ) BadgeError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -222,7 +222,7 @@ pub fn badge_build_identifier_tag(
 
 /// Builds a badge-definition `name` tag.
 pub fn badge_build_name_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     name: []const u8,
 ) BadgeError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -236,7 +236,7 @@ pub fn badge_build_name_tag(
 
 /// Builds a badge-definition `description` tag.
 pub fn badge_build_description_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     description: []const u8,
 ) BadgeError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -250,7 +250,7 @@ pub fn badge_build_description_tag(
 
 /// Builds a badge-definition `image` tag.
 pub fn badge_build_image_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     image_url: []const u8,
     dimensions: ?[]const u8,
 ) BadgeError!nip01_event.EventTag {
@@ -269,7 +269,7 @@ pub fn badge_build_image_tag(
 
 /// Builds a badge-definition `thumb` tag.
 pub fn badge_build_thumb_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     thumb_url: []const u8,
     dimensions: ?[]const u8,
 ) BadgeError!nip01_event.EventTag {
@@ -288,7 +288,7 @@ pub fn badge_build_thumb_tag(
 
 /// Builds a badge-award or profile-pair `a` tag referencing a badge definition.
 pub fn badge_build_definition_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     reference: *const DefinitionRef,
 ) BadgeError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -306,7 +306,7 @@ pub fn badge_build_definition_tag(
 
 /// Builds a badge-award `p` tag.
 pub fn badge_build_awarded_pubkey_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     pubkey_hex: []const u8,
     relay_hint: ?[]const u8,
 ) BadgeError!nip01_event.EventTag {
@@ -326,7 +326,7 @@ pub fn badge_build_awarded_pubkey_tag(
 
 /// Builds the fixed profile-badges `d` tag.
 pub fn profile_badges_build_identifier_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
 ) BadgeError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
     std.debug.assert(profile_badges_identifier.len > 0);
@@ -339,7 +339,7 @@ pub fn profile_badges_build_identifier_tag(
 
 /// Builds a profile-badge-pair `e` tag referencing a badge award.
 pub fn profile_badges_build_award_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     event_id_hex: []const u8,
     relay_hint: ?[]const u8,
 ) BadgeError!nip01_event.EventTag {
@@ -822,7 +822,7 @@ test "profile badge pair validate checks definition award and recipient" {
 }
 
 test "badge builders emit canonical tags" {
-    var output = BuiltTag{};
+    var output = TagBuilder{};
     const issuer = [_]u8{1} ** 32;
     const definition_tag = try badge_build_definition_tag(
         &output,

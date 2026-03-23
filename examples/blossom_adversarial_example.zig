@@ -12,7 +12,7 @@ test "NIP-B7 adversarial example: malformed server urls and blob urls stay typed
         "",
         tags[0..],
     );
-    var built_tag: noztr.nipb7_blossom_servers.BuiltTag = .{};
+    var built_tag: noztr.nipb7_blossom_servers.TagBuilder = .{};
     var servers: [1][]const u8 = undefined;
     var url_output: [128]u8 = undefined;
 

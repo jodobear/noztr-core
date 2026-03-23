@@ -74,11 +74,11 @@ pub const EventMarker = enum {
     reply,
 };
 
-pub const BuiltTag = struct {
+pub const TagBuilder = struct {
     items: [4][]const u8 = undefined,
     item_count: u8 = 0,
 
-    pub fn as_event_tag(self: *const BuiltTag) nip01_event.EventTag {
+    pub fn as_event_tag(self: *const TagBuilder) nip01_event.EventTag {
         std.debug.assert(self.item_count > 0);
         std.debug.assert(self.item_count <= self.items.len);
 
@@ -225,7 +225,7 @@ pub fn channel_build_metadata_json(
 
 /// Builds an `e` tag for a channel root or reply reference.
 pub fn channel_build_event_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     event_id_hex: []const u8,
     relay_hint: ?[]const u8,
     marker: EventMarker,
@@ -251,7 +251,7 @@ pub fn channel_build_event_tag(
 
 /// Builds a `p` tag for a reply author reference.
 pub fn channel_build_pubkey_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     pubkey_hex: []const u8,
     relay_hint: ?[]const u8,
 ) PublicChatError!nip01_event.EventTag {
@@ -271,7 +271,7 @@ pub fn channel_build_pubkey_tag(
 
 /// Builds a canonical category `t` tag for kind-41 channel metadata.
 pub fn channel_build_category_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     category: []const u8,
 ) PublicChatError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -724,7 +724,7 @@ test "NIP-28 extracts moderation targets and builds canonical helpers" {
     const reason_json = try channel_build_reason_json(json[0..], "duplicate");
     try std.testing.expectEqualStrings("{\"reason\":\"duplicate\"}", reason_json);
 
-    var tag: BuiltTag = .{};
+    var tag: TagBuilder = .{};
     const built = try channel_build_event_tag(
         &tag,
         "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
@@ -735,7 +735,7 @@ test "NIP-28 extracts moderation targets and builds canonical helpers" {
 }
 
 test "NIP-28 rejects overlong event-tag builder input with typed error" {
-    var built: BuiltTag = .{};
+    var built: TagBuilder = .{};
     const overlong = [_]u8{'a'} ** (limits.tag_item_bytes_max + 1);
 
     try std.testing.expectError(

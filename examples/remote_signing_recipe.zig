@@ -5,7 +5,7 @@ test "recipe: remote signing helpers compose without extra sdk machinery" {
     var arena = std.heap.ArenaAllocator.init(std.testing.allocator);
     defer arena.deinit();
 
-    var request_output: noztr.nip46_remote_signing.BuiltRequest = .{};
+    var request_output: noztr.nip46_remote_signing.RequestBuilder = .{};
     const request = try noztr.nip46_remote_signing.request_build_connect(
         &request_output,
         "sdk-connect",

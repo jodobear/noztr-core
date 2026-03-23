@@ -8,7 +8,7 @@ test "recipe: identity proof helpers stay pure and deterministic" {
         .proof = "9721ce4ee4fceb91c9711ca2a6c9a5ab",
     };
     const pubkey = [_]u8{0x22} ** 32;
-    var tag_output: noztr.nip39_external_identities.BuiltTag = .{};
+    var tag_output: noztr.nip39_external_identities.TagBuilder = .{};
     var url_buffer: [256]u8 = undefined;
     var text_buffer: [256]u8 = undefined;
 

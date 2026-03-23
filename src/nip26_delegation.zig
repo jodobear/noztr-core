@@ -35,14 +35,14 @@ pub const DelegationTag = struct {
     signature: [64]u8,
 };
 
-pub const BuiltTag = struct {
+pub const TagBuilder = struct {
     items: [4][]const u8 = undefined,
     item_count: u8 = 0,
     conditions_storage: [limits.tag_item_bytes_max]u8 = undefined,
     pubkey_hex: [limits.pubkey_hex_length]u8 = undefined,
     signature_hex: [limits.sig_hex_length]u8 = undefined,
 
-    pub fn as_event_tag(self: *const BuiltTag) nip01_event.EventTag {
+    pub fn as_event_tag(self: *const TagBuilder) nip01_event.EventTag {
         std.debug.assert(self.item_count > 0);
         std.debug.assert(self.item_count <= self.items.len);
 
@@ -200,7 +200,7 @@ pub fn delegation_event_validate(
 
 /// Builds a canonical `delegation` tag from parsed fields.
 pub fn delegation_tag_build(
-    output: *BuiltTag,
+    output: *TagBuilder,
     tag: *const DelegationTag,
 ) DelegationError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -452,7 +452,7 @@ test "delegation sign verify and tag build roundtrip" {
     };
     try delegation_signature_verify(&tag, &delegatee_pubkey);
 
-    var built: BuiltTag = .{};
+    var built: TagBuilder = .{};
     const event_tag = try delegation_tag_build(&built, &tag);
     const parsed = try delegation_tag_parse(event_tag);
     try std.testing.expectEqualStrings(conditions_text, parsed.conditions_text);

@@ -17,7 +17,7 @@ test "NIP-C0 adversarial example: reject malformed repository references" {
     );
     var licenses: [0]noztr.nipc0_code_snippets.LicenseInfo = .{};
     var dependencies: [0][]const u8 = .{};
-    var repo_tag: noztr.nipc0_code_snippets.BuiltTag = .{};
+    var repo_tag: noztr.nipc0_code_snippets.TagBuilder = .{};
 
     try std.testing.expectError(
         error.InvalidRepoTag,

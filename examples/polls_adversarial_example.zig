@@ -43,7 +43,7 @@ test "NIP-88 adversarial example: latest invalid singlechoice response counts ze
     };
     var latest: [2]noztr.nip88_polls.CountedResponse = undefined;
     var tallies: [2]noztr.nip88_polls.OptionTally = undefined;
-    var bad_response_tag: noztr.nip88_polls.BuiltTag = .{};
+    var bad_response_tag: noztr.nip88_polls.TagBuilder = .{};
 
     const tally = try noztr.nip88_polls.poll_tally_reduce(
         &poll_event,

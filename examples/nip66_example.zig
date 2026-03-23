@@ -3,16 +3,16 @@ const noztr = @import("noztr");
 const common = @import("common.zig");
 
 test "NIP-66 example: extract relay discovery and monitor metadata" {
-    var discovery_id = noztr.nip66_relay_discovery.BuiltTag{};
-    var discovery_rtt = noztr.nip66_relay_discovery.BuiltTag{};
-    var discovery_network = noztr.nip66_relay_discovery.BuiltTag{};
-    var discovery_nip = noztr.nip66_relay_discovery.BuiltTag{};
-    var discovery_requirement = noztr.nip66_relay_discovery.BuiltTag{};
-    var discovery_topic = noztr.nip66_relay_discovery.BuiltTag{};
-    var discovery_geo = noztr.nip66_relay_discovery.BuiltTag{};
-    var monitor_frequency = noztr.nip66_relay_discovery.BuiltTag{};
-    var monitor_timeout = noztr.nip66_relay_discovery.BuiltTag{};
-    var monitor_check = noztr.nip66_relay_discovery.BuiltTag{};
+    var discovery_id = noztr.nip66_relay_discovery.TagBuilder{};
+    var discovery_rtt = noztr.nip66_relay_discovery.TagBuilder{};
+    var discovery_network = noztr.nip66_relay_discovery.TagBuilder{};
+    var discovery_nip = noztr.nip66_relay_discovery.TagBuilder{};
+    var discovery_requirement = noztr.nip66_relay_discovery.TagBuilder{};
+    var discovery_topic = noztr.nip66_relay_discovery.TagBuilder{};
+    var discovery_geo = noztr.nip66_relay_discovery.TagBuilder{};
+    var monitor_frequency = noztr.nip66_relay_discovery.TagBuilder{};
+    var monitor_timeout = noztr.nip66_relay_discovery.TagBuilder{};
+    var monitor_check = noztr.nip66_relay_discovery.TagBuilder{};
     const discovery_tags = [_]noztr.nip01_event.EventTag{
         try noztr.nip66_relay_discovery.relay_discovery_build_url_tag(
             &discovery_id,

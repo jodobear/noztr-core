@@ -124,11 +124,14 @@ Current downstream migration notes:
 
 - [guides/migrating-from-0.1.0-rc.1.md](guides/migrating-from-0.1.0-rc.1.md)
 - [guides/migrating-from-0.1.0-rc.2.md](guides/migrating-from-0.1.0-rc.2.md)
+- [guides/migrating-from-0.1.0-rc.3.md](guides/migrating-from-0.1.0-rc.3.md)
 
 If you are updating from an older pre-`1.0` public line and a release note or changelog entry marks
 the change as breaking, use the relevant migration guide first:
 
 - [guides/migrating-from-0.1.0-rc.1.md](guides/migrating-from-0.1.0-rc.1.md)
+- [guides/migrating-from-0.1.0-rc.2.md](guides/migrating-from-0.1.0-rc.2.md)
+- [guides/migrating-from-0.1.0-rc.3.md](guides/migrating-from-0.1.0-rc.3.md)
 
 ## What `noztr` Does Not Support
 

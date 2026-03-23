@@ -56,11 +56,11 @@ pub const HighlightInfo = struct {
     comment: ?[]const u8 = null,
 };
 
-pub const BuiltTag = struct {
+pub const TagBuilder = struct {
     items: [4][]const u8 = undefined,
     item_count: u8 = 0,
 
-    pub fn as_event_tag(self: *const BuiltTag) nip01_event.EventTag {
+    pub fn as_event_tag(self: *const TagBuilder) nip01_event.EventTag {
         std.debug.assert(self.item_count > 0);
         std.debug.assert(self.item_count <= self.items.len);
 
@@ -88,7 +88,7 @@ pub fn highlight_extract(
 
 /// Builds a canonical highlight source `e` tag.
 pub fn highlight_build_event_source_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     event_id_hex: []const u8,
     relay_hint: ?[]const u8,
 ) HighlightError!nip01_event.EventTag {
@@ -108,7 +108,7 @@ pub fn highlight_build_event_source_tag(
 
 /// Builds a canonical highlight source `a` tag.
 pub fn highlight_build_address_source_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     coordinate_text: []const u8,
     relay_hint: ?[]const u8,
 ) HighlightError!nip01_event.EventTag {
@@ -128,7 +128,7 @@ pub fn highlight_build_address_source_tag(
 
 /// Builds a canonical highlight URL `r` tag with optional source or mention marker.
 pub fn highlight_build_url_reference_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     url: []const u8,
     marker: ?[]const u8,
 ) HighlightError!nip01_event.EventTag {
@@ -147,7 +147,7 @@ pub fn highlight_build_url_reference_tag(
 
 /// Builds a canonical highlight attribution `p` tag.
 pub fn highlight_build_author_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     pubkey_hex: []const u8,
     relay_hint: ?[]const u8,
     role: ?[]const u8,
@@ -172,7 +172,7 @@ pub fn highlight_build_author_tag(
 
 /// Builds a canonical `context` tag.
 pub fn highlight_build_context_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     context: []const u8,
 ) HighlightError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -186,7 +186,7 @@ pub fn highlight_build_context_tag(
 
 /// Builds a canonical `comment` tag.
 pub fn highlight_build_comment_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     comment: []const u8,
 ) HighlightError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -516,7 +516,7 @@ test "highlight extract rejects duplicate source tags" {
 }
 
 test "highlight builders emit canonical tags" {
-    var built = BuiltTag{};
+    var built = TagBuilder{};
 
     const event_tag = try highlight_build_event_source_tag(
         &built,

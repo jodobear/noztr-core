@@ -61,12 +61,12 @@ pub const ExternalId = struct {
 };
 
 /// Fixed-capacity `i` or `k` tag builder for NIP-73 helpers.
-pub const BuiltTag = struct {
+pub const TagBuilder = struct {
     items: [3][]const u8 = undefined,
     item_count: u8 = 0,
     kind_storage: [limits.tag_item_bytes_max]u8 = undefined,
 
-    pub fn as_event_tag(self: *const BuiltTag) nip01_event.EventTag {
+    pub fn as_event_tag(self: *const TagBuilder) nip01_event.EventTag {
         std.debug.assert(self.item_count > 0);
         std.debug.assert(self.item_count <= self.items.len);
 
@@ -150,7 +150,7 @@ pub fn external_id_matches_kind(kind_text: []const u8, value: []const u8) bool {
 
 /// Builds a bounded canonical NIP-73 `i` tag.
 pub fn external_id_build_i_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     external_id: *const ExternalId,
 ) ExternalIdError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -172,7 +172,7 @@ pub fn external_id_build_i_tag(
 
 /// Builds a bounded canonical NIP-73 `k` tag.
 pub fn external_id_build_k_tag(
-    output: *BuiltTag,
+    output: *TagBuilder,
     kind: ExternalIdKind,
 ) ExternalIdError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
@@ -306,8 +306,8 @@ test "external kind parse format and match stay deterministic" {
 }
 
 test "external id tag builders emit canonical tag names" {
-    var built_i: BuiltTag = .{};
-    var built_k: BuiltTag = .{};
+    var built_i: TagBuilder = .{};
+    var built_k: TagBuilder = .{};
     const external_id = ExternalId{
         .kind = .podcast_episode,
         .value = "podcast:item:guid:d98d189b-dc7b-45b1-8720-d4b98690f31f",
@@ -334,7 +334,7 @@ test "external id parse rejects malformed value hint and kind" {
     try std.testing.expectError(error.InvalidValue, external_id_parse("bitcoin::tx:", null));
     try std.testing.expectError(error.InvalidValue, external_id_parse("Bitcoin:tx:abcd", null));
 
-    var built: BuiltTag = .{};
+    var built: TagBuilder = .{};
     const mismatched = ExternalId{
         .kind = .podcast_episode,
         .value = "podcast:guid:feed-guid",
