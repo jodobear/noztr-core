@@ -351,7 +351,7 @@ test "root exports limits and error namespaces" {
     try std.testing.expect(@TypeOf(nip51_lists.TagBuilder) == type);
     try std.testing.expect(@TypeOf(nip51_lists.BookmarkBuilderItem) == type);
     try std.testing.expect(@TypeOf(nip51_lists.ListItem) == type);
-    try std.testing.expect(@TypeOf(nip51_lists.PrivateListInfo) == type);
+    try std.testing.expect(@TypeOf(nip51_lists.PrivateList) == type);
     try std.testing.expect(@TypeOf(nip46_remote_signing.ConnectParams) == type);
     try std.testing.expect(@TypeOf(nip46_remote_signing.PubkeyTextParams) == type);
     try std.testing.expect(@TypeOf(nip46_remote_signing.RequestBuilder) == type);
@@ -422,17 +422,17 @@ test "root exports limits and error namespaces" {
     try std.testing.expect(@TypeOf(nip32_labeling.LabelEventInfo) == type);
     try std.testing.expect(@TypeOf(nip32_labeling.SelfLabelInfo) == type);
     try std.testing.expect(@TypeOf(nip32_labeling.TagBuilder) == type);
-    try std.testing.expect(@TypeOf(nip34_git.RepositoryAnnouncementInfo) == type);
-    try std.testing.expect(@TypeOf(nip34_git.RepositoryStateRef) == type);
-    try std.testing.expect(@TypeOf(nip34_git.RepositoryStateInfo) == type);
-    try std.testing.expect(@TypeOf(nip34_git.UserGraspListInfo) == type);
+    try std.testing.expect(@TypeOf(nip34_git.Announcement) == type);
+    try std.testing.expect(@TypeOf(nip34_git.StateRef) == type);
+    try std.testing.expect(@TypeOf(nip34_git.State) == type);
+    try std.testing.expect(@TypeOf(nip34_git.GraspList) == type);
     try std.testing.expect(@TypeOf(nip34_git.TagBuilder) == type);
     try std.testing.expect(@TypeOf(nip36_content_warning.ContentWarning) == type);
     try std.testing.expect(@TypeOf(nip36_content_warning.TagBuilder) == type);
     try std.testing.expect(@TypeOf(nip38_user_status.Status) == type);
     try std.testing.expect(@TypeOf(nip38_user_status.TagBuilder) == type);
     try std.testing.expect(@TypeOf(nip56_reporting.ReportType) == type);
-    try std.testing.expect(@TypeOf(nip56_reporting.ReportInfo) == type);
+    try std.testing.expect(@TypeOf(nip56_reporting.Report) == type);
     try std.testing.expect(@TypeOf(nip56_reporting.TagBuilder) == type);
     try std.testing.expect(@TypeOf(nip05_identity.Address) == type);
     try std.testing.expect(@TypeOf(nip05_identity.Profile) == type);
@@ -760,7 +760,7 @@ test "root exports limits and error namespaces" {
                 []const u8,
                 []nip51_lists.ListItem,
                 std.mem.Allocator,
-            ) nip51_lists.PrivateListError!nip51_lists.PrivateListInfo,
+            ) nip51_lists.PrivateListError!nip51_lists.PrivateList,
     );
     try std.testing.expect(
         @TypeOf(nip51_lists.list_private_extract_nip44) ==
@@ -770,7 +770,7 @@ test "root exports limits and error namespaces" {
                 *const [32]u8,
                 []nip51_lists.ListItem,
                 std.mem.Allocator,
-            ) nip51_lists.PrivateListError!nip51_lists.PrivateListInfo,
+            ) nip51_lists.PrivateListError!nip51_lists.PrivateList,
     );
     try std.testing.expect(
         @TypeOf(nip19_bech32.nip19_encode) ==
@@ -841,7 +841,7 @@ test "root exports limits and error namespaces" {
             fn (
                 *const nip01_event.Event,
                 []nip51_lists.ListItem,
-            ) nip51_lists.ListError!nip51_lists.ListInfo,
+            ) nip51_lists.ListError!nip51_lists.List,
     );
     try std.testing.expect(
         @TypeOf(nip51_lists.list_build_identifier_tag) ==

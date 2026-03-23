@@ -121,6 +121,13 @@ The current read-model cleanup also shortens several primary route-local extract
 - `noztr.nip17_private_messages.DmMessageInfo` -> `noztr.nip17_private_messages.Message`
 - `noztr.nip17_private_messages.FileMessageInfo` -> `noztr.nip17_private_messages.FileMessage`
 - `noztr.nip36_content_warning.ContentWarningInfo` -> `noztr.nip36_content_warning.ContentWarning`
+- `noztr.nip34_git.RepositoryAnnouncementInfo` -> `noztr.nip34_git.Announcement`
+- `noztr.nip34_git.RepositoryStateRef` -> `noztr.nip34_git.StateRef`
+- `noztr.nip34_git.RepositoryStateInfo` -> `noztr.nip34_git.State`
+- `noztr.nip34_git.UserGraspListInfo` -> `noztr.nip34_git.GraspList`
+- `noztr.nip51_lists.ListInfo` -> `noztr.nip51_lists.List`
+- `noztr.nip51_lists.PrivateListInfo` -> `noztr.nip51_lists.PrivateList`
+- `noztr.nip56_reporting.ReportInfo` -> `noztr.nip56_reporting.Report`
 - `noztr.nip64_chess_pgn.ChessPgnInfo` -> `noztr.nip64_chess_pgn.Pgn`
 - `noztr.nip71_video_events.TextTrackInfo` -> `noztr.nip71_video_events.TextTrack`
 - `noztr.nip71_video_events.OriginInfo` -> `noztr.nip71_video_events.Origin`

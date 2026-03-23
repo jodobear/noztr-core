@@ -24,6 +24,13 @@ For the public versioning policy, see
   - `DmMessageInfo` -> `Message`
   - `FileMessageInfo` -> `FileMessage`
   - `ContentWarningInfo` -> `ContentWarning`
+  - `RepositoryAnnouncementInfo` -> `Announcement`
+  - `RepositoryStateRef` -> `StateRef`
+  - `RepositoryStateInfo` -> `State`
+  - `UserGraspListInfo` -> `GraspList`
+  - `ListInfo` -> `List`
+  - `PrivateListInfo` -> `PrivateList`
+  - `ReportInfo` -> `Report`
   - `ChessPgnInfo` -> `Pgn`
   - `TextTrackInfo` -> `TextTrack`
   - `OriginInfo` -> `Origin`

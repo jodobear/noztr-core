@@ -102,13 +102,13 @@ pub const ListItem = union(enum) {
     emoji: ListEmoji,
 };
 
-pub const ListInfo = struct {
+pub const List = struct {
     kind: ListKind,
     metadata: ListMetadata = .{},
     item_count: u16,
 };
 
-pub const PrivateListInfo = struct {
+pub const PrivateList = struct {
     kind: ListKind,
     item_count: u16,
     plaintext_json: []const u8,
@@ -192,12 +192,12 @@ pub fn list_is_supported(event: *const nip01_event.Event) bool {
 /// - Only public tag-carried list items are extracted here.
 /// - Encrypted private list content in `event.content` is intentionally out of scope for this
 ///   strict Wave 1 helper and is ignored by this function.
-pub fn list_extract(event: *const nip01_event.Event, out: []ListItem) ListError!ListInfo {
+pub fn list_extract(event: *const nip01_event.Event, out: []ListItem) ListError!List {
     std.debug.assert(@intFromPtr(event) != 0);
     std.debug.assert(out.len <= std.math.maxInt(u16));
 
     const kind = list_kind_classify(event.kind) orelse return error.UnsupportedListKind;
-    var info = ListInfo{ .kind = kind, .item_count = 0 };
+    var info = List{ .kind = kind, .item_count = 0 };
     var index: usize = 0;
     while (index < event.tags.len) : (index += 1) {
         const tag = event.tags[index];
@@ -315,7 +315,7 @@ pub fn list_private_extract_json(
     input_json: []const u8,
     out: []ListItem,
     scratch: std.mem.Allocator,
-) PrivateListError!PrivateListInfo {
+) PrivateListError!PrivateList {
     std.debug.assert(event_kind <= limits.kind_max);
     std.debug.assert(out.len <= std.math.maxInt(u16));
 
@@ -330,7 +330,7 @@ pub fn list_private_extract_nip44(
     author_private_key: *const [32]u8,
     out: []ListItem,
     scratch: std.mem.Allocator,
-) PrivateListError!PrivateListInfo {
+) PrivateListError!PrivateList {
     std.debug.assert(@intFromPtr(event) != 0);
     std.debug.assert(@intFromPtr(author_private_key) != 0);
 
@@ -393,12 +393,12 @@ fn list_private_extract_json_kind(
     input_json: []const u8,
     out: []ListItem,
     scratch: std.mem.Allocator,
-) PrivateListError!PrivateListInfo {
+) PrivateListError!PrivateList {
     std.debug.assert(@intFromEnum(kind) <= @intFromEnum(ListKind.emoji_set));
     std.debug.assert(out.len <= std.math.maxInt(u16));
 
     const root = try parse_private_json_root(input_json, scratch);
-    var info = PrivateListInfo{ .kind = kind, .item_count = 0, .plaintext_json = input_json };
+    var info = PrivateList{ .kind = kind, .item_count = 0, .plaintext_json = input_json };
     for (root.array.items) |tag_value| {
         const item = parse_private_json_tag(kind, tag_value) catch |err| switch (err) {
             error.UnexpectedTag => continue,
@@ -1120,7 +1120,7 @@ fn expect_list_success(
     out: []ListItem,
     expected_kind: ListKind,
     expected_count: u16,
-) !ListInfo {
+) !List {
     std.debug.assert(@intFromPtr(event) != 0);
     std.debug.assert(out.len <= std.math.maxInt(u16));
 

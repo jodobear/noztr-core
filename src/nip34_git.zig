@@ -32,7 +32,7 @@ pub const GitError = error{
     BufferTooSmall,
 };
 
-pub const RepositoryAnnouncementInfo = struct {
+pub const Announcement = struct {
     identifier: []const u8,
     name: ?[]const u8 = null,
     description: ?[]const u8 = null,
@@ -45,18 +45,18 @@ pub const RepositoryAnnouncementInfo = struct {
     topic_count: u16 = 0,
 };
 
-pub const RepositoryStateRef = struct {
+pub const StateRef = struct {
     name: []const u8,
     commit_id: []const u8,
 };
 
-pub const RepositoryStateInfo = struct {
+pub const State = struct {
     identifier: []const u8,
     head_ref: ?[]const u8 = null,
     ref_count: u16 = 0,
 };
 
-pub const UserGraspListInfo = struct {
+pub const GraspList = struct {
     server_count: u16 = 0,
 };
 
@@ -81,14 +81,14 @@ pub fn repository_announcement_extract(
     out_relays: [][]const u8,
     out_maintainers: [][32]u8,
     out_topics: [][]const u8,
-) GitError!RepositoryAnnouncementInfo {
+) GitError!Announcement {
     std.debug.assert(@intFromPtr(event) != 0);
     std.debug.assert(out_web.len <= limits.tags_max);
 
     if (event.kind != repository_announcement_kind) return error.InvalidRepositoryAnnouncementKind;
 
     var identifier: ?[]const u8 = null;
-    var info = RepositoryAnnouncementInfo{ .identifier = undefined };
+    var info = Announcement{ .identifier = undefined };
     for (event.tags) |tag| {
         try apply_announcement_tag(tag, &identifier, &info, out_web, out_clone, out_relays, out_maintainers, out_topics);
     }
@@ -99,15 +99,15 @@ pub fn repository_announcement_extract(
 /// Extracts bounded repository state from a `kind:30618` event.
 pub fn repository_state_extract(
     event: *const nip01_event.Event,
-    out_refs: []RepositoryStateRef,
-) GitError!RepositoryStateInfo {
+    out_refs: []StateRef,
+) GitError!State {
     std.debug.assert(@intFromPtr(event) != 0);
     std.debug.assert(out_refs.len <= limits.tags_max);
 
     if (event.kind != repository_state_kind) return error.InvalidRepositoryStateKind;
 
     var identifier: ?[]const u8 = null;
-    var info = RepositoryStateInfo{ .identifier = undefined };
+    var info = State{ .identifier = undefined };
     for (event.tags) |tag| {
         try apply_state_tag(tag, &identifier, &info, out_refs);
     }
@@ -119,13 +119,13 @@ pub fn repository_state_extract(
 pub fn user_grasp_list_extract(
     event: *const nip01_event.Event,
     out_servers: [][]const u8,
-) GitError!UserGraspListInfo {
+) GitError!GraspList {
     std.debug.assert(@intFromPtr(event) != 0);
     std.debug.assert(out_servers.len <= limits.tags_max);
 
     if (event.kind != user_grasp_list_kind) return error.InvalidUserGraspListKind;
 
-    var info = UserGraspListInfo{};
+    var info = GraspList{};
     for (event.tags) |tag| {
         if (tag.items.len == 0) continue;
         if (!std.mem.eql(u8, tag.items[0], "g")) continue;
@@ -299,7 +299,7 @@ pub fn repository_build_grasp_servers_tag(
 fn apply_announcement_tag(
     tag: nip01_event.EventTag,
     identifier: *?[]const u8,
-    info: *RepositoryAnnouncementInfo,
+    info: *Announcement,
     out_web: [][]const u8,
     out_clone: [][]const u8,
     out_relays: [][]const u8,
@@ -325,8 +325,8 @@ fn apply_announcement_tag(
 fn apply_state_tag(
     tag: nip01_event.EventTag,
     identifier: *?[]const u8,
-    info: *RepositoryStateInfo,
-    out_refs: []RepositoryStateRef,
+    info: *State,
+    out_refs: []StateRef,
 ) GitError!void {
     std.debug.assert(tag.items.len <= limits.tag_items_max);
     std.debug.assert(@intFromPtr(info) != 0);
@@ -386,7 +386,7 @@ fn append_url_values(
 
 fn append_maintainers(
     tag: nip01_event.EventTag,
-    info: *RepositoryAnnouncementInfo,
+    info: *Announcement,
     out: [][32]u8,
 ) GitError!void {
     std.debug.assert(tag.items.len <= limits.tag_items_max);
@@ -402,7 +402,7 @@ fn append_maintainers(
 
 fn append_topic(
     tag: nip01_event.EventTag,
-    info: *RepositoryAnnouncementInfo,
+    info: *Announcement,
     out: [][]const u8,
 ) GitError!void {
     std.debug.assert(tag.items.len <= limits.tag_items_max);
@@ -416,7 +416,7 @@ fn append_topic(
     info.topic_count += 1;
 }
 
-fn apply_euc_tag(tag: nip01_event.EventTag, info: *RepositoryAnnouncementInfo) GitError!void {
+fn apply_euc_tag(tag: nip01_event.EventTag, info: *Announcement) GitError!void {
     std.debug.assert(tag.items.len <= limits.tag_items_max);
     std.debug.assert(@intFromPtr(info) != 0);
 
@@ -428,7 +428,7 @@ fn apply_euc_tag(tag: nip01_event.EventTag, info: *RepositoryAnnouncementInfo) G
     };
 }
 
-fn apply_head_tag(tag: nip01_event.EventTag, info: *RepositoryStateInfo) GitError!void {
+fn apply_head_tag(tag: nip01_event.EventTag, info: *State) GitError!void {
     std.debug.assert(tag.items.len <= limits.tag_items_max);
     std.debug.assert(@intFromPtr(info) != 0);
 
@@ -557,7 +557,7 @@ test "NIP-34 extracts repository state refs" {
         .content = "",
         .sig = [_]u8{0x32} ** 64,
     };
-    var refs: [1]RepositoryStateRef = undefined;
+    var refs: [1]StateRef = undefined;
 
     const info = try repository_state_extract(&event, refs[0..]);
 

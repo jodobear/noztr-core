@@ -56,7 +56,7 @@ pub const BlobReportTarget = struct {
     report_type: ReportType,
 };
 
-pub const ReportInfo = struct {
+pub const Report = struct {
     content: []const u8,
     pubkey_target: PubkeyReportTarget,
     event_target: ?EventReportTarget = null,
@@ -80,7 +80,7 @@ pub const TagBuilder = struct {
 pub fn report_extract(
     event: *const nip01_event.Event,
     out_server_urls: [][]const u8,
-) ReportError!ReportInfo {
+) ReportError!Report {
     std.debug.assert(@intFromPtr(event) != 0);
     std.debug.assert(out_server_urls.len <= limits.tags_max);
 
