@@ -336,7 +336,8 @@ test "root exports limits and error namespaces" {
     try std.testing.expect(@TypeOf(nip21_uri.Reference) == type);
     try std.testing.expect(@TypeOf(nip02_contacts.ContactEntry) == type);
     try std.testing.expect(@TypeOf(nip65_relays.RelayPermission) == type);
-    try std.testing.expect(@TypeOf(nip10_threads.ThreadInfo) == type);
+    try std.testing.expect(@TypeOf(nip10_threads.Reference) == type);
+    try std.testing.expect(@TypeOf(nip10_threads.Thread) == type);
     try std.testing.expect(@TypeOf(nip28_public_chat.ChannelMetadata) == type);
     try std.testing.expect(@TypeOf(nip28_public_chat.Reference) == type);
     try std.testing.expect(@TypeOf(nip28_public_chat.Update) == type);
@@ -380,9 +381,9 @@ test "root exports limits and error namespaces" {
     try std.testing.expect(@TypeOf(nip47_wallet_connect.Notification) == type);
     try std.testing.expect(@TypeOf(nip23_long_form.LongFormMetadata) == type);
     try std.testing.expect(@TypeOf(nip23_long_form.TagBuilder) == type);
-    try std.testing.expect(@TypeOf(nipc0_code_snippets.LicenseInfo) == type);
-    try std.testing.expect(@TypeOf(nipc0_code_snippets.RepoReference) == type);
-    try std.testing.expect(@TypeOf(nipc0_code_snippets.CodeSnippetInfo) == type);
+    try std.testing.expect(@TypeOf(nipc0_code_snippets.License) == type);
+    try std.testing.expect(@TypeOf(nipc0_code_snippets.RepoRef) == type);
+    try std.testing.expect(@TypeOf(nipc0_code_snippets.Snippet) == type);
     try std.testing.expect(@TypeOf(nipc0_code_snippets.TagBuilder) == type);
     try std.testing.expect(@TypeOf(nip64_chess_pgn.Pgn) == type);
     try std.testing.expect(@TypeOf(nip64_chess_pgn.TagBuilder) == type);
@@ -422,8 +423,8 @@ test "root exports limits and error namespaces" {
     try std.testing.expect(@TypeOf(nip32_labeling.LabelNamespace) == type);
     try std.testing.expect(@TypeOf(nip32_labeling.Label) == type);
     try std.testing.expect(@TypeOf(nip32_labeling.LabelTarget) == type);
-    try std.testing.expect(@TypeOf(nip32_labeling.LabelEventInfo) == type);
-    try std.testing.expect(@TypeOf(nip32_labeling.SelfLabelInfo) == type);
+    try std.testing.expect(@TypeOf(nip32_labeling.LabelEvent) == type);
+    try std.testing.expect(@TypeOf(nip32_labeling.SelfLabel) == type);
     try std.testing.expect(@TypeOf(nip32_labeling.TagBuilder) == type);
     try std.testing.expect(@TypeOf(nip34_git.Announcement) == type);
     try std.testing.expect(@TypeOf(nip34_git.StateRef) == type);
@@ -814,8 +815,8 @@ test "root exports limits and error namespaces" {
         @TypeOf(nip10_threads.thread_extract) ==
             fn (
                 *const nip01_event.Event,
-                []nip10_threads.ThreadReference,
-            ) nip10_threads.ThreadError!nip10_threads.ThreadInfo,
+                []nip10_threads.Reference,
+            ) nip10_threads.ThreadError!nip10_threads.Thread,
     );
     try std.testing.expect(
         @TypeOf(nip18_reposts.repost_parse) ==

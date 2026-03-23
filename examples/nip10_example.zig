@@ -20,7 +20,7 @@ test "NIP-10 example: extract root and reply references from text-note tags" {
         .{ .items = reply_items[0..] },
     };
     const event = common.simple_event(1, [_]u8{0x10} ** 32, "reply", tags[0..]);
-    var mentions: [2]noztr.nip10_threads.ThreadReference = undefined;
+    var mentions: [2]noztr.nip10_threads.Reference = undefined;
 
     const thread = try noztr.nip10_threads.thread_extract(&event, mentions[0..]);
 

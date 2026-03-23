@@ -57,14 +57,14 @@ pub const LabelTarget = union(enum) {
     hashtag: []const u8,
 };
 
-pub const LabelEventInfo = struct {
+pub const LabelEvent = struct {
     content: []const u8,
     namespaces: []const LabelNamespace,
     labels: []const Label,
     targets: []const LabelTarget,
 };
 
-pub const SelfLabelInfo = struct {
+pub const SelfLabel = struct {
     kind: u32,
     content: []const u8,
     namespaces: []const LabelNamespace,
@@ -89,7 +89,7 @@ pub fn label_event_extract(
     out_namespaces: []LabelNamespace,
     out_labels: []Label,
     out_targets: []LabelTarget,
-) LabelingError!LabelEventInfo {
+) LabelingError!LabelEvent {
     std.debug.assert(@intFromPtr(event) != 0);
     std.debug.assert(out_namespaces.len <= limits.tags_max);
 
@@ -128,7 +128,7 @@ pub fn self_labels_extract(
     event: *const nip01_event.Event,
     out_namespaces: []LabelNamespace,
     out_labels: []Label,
-) LabelingError!SelfLabelInfo {
+) LabelingError!SelfLabel {
     std.debug.assert(@intFromPtr(event) != 0);
     std.debug.assert(out_labels.len <= limits.tags_max);
 

@@ -25,20 +25,20 @@ pub const ThreadMarker = enum {
     reply,
 };
 
-pub const ThreadReference = struct {
+pub const Reference = struct {
     event_id: [32]u8,
     relay_hint: ?[]const u8 = null,
     author_pubkey: ?[32]u8 = null,
 };
 
-pub const ThreadInfo = struct {
-    root: ?ThreadReference = null,
-    reply: ?ThreadReference = null,
+pub const Thread = struct {
+    root: ?Reference = null,
+    reply: ?Reference = null,
     mention_count: u16 = 0,
 };
 
 const ParsedThreadTag = struct {
-    reference: ThreadReference,
+    reference: Reference,
     kind: ThreadTagKind = .unmarked,
 };
 
@@ -55,12 +55,12 @@ const TagTail = struct {
 };
 
 const ThreadScan = struct {
-    info: ThreadInfo = .{},
+    info: Thread = .{},
     saw_root_or_reply: bool = false,
     explicit_mention_count: u16 = 0,
     unmarked_count: u16 = 0,
-    first_unmarked: ?ThreadReference = null,
-    last_unmarked: ?ThreadReference = null,
+    first_unmarked: ?Reference = null,
+    last_unmarked: ?Reference = null,
 };
 
 /// Parses a NIP-10 thread marker token.
@@ -83,8 +83,8 @@ pub fn thread_marker_parse(marker: []const u8) error{InvalidMarker}!ThreadMarker
 /// Extracts strict NIP-10 thread references from a kind-1 text note into caller-owned mentions.
 pub fn thread_extract(
     event: *const nip01_event.Event,
-    mentions_out: []ThreadReference,
-) ThreadError!ThreadInfo {
+    mentions_out: []Reference,
+) ThreadError!Thread {
     std.debug.assert(@intFromPtr(event) != 0);
     std.debug.assert(mentions_out.len <= std.math.maxInt(u16));
 
@@ -101,9 +101,9 @@ pub fn thread_extract(
 }
 
 fn apply_marked_reference(
-    info: *ThreadInfo,
+    info: *Thread,
     marker: ThreadMarker,
-    reference: ThreadReference,
+    reference: Reference,
 ) ThreadError!void {
     std.debug.assert(@intFromPtr(info) != 0);
     std.debug.assert(@intFromEnum(marker) <= @intFromEnum(ThreadMarker.reply));
@@ -260,10 +260,10 @@ fn final_mention_count(scan: ThreadScan, output_len: usize) ThreadError!u16 {
 
 fn fill_explicit_mode(
     event: *const nip01_event.Event,
-    mentions_out: []ThreadReference,
+    mentions_out: []Reference,
     scan: ThreadScan,
     mention_count: u16,
-) ThreadError!ThreadInfo {
+) ThreadError!Thread {
     std.debug.assert(@intFromPtr(event) != 0);
     std.debug.assert(mention_count <= mentions_out.len);
 
@@ -289,10 +289,10 @@ fn fill_explicit_mode(
 
 fn fill_positional_mode(
     event: *const nip01_event.Event,
-    mentions_out: []ThreadReference,
+    mentions_out: []Reference,
     scan: ThreadScan,
     mention_count: u16,
-) ThreadError!ThreadInfo {
+) ThreadError!Thread {
     std.debug.assert(@intFromPtr(event) != 0);
     std.debug.assert(mention_count <= mentions_out.len);
 
@@ -399,7 +399,7 @@ test "thread extract marked root-only reply infers direct reply" {
     };
     const tags = [_]nip01_event.EventTag{.{ .items = root_tag[0..] }};
     const event = thread_event(tags[0..]);
-    var mentions: [1]ThreadReference = undefined;
+    var mentions: [1]Reference = undefined;
 
     const parsed = try thread_extract(&event, mentions[0..]);
 
@@ -439,7 +439,7 @@ test "thread extract marked tags keep unmarked mentions and empty hints absent" 
         .{ .items = reply_tag[0..] },
     };
     const event = thread_event(tags[0..]);
-    var mentions: [2]ThreadReference = undefined;
+    var mentions: [2]Reference = undefined;
 
     const parsed = try thread_extract(&event, mentions[0..]);
 
@@ -461,7 +461,7 @@ test "thread extract accepts 4-slot pubkey fallback in canonical thread referenc
         "",
         "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
     };
-    var mentions: [1]ThreadReference = undefined;
+    var mentions: [1]Reference = undefined;
 
     const parsed = try thread_extract(&thread_event(&.{.{ .items = widened_tag[0..] }}), mentions[0..]);
 
@@ -492,7 +492,7 @@ test "thread extract positional fallback resolves root mentions and reply" {
         .{ .items = reply_tag[0..] },
     };
     const event = thread_event(tags[0..]);
-    var mentions: [3]ThreadReference = undefined;
+    var mentions: [3]Reference = undefined;
 
     const parsed = try thread_extract(&event, mentions[0..]);
 
@@ -512,7 +512,7 @@ test "thread extract positional fallback with one e tag uses same root and reply
     };
     const tags = [_]nip01_event.EventTag{.{ .items = reply_tag[0..] }};
     const event = thread_event(tags[0..]);
-    var mentions: [1]ThreadReference = undefined;
+    var mentions: [1]Reference = undefined;
 
     const parsed = try thread_extract(&event, mentions[0..]);
 
@@ -531,7 +531,7 @@ test "thread extract handles legacy mention marker as mention-only reference" {
         "mention",
         "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
     };
-    var mentions: [1]ThreadReference = undefined;
+    var mentions: [1]Reference = undefined;
 
     const parsed = try thread_extract(&thread_event(&.{.{ .items = mention_tag[0..] }}), mentions[0..]);
 
@@ -554,7 +554,7 @@ test "thread extract rejects wrong kind and duplicate root tags" {
         .{ .items = root_tag[0..] },
     };
     const root_tags = [_]nip01_event.EventTag{.{ .items = root_tag[0..] }};
-    var out: [2]ThreadReference = undefined;
+    var out: [2]Reference = undefined;
 
     try std.testing.expectError(error.DuplicateRootTag, thread_extract(&thread_event(
         duplicate_root_tags[0..],
@@ -604,7 +604,7 @@ test "thread extract rejects malformed tags and output overflow" {
         .{ .items = good_tag[0..] },
         .{ .items = good_tag[0..] },
     };
-    var out: [1]ThreadReference = undefined;
+    var out: [1]Reference = undefined;
 
     try std.testing.expectError(
         error.InvalidEventId,

@@ -24,6 +24,8 @@ For the public versioning policy, see
   - `DmMessageInfo` -> `Message`
   - `FileMessageInfo` -> `FileMessage`
   - `MessageInfo` -> `Message` in `nip04`
+  - `ThreadReference` -> `Reference` in `nip10_threads`
+  - `ThreadInfo` -> `Thread`
   - `EmojiTagInfo` -> `EmojiTag`
   - `ContentWarningInfo` -> `ContentWarning`
   - `RepositoryAnnouncementInfo` -> `Announcement`
@@ -42,6 +44,8 @@ For the public versioning policy, see
   - `OriginInfo` -> `Origin`
   - `VideoInfo` -> `Video`
   - `CommentInfo` -> `Comment`
+  - `LabelEventInfo` -> `LabelEvent`
+  - `SelfLabelInfo` -> `SelfLabel`
   - `CommunityInfo` -> `Community`
   - `EventReference` -> `EventRef` in `nip72_moderated_communities`
   - `CommunityPostInfo` -> `Post`
@@ -67,6 +71,9 @@ For the public versioning policy, see
   - `WebBookmarkInfo` -> `Bookmark`
   - `BlossomServerListInfo` -> `ServerList`
   - `BlobReference` -> `BlobRef`
+  - `LicenseInfo` -> `License`
+  - `RepoReference` -> `RepoRef`
+  - `CodeSnippetInfo` -> `Snippet`
 - migration guide:
   - [docs/guides/migrating-from-0.1.0-rc.3.md](docs/guides/migrating-from-0.1.0-rc.3.md)
 

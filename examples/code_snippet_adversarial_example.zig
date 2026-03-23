@@ -15,7 +15,7 @@ test "NIP-C0 adversarial example: reject malformed repository references" {
         "const x = 1;",
         tags[0..],
     );
-    var licenses: [0]noztr.nipc0_code_snippets.LicenseInfo = .{};
+    var licenses: [0]noztr.nipc0_code_snippets.License = .{};
     var dependencies: [0][]const u8 = .{};
     var repo_tag: noztr.nipc0_code_snippets.TagBuilder = .{};
 

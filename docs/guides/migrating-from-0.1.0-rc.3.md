@@ -121,6 +121,8 @@ The current read-model cleanup also shortens several primary route-local extract
 - `noztr.nip17_private_messages.DmMessageInfo` -> `noztr.nip17_private_messages.Message`
 - `noztr.nip17_private_messages.FileMessageInfo` -> `noztr.nip17_private_messages.FileMessage`
 - `noztr.nip04.MessageInfo` -> `noztr.nip04.Message`
+- `noztr.nip10_threads.ThreadReference` -> `noztr.nip10_threads.Reference`
+- `noztr.nip10_threads.ThreadInfo` -> `noztr.nip10_threads.Thread`
 - `noztr.nip30_custom_emoji.EmojiTagInfo` -> `noztr.nip30_custom_emoji.EmojiTag`
 - `noztr.nip36_content_warning.ContentWarningInfo` -> `noztr.nip36_content_warning.ContentWarning`
 - `noztr.nip34_git.RepositoryAnnouncementInfo` -> `noztr.nip34_git.Announcement`
@@ -153,6 +155,8 @@ The current read-model cleanup also shortens several primary route-local extract
 - `noztr.nip66_relay_discovery.RelayDiscoveryInfo` -> `noztr.nip66_relay_discovery.Discovery`
 - `noztr.nip66_relay_discovery.RelayMonitorInfo` -> `noztr.nip66_relay_discovery.Monitor`
 - `noztr.nip22_comments.CommentInfo` -> `noztr.nip22_comments.Comment`
+- `noztr.nip32_labeling.LabelEventInfo` -> `noztr.nip32_labeling.LabelEvent`
+- `noztr.nip32_labeling.SelfLabelInfo` -> `noztr.nip32_labeling.SelfLabel`
 - `noztr.nip29_relay_groups.GroupReference` -> `noztr.nip29_relay_groups.Reference`
 - `noztr.nip29_relay_groups.GroupAdminsInfo` -> `noztr.nip29_relay_groups.Admins`
 - `noztr.nip29_relay_groups.GroupMembersInfo` -> `noztr.nip29_relay_groups.Members`
@@ -164,5 +168,8 @@ The current read-model cleanup also shortens several primary route-local extract
 - `noztr.nipb0_web_bookmarking.WebBookmarkInfo` -> `noztr.nipb0_web_bookmarking.Bookmark`
 - `noztr.nipb7_blossom_servers.BlossomServerListInfo` -> `noztr.nipb7_blossom_servers.ServerList`
 - `noztr.nipb7_blossom_servers.BlobReference` -> `noztr.nipb7_blossom_servers.BlobRef`
+- `noztr.nipc0_code_snippets.LicenseInfo` -> `noztr.nipc0_code_snippets.License`
+- `noztr.nipc0_code_snippets.RepoReference` -> `noztr.nipc0_code_snippets.RepoRef`
+- `noztr.nipc0_code_snippets.CodeSnippetInfo` -> `noztr.nipc0_code_snippets.Snippet`
 
 These are naming cleanups only. They do not change parsing behavior, wire formats, or ownership.

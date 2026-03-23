@@ -26,7 +26,7 @@ pub const CodeSnippetError = error{
     BufferTooSmall,
 };
 
-pub const LicenseInfo = struct {
+pub const License = struct {
     identifier: []const u8,
     text_reference: ?[]const u8 = null,
 };
@@ -37,19 +37,19 @@ pub const RepoCoordinate = struct {
     relay_hint: ?[]const u8 = null,
 };
 
-pub const RepoReference = union(enum) {
+pub const RepoRef = union(enum) {
     url: []const u8,
     coordinate: RepoCoordinate,
 };
 
-pub const CodeSnippetInfo = struct {
+pub const Snippet = struct {
     content: []const u8,
     language: ?[]const u8 = null,
     name: ?[]const u8 = null,
     extension: ?[]const u8 = null,
     description: ?[]const u8 = null,
     runtime: ?[]const u8 = null,
-    repo: ?RepoReference = null,
+    repo: ?RepoRef = null,
     license_count: u16 = 0,
     dependency_count: u16 = 0,
 };
@@ -79,9 +79,9 @@ pub fn code_snippet_is_supported(event: *const nip01_event.Event) bool {
 /// Extracts bounded NIP-C0 metadata plus ordered licenses and dependencies.
 pub fn code_snippet_extract(
     event: *const nip01_event.Event,
-    out_licenses: []LicenseInfo,
+    out_licenses: []License,
     out_dependencies: [][]const u8,
-) CodeSnippetError!CodeSnippetInfo {
+) CodeSnippetError!Snippet {
     std.debug.assert(@intFromPtr(event) != 0);
     std.debug.assert(out_licenses.len <= std.math.maxInt(u16));
     std.debug.assert(out_dependencies.len <= std.math.maxInt(u16));
@@ -89,7 +89,7 @@ pub fn code_snippet_extract(
     if (event.kind != code_snippet_kind) return error.UnsupportedKind;
     try validate_content(event.content);
 
-    var info = CodeSnippetInfo{ .content = event.content };
+    var info = Snippet{ .content = event.content };
     for (event.tags) |tag| {
         try apply_tag(tag, &info, out_licenses, out_dependencies);
     }
@@ -147,7 +147,7 @@ pub fn code_snippet_build_runtime_tag(
 /// Builds a canonical `license` tag with an optional reference.
 pub fn code_snippet_build_license_tag(
     output: *TagBuilder,
-    license: LicenseInfo,
+    license: License,
 ) CodeSnippetError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
     std.debug.assert(output.items.len >= 3);
@@ -175,10 +175,10 @@ pub fn code_snippet_build_dependency_tag(
 /// Builds a canonical `repo` tag from either a URL or a NIP-34 repository coordinate.
 pub fn code_snippet_build_repo_tag(
     output: *TagBuilder,
-    repo: RepoReference,
+    repo: RepoRef,
 ) CodeSnippetError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
-    std.debug.assert(@sizeOf(RepoReference) > 0);
+    std.debug.assert(@sizeOf(RepoRef) > 0);
 
     output.items[0] = "repo";
     output.item_count = 2;
@@ -202,8 +202,8 @@ pub fn code_snippet_build_repo_tag(
 
 fn apply_tag(
     tag: nip01_event.EventTag,
-    info: *CodeSnippetInfo,
-    out_licenses: []LicenseInfo,
+    info: *Snippet,
+    out_licenses: []License,
     out_dependencies: [][]const u8,
 ) CodeSnippetError!void {
     std.debug.assert(@intFromPtr(info) != 0);
@@ -269,7 +269,7 @@ fn apply_optional_text_tag(
     field.* = parse_single_utf8_value(tag) catch return invalid_error;
 }
 
-fn apply_repo_tag(tag: nip01_event.EventTag, info: *CodeSnippetInfo) CodeSnippetError!void {
+fn apply_repo_tag(tag: nip01_event.EventTag, info: *Snippet) CodeSnippetError!void {
     std.debug.assert(tag.items.len <= limits.tag_items_max);
     std.debug.assert(@intFromPtr(info) != 0);
 
@@ -279,8 +279,8 @@ fn apply_repo_tag(tag: nip01_event.EventTag, info: *CodeSnippetInfo) CodeSnippet
 
 fn apply_license_tag(
     tag: nip01_event.EventTag,
-    info: *CodeSnippetInfo,
-    out_licenses: []LicenseInfo,
+    info: *Snippet,
+    out_licenses: []License,
 ) CodeSnippetError!void {
     std.debug.assert(tag.items.len <= limits.tag_items_max);
     std.debug.assert(@intFromPtr(info) != 0);
@@ -293,7 +293,7 @@ fn apply_license_tag(
 
 fn apply_dependency_tag(
     tag: nip01_event.EventTag,
-    info: *CodeSnippetInfo,
+    info: *Snippet,
     out_dependencies: [][]const u8,
 ) CodeSnippetError!void {
     std.debug.assert(tag.items.len <= limits.tag_items_max);
@@ -340,13 +340,13 @@ fn parse_single_utf8_value(tag: nip01_event.EventTag) error{InvalidValue}![]cons
     return parse_nonempty_utf8(tag.items[1]) catch return error.InvalidValue;
 }
 
-fn parse_license_tag(tag: nip01_event.EventTag) error{InvalidValue}!LicenseInfo {
+fn parse_license_tag(tag: nip01_event.EventTag) error{InvalidValue}!License {
     std.debug.assert(tag.items.len <= limits.tag_items_max);
     std.debug.assert(limits.tag_items_max >= 3);
 
     if (tag.items.len != 2 and tag.items.len != 3) return error.InvalidValue;
     const identifier = parse_nonempty_utf8(tag.items[1]) catch return error.InvalidValue;
-    var license = LicenseInfo{ .identifier = identifier };
+    var license = License{ .identifier = identifier };
     if (tag.items.len == 3) {
         license.text_reference = parse_nonempty_utf8(tag.items[2]) catch {
             return error.InvalidValue;
@@ -355,7 +355,7 @@ fn parse_license_tag(tag: nip01_event.EventTag) error{InvalidValue}!LicenseInfo 
     return license;
 }
 
-fn parse_repo_tag(tag: nip01_event.EventTag) error{InvalidValue}!RepoReference {
+fn parse_repo_tag(tag: nip01_event.EventTag) error{InvalidValue}!RepoRef {
     std.debug.assert(tag.items.len <= limits.tag_items_max);
     std.debug.assert(limits.tag_items_max >= 3);
 
@@ -370,7 +370,7 @@ fn parse_repo_tag(tag: nip01_event.EventTag) error{InvalidValue}!RepoReference {
 fn parse_repo_reference(
     text: []const u8,
     relay_hint: ?[]const u8,
-) error{InvalidValue}!RepoReference {
+) error{InvalidValue}!RepoRef {
     std.debug.assert(limits.tag_item_bytes_max <= limits.content_bytes_max);
 
     if (text.len > limits.content_bytes_max) return error.InvalidValue;
@@ -509,7 +509,7 @@ test "code snippet extract parses metadata with repo url licenses and dependenci
         .{ .items = &.{ "t", "ignored" } },
     };
     const event = test_event(code_snippet_kind, "pub fn main() void {}", tags[0..]);
-    var licenses: [2]LicenseInfo = undefined;
+    var licenses: [2]License = undefined;
     var dependencies: [2][]const u8 = undefined;
 
     const parsed = try code_snippet_extract(&event, licenses[0..], dependencies[0..]);
@@ -549,7 +549,7 @@ test "code snippet extract parses coordinate repo with optional relay hint" {
         } },
     };
     const event = test_event(code_snippet_kind, "fn main() {}", tags[0..]);
-    var licenses: [1]LicenseInfo = undefined;
+    var licenses: [1]License = undefined;
     var dependencies: [1][]const u8 = undefined;
 
     const parsed = try code_snippet_extract(&event, licenses[0..], dependencies[0..]);
@@ -569,7 +569,7 @@ test "code snippet builders emit canonical tag shapes" {
     var license_tag: TagBuilder = .{};
     var dependency_tag: TagBuilder = .{};
     var repo_tag: TagBuilder = .{};
-    const repo = RepoReference{ .coordinate = .{
+    const repo = RepoRef{ .coordinate = .{
         .pubkey = [_]u8{0xbb} ** 32,
         .identifier = "nostr",
         .relay_hint = "wss://relay.example.com",
@@ -619,7 +619,7 @@ test "code snippet builder and parser stay symmetric for canonical metadata" {
         }),
     };
     const event = test_event(code_snippet_kind, "const x = 1;", tags[0..]);
-    var licenses: [1]LicenseInfo = undefined;
+    var licenses: [1]License = undefined;
     var dependencies: [0][]const u8 = .{};
 
     const parsed = try code_snippet_extract(&event, licenses[0..], dependencies[0..]);
@@ -637,7 +637,7 @@ test "code snippet builder and parser stay symmetric for canonical metadata" {
 }
 
 test "code snippet extract rejects invalid and contradictory tag shapes" {
-    var licenses: [1]LicenseInfo = undefined;
+    var licenses: [1]License = undefined;
     var dependencies: [1][]const u8 = undefined;
     const duplicate_language = [_]nip01_event.EventTag{
         .{ .items = &.{ "l", "rust" } },
@@ -706,7 +706,7 @@ test "code snippet extract rejects invalid and contradictory tag shapes" {
 }
 
 test "code snippet extract separates invalid input from capacity failures" {
-    var no_licenses: [0]LicenseInfo = .{};
+    var no_licenses: [0]License = .{};
     var no_dependencies: [0][]const u8 = .{};
     const license_tags = [_]nip01_event.EventTag{
         .{ .items = &.{ "license", "MIT" } },
@@ -769,7 +769,7 @@ test "code snippet builders reject overlong metadata as invalid input" {
 }
 
 test "code snippet extract rejects unsupported kind and empty content" {
-    var licenses: [1]LicenseInfo = undefined;
+    var licenses: [1]License = undefined;
     var dependencies: [1][]const u8 = undefined;
 
     try std.testing.expectError(

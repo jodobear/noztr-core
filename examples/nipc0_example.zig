@@ -26,7 +26,7 @@ test "NIP-C0 example: extract code snippet metadata" {
         "const std = @import(\"std\");",
         tags[0..],
     );
-    var licenses: [1]noztr.nipc0_code_snippets.LicenseInfo = undefined;
+    var licenses: [1]noztr.nipc0_code_snippets.License = undefined;
     var dependencies: [1][]const u8 = undefined;
 
     const parsed = try noztr.nipc0_code_snippets.code_snippet_extract(
