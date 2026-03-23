@@ -29,7 +29,7 @@ test "NIP-28 example: channel metadata and linkage helpers" {
     );
     try std.testing.expectEqualStrings("root", root_tag.items[3]);
 
-    var built_json: noztr.nip28_public_chat.BuiltJson = .{};
-    const reason = try noztr.nip28_public_chat.channel_build_reason_json(&built_json, "spam");
+    var built_json: [64]u8 = undefined;
+    const reason = try noztr.nip28_public_chat.channel_build_reason_json(built_json[0..], "spam");
     try std.testing.expectEqualStrings("{\"reason\":\"spam\"}", reason);
 }

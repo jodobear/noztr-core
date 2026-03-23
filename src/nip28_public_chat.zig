@@ -86,10 +86,6 @@ pub const BuiltTag = struct {
     }
 };
 
-pub const BuiltJson = struct {
-    storage: [limits.content_bytes_max]u8 = undefined,
-};
-
 /// Parses bounded NIP-28 channel metadata JSON from kind-40 or kind-41 content.
 pub fn channel_metadata_parse_json(
     content: []const u8,
@@ -211,17 +207,17 @@ pub fn mute_user_extract(
 
 /// Builds canonical NIP-28 channel metadata JSON.
 pub fn channel_build_metadata_json(
-    output: *BuiltJson,
+    output: []u8,
     name: ?[]const u8,
     about: ?[]const u8,
     picture: ?[]const u8,
     relays: []const []const u8,
 ) PublicChatError![]const u8 {
-    std.debug.assert(@intFromPtr(output) != 0);
+    std.debug.assert(output.len <= limits.content_bytes_max);
     std.debug.assert(relays.len <= limits.tag_items_max);
 
     try validate_metadata_fields(name, about, picture, relays);
-    var stream = std.io.fixedBufferStream(output.storage[0..]);
+    var stream = std.io.fixedBufferStream(output);
     var writer = stream.writer();
     try write_metadata_json(&writer, name, about, picture, relays);
     return stream.getWritten();
@@ -289,15 +285,14 @@ pub fn channel_build_category_tag(
 
 /// Builds canonical moderation metadata JSON with an optional `reason`.
 pub fn channel_build_reason_json(
-    output: *BuiltJson,
+    output: []u8,
     reason: []const u8,
 ) PublicChatError![]const u8 {
-    std.debug.assert(@intFromPtr(output) != 0);
-    std.debug.assert(output.storage.len == limits.content_bytes_max);
+    std.debug.assert(output.len <= limits.content_bytes_max);
 
     if (reason.len > limits.content_bytes_max) return error.InvalidReasonJson;
     _ = parse_nonempty_utf8(reason) catch return error.InvalidReasonJson;
-    var stream = std.io.fixedBufferStream(output.storage[0..]);
+    var stream = std.io.fixedBufferStream(output);
     var writer = stream.writer();
     writer.writeAll("{\"reason\":") catch return error.BufferTooSmall;
     try write_json_string(&writer, reason);
@@ -725,8 +720,8 @@ test "NIP-28 extracts moderation targets and builds canonical helpers" {
     const hide_info = try hide_message_extract(&hide, arena.allocator());
     try std.testing.expectEqualStrings("spam", hide_info.reason.?);
 
-    var json: BuiltJson = .{};
-    const reason_json = try channel_build_reason_json(&json, "duplicate");
+    var json: [limits.content_bytes_max]u8 = undefined;
+    const reason_json = try channel_build_reason_json(json[0..], "duplicate");
     try std.testing.expectEqualStrings("{\"reason\":\"duplicate\"}", reason_json);
 
     var tag: BuiltTag = .{};

@@ -32,6 +32,10 @@ For the public versioning policy, see
   - `nip38_user_status`
   - `nip61_nutzaps`
   - `nip89_handlers`
+- removed pure storage-wrapper types where direct caller-owned `[]u8` buffers are clearer:
+  - `nip28_public_chat.BuiltJson`
+  - `nip71_video_events.BuiltField`
+  - `nip92_media_attachments.BuiltField`
 - downstream callers that reference those public types directly need to update symbol names
 - migration guide:
   - [docs/guides/migrating-from-0.1.0-rc.2.md](docs/guides/migrating-from-0.1.0-rc.2.md)

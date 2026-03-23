@@ -24,7 +24,8 @@ routes.
 The grouped route already carries the main context, so these names now prefer shorter role-based
 symbols instead of restating the full route in every type.
 
-This is a breaking change for downstream code that referenced the old public type names directly.
+These are breaking changes for downstream code that referenced the old public type names directly
+or called the affected builder helpers through the removed storage-wrapper types.
 
 ## Renamed Symbols
 
@@ -89,19 +90,46 @@ The goal is to reduce public-surface repetition and make the grouped routes easi
 - shorter role-based names are easier for LLMs to retrieve and reuse accurately
 - this keeps the obvious safe path more obvious without changing wire behavior
 
+## Removed Wrapper Types
+
+One wrapper-removal lane also dropped pure storage-wrapper types that added no semantic value.
+
+Use direct caller-owned output buffers now:
+
+- `noztr.nip28_public_chat.BuiltJson`
+  - removed
+  - call `channel_build_metadata_json` and `channel_build_reason_json` with `[]u8`
+- `noztr.nip71_video_events.BuiltField`
+  - removed
+  - call `video_build_duration_field` and `video_build_bitrate_field` with `[]u8`
+- `noztr.nip92_media_attachments.BuiltField`
+  - removed
+  - call `imeta_build_field` with `[]u8`
+
+Example migration shape:
+
+- before:
+  - `var field: BuiltField = .{};`
+  - `const text = try imeta_build_field(&field, "m", "image/jpeg");`
+- after:
+  - `var field: [128]u8 = undefined;`
+  - `const text = try imeta_build_field(field[0..], "m", "image/jpeg");`
+
 ## Downstream Guidance
 
 If your project depends on `noztr-core`:
 
 1. update any explicit type references to the names above
-2. update wrappers, re-exports, and examples that teach the old names
-3. rerun your normal build/test gates
-4. refresh any generated symbol indexes or local LLM context packs that still reference the old
+2. update builder call sites that still pass removed storage-wrapper structs
+3. update wrappers, re-exports, and examples that teach the old names
+4. rerun your normal build/test gates
+5. refresh any generated symbol indexes or local LLM context packs that still reference the old
    names
 
 ## Scope
 
-These changes rename public types only. They do not change:
+These changes rename public types and remove a small set of pure storage wrappers. They do not
+change:
 
 - wire formats
 - ownership model

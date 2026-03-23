@@ -127,10 +127,6 @@ pub const BuiltTag = struct {
     }
 };
 
-pub const BuiltField = struct {
-    storage: [limits.tag_item_bytes_max]u8 = undefined,
-};
-
 const VariantState = struct {
     saw_url: bool = false,
     saw_metadata: bool = false,
@@ -335,27 +331,27 @@ pub fn video_build_origin_tag(
 }
 
 pub fn video_build_duration_field(
-    output: *BuiltField,
+    output: []u8,
     duration_seconds: f64,
 ) VideoEventError![]const u8 {
-    std.debug.assert(@intFromPtr(output) != 0);
+    std.debug.assert(output.len <= limits.tag_item_bytes_max);
     std.debug.assert(duration_seconds >= 0);
 
     if (!std.math.isFinite(duration_seconds)) return error.InvalidVariantDurationField;
     if (duration_seconds < 0) return error.InvalidVariantDurationField;
-    return std.fmt.bufPrint(output.storage[0..], "duration {d}", .{duration_seconds}) catch {
+    return std.fmt.bufPrint(output, "duration {d}", .{duration_seconds}) catch {
         return error.BufferTooSmall;
     };
 }
 
 pub fn video_build_bitrate_field(
-    output: *BuiltField,
+    output: []u8,
     bitrate: u64,
 ) VideoEventError![]const u8 {
-    std.debug.assert(@intFromPtr(output) != 0);
+    std.debug.assert(output.len <= limits.tag_item_bytes_max);
     std.debug.assert(bitrate <= std.math.maxInt(u64));
 
-    return std.fmt.bufPrint(output.storage[0..], "bitrate {d}", .{bitrate}) catch {
+    return std.fmt.bufPrint(output, "bitrate {d}", .{bitrate}) catch {
         return error.BufferTooSmall;
     };
 }
@@ -984,10 +980,10 @@ test "NIP-71 rejects duplicate titles" {
 
 test "NIP-71 builds title and duration helpers" {
     var title_built: BuiltTag = .{};
-    var field_built: BuiltField = .{};
+    var field_built: [limits.tag_item_bytes_max]u8 = undefined;
 
     const title = try video_build_title_tag(&title_built, "Episode");
-    const duration = try video_build_duration_field(&field_built, 12.5);
+    const duration = try video_build_duration_field(field_built[0..], 12.5);
 
     try std.testing.expectEqualStrings("title", title.items[0]);
     try std.testing.expectEqualStrings("Episode", title.items[1]);

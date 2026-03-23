@@ -371,7 +371,8 @@ These are the quickest symbol-level routes into the modules most downstream user
 - `video_build_*`
   - build canonical identifier, title, published-at, text-track, segment, participant, and origin tags
 - `video_build_duration_field` / `video_build_bitrate_field`
-  - build the NIP-71-specific `imeta` field items for video duration and bitrate
+  - build the NIP-71-specific `imeta` field items for video duration and bitrate into
+    caller-owned output buffers
 - start example:
   - [nip71_example.zig](../../examples/nip71_example.zig)
 

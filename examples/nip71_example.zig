@@ -30,7 +30,7 @@ test "NIP-71 example: extract video metadata and build variant fields" {
     var hashtags: [0][]const u8 = .{};
     var references: [0][]const u8 = .{};
     var origins: [0]noztr.nip71_video_events.OriginInfo = .{};
-    var duration_field: noztr.nip71_video_events.BuiltField = .{};
+    var duration_field: [64]u8 = undefined;
 
     const info = try noztr.nip71_video_events.video_extract(
         &event,
@@ -44,7 +44,7 @@ test "NIP-71 example: extract video metadata and build variant fields" {
         references[0..],
         origins[0..],
     );
-    const duration = try noztr.nip71_video_events.video_build_duration_field(&duration_field, 18.25);
+    const duration = try noztr.nip71_video_events.video_build_duration_field(duration_field[0..], 18.25);
 
     try std.testing.expectEqual(noztr.nip71_video_events.VideoFlavor.short, info.flavor);
     try std.testing.expectEqual(@as(u16, 1), info.variant_count);

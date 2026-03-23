@@ -2,21 +2,21 @@ const std = @import("std");
 const noztr = @import("noztr");
 
 test "NIP-92 example: extract imeta and match it against content" {
-    var url_field: noztr.nip92_media_attachments.BuiltField = .{};
-    var mime_field: noztr.nip92_media_attachments.BuiltField = .{};
-    var hash_field: noztr.nip92_media_attachments.BuiltField = .{};
+    var url_field: [128]u8 = undefined;
+    var mime_field: [128]u8 = undefined;
+    var hash_field: [128]u8 = undefined;
     var built_tag_storage: noztr.nip92_media_attachments.BuiltTag = .{};
     const built_tag = try noztr.nip92_media_attachments.imeta_build_tag(
         &built_tag_storage,
         &.{
             try noztr.nip92_media_attachments.imeta_build_field(
-                &url_field,
+                url_field[0..],
                 "url",
                 "https://example.com/cat.jpg",
             ),
-            try noztr.nip92_media_attachments.imeta_build_field(&mime_field, "m", "image/jpeg"),
+            try noztr.nip92_media_attachments.imeta_build_field(mime_field[0..], "m", "image/jpeg"),
             try noztr.nip92_media_attachments.imeta_build_field(
-                &hash_field,
+                hash_field[0..],
                 "x",
                 "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
             ),

@@ -60,10 +60,6 @@ pub const ImetaInfo = struct {
     fallback_count: u16 = 0,
 };
 
-pub const BuiltField = struct {
-    storage: [limits.tag_item_bytes_max]u8 = undefined,
-};
-
 pub const BuiltTag = struct {
     items: [limits.tag_items_max][]const u8 = undefined,
     item_count: u8 = 0,
@@ -156,15 +152,15 @@ fn is_content_url_boundary(byte: u8, side: BoundarySide) bool {
 
 /// Builds one canonical `imeta` field item such as `url https://...` or `m image/jpeg`.
 pub fn imeta_build_field(
-    output: *BuiltField,
+    output: []u8,
     name: []const u8,
     value: []const u8,
 ) MediaAttachmentError![]const u8 {
-    std.debug.assert(@intFromPtr(output) != 0);
+    std.debug.assert(output.len <= limits.tag_item_bytes_max);
     std.debug.assert(name.len < limits.tag_item_bytes_max);
 
     try validate_field(name, value);
-    return std.fmt.bufPrint(output.storage[0..], "{s} {s}", .{ name, value }) catch {
+    return std.fmt.bufPrint(output, "{s} {s}", .{ name, value }) catch {
         return error.BufferTooSmall;
     };
 }
@@ -618,15 +614,15 @@ test "imeta extract rejects malformed or incomplete tags" {
 }
 
 test "imeta builders create canonical fields and tags" {
-    var url_field: BuiltField = .{};
-    var mime_field: BuiltField = .{};
-    var hash_field: BuiltField = .{};
+    var url_field: [limits.tag_item_bytes_max]u8 = undefined;
+    var mime_field: [limits.tag_item_bytes_max]u8 = undefined;
+    var hash_field: [limits.tag_item_bytes_max]u8 = undefined;
     var built_tag: BuiltTag = .{};
 
-    const url = try imeta_build_field(&url_field, "url", "https://example.com/cat.jpg");
-    const mime = try imeta_build_field(&mime_field, "m", "image/jpeg");
+    const url = try imeta_build_field(url_field[0..], "url", "https://example.com/cat.jpg");
+    const mime = try imeta_build_field(mime_field[0..], "m", "image/jpeg");
     const hash = try imeta_build_field(
-        &hash_field,
+        hash_field[0..],
         "x",
         "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
     );
@@ -642,7 +638,7 @@ test "imeta builders create canonical fields and tags" {
 
     try std.testing.expectError(
         error.InvalidImetaTag,
-        imeta_build_field(&url_field, "unknown", "value"),
+        imeta_build_field(url_field[0..], "unknown", "value"),
     );
 }
 
