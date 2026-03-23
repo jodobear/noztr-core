@@ -27,7 +27,19 @@ symbols instead of restating the full route in every type.
 These are breaking changes for downstream code that referenced the old public type names directly
 or called the affected builder helpers through the removed storage-wrapper types.
 
+## Quick Path
+
+If your project depends on `noztr-core`:
+
+1. update explicit type references using the route-grouped map below
+2. update builder call sites that still pass removed storage-wrapper structs
+3. update any direct pattern matches on `nip46` / `nip86` response-result type names
+4. rerun your normal build/test gates
+5. refresh generated symbol indexes or local LLM context packs that still reference the old names
+
 ## Renamed Symbols
+
+### Core Routes
 
 Use these public names now:
 
@@ -47,6 +59,9 @@ Use these public names now:
 - `noztr.nip46_remote_signing.ClientUri` -> `noztr.nip46_remote_signing.Client`
 - `noztr.nip46_remote_signing.ConnectionUri` -> `noztr.nip46_remote_signing.Uri`
 - `noztr.nip46_remote_signing.DiscoveryInfo` -> `noztr.nip46_remote_signing.Discovery`
+
+### Metadata And Event Routes
+
 - `noztr.nip28_public_chat.ChannelReference` -> `noztr.nip28_public_chat.Reference`
 - `noztr.nip28_public_chat.ChannelUpdateInfo` -> `noztr.nip28_public_chat.Update`
 - `noztr.nip28_public_chat.ChannelMessageInfo` -> `noztr.nip28_public_chat.Message`
@@ -80,6 +95,9 @@ Use these public names now:
 - `noztr.nip89_handlers.RecommendationInfo` -> `noztr.nip89_handlers.Recommendation`
 - `noztr.nip89_handlers.HandlerInfo` -> `noztr.nip89_handlers.Handler`
 - `noztr.nip89_handlers.ClientTagInfo` -> `noztr.nip89_handlers.ClientTag`
+
+### Wallet Connect Route
+
 - `noztr.nip47_wallet_connect.ConnectionUri` -> `noztr.nip47_wallet_connect.Uri`
 - `noztr.nip47_wallet_connect.InfoEventInfo` -> `noztr.nip47_wallet_connect.InfoEvent`
 - `noztr.nip47_wallet_connect.ErrorInfo` -> `noztr.nip47_wallet_connect.ErrorDetail`
@@ -184,17 +202,6 @@ The result tags are unchanged:
 
 This is a shape cleanup only. Downstream callers that pattern-match `Response.result` should update
 the type name, but not the variant names.
-
-## Downstream Guidance
-
-If your project depends on `noztr-core`:
-
-1. update any explicit type references to the names above
-2. update builder call sites that still pass removed storage-wrapper structs
-3. update wrappers, re-exports, and examples that teach the old names
-4. rerun your normal build/test gates
-5. refresh any generated symbol indexes or local LLM context packs that still reference the old
-   names
 
 ## Scope
 
