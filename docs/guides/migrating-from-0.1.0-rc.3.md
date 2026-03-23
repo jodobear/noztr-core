@@ -11,19 +11,21 @@ canonical: true
 
 # Migrating From `0.1.0-rc.3`
 
-This guide covers the current builder-workspace cleanup after `v0.1.0-rc.3`.
+This guide covers the current public-surface cleanup after `v0.1.0-rc.3`.
 
 The current line is still pre-`1.0.0`, so clarity-driven public cleanup can still happen. This
-slice keeps the caller-owned builder pattern, but renames the generic workspace types so they read
-as current role names instead of past-tense storage artifacts.
+slice keeps the caller-owned builder pattern, but now covers both:
+
+- builder workspace renames such as `BuiltTag` -> `TagBuilder`
+- route-local read-model renames such as `*Info` / `*Reference` -> shorter role names
 
 ## Quick Path
 
 If your project depends on `noztr-core`:
 
 1. replace route-local `BuiltTag` references with `TagBuilder`
-2. replace `nip17_private_messages.BuiltFileMetadataTag` with `FileTagBuilder`
-3. replace `nip46_remote_signing.BuiltRequest` with `RequestBuilder`
+2. replace specialized builder names such as `BuiltFileMetadataTag` and `BuiltRequest`
+3. replace shorter route-local read models listed below
 4. rerun your normal build/test gates
 5. refresh generated symbol indexes or local LLM context packs that still point at the old names
 
@@ -94,8 +96,10 @@ Example:
 
 The grouped route already carries the protocol context.
 
-These types are caller-owned build workspaces, so `TagBuilder`, `FileTagBuilder`, and
-`RequestBuilder` say what they are more directly than `Built*` names do.
+Builder workspaces such as `TagBuilder`, `FileTagBuilder`, and `RequestBuilder` say what they are
+more directly than `Built*` names do. The same rule applies to read models: inside an already
+grouped route, `Message`, `Comment`, `Community`, `Reference`, or `Snippet` is usually clearer
+than repeating the route name in the type itself.
 
 This is a naming cleanup only. It does not change:
 
@@ -106,7 +110,7 @@ This is a naming cleanup only. It does not change:
 
 ## Scope
 
-This guide covers the builder-workspace rename slice only.
+This guide covers the cumulative post-`rc.3` public-surface rename cleanup.
 
 If you are also updating from older release candidates, apply the earlier migration guides first:
 
