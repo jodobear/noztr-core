@@ -37,7 +37,7 @@ pub const BadgeError = error{
     BufferTooSmall,
 };
 
-pub const ImageInfo = struct {
+pub const Image = struct {
     url: []const u8,
     dimensions: ?[]const u8 = null,
 };
@@ -53,7 +53,7 @@ pub const Definition = struct {
     identifier: []const u8,
     name: ?[]const u8 = null,
     description: ?[]const u8 = null,
-    image: ?ImageInfo = null,
+    image: ?Image = null,
     thumb_count: u16 = 0,
 };
 
@@ -98,7 +98,7 @@ pub const TagBuilder = struct {
 /// Extracts bounded badge-definition metadata from a kind-30009 event.
 pub fn badge_definition_extract(
     event: *const nip01_event.Event,
-    out_thumbs: []ImageInfo,
+    out_thumbs: []Image,
 ) BadgeError!Definition {
     std.debug.assert(@intFromPtr(event) != 0);
     std.debug.assert(out_thumbs.len <= limits.tags_max);
@@ -361,7 +361,7 @@ fn apply_definition_tag(
     tag: nip01_event.EventTag,
     identifier: *?[]const u8,
     info: *Definition,
-    out_thumbs: []ImageInfo,
+    out_thumbs: []Image,
 ) BadgeError!void {
     std.debug.assert(@intFromPtr(identifier) != 0);
     std.debug.assert(@intFromPtr(info) != 0);
@@ -419,7 +419,7 @@ fn parse_definition_image(tag: nip01_event.EventTag, info: *Definition) BadgeErr
 fn parse_definition_thumb(
     tag: nip01_event.EventTag,
     info: *Definition,
-    out_thumbs: []ImageInfo,
+    out_thumbs: []Image,
 ) BadgeError!void {
     std.debug.assert(tag.items.len <= limits.tag_items_max);
     std.debug.assert(@intFromPtr(info) != 0);
@@ -722,7 +722,7 @@ test "badge definition extract parses required and optional metadata" {
         .{ .items = &.{ "thumb", "https://example.com/thumb.png", "256x256" } },
     };
     const event = event_for_tags(badge_definition_kind, issuer, [_]u8{3} ** 32, tags[0..]);
-    var thumbs: [2]ImageInfo = undefined;
+    var thumbs: [2]Image = undefined;
 
     const parsed = try badge_definition_extract(&event, thumbs[0..]);
     try std.testing.expectEqualStrings("bravery", parsed.identifier);

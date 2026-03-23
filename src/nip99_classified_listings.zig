@@ -39,13 +39,13 @@ pub const ListingStatus = union(enum) {
     other: []const u8,
 };
 
-pub const PriceInfo = struct {
+pub const Price = struct {
     amount: []const u8,
     currency: []const u8,
     frequency: ?[]const u8 = null,
 };
 
-pub const ImageInfo = struct {
+pub const Image = struct {
     url: []const u8,
     dimensions: ?[]const u8 = null,
 };
@@ -58,7 +58,7 @@ pub const ListingMetadata = struct {
     summary: ?[]const u8 = null,
     published_at: ?u64 = null,
     location: ?[]const u8 = null,
-    price: ?PriceInfo = null,
+    price: ?Price = null,
     status: ?ListingStatus = null,
     geohash: ?[]const u8 = null,
     image_count: u16 = 0,
@@ -93,7 +93,7 @@ pub fn listing_kind_classify(kind: u32) ?ListingKind {
 /// Extracts bounded NIP-99 listing metadata, images, and ordered hashtags.
 pub fn listing_extract(
     event: *const nip01_event.Event,
-    out_images: []ImageInfo,
+    out_images: []Image,
     out_hashtags: [][]const u8,
 ) ClassifiedListingError!ListingMetadata {
     std.debug.assert(@intFromPtr(event) != 0);
@@ -186,7 +186,7 @@ pub fn listing_build_location_tag(
 /// Builds a listing `price` tag.
 pub fn listing_build_price_tag(
     output: *TagBuilder,
-    price: *const PriceInfo,
+    price: *const Price,
 ) ClassifiedListingError!nip01_event.EventTag {
     std.debug.assert(@intFromPtr(output) != 0);
     std.debug.assert(@intFromPtr(price) != 0);
@@ -269,7 +269,7 @@ fn apply_tag(
     tag: nip01_event.EventTag,
     identifier: *?[]const u8,
     metadata: *ListingMetadata,
-    out_images: []ImageInfo,
+    out_images: []Image,
     out_hashtags: [][]const u8,
 ) ClassifiedListingError!void {
     std.debug.assert(@intFromPtr(identifier) != 0);
@@ -357,7 +357,7 @@ fn apply_geohash_tag(tag: nip01_event.EventTag, metadata: *ListingMetadata) Clas
 fn apply_image_tag(
     tag: nip01_event.EventTag,
     metadata: *ListingMetadata,
-    out_images: []ImageInfo,
+    out_images: []Image,
 ) ClassifiedListingError!void {
     std.debug.assert(tag.items.len <= limits.tag_items_max);
     std.debug.assert(@intFromPtr(metadata) != 0);
@@ -385,7 +385,7 @@ fn apply_hashtag_tag(
     metadata.hashtag_count += 1;
 }
 
-fn parse_price(tag: nip01_event.EventTag) ClassifiedListingError!PriceInfo {
+fn parse_price(tag: nip01_event.EventTag) ClassifiedListingError!Price {
     std.debug.assert(tag.items.len <= limits.tag_items_max);
     std.debug.assert(limits.tag_items_max >= 4);
 
@@ -399,7 +399,7 @@ fn parse_price(tag: nip01_event.EventTag) ClassifiedListingError!PriceInfo {
     return .{ .amount = amount, .currency = currency, .frequency = frequency };
 }
 
-fn validate_price(price: *const PriceInfo) ClassifiedListingError!void {
+fn validate_price(price: *const Price) ClassifiedListingError!void {
     std.debug.assert(@intFromPtr(price) != 0);
     std.debug.assert(price.amount.len <= limits.tag_item_bytes_max);
 
@@ -615,7 +615,7 @@ test "listing extract parses bounded metadata images and hashtags" {
         .{ .items = &.{ "image", "https://example.com/bike.jpg", "800x600" } },
         .{ .items = &.{ "t", "cycling" } },
     };
-    var images: [2]ImageInfo = undefined;
+    var images: [2]Image = undefined;
     var hashtags: [2][]const u8 = undefined;
 
     const parsed = try listing_extract(&test_event(tags[0..], "bike details", 30402), images[0..], hashtags[0..]);
@@ -633,7 +633,7 @@ test "listing extract rejects malformed required and supported tags" {
     const missing_identifier = [_]nip01_event.EventTag{
         .{ .items = &.{ "title", "Road bike" } },
     };
-    var images: [0]ImageInfo = .{};
+    var images: [0]Image = .{};
     var hashtags: [0][]const u8 = .{};
 
     try std.testing.expectError(

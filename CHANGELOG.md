@@ -30,14 +30,19 @@ For the public versioning policy, see
   - `UserGraspListInfo` -> `GraspList`
   - `ListInfo` -> `List`
   - `PrivateListInfo` -> `PrivateList`
+  - `LiveActivityInfo` -> `Activity`
+  - `LiveChatInfo` -> `Chat`
   - `ReportInfo` -> `Report`
   - `ChessPgnInfo` -> `Pgn`
+  - `ImageInfo` -> `Image` in `nip58_badges`
   - `TextTrackInfo` -> `TextTrack`
   - `OriginInfo` -> `Origin`
   - `VideoInfo` -> `Video`
   - `AppDataInfo` -> `AppData`
   - `UrlReference` -> `UrlRef`
   - `HighlightInfo` -> `Highlight`
+  - `PriceInfo` -> `Price`
+  - `ImageInfo` -> `Image` in `nip99_classified_listings`
   - `ImetaInfo` -> `Imeta`
   - `ImageReference` -> `ImageRef`
   - `FileMetadataInfo` -> `Metadata`

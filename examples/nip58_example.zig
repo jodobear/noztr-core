@@ -8,7 +8,7 @@ test "NIP-58 example: extract badge definition metadata" {
         .{ .items = &.{ "name", "Bravery" } },
     };
     const event = common.simple_event(30009, [_]u8{0x58} ** 32, "", tags[0..]);
-    var thumbs: [1]noztr.nip58_badges.ImageInfo = undefined;
+    var thumbs: [1]noztr.nip58_badges.Image = undefined;
 
     const definition = try noztr.nip58_badges.badge_definition_extract(&event, thumbs[0..]);
 

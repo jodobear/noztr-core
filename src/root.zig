@@ -455,7 +455,7 @@ test "root exports limits and error namespaces" {
     try std.testing.expect(@TypeOf(nip37_drafts.DraftWrapPlaintextInfo) == type);
     try std.testing.expect(@TypeOf(nip37_drafts.PrivateRelayListInfo) == type);
     try std.testing.expect(@TypeOf(nip37_drafts.TagBuilder) == type);
-    try std.testing.expect(@TypeOf(nip58_badges.ImageInfo) == type);
+    try std.testing.expect(@TypeOf(nip58_badges.Image) == type);
     try std.testing.expect(@TypeOf(nip58_badges.DefinitionRef) == type);
     try std.testing.expect(@TypeOf(nip58_badges.Definition) == type);
     try std.testing.expect(@TypeOf(nip58_badges.BadgeAwardRecipient) == type);
@@ -475,8 +475,8 @@ test "root exports limits and error namespaces" {
     try std.testing.expect(@TypeOf(nip53_live_activities.LiveActivityParticipant) == type);
     try std.testing.expect(@TypeOf(nip53_live_activities.LiveActivityCoordinate) == type);
     try std.testing.expect(@TypeOf(nip53_live_activities.LiveChatReply) == type);
-    try std.testing.expect(@TypeOf(nip53_live_activities.LiveActivityInfo) == type);
-    try std.testing.expect(@TypeOf(nip53_live_activities.LiveChatInfo) == type);
+    try std.testing.expect(@TypeOf(nip53_live_activities.Activity) == type);
+    try std.testing.expect(@TypeOf(nip53_live_activities.Chat) == type);
     try std.testing.expect(@TypeOf(nip53_live_activities.TagBuilder) == type);
     try std.testing.expect(@TypeOf(nip54_wiki.ArticleRef) == type);
     try std.testing.expect(@TypeOf(nip54_wiki.EventRef) == type);
@@ -1010,7 +1010,7 @@ test "root exports limits and error namespaces" {
         @TypeOf(nip58_badges.badge_definition_extract) ==
             fn (
                 *const nip01_event.Event,
-                []nip58_badges.ImageInfo,
+                []nip58_badges.Image,
             ) nip58_badges.BadgeError!nip58_badges.Definition,
     );
     try std.testing.expect(

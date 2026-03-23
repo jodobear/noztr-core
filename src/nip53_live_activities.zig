@@ -69,7 +69,7 @@ pub const LiveChatReply = struct {
     relay_hint: ?[]const u8 = null,
 };
 
-pub const LiveActivityInfo = struct {
+pub const Activity = struct {
     identifier: []const u8,
     title: ?[]const u8 = null,
     summary: ?[]const u8 = null,
@@ -87,7 +87,7 @@ pub const LiveActivityInfo = struct {
     pinned_count: u16 = 0,
 };
 
-pub const LiveChatInfo = struct {
+pub const Chat = struct {
     activity: LiveActivityCoordinate,
     reply: ?LiveChatReply = null,
     content: []const u8,
@@ -113,14 +113,14 @@ pub fn live_activity_extract(
     out_relays: [][]const u8,
     out_hashtags: [][]const u8,
     out_pinned: [][32]u8,
-) LiveActivityError!LiveActivityInfo {
+) LiveActivityError!Activity {
     std.debug.assert(@intFromPtr(event) != 0);
     std.debug.assert(out_participants.len <= limits.tags_max);
 
     if (event.kind != live_stream_event_kind) return error.InvalidLiveActivityKind;
 
     var identifier: ?[]const u8 = null;
-    var info = LiveActivityInfo{ .identifier = undefined };
+    var info = Activity{ .identifier = undefined };
     for (event.tags) |tag| {
         try apply_live_tag(tag, &identifier, &info, out_participants, out_relays, out_hashtags, out_pinned);
     }
@@ -129,7 +129,7 @@ pub fn live_activity_extract(
 }
 
 /// Extracts the activity reference and optional reply metadata from a live-chat message.
-pub fn live_chat_extract(event: *const nip01_event.Event) LiveActivityError!LiveChatInfo {
+pub fn live_chat_extract(event: *const nip01_event.Event) LiveActivityError!Chat {
     std.debug.assert(@intFromPtr(event) != 0);
     std.debug.assert(event.tags.len <= limits.tags_max);
 
@@ -274,7 +274,7 @@ pub fn live_chat_build_activity_tag(
 fn apply_live_tag(
     tag: nip01_event.EventTag,
     identifier: *?[]const u8,
-    info: *LiveActivityInfo,
+    info: *Activity,
     out_participants: []LiveActivityParticipant,
     out_relays: [][]const u8,
     out_hashtags: [][]const u8,
@@ -378,7 +378,7 @@ fn apply_u32_tag(
 
 fn append_participant(
     tag: nip01_event.EventTag,
-    info: *LiveActivityInfo,
+    info: *Activity,
     out: []LiveActivityParticipant,
 ) LiveActivityError!void {
     std.debug.assert(tag.items.len <= limits.tag_items_max);
@@ -401,7 +401,7 @@ fn append_participant(
     info.participant_count += 1;
 }
 
-fn append_relays(tag: nip01_event.EventTag, info: *LiveActivityInfo, out: [][]const u8) LiveActivityError!void {
+fn append_relays(tag: nip01_event.EventTag, info: *Activity, out: [][]const u8) LiveActivityError!void {
     std.debug.assert(tag.items.len <= limits.tag_items_max);
     std.debug.assert(out.len <= limits.tags_max);
 
@@ -428,7 +428,7 @@ fn append_text_value(
     count.* += 1;
 }
 
-fn append_pinned(tag: nip01_event.EventTag, info: *LiveActivityInfo, out: [][32]u8) LiveActivityError!void {
+fn append_pinned(tag: nip01_event.EventTag, info: *Activity, out: [][32]u8) LiveActivityError!void {
     std.debug.assert(tag.items.len <= limits.tag_items_max);
     std.debug.assert(out.len <= limits.tags_max);
 

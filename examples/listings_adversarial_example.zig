@@ -19,7 +19,7 @@ test "adversarial listing example: reject non-url identifier on extract path" {
         .{ .items = &.{ "d", "not a url id" } },
     };
     const event = common.simple_event(30402, [_]u8{0x99} ** 32, "bike details", tags[0..]);
-    var images: [0]noztr.nip99_classified_listings.ImageInfo = .{};
+    var images: [0]noztr.nip99_classified_listings.Image = .{};
     var hashtags: [0][]const u8 = .{};
 
     try std.testing.expectError(
