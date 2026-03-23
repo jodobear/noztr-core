@@ -120,8 +120,14 @@ The current read-model cleanup also shortens several primary route-local extract
 - `noztr.nip17_private_messages.DmReplyRef` -> `noztr.nip17_private_messages.ReplyRef`
 - `noztr.nip17_private_messages.DmMessageInfo` -> `noztr.nip17_private_messages.Message`
 - `noztr.nip17_private_messages.FileMessageInfo` -> `noztr.nip17_private_messages.FileMessage`
+- `noztr.nip36_content_warning.ContentWarningInfo` -> `noztr.nip36_content_warning.ContentWarning`
 - `noztr.nip64_chess_pgn.ChessPgnInfo` -> `noztr.nip64_chess_pgn.Pgn`
+- `noztr.nip71_video_events.TextTrackInfo` -> `noztr.nip71_video_events.TextTrack`
+- `noztr.nip71_video_events.OriginInfo` -> `noztr.nip71_video_events.Origin`
+- `noztr.nip71_video_events.VideoInfo` -> `noztr.nip71_video_events.Video`
 - `noztr.nip78_app_data.AppDataInfo` -> `noztr.nip78_app_data.AppData`
+- `noztr.nip84_highlights.UrlReference` -> `noztr.nip84_highlights.UrlRef`
+- `noztr.nip84_highlights.HighlightInfo` -> `noztr.nip84_highlights.Highlight`
 - `noztr.nip92_media_attachments.ImetaInfo` -> `noztr.nip92_media_attachments.Imeta`
 - `noztr.nip94_file_metadata.ImageReference` -> `noztr.nip94_file_metadata.ImageRef`
 - `noztr.nip94_file_metadata.FileMetadataInfo` -> `noztr.nip94_file_metadata.Metadata`

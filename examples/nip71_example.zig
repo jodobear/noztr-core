@@ -24,12 +24,12 @@ test "NIP-71 example: extract video metadata and build variant fields" {
     var variants: [1]noztr.nip71_video_events.VideoVariant = undefined;
     var images: [1][]const u8 = undefined;
     var fallbacks: [0][]const u8 = .{};
-    var tracks: [0]noztr.nip71_video_events.TextTrackInfo = .{};
+    var tracks: [0]noztr.nip71_video_events.TextTrack = .{};
     var segments: [0]noztr.nip71_video_events.VideoSegment = .{};
     var participants: [0]noztr.nip71_video_events.VideoParticipant = .{};
     var hashtags: [0][]const u8 = .{};
     var references: [0][]const u8 = .{};
-    var origins: [0]noztr.nip71_video_events.OriginInfo = .{};
+    var origins: [0]noztr.nip71_video_events.Origin = .{};
     var duration_field: [64]u8 = undefined;
 
     const info = try noztr.nip71_video_events.video_extract(

@@ -71,7 +71,7 @@ pub const VideoVariant = struct {
     fallback_count: u16 = 0,
 };
 
-pub const TextTrackInfo = struct {
+pub const TextTrack = struct {
     value: []const u8,
     track_type: ?[]const u8 = null,
     language_code: ?[]const u8 = null,
@@ -89,14 +89,14 @@ pub const VideoParticipant = struct {
     relay_hint: ?[]const u8 = null,
 };
 
-pub const OriginInfo = struct {
+pub const Origin = struct {
     platform: []const u8,
     external_id: []const u8,
     original_url: []const u8,
     metadata: ?[]const u8 = null,
 };
 
-pub const VideoInfo = struct {
+pub const Video = struct {
     flavor: VideoFlavor,
     addressable: bool,
     identifier: ?[]const u8 = null,
@@ -144,17 +144,17 @@ pub fn video_extract(
     out_variants: []VideoVariant,
     out_variant_images: [][]const u8,
     out_variant_fallbacks: [][]const u8,
-    out_text_tracks: []TextTrackInfo,
+    out_text_tracks: []TextTrack,
     out_segments: []VideoSegment,
     out_participants: []VideoParticipant,
     out_hashtags: [][]const u8,
     out_references: [][]const u8,
-    out_origins: []OriginInfo,
-) VideoEventError!VideoInfo {
+    out_origins: []Origin,
+) VideoEventError!Video {
     std.debug.assert(@intFromPtr(event) != 0);
     std.debug.assert(out_variants.len <= limits.tags_max);
 
-    var info = VideoInfo{
+    var info = Video{
         .flavor = try parse_video_flavor(event.kind),
         .addressable = is_addressable_kind(event.kind),
         .title = undefined,
@@ -358,7 +358,7 @@ pub fn video_build_bitrate_field(
 
 fn apply_video_tag(
     tag: nip01_event.EventTag,
-    info: *VideoInfo,
+    info: *Video,
     title: *?[]const u8,
     identifier: *?[]const u8,
     out_variants: []VideoVariant,
@@ -366,12 +366,12 @@ fn apply_video_tag(
     out_variant_fallbacks: [][]const u8,
     image_cursor: *u16,
     fallback_cursor: *u16,
-    out_text_tracks: []TextTrackInfo,
+    out_text_tracks: []TextTrack,
     out_segments: []VideoSegment,
     out_participants: []VideoParticipant,
     out_hashtags: [][]const u8,
     out_references: [][]const u8,
-    out_origins: []OriginInfo,
+    out_origins: []Origin,
 ) VideoEventError!void {
     std.debug.assert(@intFromPtr(info) != 0);
     std.debug.assert(@intFromPtr(title) != 0);
@@ -421,7 +421,7 @@ fn apply_title_tag(tag: nip01_event.EventTag, field: *?[]const u8) VideoEventErr
     field.* = parse_nonempty_utf8(tag.items[1]) catch return error.InvalidTitleTag;
 }
 
-fn apply_published_at_tag(tag: nip01_event.EventTag, info: *VideoInfo) VideoEventError!void {
+fn apply_published_at_tag(tag: nip01_event.EventTag, info: *Video) VideoEventError!void {
     std.debug.assert(tag.items.len <= limits.tag_items_max);
     std.debug.assert(@intFromPtr(info) != 0);
 
@@ -432,7 +432,7 @@ fn apply_published_at_tag(tag: nip01_event.EventTag, info: *VideoInfo) VideoEven
     };
 }
 
-fn apply_content_warning_tag(tag: nip01_event.EventTag, info: *VideoInfo) VideoEventError!void {
+fn apply_content_warning_tag(tag: nip01_event.EventTag, info: *Video) VideoEventError!void {
     std.debug.assert(tag.items.len <= limits.tag_items_max);
     std.debug.assert(@intFromPtr(info) != 0);
 
@@ -442,7 +442,7 @@ fn apply_content_warning_tag(tag: nip01_event.EventTag, info: *VideoInfo) VideoE
     info.content_warning = parse_optional_utf8(reason) catch return error.InvalidContentWarningTag;
 }
 
-fn apply_alt_tag(tag: nip01_event.EventTag, info: *VideoInfo) VideoEventError!void {
+fn apply_alt_tag(tag: nip01_event.EventTag, info: *Video) VideoEventError!void {
     std.debug.assert(tag.items.len <= limits.tag_items_max);
     std.debug.assert(@intFromPtr(info) != 0);
 
@@ -453,7 +453,7 @@ fn apply_alt_tag(tag: nip01_event.EventTag, info: *VideoInfo) VideoEventError!vo
 
 fn append_variant(
     tag: nip01_event.EventTag,
-    info: *VideoInfo,
+    info: *Video,
     out_variants: []VideoVariant,
     out_variant_images: [][]const u8,
     out_variant_fallbacks: [][]const u8,
@@ -477,8 +477,8 @@ fn append_variant(
 
 fn append_text_track(
     tag: nip01_event.EventTag,
-    info: *VideoInfo,
-    out_text_tracks: []TextTrackInfo,
+    info: *Video,
+    out_text_tracks: []TextTrack,
 ) VideoEventError!void {
     std.debug.assert(@intFromPtr(info) != 0);
     std.debug.assert(info.text_track_count <= out_text_tracks.len);
@@ -492,7 +492,7 @@ fn append_text_track(
 
 fn append_segment(
     tag: nip01_event.EventTag,
-    info: *VideoInfo,
+    info: *Video,
     out_segments: []VideoSegment,
 ) VideoEventError!void {
     std.debug.assert(@intFromPtr(info) != 0);
@@ -505,7 +505,7 @@ fn append_segment(
 
 fn append_participant(
     tag: nip01_event.EventTag,
-    info: *VideoInfo,
+    info: *Video,
     out_participants: []VideoParticipant,
 ) VideoEventError!void {
     std.debug.assert(@intFromPtr(info) != 0);
@@ -535,8 +535,8 @@ fn append_text_tag(
 
 fn append_origin(
     tag: nip01_event.EventTag,
-    info: *VideoInfo,
-    out_origins: []OriginInfo,
+    info: *Video,
+    out_origins: []Origin,
 ) VideoEventError!void {
     std.debug.assert(@intFromPtr(info) != 0);
     std.debug.assert(info.origin_count <= out_origins.len);
@@ -726,7 +726,7 @@ fn append_variant_url(
     count.* += 1;
 }
 
-fn parse_text_track_tag(tag: nip01_event.EventTag) VideoEventError!TextTrackInfo {
+fn parse_text_track_tag(tag: nip01_event.EventTag) VideoEventError!TextTrack {
     std.debug.assert(tag.items.len <= limits.tag_items_max);
     std.debug.assert(tag.items.len > 0);
 
@@ -772,7 +772,7 @@ fn parse_participant_tag(tag: nip01_event.EventTag) VideoEventError!VideoPartici
     };
 }
 
-fn parse_origin_tag(tag: nip01_event.EventTag) VideoEventError!OriginInfo {
+fn parse_origin_tag(tag: nip01_event.EventTag) VideoEventError!Origin {
     std.debug.assert(tag.items.len <= limits.tag_items_max);
     std.debug.assert(tag.items.len > 0);
 
@@ -926,12 +926,12 @@ test "NIP-71 extracts bounded addressable video metadata" {
     var variants: [1]VideoVariant = undefined;
     var images: [1][]const u8 = undefined;
     var fallbacks: [1][]const u8 = undefined;
-    var tracks: [1]TextTrackInfo = undefined;
+    var tracks: [1]TextTrack = undefined;
     var segments: [1]VideoSegment = undefined;
     var participants: [1]VideoParticipant = undefined;
     var hashtags: [1][]const u8 = undefined;
     var references: [1][]const u8 = undefined;
-    var origins: [1]OriginInfo = undefined;
+    var origins: [1]Origin = undefined;
 
     const info = try video_extract(
         &event,

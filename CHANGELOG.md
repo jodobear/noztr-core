@@ -23,8 +23,14 @@ For the public versioning policy, see
   - `DmReplyRef` -> `ReplyRef`
   - `DmMessageInfo` -> `Message`
   - `FileMessageInfo` -> `FileMessage`
+  - `ContentWarningInfo` -> `ContentWarning`
   - `ChessPgnInfo` -> `Pgn`
+  - `TextTrackInfo` -> `TextTrack`
+  - `OriginInfo` -> `Origin`
+  - `VideoInfo` -> `Video`
   - `AppDataInfo` -> `AppData`
+  - `UrlReference` -> `UrlRef`
+  - `HighlightInfo` -> `Highlight`
   - `ImetaInfo` -> `Imeta`
   - `ImageReference` -> `ImageRef`
   - `FileMetadataInfo` -> `Metadata`

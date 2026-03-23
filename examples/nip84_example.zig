@@ -10,7 +10,7 @@ test "NIP-84 example: extract one highlight source with context and comment" {
     };
     const event = common.simple_event(9802, [_]u8{0x84} ** 32, "highlight", tags[0..]);
     var attributions: [1]noztr.nip84_highlights.HighlightAttribution = undefined;
-    var refs: [1]noztr.nip84_highlights.UrlReference = undefined;
+    var refs: [1]noztr.nip84_highlights.UrlRef = undefined;
 
     const info = try noztr.nip84_highlights.highlight_extract(
         &event,

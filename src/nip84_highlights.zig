@@ -31,7 +31,7 @@ pub const AddressSource = struct {
     relay_hint: ?[]const u8 = null,
 };
 
-pub const UrlReference = struct {
+pub const UrlRef = struct {
     url: []const u8,
     marker: ?[]const u8 = null,
 };
@@ -39,7 +39,7 @@ pub const UrlReference = struct {
 pub const HighlightSource = union(enum) {
     event: EventSource,
     address: AddressSource,
-    url: UrlReference,
+    url: UrlRef,
 };
 
 pub const HighlightAttribution = struct {
@@ -48,7 +48,7 @@ pub const HighlightAttribution = struct {
     role: ?[]const u8 = null,
 };
 
-pub const HighlightInfo = struct {
+pub const Highlight = struct {
     source: ?HighlightSource = null,
     attribution_count: u16 = 0,
     url_reference_count: u16 = 0,
@@ -72,14 +72,14 @@ pub const TagBuilder = struct {
 pub fn highlight_extract(
     event: *const nip01_event.Event,
     out_attributions: []HighlightAttribution,
-    out_url_references: []UrlReference,
-) HighlightError!HighlightInfo {
+    out_url_references: []UrlRef,
+) HighlightError!Highlight {
     std.debug.assert(@intFromPtr(event) != 0);
     std.debug.assert(out_attributions.len <= limits.tags_max);
 
     if (event.kind != highlight_kind) return error.InvalidHighlightKind;
 
-    var info = HighlightInfo{};
+    var info = Highlight{};
     for (event.tags) |tag| {
         try apply_tag(tag, &info, out_attributions, out_url_references);
     }
@@ -200,9 +200,9 @@ pub fn highlight_build_comment_tag(
 
 fn apply_tag(
     tag: nip01_event.EventTag,
-    info: *HighlightInfo,
+    info: *Highlight,
     out_attributions: []HighlightAttribution,
-    out_url_references: []UrlReference,
+    out_url_references: []UrlRef,
 ) HighlightError!void {
     std.debug.assert(tag.items.len <= limits.tag_items_max);
     std.debug.assert(@intFromPtr(info) != 0);
@@ -215,7 +215,7 @@ fn apply_tag(
     if (std.mem.eql(u8, tag.items[0], "comment")) return parse_comment(tag, info);
 }
 
-fn parse_event_source(tag: nip01_event.EventTag, info: *HighlightInfo) HighlightError!void {
+fn parse_event_source(tag: nip01_event.EventTag, info: *Highlight) HighlightError!void {
     std.debug.assert(tag.items.len <= limits.tag_items_max);
     std.debug.assert(@intFromPtr(info) != 0);
 
@@ -230,7 +230,7 @@ fn parse_event_source(tag: nip01_event.EventTag, info: *HighlightInfo) Highlight
     };
 }
 
-fn parse_address_source(tag: nip01_event.EventTag, info: *HighlightInfo) HighlightError!void {
+fn parse_address_source(tag: nip01_event.EventTag, info: *Highlight) HighlightError!void {
     std.debug.assert(tag.items.len <= limits.tag_items_max);
     std.debug.assert(@intFromPtr(info) != 0);
 
@@ -244,8 +244,8 @@ fn parse_address_source(tag: nip01_event.EventTag, info: *HighlightInfo) Highlig
 
 fn parse_url_reference(
     tag: nip01_event.EventTag,
-    info: *HighlightInfo,
-    out_url_references: []UrlReference,
+    info: *Highlight,
+    out_url_references: []UrlRef,
 ) HighlightError!void {
     std.debug.assert(tag.items.len <= limits.tag_items_max);
     std.debug.assert(out_url_references.len <= limits.tags_max);
@@ -254,7 +254,7 @@ fn parse_url_reference(
     if (info.url_reference_count >= out_url_references.len) return error.BufferTooSmall;
 
     const marker = try parse_optional_text_item(tag, 2, error.InvalidUrlReferenceTag);
-    const parsed = UrlReference{
+    const parsed = UrlRef{
         .url = parse_url(tag.items[1]) catch return error.InvalidUrlReferenceTag,
         .marker = marker,
     };
@@ -267,7 +267,7 @@ fn parse_url_reference(
 
 fn parse_attribution(
     tag: nip01_event.EventTag,
-    info: *HighlightInfo,
+    info: *Highlight,
     out_attributions: []HighlightAttribution,
 ) HighlightError!void {
     std.debug.assert(tag.items.len <= limits.tag_items_max);
@@ -306,7 +306,7 @@ fn parse_attribution(
     info.attribution_count += 1;
 }
 
-fn parse_context(tag: nip01_event.EventTag, info: *HighlightInfo) HighlightError!void {
+fn parse_context(tag: nip01_event.EventTag, info: *Highlight) HighlightError!void {
     std.debug.assert(tag.items.len <= limits.tag_items_max);
     std.debug.assert(@intFromPtr(info) != 0);
 
@@ -315,7 +315,7 @@ fn parse_context(tag: nip01_event.EventTag, info: *HighlightInfo) HighlightError
     info.context = parse_nonempty_utf8(tag.items[1]) catch return error.InvalidContextTag;
 }
 
-fn parse_comment(tag: nip01_event.EventTag, info: *HighlightInfo) HighlightError!void {
+fn parse_comment(tag: nip01_event.EventTag, info: *Highlight) HighlightError!void {
     std.debug.assert(tag.items.len <= limits.tag_items_max);
     std.debug.assert(@intFromPtr(info) != 0);
 
@@ -447,7 +447,7 @@ test "highlight extract parses event source attributions and quote metadata" {
         .{ .items = &.{ "comment", "Quoted because this paragraph matters." } },
     };
     var attributions: [4]HighlightAttribution = undefined;
-    var urls: [4]UrlReference = undefined;
+    var urls: [4]UrlRef = undefined;
 
     const parsed = try highlight_extract(&test_event(highlight_kind, "important words", &tags), &attributions, &urls);
 
@@ -469,7 +469,7 @@ test "highlight extract parses url source and mention urls" {
         .{ .items = &.{ "r", "https://example.com/mention", "mention" } },
     };
     var attributions: [1]HighlightAttribution = undefined;
-    var urls: [2]UrlReference = undefined;
+    var urls: [2]UrlRef = undefined;
 
     const parsed = try highlight_extract(&test_event(highlight_kind, "", &tags), &attributions, &urls);
 
@@ -489,7 +489,7 @@ test "highlight extract accepts three-item author role tags" {
         } },
     };
     var attributions: [1]HighlightAttribution = undefined;
-    var urls: [1]UrlReference = undefined;
+    var urls: [1]UrlRef = undefined;
 
     const parsed = try highlight_extract(&test_event(highlight_kind, "quoted", &tags), &attributions, &urls);
 
@@ -507,7 +507,7 @@ test "highlight extract rejects duplicate source tags" {
         .{ .items = &.{ "r", "https://example.com/source" } },
     };
     var attributions: [1]HighlightAttribution = undefined;
-    var urls: [2]UrlReference = undefined;
+    var urls: [2]UrlRef = undefined;
 
     try std.testing.expectError(
         error.DuplicateSourceTag,

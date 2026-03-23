@@ -427,7 +427,7 @@ test "root exports limits and error namespaces" {
     try std.testing.expect(@TypeOf(nip34_git.RepositoryStateInfo) == type);
     try std.testing.expect(@TypeOf(nip34_git.UserGraspListInfo) == type);
     try std.testing.expect(@TypeOf(nip34_git.TagBuilder) == type);
-    try std.testing.expect(@TypeOf(nip36_content_warning.ContentWarningInfo) == type);
+    try std.testing.expect(@TypeOf(nip36_content_warning.ContentWarning) == type);
     try std.testing.expect(@TypeOf(nip36_content_warning.TagBuilder) == type);
     try std.testing.expect(@TypeOf(nip38_user_status.Status) == type);
     try std.testing.expect(@TypeOf(nip38_user_status.TagBuilder) == type);
@@ -500,10 +500,10 @@ test "root exports limits and error namespaces" {
     try std.testing.expect(@TypeOf(nip89_handlers.TagBuilder) == type);
     try std.testing.expect(@TypeOf(nip84_highlights.EventSource) == type);
     try std.testing.expect(@TypeOf(nip84_highlights.AddressSource) == type);
-    try std.testing.expect(@TypeOf(nip84_highlights.UrlReference) == type);
+    try std.testing.expect(@TypeOf(nip84_highlights.UrlRef) == type);
     try std.testing.expect(@TypeOf(nip84_highlights.HighlightSource) == type);
     try std.testing.expect(@TypeOf(nip84_highlights.HighlightAttribution) == type);
-    try std.testing.expect(@TypeOf(nip84_highlights.HighlightInfo) == type);
+    try std.testing.expect(@TypeOf(nip84_highlights.Highlight) == type);
     try std.testing.expect(@TypeOf(nip84_highlights.TagBuilder) == type);
     try std.testing.expect(@TypeOf(nip29_relay_groups.GroupMetadata) == type);
     try std.testing.expect(@TypeOf(nip29_relay_groups.GroupAdmin) == type);
@@ -1076,8 +1076,8 @@ test "root exports limits and error namespaces" {
             fn (
                 *const nip01_event.Event,
                 []nip84_highlights.HighlightAttribution,
-                []nip84_highlights.UrlReference,
-            ) nip84_highlights.HighlightError!nip84_highlights.HighlightInfo,
+                []nip84_highlights.UrlRef,
+            ) nip84_highlights.HighlightError!nip84_highlights.Highlight,
     );
     try std.testing.expect(
         @TypeOf(nip84_highlights.highlight_build_event_source_tag) ==

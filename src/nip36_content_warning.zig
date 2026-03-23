@@ -11,7 +11,7 @@ pub const ContentWarningError = error{
     InvalidContentWarningLabel,
 };
 
-pub const ContentWarningInfo = struct {
+pub const ContentWarning = struct {
     reason: ?[]const u8 = null,
 };
 
@@ -30,7 +30,7 @@ pub const TagBuilder = struct {
 /// Extracts the first NIP-36 content-warning tag from an event.
 pub fn content_warning_extract(
     event: *const nip01_event.Event,
-) ContentWarningError!?ContentWarningInfo {
+) ContentWarningError!?ContentWarning {
     std.debug.assert(@intFromPtr(event) != 0);
     std.debug.assert(event.tags.len <= limits.tags_max);
 
