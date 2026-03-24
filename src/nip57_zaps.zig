@@ -300,7 +300,7 @@ pub fn zap_build_coordinate_tag(
     std.debug.assert(@intFromPtr(output) != 0);
     std.debug.assert(coordinate_text.len <= limits.tag_item_bytes_max);
 
-    try validate_coordinate_text(coordinate_text) catch return error.InvalidCoordinateTag;
+    validate_coordinate_text(coordinate_text) catch return error.InvalidCoordinateTag;
     output.items[0] = "a";
     output.items[1] = coordinate_text;
     output.item_count = 2;
