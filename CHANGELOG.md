@@ -13,6 +13,17 @@ For the public versioning policy, see
 
 ## [Unreleased]
 
+## [0.1.0-rc.5] - 2026-03-24
+
+Release type: breaking rc
+
+### Summary
+
+Fifth public release candidate for `noztr-core`.
+
+This RC removes `NIP-26` from the supported `noztr-core` surface. The protocol-kernel boundary,
+ownership posture, and the rest of the public API remain otherwise unchanged.
+
 ### Breaking Changes
 
 - removed `NIP-26` support from `noztr-core`
