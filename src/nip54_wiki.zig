@@ -26,14 +26,14 @@ pub const WikiError = error{
     InvalidTargetTag,
     DuplicateBaseRevisionTag,
     InvalidBaseRevisionTag,
-    MissingSourceEventTag,
-    InvalidSourceEventTag,
+    MissingSourceTag,
+    InvalidSourceTag,
     MissingDestinationTag,
     DuplicateDestinationTag,
     InvalidDestinationTag,
-    MissingRedirectTargetTag,
-    DuplicateRedirectTargetTag,
-    InvalidRedirectTargetTag,
+    MissingRedirectTag,
+    DuplicateRedirectTag,
+    InvalidRedirectTag,
     BufferTooSmall,
 };
 
@@ -120,7 +120,7 @@ pub fn wiki_merge_request_extract(event: *const nip01_event.Event) WikiError!Mer
     return .{
         .target_article = target_article orelse return error.MissingTargetTag,
         .base_revision = base_revision,
-        .source_event = source_event orelse return error.MissingSourceEventTag,
+        .source_event = source_event orelse return error.MissingSourceTag,
         .destination_pubkey = destination_pubkey orelse return error.MissingDestinationTag,
         .content = event.content,
     };
@@ -142,7 +142,7 @@ pub fn wiki_redirect_extract(event: *const nip01_event.Event) WikiError!Redirect
     }
     return .{
         .identifier = identifier orelse return error.MissingIdentifierTag,
-        .target_article = target_article orelse return error.MissingRedirectTargetTag,
+        .target_article = target_article orelse return error.MissingRedirectTag,
     };
 }
 
@@ -252,16 +252,16 @@ pub fn wiki_build_event_reference_tag(
     std.debug.assert(@intFromPtr(output) != 0);
     std.debug.assert(event_id_hex.len <= limits.tag_item_bytes_max);
 
-    _ = parse_lower_hex_32(event_id_hex) catch return error.InvalidSourceEventTag;
+    _ = parse_lower_hex_32(event_id_hex) catch return error.InvalidSourceTag;
     output.items[0] = "e";
     output.items[1] = event_id_hex;
     output.item_count = 2;
     if (relay_hint) |value| {
-        output.items[2] = parse_url(value) catch return error.InvalidSourceEventTag;
+        output.items[2] = parse_url(value) catch return error.InvalidSourceTag;
         output.item_count = 3;
     }
     if (marker) |value| {
-        output.items[output.item_count] = parse_marker(value) catch return error.InvalidSourceEventTag;
+        output.items[output.item_count] = parse_marker(value) catch return error.InvalidSourceTag;
         output.item_count += 1;
     }
     return output.as_event_tag();
@@ -376,11 +376,11 @@ fn apply_source_event(tag: nip01_event.EventTag, source: *?EventRef) WikiError!v
     std.debug.assert(tag.items.len <= limits.tag_items_max);
     std.debug.assert(@intFromPtr(source) != 0);
 
-    if (tag.items.len < 2) return error.InvalidSourceEventTag;
+    if (tag.items.len < 2) return error.InvalidSourceTag;
     source.* = .{
-        .event_id = parse_lower_hex_32(tag.items[1]) catch return error.InvalidSourceEventTag,
-        .relay_hint = parse_optional_url_item(tag, 2, error.InvalidSourceEventTag) catch {
-            return error.InvalidSourceEventTag;
+        .event_id = parse_lower_hex_32(tag.items[1]) catch return error.InvalidSourceTag,
+        .relay_hint = parse_optional_url_item(tag, 2, error.InvalidSourceTag) catch {
+            return error.InvalidSourceTag;
         },
     };
 }
@@ -412,8 +412,8 @@ fn apply_redirect_target(tag: nip01_event.EventTag, target: *?ArticleRef) WikiEr
     std.debug.assert(tag.items.len <= limits.tag_items_max);
     std.debug.assert(@intFromPtr(target) != 0);
 
-    if (target.* != null) return error.DuplicateRedirectTargetTag;
-    target.* = parse_article_reference_tag(tag) catch return error.InvalidRedirectTargetTag;
+    if (target.* != null) return error.DuplicateRedirectTag;
+    target.* = parse_article_reference_tag(tag) catch return error.InvalidRedirectTag;
 }
 
 fn parse_article_reference_tag(tag: nip01_event.EventTag) error{InvalidTag}!ArticleRef {

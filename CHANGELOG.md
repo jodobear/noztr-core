@@ -44,6 +44,7 @@ For the public versioning policy, see
 - `nip72_moderated_communities.Post.top_level` is now explicit `Relation`
 - `nip72_moderated_communities.Approval` now uses one `approved` target union instead of split optional fields
 - `nip46_remote_signing.envelope_validate` now returns the validated target pubkey directly
+- `examples/README.md` now routes readers to grouped public maps instead of maintaining a large local catalog
 
 ## [0.1.0-rc.5] - 2026-03-24
 

@@ -137,6 +137,11 @@ If your project depends on `noztr-core`:
   - `MissingDestinationPubkeyTag` -> `MissingDestinationTag`
   - `DuplicateDestinationPubkeyTag` -> `DuplicateDestinationTag`
   - `InvalidDestinationPubkeyTag` -> `InvalidDestinationTag`
+  - `MissingSourceEventTag` -> `MissingSourceTag`
+  - `InvalidSourceEventTag` -> `InvalidSourceTag`
+  - `MissingRedirectTargetTag` -> `MissingRedirectTag`
+  - `DuplicateRedirectTargetTag` -> `DuplicateRedirectTag`
+  - `InvalidRedirectTargetTag` -> `InvalidRedirectTag`
 
 ### `nip47_wallet_connect`
 
