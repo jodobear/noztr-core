@@ -32,9 +32,9 @@ pub const NwcError = error{
     MissingTargetPubkey,
     DuplicateTargetPubkey,
     InvalidTargetPubkey,
-    MissingRequestId,
-    DuplicateRequestId,
-    InvalidRequestId,
+    MissingRequestEventId,
+    DuplicateRequestEventId,
+    InvalidRequestEventId,
     DuplicateExpirationTag,
     InvalidExpirationTag,
     InvalidMethod,
@@ -451,8 +451,8 @@ pub fn response_extract(event: *const nip01_event.Event) NwcError!ResponseEvent 
             continue;
         }
         if (std.mem.eql(u8, tag.items[0], "e")) {
-            if (request_event_id != null) return error.DuplicateRequestId;
-            request_event_id = parse_event_id_tag(tag) catch return error.InvalidRequestId;
+            if (request_event_id != null) return error.DuplicateRequestEventId;
+            request_event_id = parse_event_id_tag(tag) catch return error.InvalidRequestEventId;
             continue;
         }
         if (std.mem.eql(u8, tag.items[0], "encryption")) {
@@ -462,7 +462,7 @@ pub fn response_extract(event: *const nip01_event.Event) NwcError!ResponseEvent 
     }
     return .{
         .client_pubkey = client_pubkey orelse return error.MissingTargetPubkey,
-        .request_event_id = request_event_id orelse return error.MissingRequestId,
+        .request_event_id = request_event_id orelse return error.MissingRequestEventId,
         .encryption = encryption orelse .nip04,
         .encrypted_content = encrypted_content,
     };
@@ -753,8 +753,8 @@ fn parse_event_id_tag(tag: nip01_event.EventTag) NwcError![32]u8 {
     std.debug.assert(tag.items.len <= limits.tag_items_max);
     std.debug.assert(limits.id_hex_length == 64);
 
-    if (tag.items.len != 2) return error.InvalidRequestId;
-    return parse_lower_hex_32(tag.items[1]) catch return error.InvalidRequestId;
+    if (tag.items.len != 2) return error.InvalidRequestEventId;
+    return parse_lower_hex_32(tag.items[1]) catch return error.InvalidRequestEventId;
 }
 
 fn validate_capability_token(text: []const u8) error{InvalidValue}![]const u8 {
