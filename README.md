@@ -36,21 +36,49 @@ Key public entry points:
   - start the first intentional public release at `0.1.0`
   - reserve `1.0.0` for the point where the project is ready to defend the public contract as
     stable by default
-- Selected implemented surfaces:
+- Supported NIP surface snapshot:
+  - use [`docs/reference/nip-coverage.md`](docs/reference/nip-coverage.md) for the detailed
+    export/status/example matrix
+  - use [`docs/reference/contract-map.md`](docs/reference/contract-map.md) and
+    [`examples/README.md`](examples/README.md) when you want the right route or example for a job
 
-| Surface | Short scope |
-| --- | --- |
-| `NIP-01` | core events, filters, and relay message grammar |
-| `NIP-05`, `NIP-11`, `NIP-42`, `NIP-98` | identity lookup, relay info, auth, and HTTP auth helpers |
-| `NIP-06`, `NIP-49`, `BIP-85` subset | bounded wallet, mnemonic, and key-encryption helpers |
-| `NIP-04`, `NIP-17`, `NIP-44`, `NIP-59` | legacy direct-message, private-message unwrap, gift wrap, and one-recipient outbound helpers |
-| `NIP-46`, `NIP-47`, `NIP-86` | remote-signing, wallet-connect, and relay-admin typed contracts |
-| `NIP-29`, `NIP-72`, `NIP-88` | bounded reducers and community/group/poll helper flows |
-| `NIP-52`, `NIP-53`, `NIP-54`, `NIP-71` | calendar, live-activity, wiki, and video metadata helpers |
-| `NIP-61`, `NIP-66`, `NIP-75`, `NIP-89`, `NIP-91` | nutzap, relay-discovery, zap-goal, handler, and AND-filter helpers |
+| Core | Identity and trust | Messaging and wrappers | Coordination and content |
+| --- | --- | --- | --- |
+| - [x] `NIP-01` | - [x] `NIP-05` | - [x] `NIP-04` | - [x] `NIP-23` |
+| - [x] `NIP-02` | - [x] `NIP-11` | - [x] `NIP-17` | - [x] `NIP-24` |
+| - [x] `NIP-03` | - [x] `NIP-13` | - [x] `NIP-18` | - [x] `NIP-28` (`split`) |
+| - [x] `NIP-06` | - [x] `NIP-19` | - [x] `NIP-21` | - [x] `NIP-29` |
+| - [x] `NIP-09` | - [x] `NIP-39` | - [x] `NIP-22` | - [x] `NIP-30` |
+| - [x] `NIP-10` | - [x] `NIP-42` | - [x] `NIP-25` | - [x] `NIP-31` |
+| - [x] `NIP-14` | - [x] `NIP-49` | - [x] `NIP-27` | - [x] `NIP-32` |
+| - [x] `NIP-40` | - [x] `NIP-70` | - [x] `NIP-44` | - [x] `NIP-34` (`split`) |
+| - [x] `NIP-91` | - [x] `NIP-98` (`split`) | - [x] `NIP-46` | - [x] `NIP-36` |
+|  | - [x] `NIP-B7` (`split`) | - [x] `NIP-47` (`split`) | - [x] `NIP-37` |
+|  |  | - [x] `NIP-51` | - [x] `NIP-38` |
+|  |  | - [x] `NIP-57` (`split`) | - [x] `NIP-52` |
+|  |  | - [x] `NIP-59` | - [x] `NIP-53` (`split`) |
+|  |  | - [x] `NIP-61` (`split`) | - [x] `NIP-54` |
+|  |  | - [x] `NIP-86` (`split`) | - [x] `NIP-56` |
+|  |  |  | - [x] `NIP-58` |
+|  |  |  | - [x] `NIP-64` |
+|  |  |  | - [x] `NIP-65` |
+|  |  |  | - [x] `NIP-66` (`split`) |
+|  |  |  | - [x] `NIP-71` (`split`) |
+|  |  |  | - [x] `NIP-72` (`split`) |
+|  |  |  | - [x] `NIP-73` |
+|  |  |  | - [x] `NIP-75` |
+|  |  |  | - [x] `NIP-78` (`split`) |
+|  |  |  | - [x] `NIP-84` |
+|  |  |  | - [x] `NIP-88` |
+|  |  |  | - [x] `NIP-89` (`split`) |
+|  |  |  | - [x] `NIP-92` |
+|  |  |  | - [x] `NIP-94` |
+|  |  |  | - [x] `NIP-99` |
+|  |  |  | - [x] `NIP-B0` |
+|  |  |  | - [x] `NIP-C0` |
 
-For the full implemented surface, including narrower and optional/gated modules, see
-[`docs/reference/nip-coverage.md`](docs/reference/nip-coverage.md).
+- Not supported:
+  - [ ] `NIP-26`
 
 - Optional I6 extension exports (build-flag gated): `NIP-45`, `NIP-50`, `NIP-77`
 - Non-NIP bounded wallet helpers: Nostr-relevant `BIP-85` subset for lowercase-hex entropy text
