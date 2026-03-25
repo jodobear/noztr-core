@@ -21,16 +21,16 @@ pub const WikiError = error{
     InvalidSummaryTag,
     InvalidForkReferenceTag,
     InvalidDeferReferenceTag,
-    MissingTargetArticleTag,
-    DuplicateTargetArticleTag,
-    InvalidTargetArticleTag,
+    MissingTargetTag,
+    DuplicateTargetTag,
+    InvalidTargetTag,
     DuplicateBaseRevisionTag,
     InvalidBaseRevisionTag,
     MissingSourceEventTag,
     InvalidSourceEventTag,
-    MissingDestinationPubkeyTag,
-    DuplicateDestinationPubkeyTag,
-    InvalidDestinationPubkeyTag,
+    MissingDestinationTag,
+    DuplicateDestinationTag,
+    InvalidDestinationTag,
     MissingRedirectTargetTag,
     DuplicateRedirectTargetTag,
     InvalidRedirectTargetTag,
@@ -118,10 +118,10 @@ pub fn wiki_merge_request_extract(event: *const nip01_event.Event) WikiError!Mer
         try apply_merge_request_tag(tag, &target_article, &base_revision, &source_event, &destination_pubkey);
     }
     return .{
-        .target_article = target_article orelse return error.MissingTargetArticleTag,
+        .target_article = target_article orelse return error.MissingTargetTag,
         .base_revision = base_revision,
         .source_event = source_event orelse return error.MissingSourceEventTag,
-        .destination_pubkey = destination_pubkey orelse return error.MissingDestinationPubkeyTag,
+        .destination_pubkey = destination_pubkey orelse return error.MissingDestinationTag,
         .content = event.content,
     };
 }
@@ -227,16 +227,16 @@ pub fn wiki_build_article_reference_tag(
     std.debug.assert(@intFromPtr(output) != 0);
     std.debug.assert(coordinate_text.len <= limits.tag_item_bytes_max);
 
-    _ = parse_article_coordinate_text(coordinate_text) catch return error.InvalidTargetArticleTag;
+    _ = parse_article_coordinate_text(coordinate_text) catch return error.InvalidTargetTag;
     output.items[0] = "a";
     output.items[1] = coordinate_text;
     output.item_count = 2;
     if (relay_hint) |value| {
-        output.items[2] = parse_url(value) catch return error.InvalidTargetArticleTag;
+        output.items[2] = parse_url(value) catch return error.InvalidTargetTag;
         output.item_count = 3;
     }
     if (marker) |value| {
-        output.items[output.item_count] = parse_marker(value) catch return error.InvalidTargetArticleTag;
+        output.items[output.item_count] = parse_marker(value) catch return error.InvalidTargetTag;
         output.item_count += 1;
     }
     return output.as_event_tag();
@@ -275,7 +275,7 @@ pub fn wiki_build_destination_pubkey_tag(
     std.debug.assert(@intFromPtr(output) != 0);
     std.debug.assert(pubkey_hex.len <= limits.tag_item_bytes_max);
 
-    _ = parse_lower_hex_32(pubkey_hex) catch return error.InvalidDestinationPubkeyTag;
+    _ = parse_lower_hex_32(pubkey_hex) catch return error.InvalidDestinationTag;
     output.items[0] = "p";
     output.items[1] = pubkey_hex;
     output.item_count = 2;
@@ -368,8 +368,8 @@ fn apply_target_article(tag: nip01_event.EventTag, target: *?ArticleRef) WikiErr
     std.debug.assert(tag.items.len <= limits.tag_items_max);
     std.debug.assert(@intFromPtr(target) != 0);
 
-    if (target.* != null) return error.DuplicateTargetArticleTag;
-    target.* = parse_article_reference_tag(tag) catch return error.InvalidTargetArticleTag;
+    if (target.* != null) return error.DuplicateTargetTag;
+    target.* = parse_article_reference_tag(tag) catch return error.InvalidTargetTag;
 }
 
 fn apply_source_event(tag: nip01_event.EventTag, source: *?EventRef) WikiError!void {
@@ -403,9 +403,9 @@ fn apply_destination_pubkey(tag: nip01_event.EventTag, pubkey: *?[32]u8) WikiErr
     std.debug.assert(tag.items.len <= limits.tag_items_max);
     std.debug.assert(@intFromPtr(pubkey) != 0);
 
-    if (pubkey.* != null) return error.DuplicateDestinationPubkeyTag;
-    if (tag.items.len != 2) return error.InvalidDestinationPubkeyTag;
-    pubkey.* = parse_lower_hex_32(tag.items[1]) catch return error.InvalidDestinationPubkeyTag;
+    if (pubkey.* != null) return error.DuplicateDestinationTag;
+    if (tag.items.len != 2) return error.InvalidDestinationTag;
+    pubkey.* = parse_lower_hex_32(tag.items[1]) catch return error.InvalidDestinationTag;
 }
 
 fn apply_redirect_target(tag: nip01_event.EventTag, target: *?ArticleRef) WikiError!void {

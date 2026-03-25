@@ -20,8 +20,10 @@ If your project depends on `noztr-core`:
 1. update explicit type and function references in the affected routes
 2. update any explicit `nip72_moderated_communities.CommunityError` matches that still use the
    older verbose approved-target error names
-3. rerun your normal build/test gates
-4. refresh generated symbol indexes or local LLM context that still teach the older longer names
+3. update any explicit `nip54_wiki.WikiError` matches that still use the older target/destination
+   error names
+4. rerun your normal build/test gates
+5. refresh generated symbol indexes or local LLM context that still teach the older longer names
 
 ## Renamed Public Surface
 
@@ -125,6 +127,16 @@ If your project depends on `noztr-core`:
 - `ParsedRequest` -> `TypedRequest`
 - `Envelope` was removed
 - `envelope_validate(...)` now returns the validated target pubkey directly
+
+### `nip54_wiki`
+
+- verbose route-internal error names were shortened:
+  - `MissingTargetArticleTag` -> `MissingTargetTag`
+  - `DuplicateTargetArticleTag` -> `DuplicateTargetTag`
+  - `InvalidTargetArticleTag` -> `InvalidTargetTag`
+  - `MissingDestinationPubkeyTag` -> `MissingDestinationTag`
+  - `DuplicateDestinationPubkeyTag` -> `DuplicateDestinationTag`
+  - `InvalidDestinationPubkeyTag` -> `InvalidDestinationTag`
 
 ### `nip47_wallet_connect`
 
