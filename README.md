@@ -42,43 +42,75 @@ Key public entry points:
   - use [`docs/reference/contract-map.md`](docs/reference/contract-map.md) and
     [`examples/README.md`](examples/README.md) when you want the right route or example for a job
 
-| Core | Identity and trust | Messaging and wrappers | Coordination and content |
+| Status | NIP | Title | Short description |
 | --- | --- | --- | --- |
-| - [x] `NIP-01` | - [x] `NIP-05` | - [x] `NIP-04` | - [x] `NIP-23` |
-| - [x] `NIP-02` | - [x] `NIP-11` | - [x] `NIP-17` | - [x] `NIP-24` |
-| - [x] `NIP-03` | - [x] `NIP-13` | - [x] `NIP-18` | - [x] `NIP-28` (`split`) |
-| - [x] `NIP-06` | - [x] `NIP-19` | - [x] `NIP-21` | - [x] `NIP-29` |
-| - [x] `NIP-09` | - [x] `NIP-39` | - [x] `NIP-22` | - [x] `NIP-30` |
-| - [x] `NIP-10` | - [x] `NIP-42` | - [x] `NIP-25` | - [x] `NIP-31` |
-| - [x] `NIP-14` | - [x] `NIP-49` | - [x] `NIP-27` | - [x] `NIP-32` |
-| - [x] `NIP-40` | - [x] `NIP-70` | - [x] `NIP-44` | - [x] `NIP-34` (`split`) |
-| - [x] `NIP-91` | - [x] `NIP-98` (`split`) | - [x] `NIP-46` | - [x] `NIP-36` |
-|  | - [x] `NIP-B7` (`split`) | - [x] `NIP-47` (`split`) | - [x] `NIP-37` |
-|  |  | - [x] `NIP-51` | - [x] `NIP-38` |
-|  |  | - [x] `NIP-57` (`split`) | - [x] `NIP-52` |
-|  |  | - [x] `NIP-59` | - [x] `NIP-53` (`split`) |
-|  |  | - [x] `NIP-61` (`split`) | - [x] `NIP-54` |
-|  |  | - [x] `NIP-86` (`split`) | - [x] `NIP-56` |
-|  |  |  | - [x] `NIP-58` |
-|  |  |  | - [x] `NIP-64` |
-|  |  |  | - [x] `NIP-65` |
-|  |  |  | - [x] `NIP-66` (`split`) |
-|  |  |  | - [x] `NIP-71` (`split`) |
-|  |  |  | - [x] `NIP-72` (`split`) |
-|  |  |  | - [x] `NIP-73` |
-|  |  |  | - [x] `NIP-75` |
-|  |  |  | - [x] `NIP-78` (`split`) |
-|  |  |  | - [x] `NIP-84` |
-|  |  |  | - [x] `NIP-88` |
-|  |  |  | - [x] `NIP-89` (`split`) |
-|  |  |  | - [x] `NIP-92` |
-|  |  |  | - [x] `NIP-94` |
-|  |  |  | - [x] `NIP-99` |
-|  |  |  | - [x] `NIP-B0` |
-|  |  |  | - [x] `NIP-C0` |
-
-- Not supported:
-  - [ ] `NIP-26`
+| [x] | `NIP-01` | Basic protocol flow | core events, filters, relay messages, and AND-filter support |
+| [x] | `NIP-02` | Contacts | contact entries and contact-list helpers |
+| [x] | `NIP-03` | OpenTimestamps | bounded proof extraction and verification helpers |
+| [x] | `NIP-04` | Encrypted direct messages | strict legacy kind-4 crypto, payload, and event-shape helpers |
+| [x] | `NIP-05` | Mapping Nostr keys to DNS | identity lookup and profile mapping helpers |
+| [x] | `NIP-06` | Basic key derivation from mnemonic seed phrase | bounded mnemonic and seed derivation helpers |
+| [x] | `NIP-09` | Event deletion request | deletion target extraction and checked deletion helpers |
+| [x] | `NIP-10` | Text notes and threads | reply and thread extraction helpers |
+| [x] | `NIP-11` | Relay information document | relay metadata parsing helpers |
+| [x] | `NIP-13` | Proof of work | event proof-of-work verification helpers |
+| [x] | `NIP-14` | Subject tag in text events | subject-tag helpers |
+| [x] | `NIP-17` | Private direct messages | deterministic private-message unwrap and file-tag helpers |
+| [x] | `NIP-18` | Reposts | repost target extraction helpers |
+| [x] | `NIP-19` | bech32 entities | bech32 identity encode/decode helpers |
+| [x] | `NIP-21` | `nostr:` URI scheme | URI parse and validation helpers |
+| [x] | `NIP-22` | Comment | root/parent comment target extraction helpers |
+| [x] | `NIP-23` | Long-form content | long-form metadata extract/build helpers |
+| [x] | `NIP-24` | Extra metadata fields and tags | common metadata tag helpers |
+| [x] | `NIP-25` | Reactions | reaction target extraction helpers |
+| [ ] | `NIP-26` | Delegated event signing | intentionally not supported |
+| [x] | `NIP-27` | Text note references | text-reference parsing helpers |
+| [x] | `NIP-28` | Public chat | public-channel metadata and moderation helpers (`split`) |
+| [x] | `NIP-29` | Relay-based groups | pure reducer and bounded group helpers |
+| [x] | `NIP-30` | Custom emoji | custom-emoji tag helpers |
+| [x] | `NIP-31` | Dealing with unknown events | alt-tag helpers |
+| [x] | `NIP-32` | Labeling | label parsing and target extraction helpers |
+| [x] | `NIP-34` | Git stuff | repository metadata and state helpers (`split`) |
+| [x] | `NIP-36` | Sensitive content | content-warning helpers |
+| [x] | `NIP-37` | Draft events | private draft and relay-list storage helpers |
+| [x] | `NIP-38` | User status | status metadata helpers |
+| [x] | `NIP-39` | External identities in profiles | identity-claim helpers |
+| [x] | `NIP-40` | Expiration timestamp | expiration helpers |
+| [x] | `NIP-42` | Client authentication | relay auth helpers |
+| [x] | `NIP-44` | Encrypted payloads | deterministic NIP-44 crypto helpers |
+| [x] | `NIP-46` | Nostr Connect | remote-signing URI, request, response, and discovery helpers |
+| [x] | `NIP-47` | Wallet Connect | wallet-connect URI, envelope, and typed JSON helpers (`split`) |
+| [x] | `NIP-49` | Private key encryption | encrypted key-export helpers |
+| [x] | `NIP-51` | Lists | public and private list helpers |
+| [x] | `NIP-52` | Calendar events | calendar, event, and RSVP helpers |
+| [x] | `NIP-53` | Live activities | live-activity and live-chat helpers (`split`) |
+| [x] | `NIP-54` | Wiki | article, merge-request, and redirect helpers |
+| [x] | `NIP-56` | Reporting | bounded report extraction and tag helpers |
+| [x] | `NIP-57` | Lightning zaps | zap request and receipt helpers (`split`) |
+| [x] | `NIP-58` | Badges | badge definition, award, and profile helpers |
+| [x] | `NIP-59` | Gift wrap | deterministic one-recipient wrap helpers |
+| [x] | `NIP-61` | Nutzaps | nutzap event and redemption helpers (`split`) |
+| [x] | `NIP-64` | Chess | PGN and chess metadata helpers |
+| [x] | `NIP-65` | Relay list metadata | relay metadata helpers |
+| [x] | `NIP-66` | Relay discovery and liveness monitoring | relay-discovery and monitor helpers (`split`) |
+| [x] | `NIP-70` | Protected events | protected-event helpers |
+| [x] | `NIP-71` | Video events | video metadata and imported-origin helpers (`split`) |
+| [x] | `NIP-72` | Moderated communities | community definition, post, and approval helpers (`split`) |
+| [x] | `NIP-73` | External content IDs | external-ID helpers |
+| [x] | `NIP-75` | Zap goals | zap-goal helpers |
+| [x] | `NIP-78` | Application-specific data | opaque app-data helpers (`split`) |
+| [x] | `NIP-84` | Highlights | highlight source and attribution helpers |
+| [x] | `NIP-86` | Relay management API | relay-admin request/response helpers (`split`) |
+| [x] | `NIP-88` | Polls | poll extraction and tally helpers |
+| [x] | `NIP-89` | Recommended application handlers | handler recommendation helpers (`split`) |
+| [x] | `NIP-91` | Unknown event kind filters | AND-filter support in the filter surface |
+| [x] | `NIP-92` | Media attachments | media attachment metadata helpers |
+| [x] | `NIP-94` | File metadata | file metadata and dimensions helpers |
+| [x] | `NIP-98` | HTTP auth | event/header auth helpers (`split`) |
+| [x] | `NIP-99` | Classified listings | listing metadata helpers |
+| [x] | `NIP-B0` | Web bookmarks | bookmark helpers |
+| [x] | `NIP-B7` | Blossom | blossom server and blob-reference helpers (`split`) |
+| [x] | `NIP-C0` | Code snippets | code-snippet and repository-reference helpers |
 
 - Optional I6 extension exports (build-flag gated): `NIP-45`, `NIP-50`, `NIP-77`
 - Non-NIP bounded wallet helpers: Nostr-relevant `BIP-85` subset for lowercase-hex entropy text
