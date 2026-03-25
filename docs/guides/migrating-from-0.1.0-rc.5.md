@@ -11,23 +11,29 @@ canonical: true
 
 # Migrating From `0.1.0-rc.5`
 
-This guide covers the current post-`v0.1.0-rc.5` route-local type cleanup in `noztr-core`.
+This guide covers the current post-`v0.1.0-rc.5` route-local naming and surface-noise cleanup in `noztr-core`.
 
 ## Quick Path
 
 If your project depends on `noztr-core`:
 
-1. update explicit type references in the affected routes
+1. update explicit type and function references in the affected routes
 2. rerun your normal build/test gates
 3. refresh generated symbol indexes or local LLM context that still teach the older longer names
 
-## Renamed Public Types
+## Renamed Public Surface
 
 ### `nip37_drafts`
 
 - `DraftWrapInfo` -> `Wrap`
 - `DraftWrapPlaintextInfo` -> `Plaintext`
 - `PrivateRelayListInfo` -> `PrivateRelayList`
+- `draft_wrap_parse` -> `wrap_parse`
+- `draft_wrap_decrypt_json` -> `wrap_decrypt_json`
+- `draft_wrap_encrypt_json` -> `wrap_encrypt_json`
+- `draft_build_*` -> `wrap_build_*`
+- `private_relay_build_tag` -> `relay_build_tag`
+- `private_relay_list_*` -> `relay_list_*`
 
 ### `nip45_count`
 
@@ -75,6 +81,7 @@ If your project depends on `noztr-core`:
 - `http_auth_encode_event_json_base64` -> `encode_event_json_base64`
 - `http_auth_format_authorization_header` -> `format_authorization_header`
 - `http_auth_encode_authorization_header` -> `encode_authorization_header`
+
 ### `nip53_live_activities`
 
 - `LiveActivityCoordinate` -> `Coordinate`

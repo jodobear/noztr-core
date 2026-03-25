@@ -23,6 +23,7 @@ For the public versioning policy, see
   - `nip53_live_activities`
   - `nip09_delete`
 - shortened route-local function families in:
+  - `nip37_drafts`
   - `nip45_count`
   - `nip23_long_form`
   - `nip99_classified_listings`

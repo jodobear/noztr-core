@@ -67,7 +67,7 @@ pub const TagBuilder = struct {
 };
 
 /// Parses bounded NIP-37 draft-wrap metadata from a kind-31234 event.
-pub fn draft_wrap_parse(event: *const nip01_event.Event) DraftError!Wrap {
+pub fn wrap_parse(event: *const nip01_event.Event) DraftError!Wrap {
     std.debug.assert(@intFromPtr(event) != 0);
     std.debug.assert(event.kind <= limits.kind_max);
 
@@ -91,7 +91,7 @@ pub fn draft_wrap_parse(event: *const nip01_event.Event) DraftError!Wrap {
 }
 
 /// Decrypts a NIP-37 draft-wrap payload and returns the validated plaintext JSON object.
-pub fn draft_wrap_decrypt_json(
+pub fn wrap_decrypt_json(
     plaintext_output: []u8,
     event: *const nip01_event.Event,
     author_private_key: *const [32]u8,
@@ -100,7 +100,7 @@ pub fn draft_wrap_decrypt_json(
     std.debug.assert(@intFromPtr(event) != 0);
     std.debug.assert(@intFromPtr(author_private_key) != 0);
 
-    const info = try draft_wrap_parse(event);
+    const info = try wrap_parse(event);
     if (info.is_deleted) {
         return .{
             .identifier = info.identifier,
@@ -131,7 +131,7 @@ pub fn draft_wrap_decrypt_json(
 }
 
 /// Encrypts validated draft JSON for storage in a kind-31234 event `.content`.
-pub fn draft_wrap_encrypt_json(
+pub fn wrap_encrypt_json(
     output: []u8,
     author_private_key: *const [32]u8,
     author_pubkey: *const [32]u8,
@@ -146,7 +146,7 @@ pub fn draft_wrap_encrypt_json(
 }
 
 /// Builds a canonical `d` tag for a NIP-37 draft wrap.
-pub fn draft_build_identifier_tag(
+pub fn wrap_build_identifier_tag(
     output: *TagBuilder,
     identifier: []const u8,
 ) DraftError!nip01_event.EventTag {
@@ -159,7 +159,7 @@ pub fn draft_build_identifier_tag(
 }
 
 /// Builds a canonical `k` tag for a NIP-37 draft wrap.
-pub fn draft_build_kind_tag(
+pub fn wrap_build_kind_tag(
     output: *TagBuilder,
     kind: u32,
 ) DraftError!nip01_event.EventTag {
@@ -176,7 +176,7 @@ pub fn draft_build_kind_tag(
 }
 
 /// Builds a canonical `expiration` tag for a NIP-37 draft wrap.
-pub fn draft_build_expiration_tag(
+pub fn wrap_build_expiration_tag(
     output: *TagBuilder,
     unix_seconds: u64,
 ) DraftError!nip01_event.EventTag {
@@ -192,7 +192,7 @@ pub fn draft_build_expiration_tag(
 }
 
 /// Builds a canonical private `relay` tag for kind-10013 plaintext JSON.
-pub fn private_relay_build_tag(
+pub fn relay_build_tag(
     output: *TagBuilder,
     relay_url: []const u8,
 ) DraftError!nip01_event.EventTag {
@@ -205,7 +205,7 @@ pub fn private_relay_build_tag(
 }
 
 /// Serializes private relay tags into the encrypted JSON-array plaintext form for kind-10013.
-pub fn private_relay_list_serialize_json(
+pub fn relay_list_serialize_json(
     output: []u8,
     tags: []const nip01_event.EventTag,
 ) DraftError![]const u8 {
@@ -226,7 +226,7 @@ pub fn private_relay_list_serialize_json(
 }
 
 /// Parses kind-10013 private JSON content into ordered relay URLs.
-pub fn private_relay_list_extract_json(
+pub fn relay_list_extract_json(
     input_json: []const u8,
     out: [][]const u8,
     scratch: std.mem.Allocator,
@@ -252,7 +252,7 @@ pub fn private_relay_list_extract_json(
 }
 
 /// Decrypts kind-10013 private relay-list content and extracts ordered relay URLs.
-pub fn private_relay_list_extract_nip44(
+pub fn relay_list_extract_nip44(
     plaintext_output: []u8,
     event: *const nip01_event.Event,
     author_private_key: *const [32]u8,
@@ -276,7 +276,7 @@ pub fn private_relay_list_extract_nip44(
         &event.pubkey,
         event.content,
     );
-    return private_relay_list_extract_json(plaintext, out, scratch);
+    return relay_list_extract_json(plaintext, out, scratch);
 }
 
 fn apply_draft_tag(
@@ -630,7 +630,7 @@ test "draft wrap parse extracts required tags and deleted state" {
     };
     const event = event_for_tags(draft_wrap_kind, tags[0..], "");
 
-    const parsed = try draft_wrap_parse(&event);
+    const parsed = try wrap_parse(&event);
     try std.testing.expectEqualStrings("draft-1", parsed.identifier);
     try std.testing.expectEqual(@as(u32, 1), parsed.draft_kind);
     try std.testing.expectEqual(@as(?u64, 1_700_000_000), parsed.expiration);
@@ -645,7 +645,7 @@ test "draft wrap parse rejects duplicate required tags" {
     };
     const event = event_for_tags(draft_wrap_kind, tags[0..], "ciphertext");
 
-    try std.testing.expectError(error.DuplicateIdentifierTag, draft_wrap_parse(&event));
+    try std.testing.expectError(error.DuplicateIdentifierTag, wrap_parse(&event));
     try std.testing.expect(tags.len == 3);
 }
 
@@ -657,7 +657,7 @@ test "draft wrap decrypt validates decrypted json object" {
         "{\"kind\":1,\"created_at\":1,\"tags\":[],\"content\":\"hello\",\"pubkey\":\"aa\"}";
 
     var ciphertext: [limits.nip44_payload_base64_max_bytes]u8 = undefined;
-    const encoded = try draft_wrap_encrypt_json(
+    const encoded = try wrap_encrypt_json(
         ciphertext[0..],
         &private_key,
         &public_key,
@@ -672,7 +672,7 @@ test "draft wrap decrypt validates decrypted json object" {
     event.pubkey = public_key;
 
     var plaintext: [limits.nip44_plaintext_max_bytes]u8 = undefined;
-    const parsed = try draft_wrap_decrypt_json(plaintext[0..], &event, &private_key, allocator);
+    const parsed = try wrap_decrypt_json(plaintext[0..], &event, &private_key, allocator);
     try std.testing.expectEqualStrings("draft-1", parsed.identifier);
     try std.testing.expectEqual(@as(u32, 1), parsed.draft_kind);
     try std.testing.expectEqualStrings(draft_json, parsed.plaintext_json);
@@ -691,7 +691,7 @@ test "draft wrap decrypt rejects legacy private encoding" {
 
     try std.testing.expectError(
         error.UnsupportedPrivateEncoding,
-        draft_wrap_decrypt_json(plaintext[0..], &event, &private_key, allocator),
+        wrap_decrypt_json(plaintext[0..], &event, &private_key, allocator),
     );
 }
 
@@ -703,7 +703,7 @@ test "draft wrap decrypt rejects mismatched decrypted draft kind" {
         "{\"kind\":42,\"created_at\":1,\"tags\":[],\"content\":\"hello\"}";
 
     var ciphertext: [limits.nip44_payload_base64_max_bytes]u8 = undefined;
-    const encoded = try draft_wrap_encrypt_json(
+    const encoded = try wrap_encrypt_json(
         ciphertext[0..],
         &private_key,
         &public_key,
@@ -720,7 +720,7 @@ test "draft wrap decrypt rejects mismatched decrypted draft kind" {
 
     try std.testing.expectError(
         error.InvalidDraftJson,
-        draft_wrap_decrypt_json(plaintext[0..], &event, &private_key, allocator),
+        wrap_decrypt_json(plaintext[0..], &event, &private_key, allocator),
     );
 }
 
@@ -732,7 +732,7 @@ test "draft wrap encrypt rejects non-event-shaped json objects" {
 
     try std.testing.expectError(
         error.InvalidDraftJson,
-        draft_wrap_encrypt_json(
+        wrap_encrypt_json(
             ciphertext[0..],
             &private_key,
             &public_key,
@@ -745,17 +745,17 @@ test "draft wrap encrypt rejects non-event-shaped json objects" {
 test "private relay list serialize and extract json" {
     var builder_a = TagBuilder{};
     var builder_b = TagBuilder{};
-    const tag_a = try private_relay_build_tag(&builder_a, "wss://relay.one");
-    const tag_b = try private_relay_build_tag(&builder_b, "wss://relay.two");
+    const tag_a = try relay_build_tag(&builder_a, "wss://relay.one");
+    const tag_b = try relay_build_tag(&builder_b, "wss://relay.two");
     const tags = [_]nip01_event.EventTag{ tag_a, tag_b };
 
     var json_output: [256]u8 = undefined;
-    const json = try private_relay_list_serialize_json(json_output[0..], tags[0..]);
+    const json = try relay_list_serialize_json(json_output[0..], tags[0..]);
     var relay_urls: [4][]const u8 = undefined;
     var arena = std.heap.ArenaAllocator.init(std.testing.allocator);
     defer arena.deinit();
 
-    const parsed = try private_relay_list_extract_json(json, relay_urls[0..], arena.allocator());
+    const parsed = try relay_list_extract_json(json, relay_urls[0..], arena.allocator());
     try std.testing.expectEqual(@as(u16, 2), parsed.relay_count);
     try std.testing.expectEqualStrings("wss://relay.one", relay_urls[0]);
     try std.testing.expectEqualStrings("wss://relay.two", relay_urls[1]);
@@ -781,7 +781,7 @@ test "private relay list extract nip44 decrypts relay urls" {
     var arena = std.heap.ArenaAllocator.init(std.testing.allocator);
     defer arena.deinit();
 
-    const parsed = try private_relay_list_extract_nip44(
+    const parsed = try relay_list_extract_nip44(
         plaintext[0..],
         &relay_event,
         &private_key,
@@ -799,7 +799,7 @@ test "private relay list extract rejects malformed relay tag" {
 
     try std.testing.expectError(
         error.InvalidPrivateRelayUrl,
-        private_relay_list_extract_json(
+        relay_list_extract_json(
             "[[\"relay\",\"not a url\"]]",
             relay_urls[0..],
             arena.allocator(),
@@ -815,11 +815,11 @@ test "private relay list rejects non-websocket relay urls" {
 
     try std.testing.expectError(
         error.InvalidPrivateRelayUrl,
-        private_relay_build_tag(&built, "https://relay.example"),
+        relay_build_tag(&built, "https://relay.example"),
     );
     try std.testing.expectError(
         error.InvalidPrivateRelayUrl,
-        private_relay_list_extract_json(
+        relay_list_extract_json(
             "[[\"relay\",\"https://relay.example\"]]",
             relay_urls[0..],
             arena.allocator(),
@@ -834,11 +834,11 @@ test "draft builders reject overlong caller input with typed errors" {
 
     try std.testing.expectError(
         error.InvalidIdentifierTag,
-        draft_build_identifier_tag(&built, overlong_identifier[0..]),
+        wrap_build_identifier_tag(&built, overlong_identifier[0..]),
     );
     try std.testing.expectError(
         error.InvalidPrivateRelayUrl,
-        private_relay_build_tag(&built, overlong_relay),
+        relay_build_tag(&built, overlong_relay),
     );
 }
 
@@ -851,7 +851,7 @@ test "draft wrap encrypt rejects overlong draft json with typed error" {
 
     try std.testing.expectError(
         error.InvalidDraftJson,
-        draft_wrap_encrypt_json(
+        wrap_encrypt_json(
             ciphertext[0..],
             &private_key,
             &public_key,

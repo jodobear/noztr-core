@@ -34,7 +34,7 @@ test "adversarial private-relay example: reject non-websocket relay urls" {
 
     try std.testing.expectError(
         error.InvalidPrivateRelayUrl,
-        noztr.nip37_drafts.private_relay_list_extract_json(
+        noztr.nip37_drafts.relay_list_extract_json(
             "[[\"relay\",\"https://relay.one\"]]",
             relays[0..],
             arena.allocator(),

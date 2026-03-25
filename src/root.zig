@@ -899,11 +899,11 @@ test "root exports limits and error namespaces" {
             fn ([]const u8, std.mem.Allocator) nip46_remote_signing.RemoteSigningError!nip46_remote_signing.Message,
     );
     try std.testing.expect(
-        @TypeOf(nip37_drafts.draft_wrap_parse) ==
+        @TypeOf(nip37_drafts.wrap_parse) ==
             fn (*const nip01_event.Event) nip37_drafts.DraftError!nip37_drafts.Wrap,
     );
     try std.testing.expect(
-        @TypeOf(nip37_drafts.draft_wrap_decrypt_json) ==
+        @TypeOf(nip37_drafts.wrap_decrypt_json) ==
             fn (
                 []u8,
                 *const nip01_event.Event,
@@ -912,7 +912,7 @@ test "root exports limits and error namespaces" {
             ) nip37_drafts.DraftError!nip37_drafts.Plaintext,
     );
     try std.testing.expect(
-        @TypeOf(nip37_drafts.draft_wrap_encrypt_json) ==
+        @TypeOf(nip37_drafts.wrap_encrypt_json) ==
             fn (
                 []u8,
                 *const [32]u8,
@@ -922,15 +922,15 @@ test "root exports limits and error namespaces" {
             ) nip37_drafts.DraftError![]const u8,
     );
     try std.testing.expect(
-        @TypeOf(nip37_drafts.private_relay_build_tag) ==
+        @TypeOf(nip37_drafts.relay_build_tag) ==
             fn (*nip37_drafts.TagBuilder, []const u8) nip37_drafts.DraftError!nip01_event.EventTag,
     );
     try std.testing.expect(
-        @TypeOf(nip37_drafts.private_relay_list_serialize_json) ==
+        @TypeOf(nip37_drafts.relay_list_serialize_json) ==
             fn ([]u8, []const nip01_event.EventTag) nip37_drafts.DraftError![]const u8,
     );
     try std.testing.expect(
-        @TypeOf(nip37_drafts.private_relay_list_extract_json) ==
+        @TypeOf(nip37_drafts.relay_list_extract_json) ==
             fn (
                 []const u8,
                 [][]const u8,
@@ -938,7 +938,7 @@ test "root exports limits and error namespaces" {
             ) nip37_drafts.DraftError!nip37_drafts.PrivateRelayList,
     );
     try std.testing.expect(
-        @TypeOf(nip37_drafts.private_relay_list_extract_nip44) ==
+        @TypeOf(nip37_drafts.relay_list_extract_nip44) ==
             fn (
                 []u8,
                 *const nip01_event.Event,
