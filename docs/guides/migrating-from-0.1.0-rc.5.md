@@ -148,6 +148,10 @@ If your project depends on `noztr-core`:
 - `notification_event_extract` -> `notification_extract`
 - `nwc_build_*` -> `build_*`
 - `nwc_format_info_capabilities` -> `format_info_capabilities`
+- response request-id error names were shortened:
+  - `MissingRequestEventId` -> `MissingRequestId`
+  - `DuplicateRequestEventId` -> `DuplicateRequestId`
+  - `InvalidRequestEventId` -> `InvalidRequestId`
 
 ## Scope
 

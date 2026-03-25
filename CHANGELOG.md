@@ -35,6 +35,7 @@ For the public versioning policy, see
 - shortened verbose route-internal error names in:
   - `nip72_moderated_communities`
   - `nip54_wiki`
+  - `nip47_wallet_connect`
 - downstream migration guide:
   - [docs/guides/migrating-from-0.1.0-rc.5.md](docs/guides/migrating-from-0.1.0-rc.5.md)
 
