@@ -10,6 +10,7 @@
 .claude/
 .logs/
 __pycache__/
+.local-skills/
 .zig-cache/
 examples/.zig-cache/
 zig-out/
