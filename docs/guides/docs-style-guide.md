@@ -90,7 +90,6 @@ Coverage should come from the whole public docs system:
 - point readers to the best example for the job
 - point examples back to the most relevant guide or reference page
 - keep routers lean and scannable
-- do not route public readers into `.private-docs/`
 
 ## Style Expectations
 

@@ -60,6 +60,3 @@ Use the support pages for cross-cutting expectations:
 
 Use the official upstream NIPs repository for spec texts:
 <https://github.com/nostr-protocol/nips>
-
-The internal planning, audit, and process-control docs live in local-only `.private-docs/` and
-are not part of the public docs route.

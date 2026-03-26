@@ -241,7 +241,6 @@ This repo now carries one downstream examples package and wires it into
 - `src/` - protocol modules and root exports
 - `docs/` - public-facing documentation
 - official NIP texts - use the upstream repository at `https://github.com/nostr-protocol/nips`
-- `.private-docs/` - local-only internal planning, audit, and process material
 - `tools/interop/` - parity harnesses and interop tooling
 - `CONTRIBUTING.md` - repo contribution guide
 - `CHANGELOG.md` - public release history
