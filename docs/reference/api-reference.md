@@ -69,6 +69,9 @@ These are the quickest symbol-level routes into the modules most downstream user
   - parse typed inbound request bodies
 - `response_result_*`
   - parse typed successful response results
+- ownership note:
+  - JSON and typed parse routes borrow from caller-provided scratch allocation
+  - use a short-lived arena allocator for parse/validate flows
 - start example:
   - [remote_signing_recipe.zig](../../examples/remote_signing_recipe.zig)
 - hostile example:
@@ -92,6 +95,9 @@ These are the quickest symbol-level routes into the modules most downstream user
   - parse typed request JSON content
 - `response_parse_json`
   - parse typed response JSON content
+- ownership note:
+  - JSON parse routes borrow from caller-provided scratch allocation
+  - use a short-lived arena allocator for parse/validate flows
 - start example:
   - [nip47_example.zig](../../examples/nip47_example.zig)
 - hostile example:
@@ -102,7 +108,8 @@ These are the quickest symbol-level routes into the modules most downstream user
 ### `nip59_wrap`
 
 - `nip59_build_outbound_for_recipient`
-  - build one deterministic one-recipient `rumor -> seal -> wrap` transcript
+  - build one bounded one-recipient `rumor -> seal -> wrap` transcript with fixed caller-provided
+    nonces
 - `nip59_unwrap`
   - unwrap an inbound wrap into the typed kernel payload
 - start example:
@@ -545,6 +552,10 @@ These are the quickest symbol-level routes into the modules most downstream user
 | `nip46_remote_signing` | remote-signing URI, request, and response helpers | [remote_signing_recipe.zig](../../examples/remote_signing_recipe.zig) |
 | `nip47_wallet_connect` | Wallet Connect URI, envelope, and JSON contract helpers | [nip47_example.zig](../../examples/nip47_example.zig) |
 | `nip98_http_auth` | HTTP-auth event and header helpers | [nip98_example.zig](../../examples/nip98_example.zig) |
+
+For `nip46_remote_signing`, `nip47_wallet_connect`, and `nip86_relay_management`, JSON parse
+surfaces borrow from caller-provided scratch allocation. Use a short-lived arena allocator for
+parse/validate flows.
 
 ## Privacy, Encryption, And Delegation
 

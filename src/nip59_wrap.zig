@@ -62,7 +62,7 @@ pub fn nip59_validate_wrap_structure(wrap_event: *const Event) WrapError!void {
     };
 }
 
-/// Build one minimal deterministic `rumor -> seal -> wrap` transcript for one recipient.
+/// Build one minimal bounded `rumor -> seal -> wrap` transcript for one recipient.
 pub fn nip59_build_outbound_for_recipient(
     output_seal: *Event,
     output_wrap: *BuiltWrapEvent,

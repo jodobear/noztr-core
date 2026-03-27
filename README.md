@@ -9,8 +9,9 @@ backend exceptions.
 
 The Zig package/import name in examples remains `noztr`.
 
-- A deterministic, bounded, compatibility-aware protocol-kernel implementation for Nostr.
-- Built as a static library with deterministic, bounded behavior targets.
+- A bounded, compatibility-aware protocol-kernel implementation for Nostr.
+- Built as a static library with deterministic trust-boundary behavior targets and explicit crypto
+  boundary handling.
 - Focused on protocol parsing, validation, serialization, and trust-boundary helpers.
 - Keeps non-crypto surfaces stdlib-first and isolates approved crypto backends behind narrow boundary
   modules.

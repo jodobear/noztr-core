@@ -3,7 +3,7 @@ const std = @import("std");
 /// Shared typed boundary errors for strict default I0/I1 modules.
 pub const EncodeError = error{ BufferTooSmall, ValueOutOfRange };
 
-/// Phase D contract-aligned parse errors for NIP-01 events.
+/// Shared parse errors for NIP-01 events.
 pub const EventParseError = error{
     InputTooShort,
     InputTooLong,
@@ -18,7 +18,7 @@ pub const EventParseError = error{
     TagItemTooLong,
 };
 
-/// Phase D contract-aligned verify errors for NIP-01 events.
+/// Shared verify errors for NIP-01 events.
 pub const EventVerifyError = error{
     InvalidId,
     InvalidSignature,
@@ -26,7 +26,7 @@ pub const EventVerifyError = error{
     BackendUnavailable,
 };
 
-/// Phase D contract-aligned parse errors for NIP-01 filters.
+/// Shared parse errors for NIP-01 filters.
 pub const FilterParseError = error{
     InputTooLong,
     OutOfMemory,

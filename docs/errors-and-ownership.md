@@ -31,7 +31,7 @@ responsibility.
 The default expectation is:
 
 - callers provide output buffers
-- callers provide scratch buffers when a surface needs temporary workspace
+- callers provide scratch allocators when a surface needs temporary workspace
 - returned slices usually borrow from caller-owned input or caller-owned output
 - the library avoids a heap-first public API style
 
@@ -40,6 +40,9 @@ In practice this means:
 - read the function signature carefully
 - size output buffers using the documented limits for the surface
 - treat output slices as valid only as long as the underlying caller-owned storage remains valid
+- for allocator-backed parse routes, treat returned slices as valid only while the scratch
+  allocation backing them remains alive
+- a short-lived arena allocator is usually the right fit for JSON parse and validate call trees
 - do not assume hidden background ownership or long-lived retained allocations
 
 Useful public starting points:

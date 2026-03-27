@@ -8,221 +8,79 @@ pub const limits = @import("limits.zig");
 /// Strict-by-default typed errors used by v1 module contracts.
 pub const errors = @import("errors.zig");
 
-/// Canonical module namespace exports (phase-aligned).
-/// Phase I1 concrete export for the NIP-01 event module.
+/// Canonical module namespace exports.
 pub const nip01_event = @import("nip01_event.zig");
-
-/// Phase I1 concrete export for the NIP-01 filter module.
 pub const nip01_filter = @import("nip01_filter.zig");
-
-/// Phase I2 concrete export for the NIP-01 message module.
 pub const nip01_message = @import("nip01_message.zig");
-
-/// Phase I2 concrete export for the NIP-42 auth module.
 pub const nip42_auth = @import("nip42_auth.zig");
-
-/// Phase I2 concrete export for the NIP-70 protected-event module.
 pub const nip70_protected = @import("nip70_protected.zig");
-
-/// Phase H fourth requested-loop split concrete export for the NIP-71 video-events module.
 pub const nip71_video_events = @import("nip71_video_events.zig");
-
-/// Phase H fourth requested-loop split concrete export for the NIP-72 moderated-communities module.
 pub const nip72_moderated_communities = @import("nip72_moderated_communities.zig");
-
-/// Phase I2 concrete export for the NIP-11 relay information module.
 pub const nip11 = @import("nip11.zig");
-
-/// Phase I3 concrete export for the NIP-09 deletion module.
 pub const nip09_delete = @import("nip09_delete.zig");
-
-/// Phase I3 concrete export for the NIP-40 expiration module.
 pub const nip40_expire = @import("nip40_expire.zig");
-
-/// Post-kernel requested-loop concrete export for the NIP-94 file metadata module.
 pub const nip94_file_metadata = @import("nip94_file_metadata.zig");
-
-/// Post-kernel requested-loop concrete export for the NIP-92 media-attachment module.
 pub const nip92_media_attachments = @import("nip92_media_attachments.zig");
-
-/// Post-kernel requested-loop concrete export for the NIP-99 classified-listing module.
 pub const nip99_classified_listings = @import("nip99_classified_listings.zig");
-
-/// Post-kernel requested-loop concrete export for the NIP-B0 web-bookmarking module.
 pub const nipb0_web_bookmarking = @import("nipb0_web_bookmarking.zig");
-
-/// Post-kernel requested-loop concrete export for the NIP-C0 code-snippet module.
 pub const nipc0_code_snippets = @import("nipc0_code_snippets.zig");
-
-/// Post-kernel requested-loop concrete export for the NIP-64 chess PGN module.
 pub const nip64_chess_pgn = @import("nip64_chess_pgn.zig");
-
-/// Post-kernel requested-loop concrete export for the NIP-88 polls module.
 pub const nip88_polls = @import("nip88_polls.zig");
-
-/// Post-kernel requested-loop split concrete export for the NIP-98 HTTP-auth module.
 pub const nip98_http_auth = @import("nip98_http_auth.zig");
-
-/// Post-kernel requested-loop split concrete export for the NIP-B7 Blossom module.
 pub const nipb7_blossom_servers = @import("nipb7_blossom_servers.zig");
-
-/// Phase I3 concrete export for the NIP-13 proof-of-work module.
 pub const nip13_pow = @import("nip13_pow.zig");
-
-/// Phase I4 concrete export for the NIP-19 bech32 identity module.
 pub const nip19_bech32 = @import("nip19_bech32.zig");
-
-/// Phase I4 concrete export for the NIP-21 URI module.
 pub const nip21_uri = @import("nip21_uri.zig");
-
-/// Phase I4 concrete export for the NIP-02 contacts module.
 pub const nip02_contacts = @import("nip02_contacts.zig");
-
-/// Phase I4 concrete export for the NIP-65 relay metadata module.
 pub const nip65_relays = @import("nip65_relays.zig");
-
-/// Phase H split concrete export for the NIP-66 relay discovery module.
 pub const nip66_relay_discovery = @import("nip66_relay_discovery.zig");
-
-/// Phase H concrete export for the NIP-10 thread/reply helper module.
 pub const nip10_threads = @import("nip10_threads.zig");
-
-/// Phase H third requested-loop concrete export for the NIP-14 subjects module.
 pub const nip14_subjects = @import("nip14_subjects.zig");
-
-/// Phase H concrete export for the NIP-18 repost module.
 pub const nip18_reposts = @import("nip18_reposts.zig");
-
-/// Phase H concrete export for the NIP-22 comment module.
 pub const nip22_comments = @import("nip22_comments.zig");
-
-/// Phase H concrete export for the NIP-27 text-reference module.
 pub const nip27_references = @import("nip27_references.zig");
-
-/// Phase H third requested-loop split concrete export for the NIP-28 public-chat module.
 pub const nip28_public_chat = @import("nip28_public_chat.zig");
-
-/// Phase H third requested-loop concrete export for the NIP-30 custom-emoji module.
 pub const nip30_custom_emoji = @import("nip30_custom_emoji.zig");
-
-/// Phase H concrete export for the NIP-25 reactions module.
 pub const nip25_reactions = @import("nip25_reactions.zig");
-
-/// Phase H concrete export for the NIP-51 public-list module.
 pub const nip51_lists = @import("nip51_lists.zig");
-
-/// Phase H concrete export for the NIP-46 remote-signing module.
 pub const nip46_remote_signing = @import("nip46_remote_signing.zig");
-
-/// Post-kernel requested-loop split concrete export for the NIP-47 wallet-connect module.
 pub const nip47_wallet_connect = @import("nip47_wallet_connect.zig");
-
-/// Post-kernel requested-loop concrete export for the NIP-49 private-key encryption module.
 pub const nip49_private_key_encryption = @import("nip49_private_key_encryption.zig");
-
-/// Phase H concrete export for the NIP-06 mnemonic derivation module.
 pub const nip06_mnemonic = @import("nip06_mnemonic.zig");
-
-/// Post-kernel concrete export for bounded BIP-85 derivation helpers.
 pub const bip85_derivation = @import("bip85_derivation.zig");
-
-/// Post-kernel concrete export for bounded Nostr key-derivation and signing helpers.
 pub const nostr_keys = @import("nostr_keys.zig");
-
-/// Phase H concrete export for the NIP-23 long-form metadata module.
 pub const nip23_long_form = @import("nip23_long_form.zig");
-
-/// Phase H concrete export for the NIP-24 extra metadata module.
 pub const nip24_extra_metadata = @import("nip24_extra_metadata.zig");
-
-/// Phase H deferred-backlog concrete export for the NIP-03 OpenTimestamps module.
 pub const nip03_opentimestamps = @import("nip03_opentimestamps.zig");
-
-/// Phase H deferred-backlog concrete export for the NIP-17 private direct-message module.
 pub const nip17_private_messages = @import("nip17_private_messages.zig");
-
-/// Phase H deferred-backlog concrete export for the NIP-04 legacy direct-message module.
 pub const nip04 = @import("nip04.zig");
-
-/// Phase H deferred-backlog concrete export for the NIP-39 external-identity module.
 pub const nip39_external_identities = @import("nip39_external_identities.zig");
-
-/// Phase H deferred-backlog concrete export for the NIP-29 relay-group module.
 pub const nip29_relay_groups = @import("nip29_relay_groups.zig");
-
-/// Phase H second requested-loop concrete export for the NIP-31 alt-tag module.
 pub const nip31_alt_tags = @import("nip31_alt_tags.zig");
-
-/// Post-Phase-H concrete export for the NIP-73 external-id module.
 pub const nip73_external_ids = @import("nip73_external_ids.zig");
-
-/// Post-Phase-H concrete export for the NIP-32 labeling module.
 pub const nip32_labeling = @import("nip32_labeling.zig");
-
-/// Phase H second requested-loop split concrete export for the NIP-34 git metadata module.
 pub const nip34_git = @import("nip34_git.zig");
-
-/// Post-Phase-H concrete export for the NIP-36 content-warning module.
 pub const nip36_content_warning = @import("nip36_content_warning.zig");
-
-/// Post-Phase-H concrete export for the NIP-56 reporting module.
 pub const nip56_reporting = @import("nip56_reporting.zig");
-
-/// Post-Phase-H concrete export for the NIP-05 identity module.
 pub const nip05_identity = @import("nip05_identity.zig");
-
-/// Post-Phase-H concrete export for the NIP-37 drafts module.
 pub const nip37_drafts = @import("nip37_drafts.zig");
-
-/// Phase H third requested-loop concrete export for the NIP-38 user-status module.
 pub const nip38_user_status = @import("nip38_user_status.zig");
-
-/// Post-Phase-H concrete export for the NIP-58 badges module.
 pub const nip58_badges = @import("nip58_badges.zig");
-
-/// Phase H second requested-loop concrete export for the NIP-52 calendar-events module.
 pub const nip52_calendar_events = @import("nip52_calendar_events.zig");
-
-/// Phase H second requested-loop split concrete export for the NIP-53 live-activities module.
 pub const nip53_live_activities = @import("nip53_live_activities.zig");
-
-/// Phase H second requested-loop split concrete export for the NIP-54 wiki module.
 pub const nip54_wiki = @import("nip54_wiki.zig");
-
-/// Post-Phase-H concrete export for the NIP-84 highlights module.
 pub const nip84_highlights = @import("nip84_highlights.zig");
-
-/// Post-Phase-H split concrete export for the NIP-57 zaps module.
 pub const nip57_zaps = @import("nip57_zaps.zig");
-
-/// Phase H third requested-loop split concrete export for the NIP-61 nutzaps module.
 pub const nip61_nutzaps = @import("nip61_nutzaps.zig");
-
-/// Post-Phase-H split concrete export for the NIP-86 relay-management module.
 pub const nip86_relay_management = @import("nip86_relay_management.zig");
-
-/// Phase H third requested-loop concrete export for the NIP-75 zap-goals module.
 pub const nip75_zap_goals = @import("nip75_zap_goals.zig");
-
-/// Phase I5 concrete export for the NIP-44 encrypted direct-message module.
 pub const nip44 = @import("nip44.zig");
-
-/// Phase I5 concrete export for the NIP-59 gift-wrap module.
 pub const nip59_wrap = @import("nip59_wrap.zig");
-
-/// Phase H second requested-loop concrete export for the NIP-78 app-data module.
 pub const nip78_app_data = @import("nip78_app_data.zig");
-
-/// Phase H third requested-loop split concrete export for the NIP-89 handlers module.
 pub const nip89_handlers = @import("nip89_handlers.zig");
-
-/// Phase I6 concrete export for the NIP-45 count module.
+/// Optional I6 extension exports.
 pub const nip45_count = if (i6_extensions_enabled) @import("nip45_count.zig") else struct {};
-
-/// Phase I6 concrete export for the NIP-50 search module.
 pub const nip50_search = if (i6_extensions_enabled) @import("nip50_search.zig") else struct {};
-
-/// Phase I6 concrete export for the NIP-77 negentropy module.
 pub const nip77_negentropy =
     if (i6_extensions_enabled) @import("nip77_negentropy.zig") else struct {};
 

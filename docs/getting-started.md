@@ -86,7 +86,7 @@ exe.root_module.addImport("noztr", noztr_module);
 - [remote_signing_recipe.zig](../examples/remote_signing_recipe.zig)
   - remote-signing request, URI, and typed-response flow
 - [wallet_recipe.zig](../examples/wallet_recipe.zig)
-  - deterministic mnemonic, keys, and wallet-adjacent helpers
+  - deterministic mnemonic derivation plus bounded key and wallet-adjacent helpers
 
 ## Read The Failure Contract Too
 
