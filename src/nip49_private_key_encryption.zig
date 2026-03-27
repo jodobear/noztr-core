@@ -1,21 +1,17 @@
 const std = @import("std");
+const internal_bech32 = @import("internal/bech32.zig");
 const limits = @import("limits.zig");
 const nostr_keys = @import("nostr_keys.zig");
 const unicode_nfkc = @import("unicode_nfkc.zig");
 
 const XChaCha20Poly1305 = std.crypto.aead.chacha_poly.XChaCha20Poly1305;
 const scrypt = std.crypto.pwhash.scrypt;
-const bech32_charset = "qpzry9x8gf2tvdw0s3jn54khce6mua7l";
-const bech32_generator = [_]u32{ 0x3b6a57b2, 0x26508e6d, 0x1ea119fa, 0x3d4233dd, 0x2a1462b3 };
-
 pub const ncryptsec_hrp = "ncryptsec";
 pub const version_v2: u8 = limits.nip49_version;
 
 const max_log_n: u8 = 22;
 const alignment_slop_bytes: u8 = 45;
 const ciphertext_body_bytes: u8 = limits.nip49_key_bytes;
-const polymod_values_bytes: u16 = ncryptsec_hrp.len + limits.nip49_bech32_bytes_max;
-
 pub const PrivateKeyEncryptionError = error{
     InvalidUtf8,
     InvalidNormalization,
@@ -46,16 +42,6 @@ pub const EncryptedSecretKey = struct {
     nonce: [limits.nip49_nonce_bytes]u8,
     key_security: KeySecurity,
     ciphertext: [limits.nip49_ciphertext_bytes]u8,
-};
-
-const Bech32CaseState = struct {
-    saw_upper: bool = false,
-    saw_lower: bool = false,
-};
-
-const Bech32Decoded = struct {
-    hrp: []const u8,
-    payload_values: []const u8,
 };
 
 /// Return the minimum caller-owned scratch bytes required for the fixed NIP-49 scrypt boundary.
@@ -127,15 +113,21 @@ pub fn nip49_decode_bech32(input: []const u8) PrivateKeyEncryptionError!Encrypte
 
     var hrp_buffer: [ncryptsec_hrp.len]u8 = undefined;
     var value_buffer: [limits.nip49_bech32_bytes_max]u8 = undefined;
-    const decoded = try decode_bech32(input, &hrp_buffer, &value_buffer);
+    const decoded = internal_bech32.decode(input, hrp_buffer[0..], value_buffer[0..]) catch |err| {
+        return map_bech32_error(err);
+    };
     if (!std.mem.eql(u8, decoded.hrp, ncryptsec_hrp)) return error.InvalidPrefix;
 
     var payload: [limits.nip49_payload_bytes]u8 = undefined;
-    const payload_len = convert_bits(payload[0..], decoded.payload_values, 5, 8, false) catch |err| {
+    const payload_len = internal_bech32.convert_bits(payload[0..], decoded.payload_values, 5, 8, false) catch |err| {
         return switch (err) {
             error.InvalidPayload => error.InvalidPayload,
             error.BufferTooSmall => error.InvalidPayload,
-            else => err,
+            error.InvalidBech32,
+            error.InvalidChecksum,
+            error.MixedCase,
+            error.ValueOutOfRange,
+            => error.InvalidPayload,
         };
     };
     if (payload_len != limits.nip49_payload_bytes) return error.InvalidPayload;
@@ -151,8 +143,11 @@ pub fn nip49_encode_bech32(
     std.debug.assert(limits.nip49_payload_bytes <= limits.nip49_bech32_bytes_max);
 
     var payload: [limits.nip49_payload_bytes]u8 = undefined;
+    var data_values: [limits.nip49_bech32_bytes_max]u8 = undefined;
     const serialized = try nip49_serialize_bytes(payload[0..], encrypted);
-    return encode_bech32(output, ncryptsec_hrp, serialized);
+    return internal_bech32.encode(output, ncryptsec_hrp, serialized, data_values[0..]) catch |err| {
+        return map_bech32_error(err);
+    };
 }
 
 /// Encrypt a validated secret key with random salt and nonce and return the typed frame.
@@ -402,170 +397,15 @@ fn wipe_bytes(bytes: []u8) void {
     std.crypto.secureZero(u8, bytes);
 }
 
-fn decode_bech32(
-    input: []const u8,
-    hrp_buffer: *[ncryptsec_hrp.len]u8,
-    data_values_buffer: *[limits.nip49_bech32_bytes_max]u8,
-) PrivateKeyEncryptionError!Bech32Decoded {
-    if (input.len < ncryptsec_hrp.len + 1 + 6) return error.InvalidBech32;
-    if (input.len > limits.nip49_bech32_bytes_max) return error.InvalidBech32;
-
-    var separator_index: ?usize = null;
-    var case_state = Bech32CaseState{};
-    for (input, 0..) |char, index| {
-        const lowered = try lower_bech32_char(char, &case_state);
-        if (lowered == '1') separator_index = index;
-    }
-    const separator = separator_index orelse return error.InvalidBech32;
-    if (separator == 0) return error.InvalidBech32;
-    if (separator + 7 > input.len) return error.InvalidBech32;
-    if (separator != ncryptsec_hrp.len) return error.InvalidPrefix;
-
-    var hrp_len: usize = 0;
-    for (input[0..separator]) |char| {
-        if (hrp_len >= hrp_buffer.len) return error.InvalidPrefix;
-        hrp_buffer[hrp_len] = try lower_bech32_char(char, &case_state);
-        hrp_len += 1;
-    }
-
-    var data_len: usize = 0;
-    for (input[separator + 1 ..]) |char| {
-        if (data_len >= data_values_buffer.len) return error.InvalidBech32;
-        const lowered = try lower_bech32_char(char, &case_state);
-        data_values_buffer[data_len] = charset_value(lowered) orelse return error.InvalidBech32;
-        data_len += 1;
-    }
-    if (!verify_checksum(hrp_buffer[0..hrp_len], data_values_buffer[0..data_len])) {
-        return error.InvalidChecksum;
-    }
-
-    return .{
-        .hrp = hrp_buffer[0..hrp_len],
-        .payload_values = data_values_buffer[0 .. data_len - 6],
+fn map_bech32_error(err: internal_bech32.Error) PrivateKeyEncryptionError {
+    return switch (err) {
+        error.InvalidBech32 => error.InvalidBech32,
+        error.InvalidChecksum => error.InvalidChecksum,
+        error.MixedCase => error.MixedCase,
+        error.InvalidPayload => error.InvalidPayload,
+        error.BufferTooSmall => error.BufferTooSmall,
+        error.ValueOutOfRange => error.InvalidPayload,
     };
-}
-
-fn lower_bech32_char(char: u8, case_state: *Bech32CaseState) PrivateKeyEncryptionError!u8 {
-    if (char < 33 or char > 126) return error.InvalidBech32;
-
-    var lowered = char;
-    if (char >= 'A' and char <= 'Z') {
-        case_state.saw_upper = true;
-        lowered = char + 32;
-    } else if (char >= 'a' and char <= 'z') {
-        case_state.saw_lower = true;
-    }
-    if (case_state.saw_upper and case_state.saw_lower) return error.MixedCase;
-    return lowered;
-}
-
-fn encode_bech32(output: []u8, hrp: []const u8, payload: []const u8) PrivateKeyEncryptionError![]const u8 {
-    var data_values: [limits.nip49_bech32_bytes_max]u8 = undefined;
-    const data_len = try convert_bits(data_values[0..], payload, 8, 5, true);
-    const total_len = hrp.len + 1 + data_len + 6;
-    if (total_len > limits.nip49_bech32_bytes_max) return error.InvalidPayload;
-    if (output.len < total_len) return error.BufferTooSmall;
-
-    @memcpy(output[0..hrp.len], hrp);
-    output[hrp.len] = '1';
-    for (data_values[0..data_len], 0..) |value, index| {
-        output[hrp.len + 1 + index] = bech32_charset[value];
-    }
-    const checksum = create_checksum(hrp, data_values[0..data_len]);
-    for (checksum, 0..) |value, index| {
-        output[hrp.len + 1 + data_len + index] = bech32_charset[value];
-    }
-    return output[0..total_len];
-}
-
-fn convert_bits(
-    output: []u8,
-    input: []const u8,
-    from_bits: u8,
-    to_bits: u8,
-    pad: bool,
-) PrivateKeyEncryptionError!u16 {
-    var accumulator: u32 = 0;
-    var bits: u8 = 0;
-    var output_index: u16 = 0;
-    const max_value = (@as(u32, 1) << @intCast(to_bits)) - 1;
-    const from_mask = (@as(u32, 1) << @intCast(from_bits)) - 1;
-
-    for (input) |value| {
-        if ((@as(u32, value) & ~from_mask) != 0) return error.InvalidPayload;
-        accumulator = (accumulator << @intCast(from_bits)) | value;
-        bits += from_bits;
-        while (bits >= to_bits) {
-            bits -= to_bits;
-            if (output_index >= output.len) return error.BufferTooSmall;
-            output[output_index] = @intCast((accumulator >> @intCast(bits)) & max_value);
-            output_index += 1;
-        }
-    }
-
-    if (pad) {
-        if (bits > 0) {
-            if (output_index >= output.len) return error.BufferTooSmall;
-            output[output_index] = @intCast((accumulator << @intCast(to_bits - bits)) & max_value);
-            output_index += 1;
-        }
-        return output_index;
-    }
-    if (bits >= from_bits) return error.InvalidPayload;
-    if (((accumulator << @intCast(to_bits - bits)) & max_value) != 0) return error.InvalidPayload;
-    return output_index;
-}
-
-fn create_checksum(hrp: []const u8, data: []const u8) [6]u8 {
-    var values: [polymod_values_bytes]u8 = undefined;
-    const expanded_len = expand_hrp(values[0..], hrp);
-    @memcpy(values[expanded_len .. expanded_len + data.len], data);
-    @memset(values[expanded_len + data.len .. expanded_len + data.len + 6], 0);
-    const polymod_value = polymod(values[0 .. expanded_len + data.len + 6]) ^ 1;
-
-    var checksum: [6]u8 = undefined;
-    var index: u8 = 0;
-    while (index < 6) : (index += 1) {
-        const shift = @as(u5, @intCast(@as(u8, 5) * (@as(u8, 5) - index)));
-        checksum[index] = @intCast((polymod_value >> shift) & 31);
-    }
-    return checksum;
-}
-
-fn verify_checksum(hrp: []const u8, data: []const u8) bool {
-    var values: [polymod_values_bytes]u8 = undefined;
-    const expanded_len = expand_hrp(values[0..], hrp);
-    @memcpy(values[expanded_len .. expanded_len + data.len], data);
-    return polymod(values[0 .. expanded_len + data.len]) == 1;
-}
-
-fn expand_hrp(output: []u8, hrp: []const u8) usize {
-    std.debug.assert(output.len >= hrp.len * 2 + 1);
-    std.debug.assert(hrp.len == ncryptsec_hrp.len);
-
-    for (hrp, 0..) |char, index| output[index] = char >> 5;
-    output[hrp.len] = 0;
-    for (hrp, 0..) |char, index| output[hrp.len + 1 + index] = char & 31;
-    return hrp.len * 2 + 1;
-}
-
-fn polymod(values: []const u8) u32 {
-    var checksum: u32 = 1;
-    for (values) |value| {
-        const top = checksum >> 25;
-        checksum = ((checksum & 0x1ffffff) << 5) ^ value;
-        for (bech32_generator, 0..) |generator, index| {
-            if (((top >> @intCast(index)) & 1) == 1) checksum ^= generator;
-        }
-    }
-    return checksum;
-}
-
-fn charset_value(char: u8) ?u8 {
-    for (bech32_charset, 0..) |candidate, index| {
-        if (candidate == char) return @intCast(index);
-    }
-    return null;
 }
 
 fn decode_hex_secret(hex: []const u8) ![limits.nip49_key_bytes]u8 {

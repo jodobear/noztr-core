@@ -1,4 +1,5 @@
 const std = @import("std");
+const internal_bech32 = @import("internal/bech32.zig");
 const limits = @import("limits.zig");
 
 pub const Bech32Error = error{
@@ -51,9 +52,6 @@ pub const Nip19Entity = union(enum) {
     nrelay: NrelayPointer,
 };
 
-const bech32_charset = "qpzry9x8gf2tvdw0s3jn54khce6mua7l";
-const bech32_generator = [_]u32{ 0x3b6a57b2, 0x26508e6d, 0x1ea119fa, 0x3d4233dd, 0x2a1462b3 };
-
 pub fn nip19_encode(output: []u8, entity: Nip19Entity) Bech32Error![]const u8 {
     std.debug.assert(output.len <= std.math.maxInt(usize));
     std.debug.assert(limits.nip19_tlv_scratch_bytes_max > 0);
@@ -87,9 +85,12 @@ pub fn nip19_decode(input: []const u8, tlv_scratch: []u8) Bech32Error!Nip19Entit
     var hrp_buffer: [limits.nip19_bech32_hrp_bytes_max]u8 = undefined;
     var data_values: [limits.nip19_bech32_identifier_bytes_max]u8 = undefined;
 
-    const parsed = try decode_bech32(input, &hrp_buffer, &data_values);
-    const payload_values = parsed.data_values[0 .. parsed.data_values.len - 6];
-    const payload_len = try convert_bits(tlv_scratch, payload_values, 5, 8, false);
+    const parsed = internal_bech32.decode(input, hrp_buffer[0..], data_values[0..]) catch |err| {
+        return map_bech32_error(err);
+    };
+    const payload_len = internal_bech32.convert_bits(tlv_scratch, parsed.payload_values, 5, 8, false) catch |err| {
+        return map_bech32_error(err);
+    };
     const payload = tlv_scratch[0..payload_len];
 
     if (std.mem.eql(u8, parsed.hrp, "npub")) return decode_fixed_entity(payload, .npub);
@@ -109,7 +110,10 @@ fn encode_fixed_entity(output: []u8, hrp: []const u8, value: *const [32]u8) Bech
     std.debug.assert(value.len == 32);
     std.debug.assert(hrp.len <= limits.nip19_bech32_hrp_bytes_max);
 
-    return encode_bech32(output, hrp, value[0..]);
+    var data_values: [limits.nip19_bech32_identifier_bytes_max]u8 = undefined;
+    return internal_bech32.encode(output, hrp, value[0..], data_values[0..]) catch |err| {
+        return map_bech32_error(err);
+    };
 }
 
 fn decode_fixed_entity(
@@ -137,7 +141,10 @@ fn encode_nprofile(output: []u8, pointer: NprofilePointer) Bech32Error![]const u
 
     try append_tlv(&payload, &payload_len, 0, pointer.pubkey[0..], true);
     try append_relays_tlv(&payload, &payload_len, pointer.relays);
-    return encode_bech32(output, "nprofile", payload[0..payload_len]);
+    var data_values: [limits.nip19_bech32_identifier_bytes_max]u8 = undefined;
+    return internal_bech32.encode(output, "nprofile", payload[0..payload_len], data_values[0..]) catch |err| {
+        return map_bech32_error(err);
+    };
 }
 
 fn encode_nevent(output: []u8, pointer: NeventPointer) Bech32Error![]const u8 {
@@ -157,7 +164,10 @@ fn encode_nevent(output: []u8, pointer: NeventPointer) Bech32Error![]const u8 {
         std.mem.writeInt(u32, &kind_bytes, kind, .big);
         try append_tlv(&payload, &payload_len, 3, kind_bytes[0..], true);
     }
-    return encode_bech32(output, "nevent", payload[0..payload_len]);
+    var data_values: [limits.nip19_bech32_identifier_bytes_max]u8 = undefined;
+    return internal_bech32.encode(output, "nevent", payload[0..payload_len], data_values[0..]) catch |err| {
+        return map_bech32_error(err);
+    };
 }
 
 fn encode_naddr(output: []u8, pointer: NaddrPointer) Bech32Error![]const u8 {
@@ -173,7 +183,10 @@ fn encode_naddr(output: []u8, pointer: NaddrPointer) Bech32Error![]const u8 {
     try append_relays_tlv(&payload, &payload_len, pointer.relays);
     try append_tlv(&payload, &payload_len, 2, pointer.pubkey[0..], true);
     try append_tlv(&payload, &payload_len, 3, kind_bytes[0..], true);
-    return encode_bech32(output, "naddr", payload[0..payload_len]);
+    var data_values: [limits.nip19_bech32_identifier_bytes_max]u8 = undefined;
+    return internal_bech32.encode(output, "naddr", payload[0..payload_len], data_values[0..]) catch |err| {
+        return map_bech32_error(err);
+    };
 }
 
 fn encode_nrelay(output: []u8, pointer: NrelayPointer) Bech32Error![]const u8 {
@@ -188,7 +201,10 @@ fn encode_nrelay(output: []u8, pointer: NrelayPointer) Bech32Error![]const u8 {
     var payload_len: u16 = 0;
 
     try append_tlv(&payload, &payload_len, 0, pointer.relay, true);
-    return encode_bech32(output, "nrelay", payload[0..payload_len]);
+    var data_values: [limits.nip19_bech32_identifier_bytes_max]u8 = undefined;
+    return internal_bech32.encode(output, "nrelay", payload[0..payload_len], data_values[0..]) catch |err| {
+        return map_bech32_error(err);
+    };
 }
 
 fn append_relays_tlv(
@@ -244,258 +260,15 @@ const Bech32CaseState = struct {
     saw_lower: bool = false,
 };
 
-fn decode_bech32(
-    input: []const u8,
-    hrp_buffer: *[limits.nip19_bech32_hrp_bytes_max]u8,
-    data_values_buffer: *[limits.nip19_bech32_identifier_bytes_max]u8,
-) Bech32Error!Bech32Decoded {
-    if (input.len > limits.nip19_bech32_identifier_bytes_max) {
-        return error.InvalidBech32;
-    }
-    std.debug.assert(input.len <= limits.nip19_bech32_identifier_bytes_max);
-    std.debug.assert(hrp_buffer.len == limits.nip19_bech32_hrp_bytes_max);
-
-    if (input.len < 8) {
-        return error.InvalidBech32;
-    }
-
-    const separator_index = std.mem.lastIndexOfScalar(u8, input, '1') orelse {
-        return error.InvalidBech32;
+fn map_bech32_error(err: internal_bech32.Error) Bech32Error {
+    return switch (err) {
+        error.InvalidBech32 => error.InvalidBech32,
+        error.InvalidChecksum => error.InvalidChecksum,
+        error.MixedCase => error.MixedCase,
+        error.InvalidPayload => error.InvalidPayload,
+        error.BufferTooSmall => error.BufferTooSmall,
+        error.ValueOutOfRange => error.ValueOutOfRange,
     };
-    if (separator_index == 0) {
-        return error.InvalidBech32;
-    }
-    if (separator_index + 7 > input.len) {
-        return error.InvalidBech32;
-    }
-
-    var case_state = Bech32CaseState{};
-    const hrp = try normalize_hrp(
-        input[0..separator_index],
-        hrp_buffer,
-        &case_state,
-    );
-    const data_values = try decode_data_values(
-        input[separator_index + 1 ..],
-        data_values_buffer,
-        &case_state,
-    );
-    if (!verify_checksum(hrp, data_values)) {
-        return error.InvalidChecksum;
-    }
-    return .{ .hrp = hrp, .data_values = data_values };
-}
-
-fn normalize_hrp(
-    input_hrp: []const u8,
-    hrp_buffer: *[limits.nip19_bech32_hrp_bytes_max]u8,
-    case_state: *Bech32CaseState,
-) Bech32Error![]const u8 {
-    std.debug.assert(input_hrp.len <= limits.nip19_bech32_hrp_bytes_max);
-    std.debug.assert(hrp_buffer.len == limits.nip19_bech32_hrp_bytes_max);
-    std.debug.assert(@intFromPtr(case_state) != 0);
-
-    if (input_hrp.len == 0) {
-        return error.InvalidBech32;
-    }
-    if (input_hrp.len > hrp_buffer.len) {
-        return error.InvalidBech32;
-    }
-
-    for (input_hrp, 0..) |char, index| {
-        const lowered = try normalize_bech32_char(char, case_state);
-        hrp_buffer[index] = lowered;
-    }
-    return hrp_buffer[0..input_hrp.len];
-}
-
-fn decode_data_values(
-    input_data: []const u8,
-    output_values: *[limits.nip19_bech32_identifier_bytes_max]u8,
-    case_state: *Bech32CaseState,
-) Bech32Error![]const u8 {
-    std.debug.assert(input_data.len <= limits.nip19_bech32_identifier_bytes_max);
-    std.debug.assert(output_values.len == limits.nip19_bech32_identifier_bytes_max);
-    std.debug.assert(@intFromPtr(case_state) != 0);
-
-    if (input_data.len < 6) {
-        return error.InvalidBech32;
-    }
-    if (input_data.len > output_values.len) {
-        return error.InvalidBech32;
-    }
-
-    for (input_data, 0..) |char, index| {
-        const lowered = try normalize_bech32_char(char, case_state);
-        const value = charset_value(lowered) orelse return error.InvalidBech32;
-        output_values[index] = value;
-    }
-    return output_values[0..input_data.len];
-}
-
-fn normalize_bech32_char(char: u8, case_state: *Bech32CaseState) Bech32Error!u8 {
-    std.debug.assert(@intFromPtr(case_state) != 0);
-    std.debug.assert(!(case_state.saw_upper and case_state.saw_lower));
-
-    if (char < 33 or char > 126) {
-        return error.InvalidBech32;
-    }
-
-    var lowered = char;
-    if (char >= 'A' and char <= 'Z') {
-        case_state.saw_upper = true;
-        lowered = char + 32;
-    } else if (char >= 'a' and char <= 'z') {
-        case_state.saw_lower = true;
-    }
-    if (case_state.saw_upper and case_state.saw_lower) {
-        return error.MixedCase;
-    }
-    return lowered;
-}
-
-fn encode_bech32(output: []u8, hrp: []const u8, payload: []const u8) Bech32Error![]const u8 {
-    std.debug.assert(hrp.len > 0);
-    std.debug.assert(hrp.len <= limits.nip19_bech32_hrp_bytes_max);
-
-    var data_values: [limits.nip19_bech32_identifier_bytes_max]u8 = undefined;
-    const data_len = try convert_bits(&data_values, payload, 8, 5, true);
-    const total_len = hrp.len + 1 + data_len + 6;
-
-    if (total_len > limits.nip19_bech32_identifier_bytes_max) {
-        return error.ValueOutOfRange;
-    }
-    if (output.len < total_len) {
-        return error.BufferTooSmall;
-    }
-
-    @memcpy(output[0..hrp.len], hrp);
-    output[hrp.len] = '1';
-    var index: usize = 0;
-    while (index < data_len) : (index += 1) {
-        output[hrp.len + 1 + index] = bech32_charset[data_values[index]];
-    }
-    const checksum = create_checksum(hrp, data_values[0..data_len]);
-    var checksum_index: usize = 0;
-    while (checksum_index < checksum.len) : (checksum_index += 1) {
-        output[hrp.len + 1 + data_len + checksum_index] = bech32_charset[checksum[checksum_index]];
-    }
-    return output[0..total_len];
-}
-
-fn convert_bits(
-    output: []u8,
-    input: []const u8,
-    from_bits: u8,
-    to_bits: u8,
-    pad: bool,
-) Bech32Error!u16 {
-    std.debug.assert(from_bits > 0);
-    std.debug.assert(to_bits > 0);
-
-    var accumulator: u32 = 0;
-    var bits: u8 = 0;
-    var output_index: u16 = 0;
-    const max_value = (@as(u32, 1) << @intCast(to_bits)) - 1;
-    const from_mask = (@as(u32, 1) << @intCast(from_bits)) - 1;
-
-    for (input) |value| {
-        if ((@as(u32, value) & ~from_mask) != 0) return error.InvalidPayload;
-        accumulator = (accumulator << @intCast(from_bits)) | value;
-        bits += from_bits;
-        while (bits >= to_bits) {
-            bits -= to_bits;
-            if (output_index >= output.len) return error.BufferTooSmall;
-            output[output_index] = @intCast((accumulator >> @intCast(bits)) & max_value);
-            output_index += 1;
-        }
-    }
-
-    if (pad) {
-        if (bits > 0) {
-            if (output_index >= output.len) return error.BufferTooSmall;
-            output[output_index] = @intCast((accumulator << @intCast(to_bits - bits)) & max_value);
-            output_index += 1;
-        }
-        return output_index;
-    }
-
-    if (bits >= from_bits) return error.InvalidPayload;
-    if (((accumulator << @intCast(to_bits - bits)) & max_value) != 0) return error.InvalidPayload;
-    return output_index;
-}
-
-fn charset_value(char: u8) ?u8 {
-    std.debug.assert(bech32_charset.len == 32);
-    std.debug.assert(char <= 127 or char > 127);
-
-    var index: u8 = 0;
-    while (index < bech32_charset.len) : (index += 1) {
-        if (bech32_charset[index] == char) {
-            return index;
-        }
-    }
-    return null;
-}
-
-fn bech32_polymod_step(checksum: u32) u32 {
-    std.debug.assert(@sizeOf(u32) == 4);
-    std.debug.assert(checksum <= std.math.maxInt(u32));
-
-    const top = checksum >> 25;
-    var next = (checksum & 0x1ffffff) << 5;
-    var index: u8 = 0;
-    while (index < bech32_generator.len) : (index += 1) {
-        if (((top >> @intCast(index)) & 1) != 0) {
-            next ^= bech32_generator[index];
-        }
-    }
-    return next;
-}
-
-fn checksum_with_hrp(hrp: []const u8, data_values: []const u8, add_zero_tail: bool) u32 {
-    std.debug.assert(hrp.len > 0);
-    std.debug.assert(data_values.len <= limits.nip19_bech32_identifier_bytes_max);
-
-    var checksum: u32 = 1;
-    for (hrp) |char| {
-        checksum = bech32_polymod_step(checksum) ^ (char >> 5);
-    }
-    checksum = bech32_polymod_step(checksum);
-    for (hrp) |char| {
-        checksum = bech32_polymod_step(checksum) ^ (char & 31);
-    }
-    for (data_values) |value| {
-        checksum = bech32_polymod_step(checksum) ^ value;
-    }
-    if (add_zero_tail) {
-        var index: u8 = 0;
-        while (index < 6) : (index += 1) {
-            checksum = bech32_polymod_step(checksum);
-        }
-    }
-    return checksum;
-}
-
-fn create_checksum(hrp: []const u8, data_values: []const u8) [6]u8 {
-    std.debug.assert(hrp.len > 0);
-    std.debug.assert(data_values.len <= limits.nip19_bech32_identifier_bytes_max);
-
-    const polymod = checksum_with_hrp(hrp, data_values, true) ^ 1;
-    var checksum: [6]u8 = undefined;
-    var index: u8 = 0;
-    while (index < checksum.len) : (index += 1) {
-        const shift = 5 * (5 - index);
-        checksum[index] = @intCast((polymod >> @intCast(shift)) & 31);
-    }
-    return checksum;
-}
-
-fn verify_checksum(hrp: []const u8, data_values: []const u8) bool {
-    std.debug.assert(hrp.len > 0);
-    std.debug.assert(data_values.len >= 6);
-
-    return checksum_with_hrp(hrp, data_values, false) == 1;
 }
 
 const TlvEntry = struct {
@@ -661,6 +434,13 @@ fn append_tlv_for_test(
     payload_len.* += @intCast(2 + value.len);
 }
 
+fn encode_bech32_for_test(output: []u8, hrp: []const u8, payload: []const u8) Bech32Error![]const u8 {
+    var data_values: [limits.nip19_bech32_identifier_bytes_max]u8 = undefined;
+    return internal_bech32.encode(output, hrp, payload, data_values[0..]) catch |err| {
+        return map_bech32_error(err);
+    };
+}
+
 test "nip19 valid vectors include fixed, tlv, and roundtrip" {
     var output: [512]u8 = undefined;
     var scratch: [512]u8 = undefined;
@@ -756,7 +536,7 @@ test "nip19 unknown tlv types are ignored" {
     append_tlv_for_test(&payload, &payload_len, 9, "ignored-data");
     append_tlv_for_test(&payload, &payload_len, 1, "wss://relay.unknown");
 
-    const text = try encode_bech32(output[0..], "nprofile", payload[0..payload_len]);
+    const text = try encode_bech32_for_test(output[0..], "nprofile", payload[0..payload_len]);
     const decoded = try nip19_decode(text, scratch[0..]);
     try std.testing.expect(decoded == .nprofile);
     try std.testing.expectEqual(@as(u8, 1), decoded.nprofile.relays.count);
@@ -816,7 +596,7 @@ test "nip19 invalid vectors enforce strict failures" {
 
     payload_len = 0;
     append_tlv_for_test(&payload, &payload_len, 1, "wss://relay.only");
-    const missing_required = try encode_bech32(output[0..], "nprofile", payload[0..payload_len]);
+    const missing_required = try encode_bech32_for_test(output[0..], "nprofile", payload[0..payload_len]);
     try std.testing.expectError(
         error.MissingRequiredTlv,
         nip19_decode(missing_required, scratch[0..]),
@@ -825,7 +605,7 @@ test "nip19 invalid vectors enforce strict failures" {
     payload_len = 0;
     append_tlv_for_test(&payload, &payload_len, 0, &([_]u8{0x77} ** 32));
     append_tlv_for_test(&payload, &payload_len, 2, &([_]u8{0x66} ** 31));
-    const malformed_optional = try encode_bech32(output[0..], "nevent", payload[0..payload_len]);
+    const malformed_optional = try encode_bech32_for_test(output[0..], "nevent", payload[0..payload_len]);
     try std.testing.expectError(
         error.MalformedKnownOptionalTlv,
         nip19_decode(malformed_optional, scratch[0..]),
@@ -845,10 +625,10 @@ test "nip19 decode forces invalid prefix and fixed-payload shape errors" {
     var output: [512]u8 = undefined;
     var scratch: [512]u8 = undefined;
 
-    const unknown_prefix = try encode_bech32(output[0..], "abc", &([_]u8{0x01} ** 32));
+    const unknown_prefix = try encode_bech32_for_test(output[0..], "abc", &([_]u8{0x01} ** 32));
     try std.testing.expectError(error.InvalidPrefix, nip19_decode(unknown_prefix, scratch[0..]));
 
-    const invalid_fixed_payload = try encode_bech32(output[0..], "npub", &([_]u8{0x02} ** 31));
+    const invalid_fixed_payload = try encode_bech32_for_test(output[0..], "npub", &([_]u8{0x02} ** 31));
     try std.testing.expectError(
         error.InvalidPayload,
         nip19_decode(invalid_fixed_payload, scratch[0..]),
