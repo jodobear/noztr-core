@@ -1,6 +1,6 @@
 const std = @import("std");
 const nip01_event = @import("nip01_event.zig");
-const secp256k1_backend = @import("crypto/secp256k1_backend.zig");
+const secp256k1_boundary = @import("crypto/secp256k1_boundary.zig");
 
 /// Typed failures for bounded Nostr key and signing helpers.
 pub const NostrKeysError = error{
@@ -15,7 +15,7 @@ pub fn nostr_derive_public_key(secret_key: *const [32]u8) NostrKeysError![32]u8 
     std.debug.assert(secret_key[0] <= 255);
 
     var public_key: [32]u8 = undefined;
-    secp256k1_backend.derive_xonly_public_key(secret_key, &public_key) catch |derive_error| {
+    secp256k1_boundary.derive_xonly_public_key(secret_key, &public_key) catch |derive_error| {
         return switch (derive_error) {
             error.InvalidSecretKey => error.InvalidSecretKey,
             error.BackendUnavailable => error.BackendUnavailable,
@@ -38,7 +38,7 @@ pub fn nostr_sign_event(
     }
 
     event.id = nip01_event.event_compute_id_checked(event) catch return error.InvalidEvent;
-    secp256k1_backend.sign_schnorr_signature(secret_key, &event.id, &event.sig) catch |sign_error| {
+    secp256k1_boundary.sign_schnorr_signature(secret_key, &event.id, &event.sig) catch |sign_error| {
         return switch (sign_error) {
             error.InvalidSecretKey => error.InvalidSecretKey,
             error.BackendUnavailable => error.BackendUnavailable,

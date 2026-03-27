@@ -3,7 +3,7 @@ const limits = @import("limits.zig");
 const nip01_event = @import("nip01_event.zig");
 const nip44 = @import("nip44.zig");
 const nostr_keys = @import("nostr_keys.zig");
-const secp256k1_backend = @import("crypto/secp256k1_backend.zig");
+const secp256k1_boundary = @import("crypto/secp256k1_boundary.zig");
 
 const Event = nip01_event.Event;
 
@@ -811,7 +811,7 @@ fn build_signed_event_fixture(
         .json = undefined,
     };
     output_fixture.event.id = try nip01_event.event_compute_id(&output_fixture.event);
-    try secp256k1_backend.sign_schnorr_signature(
+    try secp256k1_boundary.sign_schnorr_signature(
         secret,
         &output_fixture.event.id,
         &output_fixture.event.sig,
@@ -847,7 +847,7 @@ fn rebuild_seal_after_rumor_mutation(
     );
     fixture.seal.event.content = fixture.seal_payload;
     fixture.seal.event.id = try nip01_event.event_compute_id(&fixture.seal.event);
-    try secp256k1_backend.sign_schnorr_signature(
+    try secp256k1_boundary.sign_schnorr_signature(
         sender_secret,
         &fixture.seal.event.id,
         &fixture.seal.event.sig,
@@ -880,7 +880,7 @@ fn rebuild_wrap_after_seal_mutation(
     );
     fixture.wrap.event.content = fixture.wrap_payload;
     fixture.wrap.event.id = try nip01_event.event_compute_id(&fixture.wrap.event);
-    try secp256k1_backend.sign_schnorr_signature(
+    try secp256k1_boundary.sign_schnorr_signature(
         wrap_secret,
         &fixture.wrap.event.id,
         &fixture.wrap.event.sig,
@@ -1406,7 +1406,7 @@ test "nip59 invalid outer kind fails before decrypt" {
     fixture.wrap.event.kind = 1;
     fixture.wrap.event.content = "not-base64";
     fixture.wrap.event.id = try nip01_event.event_compute_id(&fixture.wrap.event);
-    try secp256k1_backend.sign_schnorr_signature(
+    try secp256k1_boundary.sign_schnorr_signature(
         &wrap_secret,
         &fixture.wrap.event.id,
         &fixture.wrap.event.sig,
@@ -1446,7 +1446,7 @@ test "nip59 invalid decrypt failure is typed" {
     );
     fixture.wrap.event.content = "AQ==";
     fixture.wrap.event.id = try nip01_event.event_compute_id(&fixture.wrap.event);
-    try secp256k1_backend.sign_schnorr_signature(
+    try secp256k1_boundary.sign_schnorr_signature(
         &wrap_secret,
         &fixture.wrap.event.id,
         &fixture.wrap.event.sig,
@@ -1564,7 +1564,7 @@ test "nip59 invalid seal kind is typed after valid wrap decrypt" {
 
     fixture.seal.event.kind = 100;
     fixture.seal.event.id = try nip01_event.event_compute_id(&fixture.seal.event);
-    try secp256k1_backend.sign_schnorr_signature(
+    try secp256k1_boundary.sign_schnorr_signature(
         &sender_secret,
         &fixture.seal.event.id,
         &fixture.seal.event.sig,

@@ -678,7 +678,7 @@ fn build_signed_auth_event(
         .tags = tags,
     };
     event.id = nip01_event.event_compute_id(&event) catch unreachable;
-    @import("crypto/secp256k1_backend.zig").sign_schnorr_signature(
+    @import("crypto/secp256k1_boundary.zig").sign_schnorr_signature(
         &secret_key,
         &event.id,
         &event.sig,

@@ -1,6 +1,6 @@
 const std = @import("std");
 const secp256k1 = @import("secp256k1");
-const backend = @import("secp256k1_backend.zig");
+const boundary = @import("secp256k1_boundary.zig");
 
 const VerifyClass = enum {
     valid,
@@ -160,7 +160,7 @@ fn classify_boundary(
     std.debug.assert(public_key.len == 32);
     std.debug.assert(signature.len == 64);
 
-    backend.verify_schnorr_signature(public_key, message_digest, signature) catch |verify_error| {
+    boundary.verify_schnorr_signature(public_key, message_digest, signature) catch |verify_error| {
         return switch (verify_error) {
             error.InvalidPublicKey => .invalid_public_key,
             error.InvalidSignature => .invalid_signature,
@@ -406,14 +406,14 @@ fn build_non_hex_input(comptime input_len: usize, hex_input: []const u8) [input_
 }
 
 test "bip340 vectors classify with boundary-direct parity" {
-    backend.reset_counters();
+    boundary.reset_counters();
     for (bip340_vectors) |vector| {
         try run_bip340_vector(vector);
     }
 
     const expected_calls: u32 = bip340_vectors.len;
-    try std.testing.expect(backend.get_verify_signature_call_count() == expected_calls);
-    try std.testing.expect(backend.get_verify_signature_call_count() != 0);
+    try std.testing.expect(boundary.get_verify_signature_call_count() == expected_calls);
+    try std.testing.expect(boundary.get_verify_signature_call_count() != 0);
 }
 
 test "mutation matrix from valid bip340 vectors keeps boundary-direct parity" {
@@ -423,7 +423,7 @@ test "mutation matrix from valid bip340 vectors keeps boundary-direct parity" {
         .public_key_bitflip,
     };
 
-    backend.reset_counters();
+    boundary.reset_counters();
     var valid_vector_count: u32 = 0;
     for (bip340_vectors, 0..) |vector, vector_index| {
         if (vector.expected_class == .valid) {
@@ -437,8 +437,8 @@ test "mutation matrix from valid bip340 vectors keeps boundary-direct parity" {
 
     const mutation_class_count: u32 = mutation_classes.len;
     const expected_calls: u32 = valid_vector_count * mutation_class_count;
-    try std.testing.expectEqual(expected_calls, backend.get_verify_signature_call_count());
-    try std.testing.expect(backend.get_verify_signature_call_count() != 0);
+    try std.testing.expectEqual(expected_calls, boundary.get_verify_signature_call_count());
+    try std.testing.expect(boundary.get_verify_signature_call_count() != 0);
 }
 
 test "wrong-length public key classifies with boundary-direct parity" {
@@ -743,12 +743,12 @@ test "deterministic sign path yields stable signature verified by boundary" {
     var signature_a: [64]u8 = undefined;
     var signature_b: [64]u8 = undefined;
 
-    try backend.sign_schnorr_signature_deterministic(&secret_key, &message_digest, &signature_a);
-    try backend.sign_schnorr_signature_deterministic(&secret_key, &message_digest, &signature_b);
+    try boundary.sign_schnorr_signature_deterministic(&secret_key, &message_digest, &signature_a);
+    try boundary.sign_schnorr_signature_deterministic(&secret_key, &message_digest, &signature_b);
 
     try std.testing.expectEqualSlices(u8, &signature_a, &signature_b);
     try std.testing.expect(signature_a[0] <= 255);
-    try backend.verify_schnorr_signature(&public_key, &message_digest, &signature_a);
+    try boundary.verify_schnorr_signature(&public_key, &message_digest, &signature_a);
 }
 
 test "hardened sign path yields verifiable schnorr signature" {
@@ -767,10 +767,10 @@ test "hardened sign path yields verifiable schnorr signature" {
 
     var signature: [64]u8 = undefined;
 
-    try backend.sign_schnorr_signature(&secret_key, &message_digest, &signature);
+    try boundary.sign_schnorr_signature(&secret_key, &message_digest, &signature);
     try std.testing.expect(signature[0] <= 255);
     try std.testing.expect(signature.len == 64);
-    try backend.verify_schnorr_signature(&public_key, &message_digest, &signature);
+    try boundary.verify_schnorr_signature(&public_key, &message_digest, &signature);
 }
 
 test "sign path maps invalid secret key to typed boundary error" {
@@ -781,7 +781,7 @@ test "sign path maps invalid secret key to typed boundary error" {
     );
     var signature: [64]u8 = undefined;
 
-    const sign_result = backend.sign_schnorr_signature(
+    const sign_result = boundary.sign_schnorr_signature(
         &invalid_secret_key,
         &message_digest,
         &signature,

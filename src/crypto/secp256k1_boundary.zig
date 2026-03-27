@@ -2,26 +2,26 @@ const std = @import("std");
 const secp256k1 = @import("secp256k1");
 
 /// Typed boundary errors for the secp256k1 verification path.
-pub const BackendVerifyError = error{
+pub const BoundaryVerifyError = error{
     InvalidPublicKey,
     InvalidSignature,
     BackendUnavailable,
 };
 
 /// Typed boundary errors for the secp256k1 signing path.
-pub const BackendSignError = error{
+pub const BoundarySignError = error{
     InvalidSecretKey,
     BackendUnavailable,
 };
 
 /// Typed boundary errors for public-key derivation from a secret key.
-pub const BackendDerivePublicKeyError = error{
+pub const BoundaryDerivePublicKeyError = error{
     InvalidSecretKey,
     BackendUnavailable,
 };
 
 /// Typed boundary errors for the secp256k1 ECDH shared-secret path.
-pub const BackendSharedSecretError = error{
+pub const BoundarySharedSecretError = error{
     InvalidPrivateKey,
     InvalidPublicKey,
     BackendUnavailable,
@@ -51,7 +51,7 @@ pub fn verify_schnorr_signature(
     public_key: *const [32]u8,
     message_digest: *const [32]u8,
     signature: *const [64]u8,
-) BackendVerifyError!void {
+) BoundaryVerifyError!void {
     std.debug.assert(public_key[0] <= 255);
     std.debug.assert(signature[0] <= 255);
 
@@ -69,7 +69,7 @@ pub fn sign_schnorr_signature(
     secret_key: *const [32]u8,
     message_digest: *const [32]u8,
     out_signature: *[64]u8,
-) BackendSignError!void {
+) BoundarySignError!void {
     std.debug.assert(secret_key[0] <= 255);
     std.debug.assert(message_digest[0] <= 255);
 
@@ -82,7 +82,7 @@ pub fn sign_schnorr_signature_deterministic(
     secret_key: *const [32]u8,
     message_digest: *const [32]u8,
     out_signature: *[64]u8,
-) BackendSignError!void {
+) BoundarySignError!void {
     std.debug.assert(secret_key[0] <= 255);
     std.debug.assert(message_digest[0] <= 255);
 
@@ -98,7 +98,7 @@ pub fn sign_schnorr_signature_deterministic(
 pub fn derive_xonly_public_key(
     secret_key: *const [32]u8,
     out_public_key: *[32]u8,
-) BackendDerivePublicKeyError!void {
+) BoundaryDerivePublicKeyError!void {
     std.debug.assert(secret_key[0] <= 255);
     std.debug.assert(@intFromPtr(out_public_key) != 0);
 
@@ -111,7 +111,7 @@ pub fn derive_shared_secret_x(
     private_key: *const [32]u8,
     public_key: *const [32]u8,
     out_shared_secret: *[32]u8,
-) BackendSharedSecretError!void {
+) BoundarySharedSecretError!void {
     std.debug.assert(private_key[0] <= 255);
     std.debug.assert(public_key[0] <= 255);
 
@@ -124,7 +124,7 @@ pub fn derive_shared_secret_x(
     };
 }
 
-fn map_public_key_error(verify_error: secp256k1.Error) BackendVerifyError {
+fn map_public_key_error(verify_error: secp256k1.Error) BoundaryVerifyError {
     std.debug.assert(@intFromError(verify_error) >= 0);
     std.debug.assert(!@inComptime());
 
@@ -136,7 +136,7 @@ fn map_public_key_error(verify_error: secp256k1.Error) BackendVerifyError {
     };
 }
 
-fn map_signature_error(verify_error: secp256k1.Error) BackendVerifyError {
+fn map_signature_error(verify_error: secp256k1.Error) BoundaryVerifyError {
     std.debug.assert(@intFromError(verify_error) >= 0);
     std.debug.assert(!@inComptime());
 
@@ -148,7 +148,7 @@ fn map_signature_error(verify_error: secp256k1.Error) BackendVerifyError {
     };
 }
 
-fn map_sign_error(sign_error: secp256k1.Error) BackendSignError {
+fn map_sign_error(sign_error: secp256k1.Error) BoundarySignError {
     std.debug.assert(@intFromError(sign_error) >= 0);
     std.debug.assert(!@inComptime());
 
@@ -160,7 +160,7 @@ fn map_sign_error(sign_error: secp256k1.Error) BackendSignError {
     };
 }
 
-fn map_shared_secret_error(shared_secret_error: secp256k1.Error) BackendSharedSecretError {
+fn map_shared_secret_error(shared_secret_error: secp256k1.Error) BoundarySharedSecretError {
     std.debug.assert(@intFromError(shared_secret_error) >= 0);
     std.debug.assert(!@inComptime());
 
@@ -174,7 +174,7 @@ fn map_shared_secret_error(shared_secret_error: secp256k1.Error) BackendSharedSe
 
 fn map_derive_public_key_error(
     derive_error: secp256k1.Error,
-) BackendDerivePublicKeyError {
+) BoundaryDerivePublicKeyError {
     std.debug.assert(@intFromError(derive_error) >= 0);
     std.debug.assert(!@inComptime());
 
@@ -187,5 +187,5 @@ fn map_derive_public_key_error(
 }
 
 test {
-    _ = @import("secp256k1_backend_test.zig");
+    _ = @import("secp256k1_boundary_test.zig");
 }

@@ -942,7 +942,7 @@ fn build_signed_request_json(output: []u8, receipt_signer_hex: []const u8) ![]co
     std.debug.assert(output.len >= 0);
     std.debug.assert(receipt_signer_hex.len == limits.pubkey_hex_length);
 
-    const secp256k1_backend = @import("crypto/secp256k1_backend.zig");
+    const secp256k1_boundary = @import("crypto/secp256k1_boundary.zig");
     var secret_key: [32]u8 = [_]u8{0} ** 32;
     secret_key[31] = 3;
     var pubkey: [32]u8 = undefined;
@@ -967,7 +967,7 @@ fn build_signed_request_json(output: []u8, receipt_signer_hex: []const u8) ![]co
         .tags = tag_items[0..],
     };
     event.id = try nip01_event.event_compute_id(&event);
-    try secp256k1_backend.sign_schnorr_signature(&secret_key, &event.id, &event.sig);
+    try secp256k1_boundary.sign_schnorr_signature(&secret_key, &event.id, &event.sig);
 
     const id_hex = std.fmt.bytesToHex(event.id, .lower);
     const pubkey_hex = std.fmt.bytesToHex(event.pubkey, .lower);

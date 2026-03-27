@@ -1,6 +1,6 @@
 const std = @import("std");
 const limits = @import("limits.zig");
-const secp256k1_backend = @import("crypto/secp256k1_backend.zig");
+const secp256k1_boundary = @import("crypto/secp256k1_boundary.zig");
 
 const HkdfSha256 = std.crypto.kdf.hkdf.HkdfSha256;
 const HmacSha256 = std.crypto.auth.hmac.sha2.HmacSha256;
@@ -52,7 +52,7 @@ pub fn nip44_get_conversation_key(
     var shared_x: [32]u8 = undefined;
     defer wipe_bytes(shared_x[0..]);
 
-    secp256k1_backend.derive_shared_secret_x(private_key, public_key, &shared_x) catch |err| {
+    secp256k1_boundary.derive_shared_secret_x(private_key, public_key, &shared_x) catch |err| {
         return map_shared_secret_error(err);
     };
 
@@ -574,7 +574,7 @@ fn force_invalid_nonce_length() ConversationEncryptionError!void {
 }
 
 fn map_shared_secret_error(
-    shared_secret_error: secp256k1_backend.BackendSharedSecretError,
+    shared_secret_error: secp256k1_boundary.BoundarySharedSecretError,
 ) ConversationEncryptionError {
     std.debug.assert(@intFromError(shared_secret_error) >= 0);
     std.debug.assert(@typeInfo(ConversationEncryptionError) == .error_set);

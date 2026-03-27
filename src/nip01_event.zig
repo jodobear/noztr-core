@@ -1,7 +1,7 @@
 const std = @import("std");
 const limits = @import("limits.zig");
 const shared_errors = @import("errors.zig");
-const secp256k1_backend = @import("crypto/secp256k1_backend.zig");
+const secp256k1_boundary = @import("crypto/secp256k1_boundary.zig");
 
 pub const EventParseError = shared_errors.EventParseError;
 pub const EventVerifyError = shared_errors.EventVerifyError;
@@ -373,12 +373,12 @@ pub fn event_verify_signature(event: *const Event) EventVerifyError!void {
     std.debug.assert(event.sig[0] <= 255);
     std.debug.assert(event.pubkey[0] <= 255);
 
-    secp256k1_backend.verify_schnorr_signature(
+    secp256k1_boundary.verify_schnorr_signature(
         &event.pubkey,
         &event.id,
         &event.sig,
     ) catch |verify_error| {
-        return map_backend_verify_error(verify_error);
+        return map_boundary_verify_error(verify_error);
     };
 }
 
@@ -469,7 +469,7 @@ pub fn event_replace_decision(current: *const Event, candidate: *const Event) Re
     return .keep_current;
 }
 
-fn map_backend_verify_error(verify_error: secp256k1_backend.BackendVerifyError) EventVerifyError {
+fn map_boundary_verify_error(verify_error: secp256k1_boundary.BoundaryVerifyError) EventVerifyError {
     std.debug.assert(@intFromError(verify_error) >= 0);
     std.debug.assert(!@inComptime());
 
@@ -1449,10 +1449,10 @@ test "event verify signature routes through boundary module" {
             "25F66A4A85EA8B71E482A74F382D2CE5EBEEE8FDB2172F477DF4900D310536C0",
     );
 
-    secp256k1_backend.reset_counters();
+    secp256k1_boundary.reset_counters();
     try event_verify_signature(&event);
 
-    const call_count = secp256k1_backend.get_verify_signature_call_count();
+    const call_count = secp256k1_boundary.get_verify_signature_call_count();
     try std.testing.expect(call_count == 1);
     try std.testing.expect(call_count != 0);
 }
@@ -1661,7 +1661,7 @@ test "event verify rejects invalid signature explicitly" {
 }
 
 test "event verify preserves backend unavailable mapping" {
-    const mapped_error = map_backend_verify_error(error.BackendUnavailable);
+    const mapped_error = map_boundary_verify_error(error.BackendUnavailable);
 
     try std.testing.expect(mapped_error == error.BackendUnavailable);
     try std.testing.expect(mapped_error != error.InvalidSignature);

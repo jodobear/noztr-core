@@ -1,7 +1,7 @@
 const std = @import("std");
 const limits = @import("limits.zig");
 const nip01_event = @import("nip01_event.zig");
-const secp256k1_backend = @import("crypto/secp256k1_backend.zig");
+const secp256k1_boundary = @import("crypto/secp256k1_boundary.zig");
 const lower_hex_32 = @import("internal/lower_hex_32.zig");
 const url_with_host = @import("internal/url_with_host.zig");
 
@@ -74,7 +74,7 @@ pub fn nip04_get_shared_secret(
     std.debug.assert(@intFromPtr(public_key) != 0);
 
     var shared_secret: [32]u8 = undefined;
-    secp256k1_backend.derive_shared_secret_x(private_key, public_key, &shared_secret) catch |err| {
+    secp256k1_boundary.derive_shared_secret_x(private_key, public_key, &shared_secret) catch |err| {
         return map_shared_secret_error(err);
     };
     return shared_secret;
@@ -483,7 +483,7 @@ fn wipe_bytes(buffer: []u8) void {
 }
 
 fn map_shared_secret_error(
-    err: secp256k1_backend.BackendSharedSecretError,
+    err: secp256k1_boundary.BoundarySharedSecretError,
 ) LegacyDmError {
     return switch (err) {
         error.InvalidPrivateKey => error.InvalidPrivateKey,
@@ -925,6 +925,6 @@ test "nip04 decrypt rejects non utf8 plaintext after valid decrypt" {
 
 fn secp256k1_test_public_key(secret_key: *const [32]u8) ![32]u8 {
     var public_key: [32]u8 = undefined;
-    try secp256k1_backend.derive_xonly_public_key(secret_key, &public_key);
+    try secp256k1_boundary.derive_xonly_public_key(secret_key, &public_key);
     return public_key;
 }
