@@ -17,7 +17,7 @@ test "adversarial private-list example: reject deprecated NIP-04 content" {
 
     try std.testing.expectError(
         error.UnsupportedPrivateEncoding,
-        noztr.nip51_lists.list_private_extract_nip44(
+        noztr.nip51_lists.private_extract_nip44(
             plaintext[0..],
             &event,
             &private_key,

@@ -10,7 +10,7 @@ test "NIP-51 example: extract bookmark items from a public list" {
     const event = common.simple_event(10003, [_]u8{0x51} ** 32, "", tags[0..]);
     var items: [2]noztr.nip51_lists.ListItem = undefined;
 
-    const info = try noztr.nip51_lists.list_extract(&event, items[0..]);
+    const info = try noztr.nip51_lists.extract(&event, items[0..]);
 
     try std.testing.expectEqual(.bookmarks, info.kind);
     try std.testing.expect(items[0] == .event);

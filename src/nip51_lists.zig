@@ -147,7 +147,7 @@ const ItemFamily = enum {
 };
 
 /// Returns the supported strict NIP-51 list kind for `kind`, or `null` when unsupported.
-pub fn list_kind_classify(kind: u32) ?ListKind {
+pub fn kind_classify(kind: u32) ?ListKind {
     std.debug.assert(kind <= limits.kind_max);
     std.debug.assert(@sizeOf(ListKind) == @sizeOf(u32));
 
@@ -172,11 +172,11 @@ pub fn list_kind_classify(kind: u32) ?ListKind {
 }
 
 /// Returns whether the event kind is supported by the strict NIP-51 public-list helper.
-pub fn list_is_supported(event: *const nip01_event.Event) bool {
+pub fn is_supported(event: *const nip01_event.Event) bool {
     std.debug.assert(@intFromPtr(event) != 0);
     std.debug.assert(event.kind <= limits.kind_max);
 
-    return list_kind_classify(event.kind) != null;
+    return kind_classify(event.kind) != null;
 }
 
 /// Extracts strict public NIP-51 list items from a supported list event.
@@ -192,11 +192,11 @@ pub fn list_is_supported(event: *const nip01_event.Event) bool {
 /// - Only public tag-carried list items are extracted here.
 /// - Encrypted private list content in `event.content` is intentionally out of scope for this
 ///   strict Wave 1 helper and is ignored by this function.
-pub fn list_extract(event: *const nip01_event.Event, out: []ListItem) ListError!List {
+pub fn extract(event: *const nip01_event.Event, out: []ListItem) ListError!List {
     std.debug.assert(@intFromPtr(event) != 0);
     std.debug.assert(out.len <= std.math.maxInt(u16));
 
-    const kind = list_kind_classify(event.kind) orelse return error.UnsupportedListKind;
+    const kind = kind_classify(event.kind) orelse return error.UnsupportedListKind;
     var info = List{ .kind = kind, .item_count = 0 };
     var index: usize = 0;
     while (index < event.tags.len) : (index += 1) {
@@ -222,7 +222,7 @@ pub fn list_extract(event: *const nip01_event.Event, out: []ListItem) ListError!
 }
 
 /// Builds a `d` tag for addressable list kinds.
-pub fn list_build_identifier_tag(
+pub fn build_identifier_tag(
     output: *TagBuilder,
     identifier: []const u8,
 ) ListError!nip01_event.EventTag {
@@ -284,7 +284,7 @@ pub fn emoji_build_tag(
 }
 
 /// Serializes private NIP-51 item tags into the encrypted JSON-array plaintext form.
-pub fn list_private_serialize_json(
+pub fn private_serialize_json(
     output: []u8,
     tags: []const nip01_event.EventTag,
 ) PrivateListError![]const u8 {
@@ -310,7 +310,7 @@ pub fn list_private_serialize_json(
 
 /// Parses private NIP-51 item JSON into strict list items.
 /// See `examples/private_lists_recipe.zig`.
-pub fn list_private_extract_json(
+pub fn private_extract_json(
     event_kind: u32,
     input_json: []const u8,
     out: []ListItem,
@@ -319,12 +319,12 @@ pub fn list_private_extract_json(
     std.debug.assert(event_kind <= limits.kind_max);
     std.debug.assert(out.len <= std.math.maxInt(u16));
 
-    const kind = list_kind_classify(event_kind) orelse return error.UnsupportedListKind;
-    return list_private_extract_json_kind(kind, input_json, out, scratch);
+    const kind = kind_classify(event_kind) orelse return error.UnsupportedListKind;
+    return private_extract_json_kind(kind, input_json, out, scratch);
 }
 
 /// Decrypts strict NIP-44 private list content and parses the contained item JSON.
-pub fn list_private_extract_nip44(
+pub fn private_extract_nip44(
     plaintext_output: []u8,
     event: *const nip01_event.Event,
     author_private_key: *const [32]u8,
@@ -334,7 +334,7 @@ pub fn list_private_extract_nip44(
     std.debug.assert(@intFromPtr(event) != 0);
     std.debug.assert(@intFromPtr(author_private_key) != 0);
 
-    const kind = list_kind_classify(event.kind) orelse return error.UnsupportedListKind;
+    const kind = kind_classify(event.kind) orelse return error.UnsupportedListKind;
     if (event.content.len == 0) {
         return .{ .kind = kind, .item_count = 0, .plaintext_json = "" };
     }
@@ -350,7 +350,7 @@ pub fn list_private_extract_nip44(
         &conversation_key,
         event.content,
     );
-    return list_private_extract_json_kind(kind, plaintext, out, scratch);
+    return private_extract_json_kind(kind, plaintext, out, scratch);
 }
 
 fn apply_metadata_tag(
@@ -388,7 +388,7 @@ fn apply_metadata_tag(
     return false;
 }
 
-fn list_private_extract_json_kind(
+fn private_extract_json_kind(
     kind: ListKind,
     input_json: []const u8,
     out: []ListItem,
@@ -1111,7 +1111,7 @@ fn expect_single_tag_error(
     var items: [1]ListItem = undefined;
     try std.testing.expectError(
         expected,
-        list_extract(&list_event(kind, "", tags[0..]), items[0..]),
+        extract(&list_event(kind, "", tags[0..]), items[0..]),
     );
 }
 
@@ -1124,7 +1124,7 @@ fn expect_list_success(
     std.debug.assert(@intFromPtr(event) != 0);
     std.debug.assert(out.len <= std.math.maxInt(u16));
 
-    const parsed = try list_extract(event, out);
+    const parsed = try extract(event, out);
     try std.testing.expectEqual(expected_kind, parsed.kind);
     try std.testing.expectEqual(expected_count, parsed.item_count);
     return parsed;
@@ -1141,9 +1141,9 @@ fn expect_tag_items(tag: nip01_event.EventTag, expected: []const []const u8) !vo
 }
 
 test "list kind classify covers supported and unsupported kinds" {
-    try std.testing.expectEqual(ListKind.mute_list, list_kind_classify(10000).?);
-    try std.testing.expectEqual(ListKind.bookmark_set, list_kind_classify(30003).?);
-    try std.testing.expectEqual(@as(?ListKind, null), list_kind_classify(30005));
+    try std.testing.expectEqual(ListKind.mute_list, kind_classify(10000).?);
+    try std.testing.expectEqual(ListKind.bookmark_set, kind_classify(30003).?);
+    try std.testing.expectEqual(@as(?ListKind, null), kind_classify(30005));
 }
 
 test "list extract valid mute list preserves item order" {
@@ -1167,7 +1167,7 @@ test "list extract valid mute list preserves item order" {
     const event = list_event(10000, "opaque encrypted content", tags[0..]);
     var items: [4]ListItem = undefined;
 
-    const parsed = try list_extract(&event, items[0..]);
+    const parsed = try extract(&event, items[0..]);
 
     try std.testing.expectEqual(ListKind.mute_list, parsed.kind);
     try std.testing.expectEqual(@as(u16, 4), parsed.item_count);
@@ -1187,7 +1187,7 @@ test "bookmark builders emit bounded identifier event and coordinate tags" {
     var event_tag: TagBuilder = .{};
     var coordinate_tag: TagBuilder = .{};
 
-    const built_identifier = try list_build_identifier_tag(&identifier_tag, "saved");
+    const built_identifier = try build_identifier_tag(&identifier_tag, "saved");
     const built_event = try bookmark_build_tag(&event_tag, .{
         .event = .{
             .event_id = [_]u8{0xaa} ** 32,
@@ -1252,7 +1252,7 @@ test "bookmark and emoji builders widen emission and bookmark extraction accepts
             "30030:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc:icons",
         },
     );
-    const parsed = try list_extract(&list_event(10003, "", tags[0..]), items[0..]);
+    const parsed = try extract(&list_event(10003, "", tags[0..]), items[0..]);
     try std.testing.expectEqual(ListKind.bookmarks, parsed.kind);
     try std.testing.expectEqual(@as(u16, 2), parsed.item_count);
     try std.testing.expect(items[0] == .hashtag);
@@ -1269,7 +1269,7 @@ test "bookmark and emoji builders reject invalid inputs" {
 
     try std.testing.expectError(
         error.InvalidIdentifierTag,
-        list_build_identifier_tag(&identifier_tag, ""),
+        build_identifier_tag(&identifier_tag, ""),
     );
     try std.testing.expectError(
         error.InvalidHashtagTag,
@@ -1318,7 +1318,7 @@ test "list extract valid bookmark set captures metadata and mixed item families"
     const event = list_event(30003, "", tags[0..]);
     var items: [2]ListItem = undefined;
 
-    const parsed = try list_extract(&event, items[0..]);
+    const parsed = try extract(&event, items[0..]);
 
     try std.testing.expectEqual(ListKind.bookmark_set, parsed.kind);
     try std.testing.expectEqualStrings("saved", parsed.metadata.identifier.?);
@@ -1358,9 +1358,9 @@ test "list extract valid emoji and interest lists remain deterministic" {
     var emoji_items: [1]ListItem = undefined;
     var interest_items: [2]ListItem = undefined;
 
-    const first_emoji = try list_extract(&emoji_event, emoji_items[0..]);
-    const second_emoji = try list_extract(&emoji_event, emoji_items[0..]);
-    const interests = try list_extract(&interests_event, interest_items[0..]);
+    const first_emoji = try extract(&emoji_event, emoji_items[0..]);
+    const second_emoji = try extract(&emoji_event, emoji_items[0..]);
+    const interests = try extract(&interests_event, interest_items[0..]);
 
     try std.testing.expectEqual(first_emoji.kind, second_emoji.kind);
     try std.testing.expectEqual(first_emoji.item_count, second_emoji.item_count);
@@ -1427,24 +1427,24 @@ test "list extract valid remaining supported public list kinds" {
     var article_items: [2]ListItem = undefined;
     var interest_set_items: [1]ListItem = undefined;
 
-    const pinned = try list_extract(&list_event(10001, "", pinned_tags[0..]), event_items[0..]);
-    const communities = try list_extract(
+    const pinned = try extract(&list_event(10001, "", pinned_tags[0..]), event_items[0..]);
+    const communities = try extract(
         &list_event(10004, "", community_tags[0..]),
         coordinate_items[0..],
     );
-    const blocked_relays = try list_extract(
+    const blocked_relays = try extract(
         &list_event(10006, "", relay_tags[0..]),
         relay_items[0..],
     );
-    const follow_set = try list_extract(
+    const follow_set = try extract(
         &list_event(30000, "", follow_tags[0..]),
         follow_items[0..],
     );
-    const article_set = try list_extract(
+    const article_set = try extract(
         &list_event(30004, "", article_tags[0..]),
         article_items[0..],
     );
-    const interest_set = try list_extract(
+    const interest_set = try extract(
         &list_event(30015, "", interest_set_tags[0..]),
         interest_set_items[0..],
     );
@@ -1612,11 +1612,11 @@ test "list extract rejects unsupported kinds and missing identifier" {
 
     try std.testing.expectError(
         error.UnsupportedListKind,
-        list_extract(&unsupported, items[0..]),
+        extract(&unsupported, items[0..]),
     );
     try std.testing.expectError(
         error.MissingIdentifier,
-        list_extract(&missing_d_event, items[0..]),
+        extract(&missing_d_event, items[0..]),
     );
 }
 
@@ -1635,9 +1635,9 @@ test "list extract rejects duplicate metadata and ignores unknown tags" {
 
     try std.testing.expectError(
         error.DuplicateIdentifierTag,
-        list_extract(&duplicate_event, items[0..]),
+        extract(&duplicate_event, items[0..]),
     );
-    const parsed = try list_extract(&unexpected_event, items[0..]);
+    const parsed = try extract(&unexpected_event, items[0..]);
     try std.testing.expectEqual(ListKind.mute_list, parsed.kind);
     try std.testing.expectEqual(@as(u16, 0), parsed.item_count);
 }
@@ -1664,16 +1664,16 @@ test "list extract rejects invalid image metadata and accepts broad bookmark tag
 
     try std.testing.expectError(
         error.InvalidImageTag,
-        list_extract(&list_event(30030, "", invalid_image_tags[0..]), image_items[0..]),
+        extract(&list_event(30030, "", invalid_image_tags[0..]), image_items[0..]),
     );
-    const hashtag_parsed = try list_extract(
+    const hashtag_parsed = try extract(
         &list_event(30003, "", bookmark_hashtag_tags[0..]),
         bookmark_items[0..],
     );
     try std.testing.expectEqual(ListKind.bookmark_set, hashtag_parsed.kind);
     try std.testing.expectEqual(@as(u16, 1), hashtag_parsed.item_count);
     try std.testing.expect(bookmark_items[0] == .hashtag);
-    const url_parsed = try list_extract(
+    const url_parsed = try extract(
         &list_event(30003, "", bookmark_url_tags[0..]),
         bookmark_items[0..],
     );
@@ -1734,7 +1734,7 @@ test "list extract returns buffer too small for public items" {
     const event = list_event(30000, "", tags[0..]);
     var items: [1]ListItem = undefined;
 
-    try std.testing.expectError(error.BufferTooSmall, list_extract(&event, items[0..]));
+    try std.testing.expectError(error.BufferTooSmall, extract(&event, items[0..]));
 }
 
 test "private list serializer emits escaped bounded json" {
@@ -1742,7 +1742,7 @@ test "private list serializer emits escaped bounded json" {
     const tags = [_]nip01_event.EventTag{.{ .items = tag_items[0..] }};
     var output: [128]u8 = undefined;
 
-    const json = try list_private_serialize_json(output[0..], tags[0..]);
+    const json = try private_serialize_json(output[0..], tags[0..]);
 
     try std.testing.expectEqualStrings(
         "[[\"x\",\"line\\nbreak\",\"\\\"quote\\\"\"]]",
@@ -1760,7 +1760,7 @@ test "private list json extract parses supported items and ignores unknown tags"
     var arena = std.heap.ArenaAllocator.init(std.testing.allocator);
     defer arena.deinit();
 
-    const parsed = try list_private_extract_json(
+    const parsed = try private_extract_json(
         10000,
         json,
         items[0..],
@@ -1782,7 +1782,7 @@ test "private bookmark json extract accepts bounded hashtag and url items" {
     var arena = std.heap.ArenaAllocator.init(std.testing.allocator);
     defer arena.deinit();
 
-    const parsed = try list_private_extract_json(
+    const parsed = try private_extract_json(
         10003,
         json,
         items[0..],
@@ -1814,7 +1814,7 @@ test "private list nip44 extract roundtrips mute list content" {
         .{ .items = word_tag[0..] },
     };
     var plaintext_json: [256]u8 = undefined;
-    const json = try list_private_serialize_json(plaintext_json[0..], tags[0..]);
+    const json = try private_serialize_json(plaintext_json[0..], tags[0..]);
 
     var nonce = [_]u8{0} ** limits.nip44_nonce_bytes;
     nonce[limits.nip44_nonce_bytes - 1] = 1;
@@ -1834,7 +1834,7 @@ test "private list nip44 extract roundtrips mute list content" {
     var arena = std.heap.ArenaAllocator.init(std.testing.allocator);
     defer arena.deinit();
 
-    const parsed = try list_private_extract_nip44(
+    const parsed = try private_extract_nip44(
         decrypted_plaintext[0..],
         &event,
         &private_key,
@@ -1858,7 +1858,7 @@ test "private list nip44 extract treats empty content as empty private set" {
     var arena = std.heap.ArenaAllocator.init(std.testing.allocator);
     defer arena.deinit();
 
-    const parsed = try list_private_extract_nip44(
+    const parsed = try private_extract_nip44(
         plaintext[0..],
         &event,
         &private_key,
@@ -1881,7 +1881,7 @@ test "private list extract rejects legacy nip04 marker malformed json and bad ta
 
     try std.testing.expectError(
         error.UnsupportedPrivateEncoding,
-        list_private_extract_nip44(
+        private_extract_nip44(
             plaintext[0..],
             &legacy,
             &private_key,
@@ -1891,11 +1891,11 @@ test "private list extract rejects legacy nip04 marker malformed json and bad ta
     );
     try std.testing.expectError(
         error.InvalidPrivateJson,
-        list_private_extract_json(10000, "{", items[0..], arena.allocator()),
+        private_extract_json(10000, "{", items[0..], arena.allocator()),
     );
     try std.testing.expectError(
         error.InvalidRelayUrl,
-        list_private_extract_json(
+        private_extract_json(
             10006,
             "[[\"relay\",\"https://relay.example\"]]",
             items[0..],

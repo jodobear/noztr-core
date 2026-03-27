@@ -101,7 +101,7 @@ pub const TagBuilder = struct {
 };
 
 /// Extracts bounded relay discovery metadata from a kind-30166 event.
-pub fn relay_discovery_extract(
+pub fn discovery_extract(
     event: *const nip01_event.Event,
     out_supported_nips: []u16,
     out_requirements: []RelayRequirement,
@@ -134,7 +134,7 @@ pub fn relay_discovery_extract(
 }
 
 /// Extracts bounded relay monitor announcement metadata from a kind-10166 event.
-pub fn relay_monitor_extract(
+pub fn monitor_extract(
     event: *const nip01_event.Event,
     out_timeouts: []RelayMonitorTimeout,
     out_checks: [][]const u8,
@@ -156,7 +156,7 @@ pub fn relay_monitor_extract(
     return info;
 }
 
-pub fn relay_discovery_build_url_tag(
+pub fn discovery_build_url_tag(
     output: *TagBuilder,
     relay_url: []const u8,
 ) RelayDiscoveryError!nip01_event.EventTag {
@@ -172,7 +172,7 @@ pub fn relay_discovery_build_url_tag(
     return output.as_event_tag();
 }
 
-pub fn relay_discovery_build_pubkey_tag(
+pub fn discovery_build_pubkey_tag(
     output: *TagBuilder,
     relay_pubkey: *const [32]u8,
 ) RelayDiscoveryError!nip01_event.EventTag {
@@ -189,7 +189,7 @@ pub fn relay_discovery_build_pubkey_tag(
     return output.as_event_tag();
 }
 
-pub fn relay_discovery_build_rtt_tag(
+pub fn discovery_build_rtt_tag(
     output: *TagBuilder,
     metric: DiscoveryRttMetric,
     milliseconds: u32,
@@ -209,7 +209,7 @@ pub fn relay_discovery_build_rtt_tag(
     return output.as_event_tag();
 }
 
-pub fn relay_discovery_build_network_tag(
+pub fn discovery_build_network_tag(
     output: *TagBuilder,
     network_type: []const u8,
 ) RelayDiscoveryError!nip01_event.EventTag {
@@ -222,7 +222,7 @@ pub fn relay_discovery_build_network_tag(
     return output.as_event_tag();
 }
 
-pub fn relay_discovery_build_relay_type_tag(
+pub fn discovery_build_relay_type_tag(
     output: *TagBuilder,
     relay_type: []const u8,
 ) RelayDiscoveryError!nip01_event.EventTag {
@@ -235,7 +235,7 @@ pub fn relay_discovery_build_relay_type_tag(
     return output.as_event_tag();
 }
 
-pub fn relay_discovery_build_supported_nip_tag(
+pub fn discovery_build_supported_nip_tag(
     output: *TagBuilder,
     nip_number: u16,
 ) RelayDiscoveryError!nip01_event.EventTag {
@@ -251,7 +251,7 @@ pub fn relay_discovery_build_supported_nip_tag(
     return output.as_event_tag();
 }
 
-pub fn relay_discovery_build_requirement_tag(
+pub fn discovery_build_requirement_tag(
     output: *TagBuilder,
     requirement: []const u8,
     enabled: bool,
@@ -269,7 +269,7 @@ pub fn relay_discovery_build_requirement_tag(
     return output.as_event_tag();
 }
 
-pub fn relay_discovery_build_topic_tag(
+pub fn discovery_build_topic_tag(
     output: *TagBuilder,
     topic: []const u8,
 ) RelayDiscoveryError!nip01_event.EventTag {
@@ -282,7 +282,7 @@ pub fn relay_discovery_build_topic_tag(
     return output.as_event_tag();
 }
 
-pub fn relay_discovery_build_kind_tag(
+pub fn discovery_build_kind_tag(
     output: *TagBuilder,
     kind: u32,
     accepted: bool,
@@ -298,7 +298,7 @@ pub fn relay_discovery_build_kind_tag(
     return output.as_event_tag();
 }
 
-pub fn relay_discovery_build_geohash_tag(
+pub fn discovery_build_geohash_tag(
     output: *TagBuilder,
     geohash: []const u8,
 ) RelayDiscoveryError!nip01_event.EventTag {
@@ -311,7 +311,7 @@ pub fn relay_discovery_build_geohash_tag(
     return output.as_event_tag();
 }
 
-pub fn relay_monitor_build_frequency_tag(
+pub fn monitor_build_frequency_tag(
     output: *TagBuilder,
     frequency_seconds: u64,
 ) RelayDiscoveryError!nip01_event.EventTag {
@@ -329,7 +329,7 @@ pub fn relay_monitor_build_frequency_tag(
     return output.as_event_tag();
 }
 
-pub fn relay_monitor_build_timeout_tag(
+pub fn monitor_build_timeout_tag(
     output: *TagBuilder,
     milliseconds: u32,
     check: ?[]const u8,
@@ -356,7 +356,7 @@ pub fn relay_monitor_build_timeout_tag(
     return output.as_event_tag();
 }
 
-pub fn relay_monitor_build_check_tag(
+pub fn monitor_build_check_tag(
     output: *TagBuilder,
     check: []const u8,
 ) RelayDiscoveryError!nip01_event.EventTag {
@@ -369,7 +369,7 @@ pub fn relay_monitor_build_check_tag(
     return output.as_event_tag();
 }
 
-pub fn relay_monitor_build_geohash_tag(
+pub fn monitor_build_geohash_tag(
     output: *TagBuilder,
     geohash: []const u8,
 ) RelayDiscoveryError!nip01_event.EventTag {
@@ -495,10 +495,9 @@ fn apply_identity_tag(
 }
 
 fn parse_identity_value(text: []const u8) error{InvalidIdentity}!RelayIdentity {
-    std.debug.assert(text.len <= limits.tag_item_bytes_max);
     std.debug.assert(limits.pubkey_hex_length == 64);
 
-    if (text.len == 0) return error.InvalidIdentity;
+    if (text.len == 0 or text.len > limits.tag_item_bytes_max) return error.InvalidIdentity;
     if (relay_url_validate(text)) |_| {
         return .{ .relay_url = text };
     } else |_| {}
@@ -641,19 +640,18 @@ fn append_check(
 }
 
 fn parse_nip_number(text: []const u8) error{InvalidValue}!u16 {
-    std.debug.assert(text.len <= limits.tag_item_bytes_max);
     std.debug.assert(@sizeOf(u16) == 2);
 
+    if (text.len == 0 or text.len > limits.tag_item_bytes_max) return error.InvalidValue;
     const value = std.fmt.parseUnsigned(u16, text, 10) catch return error.InvalidValue;
     if (value == 0) return error.InvalidValue;
     return value;
 }
 
 fn parse_requirement(text: []const u8) error{InvalidValue}!RelayRequirement {
-    std.debug.assert(text.len <= limits.tag_item_bytes_max);
     std.debug.assert(text.len <= std.math.maxInt(u16));
 
-    if (text.len == 0) return error.InvalidValue;
+    if (text.len == 0 or text.len > limits.tag_item_bytes_max) return error.InvalidValue;
     if (text[0] == '!') {
         return .{
             .name = try parse_lower_token(text[1..]),
@@ -667,10 +665,9 @@ fn parse_requirement(text: []const u8) error{InvalidValue}!RelayRequirement {
 }
 
 fn parse_kind_policy(text: []const u8) error{InvalidValue}!RelayKindPolicy {
-    std.debug.assert(text.len <= limits.tag_item_bytes_max);
     std.debug.assert(limits.kind_max == std.math.maxInt(u16));
 
-    if (text.len == 0) return error.InvalidValue;
+    if (text.len == 0 or text.len > limits.tag_item_bytes_max) return error.InvalidValue;
     const accepted = text[0] != '!';
     const number_text = if (accepted) text else text[1..];
     const kind = std.fmt.parseUnsigned(u32, number_text, 10) catch return error.InvalidValue;
@@ -704,23 +701,22 @@ fn parse_timeout_tag(tag: nip01_event.EventTag) error{InvalidValue}!RelayMonitor
 }
 
 fn parse_frequency(text: []const u8) error{InvalidValue}!u64 {
-    std.debug.assert(text.len <= limits.tag_item_bytes_max);
     std.debug.assert(@sizeOf(u64) == 8);
 
+    if (text.len == 0 or text.len > limits.tag_item_bytes_max) return error.InvalidValue;
     const value = std.fmt.parseUnsigned(u64, text, 10) catch return error.InvalidValue;
     if (value == 0) return error.InvalidValue;
     return value;
 }
 
 fn parse_u32_text(text: []const u8) error{InvalidValue}!u32 {
-    std.debug.assert(text.len <= limits.tag_item_bytes_max);
     std.debug.assert(@sizeOf(u32) == 4);
 
+    if (text.len == 0 or text.len > limits.tag_item_bytes_max) return error.InvalidValue;
     return std.fmt.parseUnsigned(u32, text, 10) catch return error.InvalidValue;
 }
 
 fn parse_lower_token(text: []const u8) error{InvalidValue}![]const u8 {
-    std.debug.assert(text.len <= limits.tag_item_bytes_max);
     std.debug.assert(text.len <= limits.content_bytes_max);
 
     if (text.len == 0 or text.len > limits.tag_item_bytes_max) return error.InvalidValue;
@@ -734,7 +730,6 @@ fn parse_lower_token(text: []const u8) error{InvalidValue}![]const u8 {
 }
 
 fn parse_pascal_token(text: []const u8) error{InvalidValue}![]const u8 {
-    std.debug.assert(text.len <= limits.tag_item_bytes_max);
     std.debug.assert(text.len <= limits.content_bytes_max);
 
     if (text.len == 0 or text.len > limits.tag_item_bytes_max) return error.InvalidValue;
@@ -748,7 +743,6 @@ fn parse_pascal_token(text: []const u8) error{InvalidValue}![]const u8 {
 }
 
 fn parse_topic(text: []const u8) error{InvalidValue}![]const u8 {
-    std.debug.assert(text.len <= limits.tag_item_bytes_max);
     std.debug.assert(text.len <= limits.content_bytes_max);
 
     if (text.len == 0 or text.len > limits.tag_item_bytes_max) return error.InvalidValue;
@@ -761,7 +755,6 @@ fn parse_topic(text: []const u8) error{InvalidValue}![]const u8 {
 }
 
 fn parse_geohash(text: []const u8) error{InvalidValue}![]const u8 {
-    std.debug.assert(text.len <= limits.tag_item_bytes_max);
     std.debug.assert(text.len <= limits.content_bytes_max);
 
     if (text.len == 0 or text.len > limits.tag_item_bytes_max) return error.InvalidValue;
@@ -885,15 +878,15 @@ test "relay discovery extract parses bounded metadata and normalized identity ta
     var geo_tag = TagBuilder{};
 
     const tags = [_]nip01_event.EventTag{
-        try relay_discovery_build_url_tag(&d_tag, "WSS://Relay.EXAMPLE:443/path?drop=1"),
-        try relay_discovery_build_rtt_tag(&rtt_tag, .open, 234),
-        try relay_discovery_build_network_tag(&network_tag, "clearnet"),
-        try relay_discovery_build_relay_type_tag(&type_tag, "PrivateInbox"),
-        try relay_discovery_build_supported_nip_tag(&nip_tag, 11),
-        try relay_discovery_build_requirement_tag(&req_tag, "payment", false),
-        try relay_discovery_build_topic_tag(&topic_tag, "nsfw"),
-        try relay_discovery_build_kind_tag(&kind_tag, 1, false),
-        try relay_discovery_build_geohash_tag(&geo_tag, "ww8p1r4t8"),
+        try discovery_build_url_tag(&d_tag, "WSS://Relay.EXAMPLE:443/path?drop=1"),
+        try discovery_build_rtt_tag(&rtt_tag, .open, 234),
+        try discovery_build_network_tag(&network_tag, "clearnet"),
+        try discovery_build_relay_type_tag(&type_tag, "PrivateInbox"),
+        try discovery_build_supported_nip_tag(&nip_tag, 11),
+        try discovery_build_requirement_tag(&req_tag, "payment", false),
+        try discovery_build_topic_tag(&topic_tag, "nsfw"),
+        try discovery_build_kind_tag(&kind_tag, 1, false),
+        try discovery_build_geohash_tag(&geo_tag, "ww8p1r4t8"),
     };
     const event = build_event(discovery_kind, tags[0..], "{\"name\":\"relay\"}");
     var supported_nips: [2]u16 = undefined;
@@ -901,7 +894,7 @@ test "relay discovery extract parses bounded metadata and normalized identity ta
     var topics: [2][]const u8 = undefined;
     var kind_policies: [2]RelayKindPolicy = undefined;
 
-    const parsed = try relay_discovery_extract(
+    const parsed = try discovery_extract(
         &event,
         supported_nips[0..],
         requirements[0..],
@@ -911,7 +904,7 @@ test "relay discovery extract parses bounded metadata and normalized identity ta
 
     try std.testing.expect(parsed.identity == .relay_url);
     try std.testing.expectEqualStrings(
-        "WSS://Relay.EXAMPLE:443/path?drop=1",
+        "wss://relay.example/path",
         parsed.identity.relay_url,
     );
     try std.testing.expectEqualStrings("{\"name\":\"relay\"}", parsed.content);
@@ -936,7 +929,7 @@ test "relay discovery extract accepts relay pubkey identity" {
     var id_tag = TagBuilder{};
     const relay_pubkey = [_]u8{0xaa} ** 32;
     const tags = [_]nip01_event.EventTag{
-        try relay_discovery_build_pubkey_tag(&id_tag, &relay_pubkey),
+        try discovery_build_pubkey_tag(&id_tag, &relay_pubkey),
     };
     const event = build_event(discovery_kind, tags[0..], "");
 
@@ -944,7 +937,7 @@ test "relay discovery extract accepts relay pubkey identity" {
     var requirements: [1]RelayRequirement = undefined;
     var topics: [1][]const u8 = undefined;
     var kind_policies: [1]RelayKindPolicy = undefined;
-    const parsed = try relay_discovery_extract(
+    const parsed = try discovery_extract(
         &event,
         supported_nips[0..],
         requirements[0..],
@@ -962,17 +955,17 @@ test "relay monitor extract parses canonical and ambiguous timeout orders" {
     var check_tag = TagBuilder{};
     var geo_tag = TagBuilder{};
     const tags = [_]nip01_event.EventTag{
-        try relay_monitor_build_frequency_tag(&freq_tag, 3600),
-        try relay_monitor_build_timeout_tag(&timeout_tag, 5000, "open"),
+        try monitor_build_frequency_tag(&freq_tag, 3600),
+        try monitor_build_timeout_tag(&timeout_tag, 5000, "open"),
         .{ .items = &.{ "timeout", "3000", "read" } },
-        try relay_monitor_build_check_tag(&check_tag, "dns"),
-        try relay_monitor_build_geohash_tag(&geo_tag, "ww8p1r4t8"),
+        try monitor_build_check_tag(&check_tag, "dns"),
+        try monitor_build_geohash_tag(&geo_tag, "ww8p1r4t8"),
     };
     const event = build_event(monitor_kind, tags[0..], "");
     var timeouts: [2]RelayMonitorTimeout = undefined;
     var checks: [1][]const u8 = undefined;
 
-    const parsed = try relay_monitor_extract(&event, timeouts[0..], checks[0..]);
+    const parsed = try monitor_extract(&event, timeouts[0..], checks[0..]);
 
     try std.testing.expectEqual(@as(u64, 3600), parsed.frequency_seconds);
     try std.testing.expectEqual(@as(u16, 2), parsed.timeout_count);
@@ -993,11 +986,11 @@ test "relay discovery and monitor direct invalid input stays typed" {
 
     try std.testing.expectError(
         error.InvalidTopicTag,
-        relay_discovery_build_topic_tag(&topic_tag, overlong[0..]),
+        discovery_build_topic_tag(&topic_tag, overlong[0..]),
     );
     try std.testing.expectError(
         error.InvalidTimeoutTag,
-        relay_monitor_build_timeout_tag(&timeout_tag, 3000, overlong[0..]),
+        monitor_build_timeout_tag(&timeout_tag, 3000, overlong[0..]),
     );
 }
 
@@ -1010,7 +1003,7 @@ test "relay discovery and monitor reject malformed tags deterministically" {
     var kind_policies: [1]RelayKindPolicy = undefined;
     try std.testing.expectError(
         error.InvalidIdentifierTag,
-        relay_discovery_extract(
+        discovery_extract(
             &discovery_event,
             supported_nips[0..],
             requirements[0..],
@@ -1028,6 +1021,6 @@ test "relay discovery and monitor reject malformed tags deterministically" {
     var checks: [1][]const u8 = undefined;
     try std.testing.expectError(
         error.InvalidTimeoutTag,
-        relay_monitor_extract(&monitor_event, timeouts[0..], checks[0..]),
+        monitor_extract(&monitor_event, timeouts[0..], checks[0..]),
     );
 }

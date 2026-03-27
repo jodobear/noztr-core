@@ -13,6 +13,13 @@ For the public versioning policy, see
 
 ## [Unreleased]
 
+### Changed
+
+- shortened remaining route-local function families in:
+  - `nip51_lists`
+  - `nip66_relay_discovery`
+  - `nip78_app_data`
+
 ## [0.1.0-rc.6] - 2026-03-25
 
 Release type: breaking rc

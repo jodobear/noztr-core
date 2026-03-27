@@ -428,11 +428,11 @@ These are the quickest symbol-level routes into the modules most downstream user
 
 ### `nip78_app_data`
 
-- `app_data_is_supported`
+- `is_supported`
   - check whether an event is the narrow `kind:30078` app-data surface
-- `app_data_extract`
+- `extract`
   - extract the required `d` identifier and opaque content
-- `app_data_build_identifier_tag`
+- `build_identifier_tag`
   - build the required canonical identifier tag
 - start example:
   - [nip78_example.zig](../../examples/nip78_example.zig)
@@ -480,13 +480,13 @@ These are the quickest symbol-level routes into the modules most downstream user
 
 ### `nip66_relay_discovery`
 
-- `relay_discovery_extract`
+- `discovery_extract`
   - extract bounded kind-`30166` relay discovery metadata and repeated tags
-- `relay_monitor_extract`
+- `monitor_extract`
   - extract bounded kind-`10166` relay monitor announcement metadata
-- `relay_discovery_build_*` / `relay_monitor_build_*`
+- `discovery_build_*` / `monitor_build_*`
   - build canonical relay discovery and monitor tags without relay policy
-- `relay_monitor_build_timeout_tag`
+- `monitor_build_timeout_tag`
   - emits the canonical example form `["timeout", "<check>", "<milliseconds>"]`
   - the parser also accepts `["timeout", "<milliseconds>", "<check>"]` because the current `NIP-66`
     prose and example disagree on ordering

@@ -164,6 +164,29 @@ If your project depends on `noztr-core`:
 - `nwc_build_*` -> `build_*`
 - `nwc_format_info_capabilities` -> `format_info_capabilities`
 
+### `nip51_lists`
+
+- `list_kind_classify` -> `kind_classify`
+- `list_is_supported` -> `is_supported`
+- `list_extract` -> `extract`
+- `list_build_identifier_tag` -> `build_identifier_tag`
+- `list_private_serialize_json` -> `private_serialize_json`
+- `list_private_extract_json` -> `private_extract_json`
+- `list_private_extract_nip44` -> `private_extract_nip44`
+
+### `nip66_relay_discovery`
+
+- `relay_discovery_extract` -> `discovery_extract`
+- `relay_monitor_extract` -> `monitor_extract`
+- `relay_discovery_build_*` -> `discovery_build_*`
+- `relay_monitor_build_*` -> `monitor_build_*`
+
+### `nip78_app_data`
+
+- `app_data_is_supported` -> `is_supported`
+- `app_data_extract` -> `extract`
+- `app_data_build_identifier_tag` -> `build_identifier_tag`
+
 ## Scope
 
 This is naming and surface-noise cleanup only.

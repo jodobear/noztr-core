@@ -14,10 +14,10 @@ test "NIP-78 example: extract app-data identifier and build the d tag" {
     );
     var built: noztr.nip78_app_data.TagBuilder = .{};
 
-    const info = try noztr.nip78_app_data.app_data_extract(&event);
-    const tag = try noztr.nip78_app_data.app_data_build_identifier_tag(&built, "user-settings");
+    const info = try noztr.nip78_app_data.extract(&event);
+    const tag = try noztr.nip78_app_data.build_identifier_tag(&built, "user-settings");
 
-    try std.testing.expect(noztr.nip78_app_data.app_data_is_supported(&event));
+    try std.testing.expect(noztr.nip78_app_data.is_supported(&event));
     try std.testing.expectEqualStrings("user-settings", info.identifier);
     try std.testing.expectEqualStrings("{\"theme\":\"dark\"}", info.content);
     try std.testing.expectEqualStrings("d", tag.items[0]);

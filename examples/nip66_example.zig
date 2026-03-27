@@ -14,48 +14,48 @@ test "NIP-66 example: extract relay discovery and monitor metadata" {
     var monitor_timeout = noztr.nip66_relay_discovery.TagBuilder{};
     var monitor_check = noztr.nip66_relay_discovery.TagBuilder{};
     const discovery_tags = [_]noztr.nip01_event.EventTag{
-        try noztr.nip66_relay_discovery.relay_discovery_build_url_tag(
+        try noztr.nip66_relay_discovery.discovery_build_url_tag(
             &discovery_id,
             "wss://relay.example",
         ),
-        try noztr.nip66_relay_discovery.relay_discovery_build_rtt_tag(
+        try noztr.nip66_relay_discovery.discovery_build_rtt_tag(
             &discovery_rtt,
             .open,
             200,
         ),
-        try noztr.nip66_relay_discovery.relay_discovery_build_network_tag(
+        try noztr.nip66_relay_discovery.discovery_build_network_tag(
             &discovery_network,
             "clearnet",
         ),
-        try noztr.nip66_relay_discovery.relay_discovery_build_supported_nip_tag(
+        try noztr.nip66_relay_discovery.discovery_build_supported_nip_tag(
             &discovery_nip,
             11,
         ),
-        try noztr.nip66_relay_discovery.relay_discovery_build_requirement_tag(
+        try noztr.nip66_relay_discovery.discovery_build_requirement_tag(
             &discovery_requirement,
             "auth",
             true,
         ),
-        try noztr.nip66_relay_discovery.relay_discovery_build_topic_tag(
+        try noztr.nip66_relay_discovery.discovery_build_topic_tag(
             &discovery_topic,
             "nostr",
         ),
-        try noztr.nip66_relay_discovery.relay_discovery_build_geohash_tag(
+        try noztr.nip66_relay_discovery.discovery_build_geohash_tag(
             &discovery_geo,
             "ww8p1r4t8",
         ),
     };
     const monitor_tags = [_]noztr.nip01_event.EventTag{
-        try noztr.nip66_relay_discovery.relay_monitor_build_frequency_tag(
+        try noztr.nip66_relay_discovery.monitor_build_frequency_tag(
             &monitor_frequency,
             3600,
         ),
-        try noztr.nip66_relay_discovery.relay_monitor_build_timeout_tag(
+        try noztr.nip66_relay_discovery.monitor_build_timeout_tag(
             &monitor_timeout,
             3000,
             "open",
         ),
-        try noztr.nip66_relay_discovery.relay_monitor_build_check_tag(&monitor_check, "dns"),
+        try noztr.nip66_relay_discovery.monitor_build_check_tag(&monitor_check, "dns"),
     };
     const discovery_event = common.simple_event(
         noztr.nip66_relay_discovery.discovery_kind,
@@ -76,14 +76,14 @@ test "NIP-66 example: extract relay discovery and monitor metadata" {
     var timeouts: [1]noztr.nip66_relay_discovery.RelayMonitorTimeout = undefined;
     var checks: [1][]const u8 = undefined;
 
-    const discovery = try noztr.nip66_relay_discovery.relay_discovery_extract(
+    const discovery = try noztr.nip66_relay_discovery.discovery_extract(
         &discovery_event,
         supported_nips[0..],
         requirements[0..],
         topics[0..],
         kind_policies[0..],
     );
-    const monitor = try noztr.nip66_relay_discovery.relay_monitor_extract(
+    const monitor = try noztr.nip66_relay_discovery.monitor_extract(
         &monitor_event,
         timeouts[0..],
         checks[0..],

@@ -29,7 +29,7 @@ pub const TagBuilder = struct {
 };
 
 /// Returns whether an event is the strict `kind:30078` app-data helper surface.
-pub fn app_data_is_supported(event: *const nip01_event.Event) bool {
+pub fn is_supported(event: *const nip01_event.Event) bool {
     std.debug.assert(@intFromPtr(event) != 0);
     std.debug.assert(event.kind <= limits.kind_max);
 
@@ -37,7 +37,7 @@ pub fn app_data_is_supported(event: *const nip01_event.Event) bool {
 }
 
 /// Extracts the strict `d` identifier and opaque content from a `kind:30078` event.
-pub fn app_data_extract(event: *const nip01_event.Event) AppDataError!AppData {
+pub fn extract(event: *const nip01_event.Event) AppDataError!AppData {
     std.debug.assert(@intFromPtr(event) != 0);
     std.debug.assert(event.tags.len <= limits.tags_max);
 
@@ -56,7 +56,7 @@ pub fn app_data_extract(event: *const nip01_event.Event) AppDataError!AppData {
 }
 
 /// Builds the required `d` tag for `kind:30078` app-data events.
-pub fn app_data_build_identifier_tag(
+pub fn build_identifier_tag(
     output: *TagBuilder,
     identifier: []const u8,
 ) AppDataError!nip01_event.EventTag {
@@ -108,7 +108,7 @@ test "NIP-78 extracts identifier and opaque content" {
         .sig = [_]u8{0x24} ** 64,
     };
 
-    const info = try app_data_extract(&event);
+    const info = try extract(&event);
 
     try std.testing.expectEqualStrings("app-settings", info.identifier);
     try std.testing.expectEqualStrings("{\"theme\":\"dark\"}", info.content);
@@ -129,13 +129,13 @@ test "NIP-78 rejects duplicate identifiers" {
         .sig = [_]u8{0x25} ** 64,
     };
 
-    try std.testing.expectError(error.DuplicateIdentifierTag, app_data_extract(&event));
+    try std.testing.expectError(error.DuplicateIdentifierTag, extract(&event));
 }
 
 test "NIP-78 builds canonical identifier tag" {
     var built: TagBuilder = .{};
 
-    const tag = try app_data_build_identifier_tag(&built, "profile-cache");
+    const tag = try build_identifier_tag(&built, "profile-cache");
 
     try std.testing.expectEqualStrings("d", tag.items[0]);
     try std.testing.expectEqualStrings("profile-cache", tag.items[1]);

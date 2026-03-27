@@ -19,7 +19,7 @@ test "NIP-66 adversarial example: reject invalid discovery identity" {
 
     try std.testing.expectError(
         error.InvalidIdentifierTag,
-        noztr.nip66_relay_discovery.relay_discovery_extract(
+        noztr.nip66_relay_discovery.discovery_extract(
             &event,
             supported_nips[0..],
             requirements[0..],
@@ -45,6 +45,6 @@ test "NIP-66 adversarial example: reject malformed timeout tag" {
 
     try std.testing.expectError(
         error.InvalidTimeoutTag,
-        noztr.nip66_relay_discovery.relay_monitor_extract(&event, timeouts[0..], checks[0..]),
+        noztr.nip66_relay_discovery.monitor_extract(&event, timeouts[0..], checks[0..]),
     );
 }

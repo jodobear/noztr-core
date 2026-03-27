@@ -617,11 +617,11 @@ test "root exports limits and error namespaces" {
     try std.testing.expect(@TypeOf(PowVerifiedIdError) == type);
     try std.testing.expect(@TypeOf(DeleteExtractCheckedError) == type);
     try std.testing.expect(
-        @TypeOf(nip51_lists.list_private_serialize_json) ==
+        @TypeOf(nip51_lists.private_serialize_json) ==
             fn ([]u8, []const nip01_event.EventTag) nip51_lists.PrivateListError![]const u8,
     );
     try std.testing.expect(
-        @TypeOf(nip51_lists.list_private_extract_json) ==
+        @TypeOf(nip51_lists.private_extract_json) ==
             fn (
                 u32,
                 []const u8,
@@ -630,7 +630,7 @@ test "root exports limits and error namespaces" {
             ) nip51_lists.PrivateListError!nip51_lists.PrivateList,
     );
     try std.testing.expect(
-        @TypeOf(nip51_lists.list_private_extract_nip44) ==
+        @TypeOf(nip51_lists.private_extract_nip44) ==
             fn (
                 []u8,
                 *const nip01_event.Event,
@@ -638,6 +638,21 @@ test "root exports limits and error namespaces" {
                 []nip51_lists.ListItem,
                 std.mem.Allocator,
             ) nip51_lists.PrivateListError!nip51_lists.PrivateList,
+    );
+    try std.testing.expect(
+        @TypeOf(nip78_app_data.is_supported) ==
+            fn (*const nip01_event.Event) bool,
+    );
+    try std.testing.expect(
+        @TypeOf(nip78_app_data.extract) ==
+            fn (*const nip01_event.Event) nip78_app_data.AppDataError!nip78_app_data.AppData,
+    );
+    try std.testing.expect(
+        @TypeOf(nip78_app_data.build_identifier_tag) ==
+            fn (
+                *nip78_app_data.TagBuilder,
+                []const u8,
+            ) nip78_app_data.AppDataError!nip01_event.EventTag,
     );
     try std.testing.expect(
         @TypeOf(nip19_bech32.nip19_encode) ==
@@ -704,14 +719,14 @@ test "root exports limits and error namespaces" {
             ) nip25_reactions.ReactionError!nip25_reactions.ReactionTarget,
     );
     try std.testing.expect(
-        @TypeOf(nip51_lists.list_extract) ==
+        @TypeOf(nip51_lists.extract) ==
             fn (
                 *const nip01_event.Event,
                 []nip51_lists.ListItem,
             ) nip51_lists.ListError!nip51_lists.List,
     );
     try std.testing.expect(
-        @TypeOf(nip51_lists.list_build_identifier_tag) ==
+        @TypeOf(nip51_lists.build_identifier_tag) ==
             fn (
                 *nip51_lists.TagBuilder,
                 []const u8,
@@ -730,6 +745,39 @@ test "root exports limits and error namespaces" {
                 *nip51_lists.TagBuilder,
                 *const nip51_lists.ListEmoji,
             ) nip51_lists.ListError!nip01_event.EventTag,
+    );
+    try std.testing.expect(
+        @TypeOf(nip66_relay_discovery.discovery_extract) ==
+            fn (
+                *const nip01_event.Event,
+                []u16,
+                []nip66_relay_discovery.RelayRequirement,
+                [][]const u8,
+                []nip66_relay_discovery.RelayKindPolicy,
+            ) nip66_relay_discovery.RelayDiscoveryError!nip66_relay_discovery.Discovery,
+    );
+    try std.testing.expect(
+        @TypeOf(nip66_relay_discovery.monitor_extract) ==
+            fn (
+                *const nip01_event.Event,
+                []nip66_relay_discovery.RelayMonitorTimeout,
+                [][]const u8,
+            ) nip66_relay_discovery.RelayDiscoveryError!nip66_relay_discovery.Monitor,
+    );
+    try std.testing.expect(
+        @TypeOf(nip66_relay_discovery.discovery_build_url_tag) ==
+            fn (
+                *nip66_relay_discovery.TagBuilder,
+                []const u8,
+            ) nip66_relay_discovery.RelayDiscoveryError!nip01_event.EventTag,
+    );
+    try std.testing.expect(
+        @TypeOf(nip66_relay_discovery.monitor_build_timeout_tag) ==
+            fn (
+                *nip66_relay_discovery.TagBuilder,
+                u32,
+                ?[]const u8,
+            ) nip66_relay_discovery.RelayDiscoveryError!nip01_event.EventTag,
     );
     try std.testing.expect(
         @TypeOf(nip05_identity.address_parse) ==
@@ -1227,7 +1275,7 @@ test "I4 optional paths do not interfere with strict core defaults" {
         .tags = list_tags[0..],
     };
     var list_output: [1]nip51_lists.ListItem = undefined;
-    const list_info = try nip51_lists.list_extract(&list_event, list_output[0..]);
+    const list_info = try nip51_lists.extract(&list_event, list_output[0..]);
     try std.testing.expectEqual(nip51_lists.ListKind.follow_set, list_info.kind);
     try std.testing.expectEqual(@as(u16, 1), list_info.item_count);
     try std.testing.expectEqualStrings("team", list_info.metadata.identifier.?);

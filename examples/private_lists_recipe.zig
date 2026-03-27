@@ -15,13 +15,13 @@ test "recipe: private list helpers roundtrip without decrypt flow noise" {
     const public_event = common.simple_event(10000, [_]u8{0x51} ** 32, "", tags[0..]);
     var json_output: [256]u8 = undefined;
     var public_items: [2]noztr.nip51_lists.ListItem = undefined;
-    const json = try noztr.nip51_lists.list_private_serialize_json(json_output[0..], tags[0..]);
+    const json = try noztr.nip51_lists.private_serialize_json(json_output[0..], tags[0..]);
     var items: [2]noztr.nip51_lists.ListItem = undefined;
     var arena = std.heap.ArenaAllocator.init(std.testing.allocator);
     defer arena.deinit();
 
-    const public_info = try noztr.nip51_lists.list_extract(&public_event, public_items[0..]);
-    const parsed = try noztr.nip51_lists.list_private_extract_json(
+    const public_info = try noztr.nip51_lists.extract(&public_event, public_items[0..]);
+    const parsed = try noztr.nip51_lists.private_extract_json(
         10000,
         json,
         items[0..],
