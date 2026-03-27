@@ -21,6 +21,8 @@ For the public versioning policy, see
   - `nip78_app_data`
   - `nip34_git`
   - `nip64_chess_pgn`
+  - `nip11`
+  - `nip44`
 
 ## [0.1.0-rc.6] - 2026-03-25
 

@@ -431,9 +431,9 @@ fn decrypt_private_content(
     std.debug.assert(@intFromPtr(author_private_key) != 0);
     std.debug.assert(@intFromPtr(author_pubkey) != 0);
 
-    var conversation_key = try nip44.nip44_get_conversation_key(author_private_key, author_pubkey);
+    var conversation_key = try nip44.get_conversation_key(author_private_key, author_pubkey);
     defer std.crypto.secureZero(u8, conversation_key[0..]);
-    return nip44.nip44_decrypt_from_base64(plaintext_output, &conversation_key, ciphertext);
+    return nip44.decrypt_from_base64(plaintext_output, &conversation_key, ciphertext);
 }
 
 fn encrypt_private_content(
@@ -445,9 +445,9 @@ fn encrypt_private_content(
     std.debug.assert(@intFromPtr(author_private_key) != 0);
     std.debug.assert(@intFromPtr(author_pubkey) != 0);
 
-    var conversation_key = try nip44.nip44_get_conversation_key(author_private_key, author_pubkey);
+    var conversation_key = try nip44.get_conversation_key(author_private_key, author_pubkey);
     defer std.crypto.secureZero(u8, conversation_key[0..]);
-    return nip44.nip44_encrypt_to_base64(
+    return nip44.encrypt_to_base64(
         output,
         &conversation_key,
         plaintext,

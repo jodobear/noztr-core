@@ -42,7 +42,7 @@ pub const DecodedPayload = struct {
 };
 
 /// Derive the NIP-44 conversation key from secp256k1 key agreement.
-pub fn nip44_get_conversation_key(
+pub fn get_conversation_key(
     private_key: *const [32]u8,
     public_key: *const [32]u8,
 ) ConversationEncryptionError![32]u8 {
@@ -63,7 +63,7 @@ pub fn nip44_get_conversation_key(
 }
 
 /// Compute padded plaintext length without the 2-byte prefix.
-pub fn nip44_calc_padded_plaintext_len(plaintext_len: u16) ConversationEncryptionError!u32 {
+pub fn calc_padded_plaintext_len(plaintext_len: u16) ConversationEncryptionError!u32 {
     std.debug.assert(plaintext_len <= limits.nip44_plaintext_max_bytes);
     std.debug.assert(limits.nip44_plaintext_min_bytes > 0);
 
@@ -88,7 +88,7 @@ pub fn nip44_calc_padded_plaintext_len(plaintext_len: u16) ConversationEncryptio
 }
 
 /// Encrypt plaintext with random nonce callback and output base64 payload.
-pub fn nip44_encrypt_to_base64(
+pub fn encrypt_to_base64(
     output: []u8,
     conversation_key: *const [32]u8,
     plaintext: []const u8,
@@ -101,11 +101,11 @@ pub fn nip44_encrypt_to_base64(
     var nonce: [32]u8 = undefined;
     defer wipe_bytes(nonce[0..]);
     try nonce_provider(nonce_ctx, &nonce);
-    return nip44_encrypt_with_nonce_to_base64(output, conversation_key, plaintext, &nonce);
+    return encrypt_with_nonce_to_base64(output, conversation_key, plaintext, &nonce);
 }
 
 /// Encrypt plaintext with a fixed caller-provided nonce.
-pub fn nip44_encrypt_with_nonce_to_base64(
+pub fn encrypt_with_nonce_to_base64(
     output: []u8,
     conversation_key: *const [32]u8,
     plaintext: []const u8,
@@ -118,7 +118,7 @@ pub fn nip44_encrypt_with_nonce_to_base64(
     try validate_fixed_size_secret(nonce[0..], limits.nip44_nonce_bytes);
 
     const plaintext_len_u16 = try validate_plaintext_len(plaintext.len);
-    const padded_len = try nip44_calc_padded_plaintext_len(plaintext_len_u16);
+    const padded_len = try calc_padded_plaintext_len(plaintext_len_u16);
     const ciphertext_len: usize = @as(usize, padded_len) + 2;
 
     const raw_len = 1 + limits.nip44_nonce_bytes + ciphertext_len + limits.nip44_mac_bytes;
@@ -150,7 +150,7 @@ pub fn nip44_encrypt_with_nonce_to_base64(
 }
 
 /// Decode and split NIP-44 base64 payload into frame components.
-pub fn nip44_decode_payload(
+pub fn decode_payload(
     payload_base64: []const u8,
     raw_output: []u8,
 ) ConversationEncryptionError!DecodedPayload {
@@ -190,7 +190,7 @@ pub fn nip44_decode_payload(
 }
 
 /// Decrypt a NIP-44 base64 payload into caller-provided plaintext buffer.
-pub fn nip44_decrypt_from_base64(
+pub fn decrypt_from_base64(
     output_plaintext: []u8,
     conversation_key: *const [32]u8,
     payload_base64: []const u8,
@@ -203,7 +203,7 @@ pub fn nip44_decrypt_from_base64(
     var decoded_raw: [limits.nip44_payload_decoded_max_bytes]u8 = undefined;
     defer wipe_bytes(decoded_raw[0..]);
 
-    const decoded = try nip44_decode_payload(payload_base64, decoded_raw[0..]);
+    const decoded = try decode_payload(payload_base64, decoded_raw[0..]);
 
     var message_keys: [limits.nip44_message_keys_bytes]u8 = undefined;
     defer wipe_bytes(message_keys[0..]);
@@ -413,7 +413,7 @@ fn remove_padding(output_plaintext: []u8, padded_plaintext: []const u8) Conversa
         return error.InvalidPadding;
     }
 
-    const expected_padded_len = try nip44_calc_padded_plaintext_len(plaintext_len);
+    const expected_padded_len = try calc_padded_plaintext_len(plaintext_len);
     const expected_total = @as(usize, expected_padded_len) + 2;
     if (padded_plaintext.len != expected_total) {
         return error.InvalidPadding;
@@ -591,23 +591,23 @@ test "nip44 valid vectors derive conversation keys" {
         const private_key = try parse_hex_32(vector.private_key_hex);
         const public_key = try parse_hex_32(vector.public_key_hex);
         const expected = try parse_hex_32(vector.conversation_key_hex);
-        const actual = try nip44_get_conversation_key(&private_key, &public_key);
+        const actual = try get_conversation_key(&private_key, &public_key);
         try std.testing.expectEqualSlices(u8, expected[0..], actual[0..]);
         try std.testing.expect(actual[0] <= 255);
     }
 }
 
 test "nip44 valid vectors calc padded length" {
-    try std.testing.expectEqual(@as(u32, 32), try nip44_calc_padded_plaintext_len(16));
-    try std.testing.expectEqual(@as(u32, 32), try nip44_calc_padded_plaintext_len(32));
-    try std.testing.expectEqual(@as(u32, 64), try nip44_calc_padded_plaintext_len(33));
-    try std.testing.expectEqual(@as(u32, 64), try nip44_calc_padded_plaintext_len(49));
-    try std.testing.expectEqual(@as(u32, 96), try nip44_calc_padded_plaintext_len(65));
+    try std.testing.expectEqual(@as(u32, 32), try calc_padded_plaintext_len(16));
+    try std.testing.expectEqual(@as(u32, 32), try calc_padded_plaintext_len(32));
+    try std.testing.expectEqual(@as(u32, 64), try calc_padded_plaintext_len(33));
+    try std.testing.expectEqual(@as(u32, 64), try calc_padded_plaintext_len(49));
+    try std.testing.expectEqual(@as(u32, 96), try calc_padded_plaintext_len(65));
 }
 
 test "nip44 padded length upper boundary accepts max plaintext" {
     const max_len = limits.nip44_plaintext_max_bytes;
-    const max_padded = try nip44_calc_padded_plaintext_len(max_len);
+    const max_padded = try calc_padded_plaintext_len(max_len);
     try std.testing.expectEqual(@as(u32, 65_536), max_padded);
     try std.testing.expect(max_padded <= limits.nip44_ciphertext_max_bytes - 2);
 }
@@ -618,7 +618,7 @@ test "nip44 valid vectors encrypt and decrypt parity" {
         const nonce = try parse_hex_32(vector.nonce_hex);
 
         var encoded_output: [limits.nip44_payload_base64_max_bytes]u8 = undefined;
-        const encoded = try nip44_encrypt_with_nonce_to_base64(
+        const encoded = try encrypt_with_nonce_to_base64(
             encoded_output[0..],
             &conversation_key,
             vector.plaintext,
@@ -627,7 +627,7 @@ test "nip44 valid vectors encrypt and decrypt parity" {
         try std.testing.expectEqualStrings(vector.payload_base64, encoded);
 
         var plaintext_output: [limits.nip44_plaintext_max_bytes]u8 = undefined;
-        const decrypted = try nip44_decrypt_from_base64(
+        const decrypted = try decrypt_from_base64(
             plaintext_output[0..],
             &conversation_key,
             vector.payload_base64,
@@ -643,13 +643,13 @@ test "nip44 deterministic fixed nonce encrypt path" {
 
     var encoded_a: [limits.nip44_payload_base64_max_bytes]u8 = undefined;
     var encoded_b: [limits.nip44_payload_base64_max_bytes]u8 = undefined;
-    const payload_a = try nip44_encrypt_with_nonce_to_base64(
+    const payload_a = try encrypt_with_nonce_to_base64(
         encoded_a[0..],
         &conversation_key,
         vector.plaintext,
         &nonce,
     );
-    const payload_b = try nip44_encrypt_with_nonce_to_base64(
+    const payload_b = try encrypt_with_nonce_to_base64(
         encoded_b[0..],
         &conversation_key,
         vector.plaintext,
@@ -666,7 +666,7 @@ test "nip44 decrypt staged check order enforces version before mac" {
     const decoded_len = try base64_standard.Decoder.calcSizeForSlice(vector.payload_base64);
 
     var decoded: [limits.nip44_payload_decoded_max_bytes]u8 = undefined;
-    _ = try nip44_decode_payload(vector.payload_base64, decoded[0..]);
+    _ = try decode_payload(vector.payload_base64, decoded[0..]);
 
     decoded[0] = 3;
     decoded[decoded_len - 1] ^= 1;
@@ -677,7 +677,7 @@ test "nip44 decrypt staged check order enforces version before mac" {
     var plaintext_output: [limits.nip44_plaintext_max_bytes]u8 = undefined;
     try std.testing.expectError(
         error.InvalidVersion,
-        nip44_decrypt_from_base64(plaintext_output[0..], &conversation_key, encoded),
+        decrypt_from_base64(plaintext_output[0..], &conversation_key, encoded),
     );
 }
 
@@ -686,7 +686,7 @@ test "nip44 decrypt staged check order enforces mac before padding" {
     const conversation_key = try parse_hex_32(vector.conversation_key_hex);
 
     var decoded: [limits.nip44_payload_decoded_max_bytes]u8 = undefined;
-    const decoded_payload = try nip44_decode_payload(vector.payload_base64, decoded[0..]);
+    const decoded_payload = try decode_payload(vector.payload_base64, decoded[0..]);
     const decoded_len = 1 + limits.nip44_nonce_bytes + decoded_payload.ciphertext.len +
         limits.nip44_mac_bytes;
 
@@ -700,7 +700,7 @@ test "nip44 decrypt staged check order enforces mac before padding" {
     var plaintext_output: [limits.nip44_plaintext_max_bytes]u8 = undefined;
     try std.testing.expectError(
         error.InvalidMac,
-        nip44_decrypt_from_base64(plaintext_output[0..], &conversation_key, encoded),
+        decrypt_from_base64(plaintext_output[0..], &conversation_key, encoded),
     );
 }
 
@@ -723,15 +723,15 @@ test "nip44 invalid vectors and forcing checks" {
     const valid_conversation_key = try parse_hex_32(encrypt_vectors[0].conversation_key_hex);
     try std.testing.expectError(
         error.UnsupportedEncoding,
-        nip44_decrypt_from_base64(plaintext_output[0..], &valid_conversation_key, "#AQ=="),
+        decrypt_from_base64(plaintext_output[0..], &valid_conversation_key, "#AQ=="),
     );
     try std.testing.expectError(
         error.InvalidPayloadLength,
-        nip44_decrypt_from_base64(plaintext_output[0..], &bad_mac_conversation_key, "AQ=="),
+        decrypt_from_base64(plaintext_output[0..], &bad_mac_conversation_key, "AQ=="),
     );
     try std.testing.expectError(
         error.InvalidMac,
-        nip44_decrypt_from_base64(
+        decrypt_from_base64(
             plaintext_output[0..],
             &bad_mac_conversation_key,
             bad_mac_ciphertext,
@@ -739,7 +739,7 @@ test "nip44 invalid vectors and forcing checks" {
     );
     try std.testing.expectError(
         error.InvalidPadding,
-        nip44_decrypt_from_base64(
+        decrypt_from_base64(
             plaintext_output[0..],
             &bad_padding_conversation_key,
             bad_padding_ciphertext,
@@ -751,7 +751,7 @@ test "nip44 invalid vectors and forcing checks" {
     const nonce = try parse_hex_32(encrypt_vectors[0].nonce_hex);
     try std.testing.expectError(
         error.BufferTooSmall,
-        nip44_encrypt_with_nonce_to_base64(
+        encrypt_with_nonce_to_base64(
             tiny_output[0..],
             &conversation_key,
             encrypt_vectors[0].plaintext,
@@ -766,7 +766,7 @@ test "nip44 decrypt rejects invalid utf8 plaintext" {
     const invalid_utf8 = [_]u8{ 0xC3, 0x28 };
 
     var encoded_output: [limits.nip44_payload_base64_max_bytes]u8 = undefined;
-    const payload = try nip44_encrypt_with_nonce_to_base64(
+    const payload = try encrypt_with_nonce_to_base64(
         encoded_output[0..],
         &conversation_key,
         invalid_utf8[0..],
@@ -776,7 +776,7 @@ test "nip44 decrypt rejects invalid utf8 plaintext" {
     var plaintext_output: [limits.nip44_plaintext_max_bytes]u8 = undefined;
     try std.testing.expectError(
         error.InvalidPadding,
-        nip44_decrypt_from_base64(plaintext_output[0..], &conversation_key, payload),
+        decrypt_from_base64(plaintext_output[0..], &conversation_key, payload),
     );
 }
 
@@ -787,14 +787,14 @@ test "nip44 additional public error forcing" {
     var encoded_output: [limits.nip44_payload_base64_max_bytes]u8 = undefined;
     try std.testing.expectError(
         error.InvalidPlaintextLength,
-        nip44_encrypt_with_nonce_to_base64(encoded_output[0..], &conversation_key, "", &nonce),
+        encrypt_with_nonce_to_base64(encoded_output[0..], &conversation_key, "", &nonce),
     );
 
     var invalid_len_plaintext: [@as(usize, limits.nip44_plaintext_max_bytes) + 1]u8 = undefined;
     @memset(invalid_len_plaintext[0..], 'a');
     try std.testing.expectError(
         error.InvalidPlaintextLength,
-        nip44_encrypt_with_nonce_to_base64(
+        encrypt_with_nonce_to_base64(
             encoded_output[0..],
             &conversation_key,
             invalid_len_plaintext[0..],
@@ -804,7 +804,7 @@ test "nip44 additional public error forcing" {
 
     try std.testing.expectError(
         error.EntropyUnavailable,
-        nip44_encrypt_to_base64(
+        encrypt_to_base64(
             encoded_output[0..],
             &conversation_key,
             "a",
@@ -816,7 +816,7 @@ test "nip44 additional public error forcing" {
     var decoded_raw_tiny: [10]u8 = undefined;
     try std.testing.expectError(
         error.BufferTooSmall,
-        nip44_decode_payload(encrypt_vectors[0].payload_base64, decoded_raw_tiny[0..]),
+        decode_payload(encrypt_vectors[0].payload_base64, decoded_raw_tiny[0..]),
     );
 
     var invalid_base64_payload = [_]u8{0} ** limits.nip44_payload_base64_min_bytes;
@@ -825,7 +825,7 @@ test "nip44 additional public error forcing" {
     var decoded_raw: [limits.nip44_payload_decoded_max_bytes]u8 = undefined;
     try std.testing.expectError(
         error.InvalidBase64,
-        nip44_decode_payload(invalid_base64_payload[0..], decoded_raw[0..]),
+        decode_payload(invalid_base64_payload[0..], decoded_raw[0..]),
     );
 
     try std.testing.expectError(
@@ -846,7 +846,7 @@ test "nip44 encrypt and decrypt max plaintext boundary" {
     }
 
     var payload_base64: [limits.nip44_payload_base64_max_bytes]u8 = undefined;
-    const encoded = try nip44_encrypt_with_nonce_to_base64(
+    const encoded = try encrypt_with_nonce_to_base64(
         payload_base64[0..],
         &conversation_key,
         max_plaintext[0..],
@@ -854,7 +854,7 @@ test "nip44 encrypt and decrypt max plaintext boundary" {
     );
 
     var decrypted_plaintext: [limits.nip44_plaintext_max_bytes]u8 = undefined;
-    const decrypted = try nip44_decrypt_from_base64(
+    const decrypted = try decrypt_from_base64(
         decrypted_plaintext[0..],
         &conversation_key,
         encoded,
@@ -877,11 +877,11 @@ test "nip44 conversation key invalid key forcing" {
 
     try std.testing.expectError(
         error.InvalidPrivateKey,
-        nip44_get_conversation_key(&invalid_private, &valid_public),
+        get_conversation_key(&invalid_private, &valid_public),
     );
     try std.testing.expectError(
         error.InvalidPublicKey,
-        nip44_get_conversation_key(&valid_private, &invalid_public),
+        get_conversation_key(&valid_private, &invalid_public),
     );
 }
 

@@ -342,10 +342,10 @@ pub fn private_extract_nip44(
         return error.UnsupportedPrivateEncoding;
     }
 
-    var conversation_key = try nip44.nip44_get_conversation_key(author_private_key, &event.pubkey);
+    var conversation_key = try nip44.get_conversation_key(author_private_key, &event.pubkey);
     defer std.crypto.secureZero(u8, conversation_key[0..]);
 
-    const plaintext = try nip44.nip44_decrypt_from_base64(
+    const plaintext = try nip44.decrypt_from_base64(
         plaintext_output,
         &conversation_key,
         event.content,
@@ -1819,9 +1819,9 @@ test "private list nip44 extract roundtrips mute list content" {
     var nonce = [_]u8{0} ** limits.nip44_nonce_bytes;
     nonce[limits.nip44_nonce_bytes - 1] = 1;
     var payload_output: [limits.nip44_payload_base64_max_bytes]u8 = undefined;
-    var conversation_key = try nip44.nip44_get_conversation_key(&private_key, &pubkey);
+    var conversation_key = try nip44.get_conversation_key(&private_key, &pubkey);
     defer std.crypto.secureZero(u8, conversation_key[0..]);
-    const payload = try nip44.nip44_encrypt_with_nonce_to_base64(
+    const payload = try nip44.encrypt_with_nonce_to_base64(
         payload_output[0..],
         &conversation_key,
         json,

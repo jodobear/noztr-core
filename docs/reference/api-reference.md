@@ -263,9 +263,9 @@ These are the quickest symbol-level routes into the modules most downstream user
 
 ### `nip11`
 
-- `nip11_parse_document`
+- `parse_document`
   - parse a relay information document into typed state
-- `nip11_validate_known_fields`
+- `validate_known_fields`
   - validate parsed known fields and limitation ranges
 - start example:
   - [nip11_example.zig](../../examples/nip11_example.zig)

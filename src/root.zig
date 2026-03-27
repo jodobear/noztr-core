@@ -1147,11 +1147,11 @@ test "root exports limits and error namespaces" {
             ) nip46_remote_signing.RemoteSigningError!?[]const []const u8,
     );
     try std.testing.expect(
-        @TypeOf(nip44.nip44_get_conversation_key) ==
+        @TypeOf(nip44.get_conversation_key) ==
             fn (*const [32]u8, *const [32]u8) nip44.ConversationEncryptionError![32]u8,
     );
     try std.testing.expect(
-        @TypeOf(nip44.nip44_encrypt_to_base64) ==
+        @TypeOf(nip44.encrypt_to_base64) ==
             fn (
                 []u8,
                 *const [32]u8,
@@ -1161,8 +1161,16 @@ test "root exports limits and error namespaces" {
             ) nip44.ConversationEncryptionError![]const u8,
     );
     try std.testing.expect(
-        @TypeOf(nip44.nip44_decrypt_from_base64) ==
+        @TypeOf(nip44.decrypt_from_base64) ==
             fn ([]u8, *const [32]u8, []const u8) nip44.ConversationEncryptionError![]const u8,
+    );
+    try std.testing.expect(
+        @TypeOf(nip11.parse_document) ==
+            fn ([]const u8, std.mem.Allocator) nip11.RelayInfoError!nip11.RelayInformationDocument,
+    );
+    try std.testing.expect(
+        @TypeOf(nip11.validate_known_fields) ==
+            fn (*const nip11.RelayInformationDocument) nip11.RelayInfoError!void,
     );
     try std.testing.expect(
         @TypeOf(nip59_wrap.nip59_validate_wrap_structure) ==

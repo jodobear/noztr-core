@@ -132,7 +132,7 @@ pub fn nip59_unwrap(
 
     try nip59_validate_wrap_structure(wrap_event);
 
-    var wrap_conversation_key = nip44.nip44_get_conversation_key(
+    var wrap_conversation_key = nip44.get_conversation_key(
         recipient_private_key_material,
         &wrap_event.pubkey,
     ) catch {
@@ -142,7 +142,7 @@ pub fn nip59_unwrap(
 
     var seal_plaintext: [limits.nip44_plaintext_max_bytes]u8 = undefined;
     defer wipe_bytes(seal_plaintext[0..]);
-    const seal_json = nip44.nip44_decrypt_from_base64(
+    const seal_json = nip44.decrypt_from_base64(
         seal_plaintext[0..],
         &wrap_conversation_key,
         wrap_event.content,
@@ -155,7 +155,7 @@ pub fn nip59_unwrap(
     };
     try validate_seal_event(&seal_event);
 
-    var seal_conversation_key = nip44.nip44_get_conversation_key(
+    var seal_conversation_key = nip44.get_conversation_key(
         recipient_private_key_material,
         &seal_event.pubkey,
     ) catch {
@@ -165,7 +165,7 @@ pub fn nip59_unwrap(
 
     var rumor_plaintext: [limits.nip44_plaintext_max_bytes]u8 = undefined;
     defer wipe_bytes(rumor_plaintext[0..]);
-    const rumor_json = nip44.nip44_decrypt_from_base64(
+    const rumor_json = nip44.decrypt_from_base64(
         rumor_plaintext[0..],
         &seal_conversation_key,
         seal_event.content,
@@ -221,10 +221,10 @@ fn encrypt_payload_for_recipient(
     std.debug.assert(@intFromPtr(sender_secret) != 0);
     std.debug.assert(@intFromPtr(recipient_pubkey) != 0);
 
-    var conversation_key = try nip44.nip44_get_conversation_key(sender_secret, recipient_pubkey);
+    var conversation_key = try nip44.get_conversation_key(sender_secret, recipient_pubkey);
     defer wipe_bytes(conversation_key[0..]);
 
-    return nip44.nip44_encrypt_with_nonce_to_base64(output, &conversation_key, plaintext, nonce);
+    return nip44.encrypt_with_nonce_to_base64(output, &conversation_key, plaintext, nonce);
 }
 
 fn build_seal_event(
@@ -709,13 +709,13 @@ fn build_valid_wrap_fixture(
         rumor_pubkey_override,
     );
 
-    var seal_conversation_key = try nip44.nip44_get_conversation_key(
+    var seal_conversation_key = try nip44.get_conversation_key(
         recipient_private_key,
         sender_pubkey,
     );
     defer wipe_bytes(seal_conversation_key[0..]);
 
-    const seal_payload = try nip44.nip44_encrypt_with_nonce_to_base64(
+    const seal_payload = try nip44.encrypt_with_nonce_to_base64(
         output_fixture.seal_payload_storage[0..],
         &seal_conversation_key,
         output_fixture.rumor.json,
@@ -731,13 +731,13 @@ fn build_valid_wrap_fixture(
         output_fixture.seal_payload,
     );
 
-    var wrap_conversation_key = try nip44.nip44_get_conversation_key(
+    var wrap_conversation_key = try nip44.get_conversation_key(
         recipient_private_key,
         wrap_pubkey,
     );
     defer wipe_bytes(wrap_conversation_key[0..]);
 
-    const wrap_payload = try nip44.nip44_encrypt_with_nonce_to_base64(
+    const wrap_payload = try nip44.encrypt_with_nonce_to_base64(
         output_fixture.wrap_payload_storage[0..],
         &wrap_conversation_key,
         output_fixture.seal.json,
@@ -833,13 +833,13 @@ fn rebuild_seal_after_rumor_mutation(
     std.debug.assert(@intFromPtr(sender_pubkey) != 0);
     std.debug.assert(@intFromPtr(sender_secret) != 0);
 
-    var seal_conversation_key = try nip44.nip44_get_conversation_key(
+    var seal_conversation_key = try nip44.get_conversation_key(
         recipient_private_key,
         sender_pubkey,
     );
     defer wipe_bytes(seal_conversation_key[0..]);
 
-    fixture.seal_payload = try nip44.nip44_encrypt_with_nonce_to_base64(
+    fixture.seal_payload = try nip44.encrypt_with_nonce_to_base64(
         fixture.seal_payload_storage[0..],
         &seal_conversation_key,
         fixture.rumor.json,
@@ -866,13 +866,13 @@ fn rebuild_wrap_after_seal_mutation(
     std.debug.assert(@intFromPtr(wrap_pubkey) != 0);
     std.debug.assert(@intFromPtr(wrap_secret) != 0);
 
-    var wrap_conversation_key = try nip44.nip44_get_conversation_key(
+    var wrap_conversation_key = try nip44.get_conversation_key(
         recipient_private_key,
         wrap_pubkey,
     );
     defer wipe_bytes(wrap_conversation_key[0..]);
 
-    fixture.wrap_payload = try nip44.nip44_encrypt_with_nonce_to_base64(
+    fixture.wrap_payload = try nip44.encrypt_with_nonce_to_base64(
         fixture.wrap_payload_storage[0..],
         &wrap_conversation_key,
         fixture.seal.json,

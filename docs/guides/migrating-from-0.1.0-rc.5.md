@@ -201,6 +201,20 @@ If your project depends on `noztr-core`:
 - `chess_pgn_validate` -> `validate`
 - `chess_pgn_build_alt_tag` -> `build_alt_tag`
 
+### `nip11`
+
+- `nip11_parse_document` -> `parse_document`
+- `nip11_validate_known_fields` -> `validate_known_fields`
+
+### `nip44`
+
+- `nip44_get_conversation_key` -> `get_conversation_key`
+- `nip44_calc_padded_plaintext_len` -> `calc_padded_plaintext_len`
+- `nip44_encrypt_to_base64` -> `encrypt_to_base64`
+- `nip44_encrypt_with_nonce_to_base64` -> `encrypt_with_nonce_to_base64`
+- `nip44_decode_payload` -> `decode_payload`
+- `nip44_decrypt_from_base64` -> `decrypt_from_base64`
+
 ## Scope
 
 This is naming and surface-noise cleanup only.

@@ -41,12 +41,12 @@ test "recipe: build and unwrap a full signed NIP-17 gift wrap transcript" {
         &([_]u8{0x44} ** 32),
         &([_]u8{0x55} ** 32),
     );
-    const wrap_conversation_key = try noztr.nip44.nip44_get_conversation_key(
+    const wrap_conversation_key = try noztr.nip44.get_conversation_key(
         &recipient_secret,
         &wrap.event.pubkey,
     );
     var seal_plaintext: [1536]u8 = undefined;
-    const decrypted_seal = try noztr.nip44.nip44_decrypt_from_base64(
+    const decrypted_seal = try noztr.nip44.decrypt_from_base64(
         seal_plaintext[0..],
         &wrap_conversation_key,
         wrap.event.content,

@@ -580,7 +580,7 @@ pub fn envelope_validate(
         }
     }
 
-    _ = nip44.nip44_decode_payload(event.content, nip44_scratch) catch {
+    _ = nip44.decode_payload(event.content, nip44_scratch) catch {
         return error.InvalidEncryptedContent;
     };
     return resolved;

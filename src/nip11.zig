@@ -30,7 +30,7 @@ pub const RelayInformationDocument = struct {
     limitation: ?Limitation = null,
 };
 
-pub fn nip11_parse_document(
+pub fn parse_document(
     input: []const u8,
     scratch: std.mem.Allocator,
 ) RelayInfoError!RelayInformationDocument {
@@ -64,11 +64,11 @@ pub fn nip11_parse_document(
         try parse_known_top_level_field(&document, key, value, scratch);
     }
 
-    try nip11_validate_known_fields(&document);
+    try validate_known_fields(&document);
     return document;
 }
 
-pub fn nip11_validate_known_fields(doc: *const RelayInformationDocument) RelayInfoError!void {
+pub fn validate_known_fields(doc: *const RelayInformationDocument) RelayInfoError!void {
     std.debug.assert(doc.supported_nips.len <= std.math.maxInt(usize));
     std.debug.assert(@intFromPtr(doc) != 0);
 
@@ -351,7 +351,7 @@ test "nip11 parses partial valid document" {
         "\"name\":\"relay-a\"," ++
         "\"supported_nips\":[1,11,42]," ++
         "\"limitation\":{\"max_message_length\":2048}}";
-    const document = try nip11_parse_document(input, arena.allocator());
+    const document = try parse_document(input, arena.allocator());
 
     try std.testing.expectEqualStrings("relay-a", document.name.?);
     try std.testing.expect(document.supported_nips.len == 3);
@@ -367,7 +367,7 @@ test "nip11 valid vectors satisfy strict known-field and unknown-field behavior"
         "\"name\":\"relay-a\"," ++
         "\"supported_nips\":[1]," ++
         "\"unknown_field\":{\"anything\":true}}";
-    const document_1 = try nip11_parse_document(vector_1, arena.allocator());
+    const document_1 = try parse_document(vector_1, arena.allocator());
 
     try std.testing.expectEqualStrings("relay-a", document_1.name.?);
     try std.testing.expectEqual(@as(u32, 1), document_1.supported_nips[0]);
@@ -377,7 +377,7 @@ test "nip11 valid vectors satisfy strict known-field and unknown-field behavior"
         "\"pubkey\":\"0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef\"," ++
         "\"limitation\":{\"max_subscriptions\":100," ++
         "\"unknown_nested\":9}}";
-    const document_2 = try nip11_parse_document(vector_2, arena.allocator());
+    const document_2 = try parse_document(vector_2, arena.allocator());
 
     try std.testing.expectEqualStrings(
         "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
@@ -389,7 +389,7 @@ test "nip11 valid vectors satisfy strict known-field and unknown-field behavior"
         "{" ++
         "\"name\":\"relay-b\"," ++
         "\"supported_nips\":[]}";
-    const document_3 = try nip11_parse_document(vector_3, arena.allocator());
+    const document_3 = try parse_document(vector_3, arena.allocator());
 
     try std.testing.expectEqualStrings("relay-b", document_3.name.?);
     try std.testing.expectEqual(@as(usize, 0), document_3.supported_nips.len);
@@ -400,13 +400,13 @@ test "nip11 valid vectors satisfy strict known-field and unknown-field behavior"
         "\"max_message_length\":1024," ++
         "\"max_content_length\":4096," ++
         "\"min_pow_difficulty\":20}}";
-    const document_4 = try nip11_parse_document(vector_4, arena.allocator());
+    const document_4 = try parse_document(vector_4, arena.allocator());
 
     try std.testing.expect(document_4.limitation != null);
     try std.testing.expectEqual(@as(u32, 1024), document_4.limitation.?.max_message_length.?);
 
     const vector_5 = "{}";
-    const document_5 = try nip11_parse_document(vector_5, arena.allocator());
+    const document_5 = try parse_document(vector_5, arena.allocator());
 
     try std.testing.expect(document_5.name == null);
     try std.testing.expectEqual(@as(usize, 0), document_5.supported_nips.len);
@@ -435,7 +435,7 @@ test "nip11 parses full spec-shaped document while ignoring unmodeled fields" {
         "\"auth_required\":true," ++
         "\"payment_required\":false," ++
         "\"restricted_writes\":true}}";
-    const document = try nip11_parse_document(input, arena.allocator());
+    const document = try parse_document(input, arena.allocator());
 
     try std.testing.expectEqualStrings("relay-full", document.name.?);
     try std.testing.expectEqualStrings(
@@ -465,7 +465,7 @@ test "nip11 parsed known strings stay valid after input mutation" {
     const input = try std.testing.allocator.dupe(u8, input_json);
     defer std.testing.allocator.free(input);
 
-    const document = try nip11_parse_document(input, arena.allocator());
+    const document = try parse_document(input, arena.allocator());
 
     try std.testing.expectEqualStrings(expected_name, document.name.?);
     try std.testing.expectEqualStrings(expected_pubkey, document.pubkey.?);
@@ -488,56 +488,56 @@ test "nip11 invalid vectors reject typed failures" {
 
     try std.testing.expectError(
         error.InvalidKnownFieldType,
-        nip11_parse_document("{\"name\":10}", arena.allocator()),
+        parse_document("{\"name\":10}", arena.allocator()),
     );
     try std.testing.expectError(
         error.InvalidKnownFieldType,
-        nip11_parse_document("{\"pubkey\":3}", arena.allocator()),
+        parse_document("{\"pubkey\":3}", arena.allocator()),
     );
     try std.testing.expectError(
         error.InvalidPubkey,
-        nip11_parse_document("{\"pubkey\":\"aabbcc\"}", arena.allocator()),
+        parse_document("{\"pubkey\":\"aabbcc\"}", arena.allocator()),
     );
     try std.testing.expectError(
         error.InvalidPubkey,
-        nip11_parse_document(
+        parse_document(
             "{\"pubkey\":\"0123456789ABCDEF0123456789abcdef0123456789abcdef0123456789abcdef\"}",
             arena.allocator(),
         ),
     );
     try std.testing.expectError(
         error.InvalidPubkey,
-        nip11_parse_document(
+        parse_document(
             "{\"pubkey\":\"0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdé\"}",
             arena.allocator(),
         ),
     );
     try std.testing.expectError(
         error.InvalidKnownFieldType,
-        nip11_parse_document("{\"supported_nips\":\"11\"}", arena.allocator()),
+        parse_document("{\"supported_nips\":\"11\"}", arena.allocator()),
     );
     try std.testing.expectError(
         error.InvalidKnownFieldType,
-        nip11_parse_document("{\"supported_nips\":[1,\"x\"]}", arena.allocator()),
+        parse_document("{\"supported_nips\":[1,\"x\"]}", arena.allocator()),
     );
     try std.testing.expectError(
         error.InvalidStructuredField,
-        nip11_parse_document("{\"limitation\":\"bad\"}", arena.allocator()),
+        parse_document("{\"limitation\":\"bad\"}", arena.allocator()),
     );
     try std.testing.expectError(
         error.InvalidStructuredField,
-        nip11_parse_document(
+        parse_document(
             "{\"limitation\":{\"max_subscriptions\":\"x\"}}",
             arena.allocator(),
         ),
     );
     try std.testing.expectError(
         error.TooManySupportedNips,
-        nip11_parse_document(supported_nips_overflow_json, arena.allocator()),
+        parse_document(supported_nips_overflow_json, arena.allocator()),
     );
     try std.testing.expectError(
         error.LimitationOutOfRange,
-        nip11_parse_document("{\"limitation\":{\"min_pow_difficulty\":257}}", arena.allocator()),
+        parse_document("{\"limitation\":{\"min_pow_difficulty\":257}}", arena.allocator()),
     );
 }
 
@@ -547,7 +547,7 @@ test "nip11 forcing InvalidJson through malformed document" {
 
     try std.testing.expectError(
         error.InvalidJson,
-        nip11_parse_document("{\"name\":\"relay", arena.allocator()),
+        parse_document("{\"name\":\"relay", arena.allocator()),
     );
 }
 
@@ -563,7 +563,7 @@ test "nip11 forcing InputTooLong before parse stage" {
 
     try std.testing.expectError(
         error.InputTooLong,
-        nip11_parse_document(input, arena.allocator()),
+        parse_document(input, arena.allocator()),
     );
 }
 
@@ -574,6 +574,6 @@ test "nip11 maps allocator exhaustion to OutOfMemory" {
 
     try std.testing.expectError(
         error.OutOfMemory,
-        nip11_parse_document(input, tiny_allocator.allocator()),
+        parse_document(input, tiny_allocator.allocator()),
     );
 }

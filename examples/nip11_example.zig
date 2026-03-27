@@ -10,7 +10,7 @@ test "NIP-11 example: parse the bounded relay information subset" {
         "0123456789abcdef0123456789abcdef\",\"supported_nips\":[1,11,42]," ++
         "\"limitation\":{\"max_message_length\":65536}}";
 
-    const parsed = try noztr.nip11.nip11_parse_document(document, arena.allocator());
+    const parsed = try noztr.nip11.parse_document(document, arena.allocator());
 
     try std.testing.expectEqualStrings("relay.one", parsed.name.?);
     try std.testing.expectEqual(@as(usize, 3), parsed.supported_nips.len);

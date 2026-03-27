@@ -10,14 +10,14 @@ test "NIP-44 example: encrypt and decrypt with fixed conversation key and nonce"
     };
     const nonce = [_]u8{0} ** 31 ++ [_]u8{1};
     var encoded: [noztr.limits.nip44_payload_base64_max_bytes]u8 = undefined;
-    const payload = try noztr.nip44.nip44_encrypt_with_nonce_to_base64(
+    const payload = try noztr.nip44.encrypt_with_nonce_to_base64(
         encoded[0..],
         &conversation_key,
         "a",
         &nonce,
     );
     var plaintext: [noztr.limits.nip44_plaintext_max_bytes]u8 = undefined;
-    const decrypted = try noztr.nip44.nip44_decrypt_from_base64(
+    const decrypted = try noztr.nip44.decrypt_from_base64(
         plaintext[0..],
         &conversation_key,
         payload,
